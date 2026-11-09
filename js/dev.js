@@ -9,7 +9,7 @@ function devGame(){SAVE=DEVKEY;migrate(newGame());G.dev=1;G.gold=999999;G.tou=99
  for(const id of G.members){const h=G.h[id];h.lv=55;h.xp=0;h.hp=null;h.awLv=3;for(const j in JOBS)h.jobs[j]={lv:10,xp:0};}
  for(const k in G.fac)G.fac[k]=5;G.tower={cp:26,cur:26,max:30};G.kairou={cp:31,cur:31,max:31};devGear();devItems();devLegs();devRoyal();save();}
 function devItems(){for(const k in ITEMS)G.items[k]=9;for(const k in MATS)G.mats[k]=99;for(const k in STONES)G.stones[k]=9;}
-function devLegs(){Object.keys(LEG).forEach(k=>{const it=devLeg(k);if(it)G.inv.push(it);});}
+function devLegs(){Object.keys(LEG).filter(k=>!LEG[k].uq).forEach(k=>{const it=devLeg(k);if(it)G.inv.push(it);});}
 function devRoyal(){for(const s in ROYAL){const it=royalItem(s,40);it.unid=false;G.inv.push(it);}}
 function devStart(){SAVE=DEVKEY;const s=loadSave(),ov=$('#ov');
  const go=()=>{setSpeed(G.speed||2);enterTown('<b>開発者モード</b>――全要素を解放した状態。画面右下の「DEV」から各verの要素へ直行できる。<br><small>通常のセーブには一切影響しません</small>');};
@@ -42,7 +42,7 @@ function dev13(m){log((m||'<b>ver0.13 終章</b>')+`<br><small>残響${echoN()}/
   {l:'残響・全共鳴・クリアをリセット',f:()=>{G.flags.echo={};G.flags.zenkyo=0;G.flags.boss8=false;G.flags.endSeen=0;save();dev13('終章を未クリア状態に戻した');}},{l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
 function dev12(m){log((m||'<b>ver0.12 天への塔</b>　階を選んで直行'));
  menu([...[1,6,10,11,16,20,21,26,30].map(f=>({l:`${f}階`,s:f%10===0?'番人の階':'',f:()=>{G.tower.cp=Math.max(G.tower.cp,26);enterTower(f);}})),{l:'星核の守護者戦',f:()=>{AREAS.tower=makeTowerArea(30);G.tower.cur=30;devBattle([{kind:'boss7',lv:50}],'tower',{theme:'tower'});}},
-  {l:'レジェンド全種を受け取る',s:Object.keys(LEG).length+'種',f:()=>{devLegs();save();dev12('レジェンドを全種受け取った（装備画面で確認）');}},{l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
+  {l:'レジェンド全種を受け取る',s:Object.keys(LEG).filter(k=>!LEG[k].uq).length+'種',f:()=>{devLegs();save();dev12('レジェンドを全種受け取った（装備画面で確認）');}},{l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
 function dev11(m){log(m||'<b>ver0.11 覚醒の深化</b>');
  menu([{l:'覚醒の試練',cls:'ready',f:()=>trialMenu()},...[1,2,3].map(n=>({l:`全員の覚醒段階を${ROMAN[n]}に`,f:()=>{G.members.forEach(id=>G.h[id].awLv=n);save();dev11(`全員の覚醒段階を${ROMAN[n]}にした`);}})),{l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
 function devAreas(){menu([...Object.keys(AREAS).filter(k=>k!=='tower'&&k!=='kairou').map(k=>({l:AREAS[k].name,s:AREAS[k].rec||'',f:()=>enterField(k)})),{l:'戻る',cls:'back',f:()=>dvMenu()}],true);}

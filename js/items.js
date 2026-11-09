@@ -14,7 +14,7 @@ function genItem(ilv,minR=0,bonus=0,slot=null,rarFix=null){
  const rar=rarFix!=null?rarFix:rollRar(minR,bonus);
  if(!slot){const r=Math.random();slot=r<.28?'w':r<.4?'sub':r<.58?'head':r<.78?'body':'acc';}
  const it={uid:++G.uid,slot,ilv,rar,plus:0,ops:[],unid:rar>=3,lock:false,base:{}};
- if(rar===4){const ks=Object.keys(LEG).filter(k=>LEG[k].slot===slot);it.leg=ks.length?ks[Math.random()*ks.length|0]:Object.keys(LEG)[Math.random()*Object.keys(LEG).length|0];it.slot=slot=LEG[it.leg].slot;}
+ if(rar===4){const al=Object.keys(LEG).filter(k=>!LEG[k].uq),ks=al.filter(k=>LEG[k].slot===slot);it.leg=ks.length?ks[Math.random()*ks.length|0]:al[Math.random()*al.length|0];it.slot=slot=LEG[it.leg].slot;}
  const m=MATL(ilv);
  if(slot==='w'){it.who=(it.leg&&LEG[it.leg].who)||G.members[Math.random()*G.members.length|0];wbase(it,ilv,m);}
  else if(slot==='sub'){if(Math.random()<.5){it.base.def=Math.round(3+ilv*1.1);it.name=m+'の小盾';}else{it.base.res=Math.round(3+ilv*1.2);it.name='灯の護符';}}
