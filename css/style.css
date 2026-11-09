@@ -229,3 +229,12 @@ button,textarea{font-family:inherit}
 .ztile.bs{border-color:#d0506a}.ztile img{width:40px;height:40px;image-rendering:pixelated;display:block;margin:0 auto}
 .ztile span{display:block;font-size:9px;line-height:1.2;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ztile.un img{filter:brightness(.18)}.ztile.un span{color:#667}
+/* ===== ver0.16 音と絵 ===== */
+.pbrk{position:absolute;left:0;right:0;top:34%;text-align:center;font-size:24px;color:#fff;letter-spacing:2px;text-shadow:0 0 10px #ff7a30,0 0 4px #ff7a30,2px 2px 0 #000;pointer-events:none;z-index:30;animation:pbrk 1.4s ease-out forwards}
+.pbrk small{display:block;font-size:11px;letter-spacing:0;color:#ffd8b0;margin-top:2px}
+@keyframes pbrk{0%{transform:scale(2.4);opacity:0}14%{transform:scale(1);opacity:1}72%{opacity:1}100%{opacity:0;transform:translateY(-12px)}}
+.bgmB{font-family:inherit;font-size:11px;padding:4px 8px;border:1px solid #3a4275;background:#171c38;color:#8a90b8;border-radius:6px}
+.bgmB.on{color:#ffe27a;border-color:#8a7a3a}
+#top .bgmB{height:30px;min-width:44px;padding:0 6px}
+#ttap{position:absolute;left:0;right:0;top:56%;text-align:center;color:#ffe9a0;font-size:14px;letter-spacing:3px;text-shadow:0 0 8px #000;pointer-events:none;animation:ttap 1.1s steps(2) infinite}
+@keyframes ttap{50%{opacity:.15}}
