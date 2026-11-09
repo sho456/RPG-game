@@ -158,7 +158,7 @@ function encounter(e,first){F.p.path=[];const minLv=Math.min(...G.party.map(i=>G
 function afterBattle(mode){const e=F.cur;if(e&&mode!=='flee')F.en.splice(F.en.indexOf(e),1);F.cur=null;
  if(F.en.length<5&&Math.random()<.7)spawnOne();
  show('field');$('#ov').classList.add('hide');F.lock=false;hud(`${A.name}　<b>${A.rec.replace('推奨','')}</b>`);F.safe=mode==='flee'?3000:1500;
- if(B.opts.boss&&mode!=='flee')F.bossDown=true;log(mode==='flee'?'戦闘から離脱した。':B.opts.boss?`<b>${ED[A.boss.kind].name}を倒した！</b> 次の出撃でまた挑める`+(AREA==='haido'?'（翠の森が解放された）':''):'戦いに勝利した。'+goldTxt());fieldMenu();renderPartyStatic();fitField();
+ if(B.opts.boss&&mode!=='flee')F.bossDown=true;log(mode==='flee'?'戦闘から離脱した。':B.opts.boss?`<b>${B.enemies[0].name}を倒した！</b> 次の出撃でまた挑める`+(AREA==='haido'?'（翠の森が解放された）':''):'戦いに勝利した。'+goldTxt());fieldMenu();renderPartyStatic();fitField();
  if(mode===true&&B.opts.event==='erna'){G.flags.ernaMet=1;newMember('erna');save();fieldMenu('<b>エルナが仲間になった！</b> 「……悪くない腕ね。いいわ、付き合ってあげる」');renderPartyStatic();}
  if(mode===true&&B.opts.event==='balza'){G.flags.balzaMet=1;newMember('balza');save();fieldMenu('<b>バルザが仲間になった！</b> 「助かったわい。礼に、わしの槌を貸してやろう」');renderPartyStatic();}
  if(mode===true&&B.opts.event==='valk'){G.flags.valkMet=1;newMember('valk');SFX.aw();save();fieldMenu('<b>ヴァルクが仲間になった！</b> 「……いい灯だ。喰らうのはやめた。隣で燃えるほうが面白い」'+(G.party.includes('valk')?'':'（控えに入った）'));renderPartyStatic();}
