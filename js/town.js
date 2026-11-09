@@ -1,14 +1,15 @@
 /* ===== 灯都ルミナス ===== */
 function enterTown(m){show('town');setH(128);TOWN=makeTown(townP());gardenTick();$('#ov').classList.add('hide');healAll();save();townMenu(m);}
-function worldMap(){log('<b>ワールドマップ</b>　行き先を選ぶ'+goldTxt());
- menu([{l:'灰の街道'+(G.flags.boss1?' ★':''),s:AREAS.haido.rec,cls:'ready',f:()=>enterField('haido')},
-  {l:'翠の森・沈黙の図書遺跡'+(G.flags.boss2?' ★':''),s:G.flags.boss1?AREAS.midori.rec+'（第1章）':'灰の街道のボスを倒すと解放',cls:G.flags.boss1?'ready':'',dis:!G.flags.boss1,f:()=>enterField('midori')},
-  {l:'祈りの廃聖堂'+(G.flags.boss3?' ★':''),s:G.flags.boss2?AREAS.seido.rec+'（第2章）':'図書遺跡のボスを倒すと解放',cls:G.flags.boss2?'ready':'',dis:!G.flags.boss2,f:()=>enterField('seido')},
-  {l:'雷鳴高原・黒鉄鉱山'+(G.flags.boss4?' ★':''),s:G.flags.boss3?AREAS.raimei.rec+'（第3章）':'廃聖堂のボスを倒すと解放',cls:G.flags.boss3?'ready':'',dis:!G.flags.boss3,f:()=>enterField('raimei')},
-  {l:'東方の島・氷華の社'+(G.flags.boss5?' ★':''),s:G.flags.boss4?AREAS.kouka.rec+'（第4章）':'第3章のボスを倒すと解放',cls:G.flags.boss4?'ready':'',dis:!G.flags.boss4,f:()=>enterField('kouka')},
+function worldMap(){const nv=voidArea(G.sorties+1),vt=id=>nv===id?' ◆虚蝕化':'',vs=id=>nv===id?'虚蝕化中：敵が強くドロップ増　':'';
+ const ar=(id,nm,bf,need,un,ch)=>({l:nm+(G.flags[bf]?' ★':'')+vt(id),s:need?vs(id)+AREAS[id].rec+ch:un,cls:need?(nv===id?'ready vd':'ready'):'',dis:!need,f:()=>enterField(id)});
+ log('<b>ワールドマップ</b>　行き先を選ぶ'+goldTxt()+(G.flags.boss8?voidNews():''));
+ menu([ar('haido','灰の街道','boss1',true,'',''),ar('midori','翠の森・沈黙の図書遺跡','boss2',G.flags.boss1,'灰の街道のボスを倒すと解放','（第1章）'),
+  ar('seido','祈りの廃聖堂','boss3',G.flags.boss2,'図書遺跡のボスを倒すと解放','（第2章）'),ar('raimei','雷鳴高原・黒鉄鉱山','boss4',G.flags.boss3,'廃聖堂のボスを倒すと解放','（第3章）'),
+  ar('kouka','東方の島・氷華の社','boss5',G.flags.boss4,'第3章のボスを倒すと解放','（第4章）'),ar('ouito','沈んだ王都','boss6',G.flags.boss5,'第4章のボスを倒すと解放','（第5章）'),
   {l:'天への塔'+(G.flags.boss7?' ★':''),s:G.flags.boss6?`第6章（最高${(G.tower&&G.tower.max)||0}階）`:'第5章のボスを倒すと解放',cls:G.flags.boss6?'ready':'',dis:!G.flags.boss6,f:towerMenu},
-  {l:'沈んだ王都'+(G.flags.boss6?' ★':''),s:G.flags.boss5?AREAS.ouito.rec+'（第5章）':'第4章のボスを倒すと解放',cls:G.flags.boss5?'ready':'',dis:!G.flags.boss5,f:()=>enterField('ouito')},
-  {l:'星核の残響'+(G.flags.boss8?' ★':''),s:G.flags.boss7?AREAS.zankyo.rec+'（終章）':'天への塔の頂上を制すると解放',cls:G.flags.boss7?'ready':'',dis:!G.flags.boss7,f:()=>enterField('zankyo')},{l:'？？？',s:G.flags.boss8?'次の更新で解放（虚の回廊）':'？？？',dis:true,f:()=>{}},{l:'戻る',cls:'back',f:()=>townMenu()}],true);}
+  ar('zankyo','星核の残響','boss8',G.flags.boss7,'天への塔の頂上を制すると解放','（終章）'),
+  {l:'虚の回廊'+(G.flags.kr30?' ★':''),s:G.flags.boss8?`クリア後（最深${kst().max||0}層）`:'？？？',cls:G.flags.boss8?'ready':'',dis:!G.flags.boss8,f:kairouMenu},
+  ar('ryuu','竜の巣','boss9',G.flags.boss8,'？？？','（クリア後）'),{l:'戻る',cls:'back',f:()=>townMenu()}],true);}
 const QS=[{id:'q1',n:'灰狼退治',d:'灰狼を3体倒す',ok:()=>G.q.wolf>=3,pg:()=>`${Math.min(3,G.q.wolf)}/3`,rw:'150G',give:()=>{G.gold+=150;}},
  {id:'q2',n:'灰石の納品',d:'灰石を3個納める',ok:()=>G.mats.haiseki>=3,pg:()=>`${G.mats.haiseki}/3`,rw:'星の雫×1',give:()=>{G.mats.haiseki-=3;addItem('drop',1);}},
  {id:'q3',n:'街道の番人',d:'虚ろの番人を倒す',ok:()=>G.flags.boss1,pg:()=>G.flags.boss1?'達成':'未達成',rw:'500G・不死鳥の羽',give:()=>{G.gold+=500;addItem('feather',1);}}];
@@ -18,8 +19,8 @@ function shop(m){log((m||'<b>道具屋</b>　持ち込みは各9個まで')+gold
  const sell=Object.keys(MATS).reduce((a,k)=>a+(G.mats[k]||0)*MATS[k].p,0);
  menu([...Object.keys(ITEMS).filter(k=>(ITEMS[k].lv||1)<=G.fac.shop).map(k=>({ic:k,l:ITEMS[k].n,s:`${ITEMS[k].p}G ${ITEMS[k].d}`,dis:G.gold<ITEMS[k].p||G.items[k]>=9,f:()=>{G.gold-=ITEMS[k].p;addItem(k,1);save();shop(`${ITEMS[k].n}を買った`);}})),
   {l:'素材を売る',s:sell?`全部で${sell}G`:'売れる素材なし',dis:!sell,f:()=>{G.gold+=sell;for(const k in MATS)G.mats[k]=0;SFX.heal();save();shop(`素材を売って${sell}Gを得た`);}},{l:'戻る',cls:'back',f:()=>townMenu()}],true);}
-function townMenu(m){log((G.dev?'<button onclick="dvMenu()" style="float:right;font-size:11px;padding:3px 8px;background:#3a1a5a;color:#ffd0ff;border:1px solid #b07cff;border-radius:6px">DEV</button>':'')+(m||'大灯（おおあかり）に守られた最後の街。準備を整えよう。')+goldTxt()+(!G.dev&&G.sorties-(G.lastExp??-99)>=8?'<br><small style="color:#ffb030">⚠ しばらく記録の控えを取っていません。「記録→書き出す」で控えを</small>':''));const un=G.inv.filter(i=>i.unid).length;
- hud(`灯都ルミナス　<b>${chapter()}</b>`);
+function townMenu(m){devBtn(!!G.dev);log((m||'大灯（おおあかり）に守られた最後の街。準備を整えよう。')+goldTxt()+(!G.dev&&G.sorties-(G.lastExp??-99)>=8?'<br><small style="color:#ffb030">⚠ しばらく記録の控えを取っていません。「記録→書き出す」で控えを</small>':''));const un=G.inv.filter(i=>i.unid).length;
+ hud(`灯都ルミナス　<b>${chapter()}</b>`);if(G.flags.boss8)$('#msg').insertAdjacentHTML('beforeend',voidNews());
  menu([{l:'出撃',ic:'go',cls:'ready',f:worldMap},{l:'装備',ic:'eq',f:()=>equipMenu(G.party[0])},{l:'酒場',ic:'bar',f:tavern},
   {l:'鍛冶屋',ic:'smith',f:smith},{l:'鑑定屋',ic:'eye',s:un?`未鑑定${un}`:'',cls:un?'ready':'',f:appraise},{l:'道具屋',ic:'shop',f:shop},
   {l:'星詠みの塔',ic:'star',cls:G.members.some(i=>ptsLeft(i)>0)?'ready':'',f:()=>openBoard(G.party[0])},{l:'街の発展',ic:'door',cls:G.fac.garden&&G.garden.n?'ready':'',f:devMenu},{l:'記録',ic:'rec',f:saveMenu}],false,'grid9');}
@@ -44,8 +45,8 @@ function loadMenu(){log('書き出した文字列を貼り付けて「読み込�
 function title(){SAVE='astral_save_v1';show('title');const ov=$('#ov');ov.classList.remove('hide');ov.classList.add('ttl');const has=!!loadSave();let warn=false;
  ov.innerHTML=`<canvas id="tcv" width="180" height="320"></canvas><div class="tlogo">ASTRAL<br>BREAKER</div><div class="tsub">〜 星継ぎの灯 〜</div>
  <div class="tmenu"><button class="big" id="newg">はじめから</button><button class="big gold" id="cont" ${has?'':'disabled style="opacity:.35"'}>つづきから</button><button class="big" id="howto" style="height:40px;font-size:13px">遊び方</button></div>
- <div class="note" id="hw" style="display:none;background:rgba(5,8,25,.85);padding:10px;border-radius:8px;border:1px solid #4a5490"><b>遊び方</b><br>・灯都で準備→「出撃」で各地へ。タップした場所へ歩く。<br>・魔物に<b>自分からぶつかると先制攻撃</b>。宝箱・採取ポイントを探そう。<br>・戦闘：弱点でブレイク、AG100で<b>覚醒</b>（行動を消費しない）。2人覚醒で<b>共鳴技</b>。<br>・街に戻るとHP全回復＆自動セーブ。<b>星詠みの塔</b>で星盤とジョブ。</div>
- <div class="ver" id="verL">ver0.13</div><button id="devg" style="position:absolute;left:8px;bottom:8px;font-size:10px;padding:4px 8px;background:rgba(40,20,70,.7);color:#c8b0ff;border:1px solid #6a4c9c;border-radius:6px">開発者モード</button>`;
+ <div class="note" id="hw" style="display:none"><b>遊び方</b><br>・灯都で準備→「出撃」で各地へ。タップした場所へ歩く。<br>・魔物に<b>自分からぶつかると先制攻撃</b>。宝箱・採取ポイントを探そう。<br>・戦闘：弱点でブレイク、AG100で<b>覚醒</b>（行動を消費しない）。2人覚醒で<b>共鳴技</b>。<br>・街に戻るとHP全回復＆自動セーブ。<b>星詠みの塔</b>で星盤とジョブ。</div>
+ <div class="tfoot"><button id="devg">開発者モード</button><div class="ver" id="verL">ver0.14</div></div>`;
  $('#howto').onclick=()=>{const h=$('#hw');h.style.display=h.style.display==='none'?'block':'none';};
  $('#devg').onclick=()=>{au();devStart();};
  $('#cont').onclick=()=>{au();SAVE='astral_save_v1';migrate(Object.assign(newGame(),loadSave()));setSpeed(G.speed||1);enterTown('おかえりなさい。');};

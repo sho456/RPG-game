@@ -17,7 +17,7 @@ const ECHO={a:['<b>残響Ⅰ</b>――大灯が初めて灯った夜。','灯守
 const echoN=()=>Object.keys(G.flags.echo||{}).length;
 function echoEvent(x,y){const k=x+','+y,seen=G.flags.echo=G.flags.echo||{};if(seen[k])return;const id=['a','b','c'][echoN()];seen[k]=1;F.pause=true;F.flash=10;SFX.aw();
  const pg=ECHO[id];let i=0;const step=()=>{if(i<pg.length){log(pg[i++]);menu([{l:'▶ 次へ',cls:'ready',f:step}]);}else{if(id==='c')G.flags.zenkyo=1;save();fieldMenu(echoN()>=3?'<b>星核の扉が開いた。</b>最奥へ向かおう。':`残響はあと${3-echoN()}つ。`);}};step();}
-{const c=document.createElement('canvas');c.width=c.height=16;const g=c.getContext('2d');g.drawImage(TL.t,0,0);for(let i=0;i<14;i++){g.fillStyle=['#ffffff','#c8b0ff','#ffe27a'][i%3];g.fillRect(4+(i*5)%8,3+(i*7)%10,1,1);}g.fillStyle='rgba(180,140,255,.45)';g.fillRect(6,6,4,4);TL.Y=c;}
+{const c=document.createElement('canvas');c.width=c.height=16;const g=c.getContext('2d');g.drawImage(TL.t,0,0);for(let i=0;i<14;i++){g.fillStyle=['#ffffff','#c8b0ff','#ffe27a'][i%3];g.fillRect(4+(i*5)%8,3+(i*7)%10,1,1);}g.fillStyle='rgba(180,140,255,.45)';g.fillRect(6,6,4,4);TL.e=c;}
 AREAS.zankyo={name:'星核の残響',lv:[50,54],theme:'void',rec:'推奨Lv50〜55',bflag:'boss8',boss:{kind:'last1',lv:55},stages:['last1','last2','last3'],
  map:['####################','#########B##########','########ttt#########','##C#####ttt#####G###','##t######t######t###','##tttttttttttttttt##','##t#####t###t####t##','#Yt#####t###t####tY#',
   '#tt##tttttttttt##tt#','#t###t###tt###t###t#','#t###t###tt###t###t#','#ttttt##tttt##ttttt#','###t####tYtt####t###','###t####tttt####t###','##Ctt####tt####ttC##','####t####tt####t####',

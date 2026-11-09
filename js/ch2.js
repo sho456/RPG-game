@@ -42,7 +42,7 @@ BDEF.noah={star:'機巧座',sec:[['resP'],['magP'],['mhpP'],['defP'],['spGain'],
   '3,0':{t:'fork',g:1,v:{resP:15},d:'聖骸：精神+15%'},'0,3':{t:'fork',g:1,v:{mhpP:15},d:'機巧：最大HP+15%'},'-3,0':{t:'fork',g:2,v:{magP:12},d:'神威：魔力+12%'},'-3,3':{t:'fork',g:2,v:{defP:15},d:'鉄甲：防御+15%'}}};
 BOARD.shion=buildBoard('shion');BOARD.noah=buildBoard('noah');
 Object.assign(RESO,{'rio,shion':'閃光迅影','gald,noah':'鉄壁の聖堂','mire,noah':'聖炎の祈り','noah,rio':'星灯の祈り','gald,shion':'影城塞','mire,shion':'風火輪','noah,shion':'影と聖印'});
-const MAG=id=>id==='mire'||id==='noah'||id==='crow';
+const MAG=id=>id==='mire'||id==='noah'||id==='crow'||id==='celes';
 const MAP3=["####################","#zzzzzzz#zz#zzzzzzz#","#zCzzzzz#zB#zzzzzNz#","#zzzzzzz#zz#zzzzzzz#","#zzzzzzzzzzzzzzzzzz#","####zz######zz######","#zzzzzzzzzzzzzzzzzz#","#zPzzPzzPzzPzzPzzPz#","#zzzzzzzzzzzzzzzzzz#","#zPzzPzzPzzPzzPzzPz#","#zzzzzzzzzzzzzzzzCz#","#zPzzPzzPzzPzzPzzPz#","#zzzzzzzzzzzzzzzzzz#","#######zzzzzz#######","TTTTT##zzzzzz##TTTTT","TTTT...,,,,,,...TTTT","TTT..G..,,,,..R..TTT","TT..C...,,,,......TT","TT.....,,,,.....G.TT","TT..RR..,,,,......TT","TTT.....,,,,.....TTT","TT......,,,,..TT..TT","TT..TT..,,,,..TT.CTT","TT..TT...,,,......TT","TTT.......,,,....TTT","TTTT.......,,,..TTTT","TTTTTT.....,,,.TTTTT","TTTTTTTT....,S.TTTTT","TTTTTTTTTTTTTTTTTTTT"].map(r=>r.padEnd(20,'T').slice(0,20));
 AREAS.seido={name:'祈りの廃聖堂',map:MAP3,lv:[11,16],groups:[['cursedslime','cursedslime'],['darkknight'],['shade','cursedslime'],['darkknight','shade'],['shade','shade','cursedslime']],
  libGroups:[['darkknight','shade'],['shade','shade'],['darkknight','darkknight']],crew:[{gold:800},{loot:[14,2]},{item:'feather',n:2},{loot:[15,3]}],boss:{kind:'boss3',lv:16},bflag:'boss3',theme:'chapel',rec:'推奨Lv11〜16',

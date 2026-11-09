@@ -11,6 +11,9 @@ function makeBg(th='ash',boss=false){const c=document.createElement('canvas');c.
  else if(th==='tower'){dith(0,hz,['#0a0c28','#1a1e50','#3a3a80','#6a5aa0']);for(let i=0;i<90;i++){g.fillStyle=['#fff','#c8ccff','#ffe9a0'][R()*3|0];g.fillRect(R()*W|0,R()*hz|0,1,1);}
   for(const q of[10,58,122,170]){g.fillStyle='#d8d4e8';g.fillRect(q-4,4,8,hz);g.fillStyle='#ffffff';g.fillRect(q-4,4,2,hz);g.fillStyle='#a8a4c0';g.fillRect(q+2,4,2,hz);}
   for(let y=hz;y<H;y++)for(let x=0;x<W;x++){g.fillStyle=((x>>3)+(y>>2))%2?'#e0dcf0':'#c8c4dc';g.fillRect(x,y,1,1);}}
+ else if(th==='lava'){dith(0,hz,['#1a0806','#3a120a','#6a2410']);g.fillStyle='#2a0e08';for(let x=0;x<W;x++){const h=16+Math.sin(x*.06)*8+Math.sin(x*.17)*4;g.fillRect(x,hz-h,1,h);}
+  for(let i=0;i<6;i++){const x=R()*W|0;g.fillStyle='#ff6020';for(let y=0;y<14;y++)g.fillRect(x+(Math.sin(y*.7)*1.5|0),hz-15+y,1,1);}
+  dith(hz,H,['#3a1a10','#2a120a','#1a0a06']);for(let i=0;i<50;i++){g.fillStyle=R()<.5?'#ff7a30':'#ffb040';g.fillRect(R()*W|0,hz+R()*(H-hz)|0,R()<.3?2:1,1);}}
  else if(th==='void'){dith(0,H,['#05020e','#120628','#24104a','#120628']);for(let i=0;i<120;i++){g.fillStyle=['#fff','#c8b0ff','#8a6aff','#ffd0ff'][R()*4|0];g.fillRect(R()*W|0,R()*H|0,1,1);}
   for(let i=0;i<5;i++){const cx=R()*W,cy=R()*hz;for(let k=0;k<40;k++){g.fillStyle='rgba(160,100,255,.08)';g.fillRect(cx+(R()-.5)*40|0,cy+(R()-.5)*20|0,3,3);}}g.fillStyle='rgba(180,150,255,.25)';for(let x=0;x<W;x+=2)g.fillRect(x,hz+((x*7)%5),1,1);}
  else if(th==='ruin'){dith(0,hz,['#06121e','#0e2232','#163446']);for(let i=0;i<4;i++){g.fillStyle='rgba(140,220,255,.08)';for(let y=0;y<hz+30;y++)g.fillRect(20+i*44+y*.4|0,y,10,1);}
@@ -32,7 +35,7 @@ function makeBg(th='ash',boss=false){const c=document.createElement('canvas');c.
   for(let i=0;i<70;i++){g.fillStyle=fo?(R()<.5?'#3e7038':'#1a3016'):boss?(R()<.5?'#3a2840':'#4a2a5a'):(R()<.5?'#4f5e38':'#2a3520');g.fillRect(R()*W|0,hz+R()*(H-hz)|0,R()<.3?2:1,1);}}
  if(boss&&th!=='ash'){g.fillStyle='rgba(60,0,80,.22)';g.fillRect(0,0,W,H);}
  g.fillStyle='rgba(0,0,0,.25)';g.fillRect(0,hz,W,1);return c;}
-function battleTheme(boss){if(!F||!A||!MAP1)return'ash';if(boss)return{midori:'lib',seido:'chapel',raimei:'mine',kouka:'shrine',ouito:'ruin',tower:'tower',zankyo:'void'}[AREA]||'ash';const t=MAP1[F.p.ty][F.p.tx];return AREA==='tower'?'tower':AREA==='zankyo'?'void':AREA==='ouito'?'ruin':'hU'.includes(t)?'shrine':A.theme==='ice'?'ice':'rlVY'.includes(t)?'mine':A.theme==='storm'&&'.,GE'.includes(t)?'storm':'fM'.includes(t)?'lib':'zN'.includes(t)?'chapel':A.theme==='forest'?'forest':'ash';}
+function battleTheme(boss){if(!F||!A||!MAP1)return'ash';if(boss)return{midori:'lib',seido:'chapel',raimei:'mine',kouka:'shrine',ouito:'ruin',tower:'tower',zankyo:'void',kairou:'void',ryuu:'lava'}[AREA]||'ash';const t=MAP1[F.p.ty][F.p.tx];return AREA==='tower'?'tower':AREA==='zankyo'||AREA==='kairou'?'void':AREA==='ryuu'?'lava':AREA==='ouito'?'ruin':'hU'.includes(t)?'shrine':A.theme==='ice'?'ice':'rlVY'.includes(t)?'mine':A.theme==='storm'&&'.,GE'.includes(t)?'storm':'fM'.includes(t)?'lib':'zN'.includes(t)?'chapel':A.theme==='forest'?'forest':'ash';}
 let BG=makeBg('ash');
 
 /* ===== サウンド ===== */
@@ -157,7 +160,8 @@ async function awaken(u){const A=AW[u.id];u.aw=true;u.awT=0;u.ag=GAUGE.includes(
  cut.style.background='';cut.innerHTML='';cut.appendChild(c);const tx=document.createElement('div');tx.innerHTML=`<div class="t">${u.name} ― 覚醒${(u.awLv||1)>1?'・段階'+ROMAN[u.awLv]:''}</div><div class="b">${A.name}</div>`;cut.appendChild(tx);
  cut.classList.remove('show');void cut.offsetWidth;cut.classList.add('show');B.flashBg=30;SFX.aw();
  log(`<b>${u.name}、覚醒――「${A.name}」！</b>`);refresh();await wait(1150);cut.classList.remove('show');
- if(B.heroes.filter(h=>h.aw).length>=2&&!B.reso)log('二つの星片が<b>共鳴</b>している！ 共鳴技が使える');}
+ if(canReso())log('二つの星片が<b>共鳴</b>している！ 共鳴技が使える');else if(B.heroes.filter(h=>h.aw).length>=2&&!B.reso)log('竜の血は、リオの灯にしか共鳴しない…');}
+function canReso(){if(B.reso)return false;const p=B.heroes.filter(h=>h.aw&&h.alive).slice(0,2);if(p.length<2)return false;return!p.some(h=>h.id==='valk')||p.some(h=>h.id==='rio');}
 
 function endAw(u,silent){u._gk=0;if(u.id==='noah')B.domain=false;u.aw=false;u.awT=0;u.store=0;u.stk=0;u.second=false;if(u.legs&&u.legs.includes('koukagari'))u.ag=50;if(!silent){if(!u.noRecoil)u.ct+=20/spdOf(u)*5;log(`${u.name}の覚醒が解けた（反動で行動が遅れる）`);}refresh();}
 
@@ -242,7 +246,7 @@ async function heroTurn(u){
  await doAction(u,ch.sk,ch.t);
  if(u.aw&&u.alive&&u.id==='mire'){if(u.ag<=0)endAw(u);else if(!u.second){u.second=true;u.ct=0;log('<b>二重詠唱！</b> もう一度行動できる');}else u.second=false;}
  else if(u.aw&&u.alive){u.awT++;
-  if(['rio','noah','crow','hakua','jin'].includes(u.id)&&u.awT>=awN(u))endAw(u);
+  if(['rio','noah','crow','hakua','jin','celes','valk'].includes(u.id)&&u.awT>=awN(u))endAw(u);
   else if(u.id==='erna'){if(u.ag<=0)endAw(u);}
   else if(u.id==='balza'&&u.awT>=awN(u)){log('炉心が臨界に――<b>自動で溶鉄爆砕</b>！');await wait(400);await doAction(u,SK.youtetsu);}
   else if(u.id==='shion'){if(u.awT>=awN(u))endAw(u);else{u.ct=0;log('<b>影縫いの刻</b>――続けて動ける');}}
@@ -251,7 +255,7 @@ async function heroTurn(u){
 
 function autoPick(u){
  if(u.ag>=100&&!u.aw&&B.heroes.filter(h=>h.aw).length<2)return{aw:true};
- if(B.heroes.filter(h=>h.aw).length>=2&&!B.reso)return{sk:{k:'reso'}};
+ if(canReso())return{sk:{k:'reso'}};
  if(u.id==='rio'&&!u.aw&&u.sp>=20){const low=aliveH().find(h=>h.hp<h.mhp*.35);if(low)return{sk:SK.teate,t:low};}
  const es=aliveE().sort((a,b)=>a.hp-b.hp);
  if(u.aw&&(u.awLv||1)>=3&&!u._gk&&!((SK['goku'+u.id].gauge||0)>u.ag)){u._gk=1;return{sk:SK['goku'+u.id],t:es[0]};}
@@ -268,7 +272,7 @@ function chooseRoot(u){return new Promise(res0=>{const res=v=>{B.res=null;res0(v
   const its=[{l:'たたかう',f:()=>pickT(u,ATK(u),root,res)},{l:u.aw?'覚醒技':'スキル',f:()=>skillMenu(u,root,res)},
    {l:'覚醒',s:u.aw?'発動中':`AG ${Math.floor(u.ag)}%`,cls:'aw'+(ready?' ready':''),dis:!ready,f:async()=>{$('#cmd').innerHTML='';await awaken(u);root();}},
    {l:'防御',s:'被ダメ半減',f:()=>res({sk:GUARD})},{l:'アイテム',f:()=>itemMenu(u,root,res)}];
-  if(B.heroes.filter(h=>h.aw).length>=2&&!B.reso)its.push({l:'共鳴技',s:resoName(),cls:'reso',f:()=>res({sk:{k:'reso'}})});
+  if(canReso())its.push({l:'共鳴技',s:resoName(),cls:'reso',f:()=>res({sk:{k:'reso'}})});
   else if(u.aw&&u.id==='rio')its.push({l:'覚醒解除',s:'任意で解く',f:()=>{endAw(u);root();}});
 
   const rs=G.members.filter(id=>!B.heroes.some(h=>h.id===id)&&G.h[id].hp!==0);
@@ -297,7 +301,7 @@ async function enemyTurn(e){
  e.turn++;let sk;const ai=ED[e.kind].ai,pick=a=>{let r=Math.random();for(const[k,w]of a){if((r-=w)<0)return k;}return a[0][0];};
  if(ai){
   if(e.charging){sk=EA[ai.charge];e.charging=false;}
-  else if(!e.summoned&&e.hp<e.mhp/2){e.summoned=true;log(`${e.name}が<b>眷属を呼び出した</b>！`);
+  else if(!e.summoned&&ai.summon&&e.hp<e.mhp/2){e.summoned=true;log(`${e.name}が<b>眷属を呼び出した</b>！`);
    const s1=enemy(ai.summon,ai.sumLv,78,14,'A'),s2=enemy(ai.summon,ai.sumLv,78,80,'B');[s1,s2].forEach(s=>{setCT(s);B.enemies.push(s);});SFX.warn();setCT(e);refresh();await wait(700);return;}
   else if(e.turn%ai.every===0){e.charging=true;SFX.warn();pop(e,'溜め！','#ffb030');log(`${e.name}は<b>力を溜めている</b>…！ ブレイクで止めるか、備えろ！`);setCT(e);refresh();await wait(800);return;}
   else sk=EA[pick(ai.acts)];}
