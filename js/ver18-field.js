@@ -30,10 +30,10 @@ function tFringe(th,side){const k='f'+th+side;if(T18[k])return T18[k];const c=(G
 /* 木（背が高い：下端が根元） */
 const TREEP={ash:['#7d9460','#5d7449','#44583a','#2e3e2c'],forest:['#7cc860','#4fa44a','#33803c','#1f5a30'],ice:['#4a7a5e','#356048','#264a3a','#18342c']};
 function tTree(th,v){const k='t'+th+v;if(T18[k])return T18[k];const P=TREEP[th]||TREEP.ash,R3=[C(P[0]),C(P[1]),C(P[2]),C(P[3])],tr=ramp('#6a4a30');
- return T18[k]=tcan(18,28,b=>{part(b,q=>{q.rect(7,20,4,7,tr[1]);q.rect(7,20,1,7,tr[0]);q.rect(10,20,1,7,tr[2]);q.px(6,26,tr[2]);q.px(11,26,tr[2]);});
-  part(b,q=>{const t=new Buf(18,28);t.ell(9,10+v,8,8,R3[1]);t.ell(5,14,5,5,R3[1]);t.ell(13,14,5,5,R3[1]);t.ell(9,5+v,5.5,5,R3[1]);lit(t,R3,9,11,9,10,1);q.blit(t,0,0);
-   for(const[x,y]of[[5,8],[11,6],[8,12],[13,11],[4,13]])q.px(x,y+v,R3[0]);for(const[x,y]of[[9,16],[6,17],[12,17],[14,14]])q.px(x,y,R3[2]);
-   if(th==='ice'){const s=C('#ffffff'),s2=C('#c8d8ec');q.ell(9,3+v,4.5,2.2,s);q.ell(5,10,3.4,1.6,s);q.ell(13,10,3.4,1.6,s);q.px(9,5+v,s2);q.px(4,11,s2);}});});}
+ return T18[k]=tcan(18,24,b=>{part(b,q=>{q.rect(7,17,4,6,tr[1]);q.rect(7,17,1,6,tr[0]);q.rect(10,17,1,6,tr[2]);q.px(6,22,tr[2]);q.px(11,22,tr[2]);});
+  part(b,q=>{const t=new Buf(18,24);t.ell(9,9+v,8,7,R3[1]);t.ell(5,12,5,4.6,R3[1]);t.ell(13,12,5,4.6,R3[1]);t.ell(9,5+v,5.5,4.4,R3[1]);lit(t,R3,9,9,9,9,1);q.blit(t,0,0);
+   for(const[x,y]of[[5,7],[11,5],[8,10],[13,9],[4,11]])q.px(x,y+v,R3[0]);for(const[x,y]of[[9,14],[6,15],[12,15],[14,12]])q.px(x,y,R3[2]);
+   if(th==='ice'){const s=C('#ffffff'),s2=C('#c8d8ec');q.ell(9,3+v,4.5,2,s);q.ell(5,9,3.4,1.5,s);q.ell(13,9,3.4,1.5,s);q.px(9,5+v,s2);q.px(4,10,s2);}});});}
 function tRock(th){const k='k'+th;if(T18[k])return T18[k];const R3=ramp(th==='ice'?'#a8b8cc':th==='lava'?'#5a4a48':'#8a8a94');
  return T18[k]=tcan(16,16,b=>{part(b,q=>{const t=new Buf(16,16);t.ell(8,10,6.5,5,R3[1]);t.ell(5,11,3.5,3.5,R3[1]);lit(t,R3,8,10,7,5);q.blit(t,0,0);q.px(6,8,R3[0]);q.px(10,12,R3[2]);q.line(8,9,10,11,R3[2],1);if(th==='ice'){q.ell(8,6.5,4,1.6,C('#ffffff'));}});});}
 /* 水（2コマ） */
