@@ -3,7 +3,7 @@
 const VER18='ver0.18';
 const LEGCOL={tenkyuu:'#ffe14a',meikai:'#b07cff',hyouga:'#bff4ff',taiyou:'#ff9a40'};
 /* ユニット→スプライト。装備している武器の素材（銅・鉄・鋼・星鋼）とレジェンドで見た目が変わる */
-function heroOpt(id,aw){const o={};if(aw)o.aw=1;try{const h=G&&G.h[id],it=h&&h.eq&&h.eq.w&&findItem(h.eq.w);if(it){if(it.leg&&LEGCOL[it.leg])o.wl=LEGCOL[it.leg];else o.wt=it.rar===4||it.set?'星鋼':MATL(it.ilv);}}catch(e){}return Object.keys(o).length?JSON.stringify(o):'';}
+function heroOpt(id,aw){const o={};if(aw)o.aw=1;try{const h=G&&G.h[id],it=h&&h.eq&&h.eq.w&&findItem(h.eq.w);if(it){if(it.leg&&LEGCOL[it.leg])o.wl=LEGCOL[it.leg];else o.wt=it.rar===4||it.set?'星鋼':MATL(it.ilv);}const bd=h&&h.eq&&h.eq.body&&findItem(h.eq.body);if(bd)o.at=bd.rar===4||bd.set?'星鋼':MATL(bd.ilv);}catch(e){}return Object.keys(o).length?JSON.stringify(o):'';}
 function uKey(u){if(u._k)return u._k;return u._k=u.side===0?(SPDEF[u.id]?u.id:'rio'):resolveSpr(u.kind);}
 function uOpt(u){if(u.side!==0)return'';const s=(u.aw?1:0);if(u._os!==s){u._os=s;u._o=heroOpt(u.id,u.aw);}return u._o;}
 const aSp=b=>Math.max(1,b*SPD[speed]/1.7);

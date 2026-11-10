@@ -40,7 +40,7 @@ function tRock(th){const k='k'+th;if(T18[k])return T18[k];const R3=ramp(th==='ic
 function tWater(f,lava){const k=(lava?'lv':'w')+f;if(T18[k])return T18[k];const c=(lava?['#ffe080','#ff8a30','#d04a14','#a02a0a']:['#b8e0ff','#5a94d0','#3a6aa8','#2b4a80']).map(C);
  return T18[k]=tcan(16,16,b=>{b.rect(0,0,16,16,c[2]);for(let y=1;y<16;y+=4)for(let x=0;x<16;x++){const p=(x+f*4+y*3)%16;if(p<5)b.px(x,y+(p===2?-1:0),c[1]);if(p===1&&y%8===1)b.px(x,y-1,c[0]);}
   for(let i=0;i<3;i++)b.px((i*7+f*5+2)%16,(i*5+f*3+4)%16,c[lava?0:3]);});}
-function tShore(side,lava){const k='sh'+side+(lava?'l':'');if(T18[k])return T18[k];const c=(lava?['#ffe080','#3a2018']:['#e8f8ff','#1e3a66']).map(C);
+function tShore(side,lava){const k='sh'+side+(lava?'l':'');if(T18[k])return T18[k];const c=(lava?['#ffe080','#3a2018']:['#8fc4f0','#1e3a66']).map(C);
  return T18[k]=tcan(16,16,b=>{for(let i=0;i<16;i++){const w=(i*5)%3===0?1:0;if(side===0){b.px(i,0,c[1]);b.px(i,1,c[1]);if(!w)b.px(i,2,c[0]);}else if(side===1){b.px(15,i,c[1]);if(!w)b.px(14,i,c[0]);}else if(side===2){b.px(i,15,c[1]);}else{b.px(0,i,c[1]);if(!w)b.px(1,i,c[0]);}}});}
 /* 壁：上面と正面 */
 const WALLP={ash:'#6a6a84',forest:'#7a6450',chapel:'#6e6a8c',ice:'#9a3a30',ruin:'#4a7078',tower:'#b8b4d4',void:'#3a2c5c',storm:'#4a4238',lava:'#4a3530',mine:'#4a4238'};
@@ -141,9 +141,10 @@ function drawMini(big){const z=big?4:2,mw=MW*z,mh=MH*z,ox=big?Math.round((W-mw)/
  if(!F.bossDown&&BSX>=0){const b=(tick>>4)%2;dot(BSX,BSY,b?'#e080ff':'#a040e0',2);}
  /* 現在地と向き */
  const px0=ox+p.tx*z,py0=oy+p.ty*z,[fx2,fy2]=F.face||[0,-1];ctx.fillStyle='#0a0c18';ctx.fillRect(px0-2,py0-2,z+4,z+4);ctx.fillRect(px0+fx2*(z+1)-1,py0+fy2*(z+1)-1,z+2,z+2);ctx.fillStyle=(tick>>3)%2?'#ffffff':'#ffe27a';ctx.fillRect(px0-1,py0-1,z+2,z+2);ctx.fillStyle='#ff6a30';ctx.fillRect(px0+fx2*(z+1),py0+fy2*(z+1),z,z);
- if(big){ctx.font='8px sans-serif';ctx.textBaseline='top';let lx=ox-2,ly=oy+mh+6;for(const[c,l]of[['#ffffff','現在地'],['#ff4a5a','魔物'],['#ff9a30','強敵'],['#e080ff','ボス'],['#ffe14a','宝箱'],['#7fd6ff','採取'],['#ff9a40','帰還の灯']]){const tw=ctx.measureText(l).width+12;if(lx+tw>W-2){lx=ox-2;ly+=11;}ctx.fillStyle='rgba(6,8,20,.82)';ctx.fillRect(lx-1,ly-1,tw,10);ctx.fillStyle=c;ctx.fillRect(lx+1,ly+2,4,4);ctx.fillStyle='#e8e4f4';ctx.fillText(l,lx+8,ly);lx+=tw+2;}}}
+}
 {const _fm=fieldMenu;fieldMenu=function(m){_fm(m);const b=$('#cmd').children[1];if(!b)return;const st=!G.set.mm?0:G.set.mmBig?2:1;b.innerHTML=`マップ<small>${['非表示','小さく表示','大きく表示'][st]}</small>`;b.className='c'+(st?' ready':'');
-  b.onclick=()=>{SFX.sel();if(st===0){G.set.mm=true;G.set.mmBig=false;}else if(st===1){G.set.mmBig=true;}else{G.set.mm=false;G.set.mmBig=false;}save();fieldMenu();};};}
+  b.onclick=()=>{SFX.sel();if(st===0){G.set.mm=true;G.set.mmBig=false;}else if(st===1){G.set.mmBig=true;}else{G.set.mm=false;G.set.mmBig=false;}save();fieldMenu();};
+  $('#labels').innerHTML=st===2?'<div class="mleg">'+[['#ffffff','現在地'],['#ff4a5a','魔物'],['#ff9a30','強敵'],['#e080ff','ボス'],['#ffe14a','宝箱'],['#7fd6ff','採取'],['#ff9a40','帰還の灯']].map(([c,l])=>`<span><i style="background:${c}"></i>${l}</span>`).join('')+'</div>':'';};}
 
 /* ---------- 探索画面の描画 ---------- */
 const FOPT='{"noW":1}';

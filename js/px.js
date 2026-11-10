@@ -160,6 +160,9 @@ function drawHumanoid(b,anim,i,d,opt){const o=opt?JSON.parse(opt):{},R=heroCols(
  /* 胴 */
  part(b,q=>{const t=new Buf(tw,th);t.grid(tg,0,0,m);t.shear(sh);q.blit(t,tx,ty);});
  if(d.over)d.over(b,{ox,oy,by,ln,i,anim,R,p,J,tx,ty,o});
+ /* 胴防具：素材ごとの肩当てと留め金 */
+ if(o.at&&TIERC[o.at]&&!d.robe){const A=ramp(TIERC[o.at]);part(b,q=>{q.rect(shF[0]-1,shF[1]-2,4,3,A[1]);q.rect(shF[0]-1,shF[1]-2,4,1,A[0]);q.px(shF[0]+2,shF[1],A[2]);});}
+ else if(o.at&&TIERC[o.at]){const A=ramp(TIERC[o.at]);b.rect(tx+(tw>>1)-1,ty+1,2,2,A[1]);b.px(tx+(tw>>1)-1,ty+1,A[0]);}
  /* 頭 */
  const hg=(o.aw&&d.headAw)||d.head,hw=hg.reduce((a,r)=>Math.max(a,r.length),0),hx0=ox-(hw>>1)+(d.hdx||0)+Math.round(ln*.7)+hd[0],hy0=ty-hg.length+(d.hup??2)+hd[1];
  part(b,q=>{q.grid(hg,hx0,hy0,m);if(anim==='hurt'||anim==='down'){/* 目を閉じる */for(let y=0;y<hg.length;y++)for(let x=0;x<hg[y].length;x++){const ch=hg[y][x];if(ch==='b'||ch==='w')q.px(hx0+x,hy0+y,R.skin[1]);}}});
