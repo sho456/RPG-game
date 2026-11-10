@@ -51,7 +51,7 @@ function tWall(key,face){const k='W'+key+(face?'f':'t');if(T18[k])return T18[k];
 /* 床 */
 function tFloor(t,v=0){const k='F'+t+v;if(T18[k])return T18[k];const R=rng(t.charCodeAt(0)*7+v*3);
  const mk=(hex,fn)=>T18[k]=tcan(16,16,b=>{const c=ramp(hex);b.rect(0,0,16,16,c[1]);fn(b,c);});
- if(t==='f')return mk('#7a5a40',(b,c)=>{for(let y=3;y<16;y+=4){b.rect(0,y,16,1,c[2]);b.rect(0,y-3,16,1,c[0]);}for(let y=0;y<16;y+=4)b.rect((y*3+v*5)%16,y,1,3,c[2]);for(let i=0;i<4;i++)b.px(R()*16|0,R()*16|0,c[2]);});
+ if(t==='f')return mk('#a8845a',(b,c)=>{for(let y=7;y<16;y+=8)b.rect(0,y,16,1,c[2]);for(let y=0;y<16;y+=8)b.rect((y*3+v*7+3)%16,y,1,7,c[2]);for(let i=0;i<5;i++){const x=R()*14|0,y=R()*16|0;b.px(x,y,c[0]);b.px(x+1,y,c[0]);}for(let i=0;i<3;i++)b.px(R()*16|0,R()*16|0,c[2]);});
  if(t==='z')return mk('#8a86a4',(b,c)=>{for(let y=0;y<16;y++)for(let x=0;x<16;x++)if(((x>>3)+(y>>3))%2)b.px(x,y,c[2]);b.rect(0,7,16,1,c[3]);b.rect(0,15,16,1,c[3]);b.rect(7,0,1,16,c[3]);b.rect(15,0,1,16,c[3]);b.px(1,1,c[0]);b.px(9,9,c[0]);for(let i=0;i<3;i++)b.px(R()*16|0,R()*16|0,c[0]);});
  if(t==='r')return mk('#4a4034',(b,c)=>{for(let i=0;i<14;i++)b.px(R()*16|0,R()*16|0,c[R()<.5?0:2]);for(let i=0;i<2;i++){const x=1+R()*12|0,y=1+R()*12|0;b.rect(x,y,2,2,c[0]);b.px(x+2,y+1,c[3]);b.px(x,y+2,c[3]);}});
  if(t==='l')return mk('#4a4034',(b,c)=>{for(let i=0;i<10;i++)b.px(R()*16|0,R()*16|0,c[R()<.5?0:2]);const w=ramp('#7a5234'),m=ramp('#a0a4b0');for(let x=1;x<16;x+=4){b.rect(x,2,2,12,w[1]);b.rect(x,2,1,12,w[0]);}b.rect(0,4,16,2,m[1]);b.rect(0,4,16,1,m[0]);b.rect(0,10,16,2,m[1]);b.rect(0,10,16,1,m[0]);});
@@ -87,7 +87,8 @@ function wallKey(t){if(t==='q')return'void';if(t==='Y')return AREA==='ryuu'?'lav
 const outTheme=()=>{const th=A&&A.theme;return th==='forest'?'forest':th==='ice'?'ice':th==='storm'?'storm':th==='lava'?'lava':'ash';};
 /* 地面（置物の下も含む） */
 function groundImg(t,x,y){const th=outTheme(),v=(x*7+y*13)%3;
- if(t==='.'||t==='T'||t==='R'||t==='G'||t==='g'||t==='E'||t==='J')return tGround(t==='n'?'forest':th,v);
+ if(t==='R'&&[[1,0],[-1,0],[0,1],[0,-1]].filter(([dx,dy])=>rawAt(x+dx,y+dy)==='i').length>=2)return tFloor('i');
+ if(t==='.'||t==='T'||t==='R'||t==='G'||t==='g'||t==='E'||t==='J')return tGround(th,v);
  if(t===','||t==='S'||t==='C'||t==='c'||t==='B')return AREA==='haido'||'.,TRG'.includes(rawAt(x,y+1))||'.,TRG'.includes(rawAt(x,y-1))||t===','?tRoad(th,(x+y)%2):tFloor(floorNear(x,y));
  if(t==='~')return tWater((tick>>5)%2);if(t==='w')return tWater((tick>>5)%2);if(t==='m')return tWater((tick>>4)%2,1);
  if(t==='K'||t==='M')return tFloor('f',(x+y)%2);if(t==='P'||t==='N')return tFloor('z');if(t==='L')return tFloor('o');if(t==='U')return tFloor('h');if(t==='V'||t==='D')return tFloor('r');
@@ -103,22 +104,27 @@ const NOSPAWN='CGSBMNEVUiwxLnJ^QDYm';
 function openness(x,y){let n=0;for(let j=-2;j<=2;j++)for(let i=-2;i<=2;i++)if(walk(x+i,y+j))n++;return n;}
 function groupsAt(x,y){return'fzrlho'.includes(MAP1[y][x])&&A.libGroups?A.libGroups:GROUPS;}
 function mkSym(x,y,kinds,lv,o){return Object.assign({tx:x,ty:y,fx:x,fy:y,px:x*16,py:y*16,t:null,kinds,lv,dir:Math.random()<.5?1:-1,chase:false,cd:400+Math.random()*900},o||{});}
-function populate18(){const p=F.p,D=reach18(p.tx,p.ty),[l0,l1]=A.lv;let far=1;D.forEach(v=>{far=Math.max(far,v);});
+function bossZone(D){if(BSX<0)return null;let cur=null,best=1e9;for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const v=D.get((BSX+dx)+','+(BSY+dy));if(v!=null&&v<best){best=v;cur=[BSX+dx,BSY+dy];}}return cur?reach18(cur[0],cur[1]):null;}
+function populate18(){const p=F.p,D=reach18(p.tx,p.ty),Db=bossZone(D),[l0,l1]=A.lv;let far=1;D.forEach(v=>{far=Math.max(far,v);});
  const bd=BSX>=0?Math.max(...[[1,0],[-1,0],[0,1],[0,-1]].map(([dx,dy])=>D.get((BSX+dx)+','+(BSY+dy))||0))||far:far;
  const lvAt=d=>Math.max(l0,Math.min(l1,l0+Math.floor(Math.min(.999,d/Math.max(1,bd))*(l1-l0+1))));
- const cand=[];D.forEach((d,k)=>{const[x,y]=k.split(',').map(Number);if(d<6||NOSPAWN.includes(MAP1[y][x]))return;if(BSX>=0&&Math.abs(x-BSX)<=3&&Math.abs(y-BSY)<=3)return;cand.push({x,y,d,o:openness(x,y)});});
+ const cand=[];D.forEach((d,k)=>{const[x,y]=k.split(',').map(Number);if(d<6||NOSPAWN.includes(MAP1[y][x]))return;if(Db&&(Db.get(k)??99)<=7)return;cand.push({x,y,d,o:openness(x,y)});});
  const en=[],taken=(x,y,r)=>en.some(e=>Math.abs(e.tx-x)+Math.abs(e.ty-y)<r),bySize=(gs,n)=>{const s=[...gs].sort((a,b)=>a.length-b.length);return n<0?s[Math.min(s.length-1,Math.random()*Math.ceil(s.length/2)|0)]:n>0?s[s.length-1-(Math.random()*Math.ceil(s.length/2)|0)]:gs[Math.random()*gs.length|0];};
  /* 宝箱の番 */
  CHESTS.forEach(ck2=>{const[cx,cy]=ck2.split(',').map(Number);if(G.flags.chest[ck(cx,cy)])return;const near=cand.filter(c=>{const m=Math.abs(c.x-cx)+Math.abs(c.y-cy);return m>=1&&m<=3;}).sort((a,b)=>b.o-a.o)[0];
   if(near&&!taken(near.x,near.y,2)&&Math.random()<.85)en.push(mkSym(near.x,near.y,bySize(groupsAt(near.x,near.y),1),Math.min(l1,lvAt(near.d)+1),{guard:1,hx:near.x,hy:near.y}));});
  /* 強敵：ボスへの道の奥、広い場所に1体（広いマップは2体） */
- const deep=cand.filter(c=>c.d>bd*.55&&c.d<bd*.92&&c.o>=12).sort((a,b)=>b.o-a.o),nE=cand.length>260?2:1;
- for(let i=0,n=0;i<deep.length&&n<nE;i++){const c=deep[(i*7)%deep.length];if(taken(c.x,c.y,7))continue;const gs=groupsAt(c.x,c.y),big=[...gs].sort((a,b)=>b.length-a.length)[0];en.push(mkSym(c.x,c.y,big.length<3?[...big,big[0]]:big,l1+1,{elite:1,guard:1,hx:c.x,hy:c.y}));n++;}
+ /* 本道（出発点→ボス）を求め、そこから離れた脇道の広い場所を選ぶ */
+ const road=[];if(BSX>=0){let cur=null,best=1e9;for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const v=D.get((BSX+dx)+','+(BSY+dy));if(v!=null&&v<best){best=v;cur=[BSX+dx,BSY+dy];}}
+  while(cur){road.push(cur);const v=D.get(cur[0]+','+cur[1]);if(!v)break;let nx=null;for(const[dx,dy]of[[0,1],[1,0],[-1,0],[0,-1]]){if(D.get((cur[0]+dx)+','+(cur[1]+dy))===v-1){nx=[cur[0]+dx,cur[1]+dy];break;}}cur=nx;}}
+ const offRoad=c=>road.length?Math.min(...road.map(r=>Math.abs(r[0]-c.x)+Math.abs(r[1]-c.y))):9;
+ const deep=cand.filter(c=>c.d>bd*.4&&c.o>=11&&offRoad(c)>=4&&MAP1[c.y][c.x]!==',').sort((a,b)=>(b.o+offRoad(b))-(a.o+offRoad(a))),nE=cand.length>340?2:1;
+ for(let i=0,n=0;i<deep.length&&n<nE;i++){const c=deep[i];if(taken(c.x,c.y,7))continue;const gs=groupsAt(c.x,c.y),big=[...gs].sort((a,b)=>b.length-a.length)[0];en.push(mkSym(c.x,c.y,big.length<3?[...big,big[0]]:big,l1,{elite:1,guard:1,hx:c.x,hy:c.y}));n++;}
  /* 通路と広場 */
  const want=Math.max(5,Math.min(12,Math.round(cand.length/34)));for(let tries=0;tries<500&&en.length<want+ (en.length?0:0);tries++){const c=cand[Math.random()*cand.length|0];if(!c||taken(c.x,c.y,c.o>=17?4:5))continue;
   const zone=c.o>=17?1:c.o<=10?-1:0;en.push(mkSym(c.x,c.y,bySize(groupsAt(c.x,c.y),zone),lvAt(c.d),{zone}));if(en.filter(e=>!e.guard).length>=want)break;}
  F.en=en;if(F.voided)F.en.forEach(voidify);}
-spawnOne=function(){if(!F||!A)return;const p=F.p,D=reach18(p.tx,p.ty),[l0,l1]=A.lv,c=[];D.forEach((d,k)=>{const[x,y]=k.split(',').map(Number);if(d<8||NOSPAWN.includes(MAP1[y][x]))return;if(BSX>=0&&Math.abs(x-BSX)<=3&&Math.abs(y-BSY)<=3)return;if(F.en.some(e=>Math.abs(e.tx-x)+Math.abs(e.ty-y)<4))return;c.push([x,y,d]);});
+spawnOne=function(){if(!F||!A)return;const p=F.p,D=reach18(p.tx,p.ty),Db=bossZone(D),[l0,l1]=A.lv,c=[];D.forEach((d,k)=>{const[x,y]=k.split(',').map(Number);if(d<8||NOSPAWN.includes(MAP1[y][x]))return;if(Db&&(Db.get(k)??99)<=7)return;if(F.en.some(e=>Math.abs(e.tx-x)+Math.abs(e.ty-y)<4))return;c.push([x,y,d]);});
  if(!c.length)return;let far=1;D.forEach(v=>{far=Math.max(far,v);});const[x,y,d]=c[Math.random()*c.length|0],gs=groupsAt(x,y),e=mkSym(x,y,gs[Math.random()*gs.length|0],Math.max(l0,Math.min(l1,l0+Math.floor(d/far*(l1-l0+1)))));F.en.push(e);if(F.voided)voidify(e);};
 {const _ef=enterField;enterField=function(id,keep){_ef(id,keep);if(!F)return;F.seen={};F.hist=[];F.face=[0,-1];F.steps={};populate18();seeAround();};}
 
@@ -142,9 +148,10 @@ function drawMini(big){const z=big?4:2,mw=MW*z,mh=MH*z,ox=big?Math.round((W-mw)/
 /* ---------- 探索画面の描画 ---------- */
 const FOPT='{"noW":1}';
 function fieldSprite(key,moving,ph){const d=SPDEF[key];if(!d)return null;const mv=moving&&d.human;return frameOf(key,mv?'walk':'idle',mv?(tick>>3)+ph:((tick>>4)+ph),d.human?FOPT:'');}
-drawField=function(){const p=F.p,dt=Math.min(50,performance.now()-lastT);lastT=performance.now();const ptx=p.tx,pty=p.ty;updField(dt);if(scene!=='field'||!F)return;
+drawField=function(){const p=F.p,dt=Math.min(50,performance.now()-lastT);lastT=performance.now();const ptx=p.tx,pty=p.ty,wt0=F.water;updField(dt);if(scene!=='field'||!F)return;
+ if(F.water!==wt0){for(let i=0;i<3;i++)if(F.en.length<7)spawnOne();}
  if(p.tx!==ptx||p.ty!==pty){F.face=[Math.sign(p.tx-ptx),Math.sign(p.ty-pty)];F.hist.push([ptx,pty]);if(F.hist.length>8)F.hist.shift();seeAround();}
- F.en.forEach(e=>{if(e.guard){const near=Math.abs(e.tx-p.tx)+Math.abs(e.ty-p.ty)<=(e.elite?5:4);if(!near)e.cd=1e9;else if(e.cd>1e6)e.cd=260;}});
+ F.en.forEach(e=>{if(e.guard){const near=Math.abs(e.tx-p.tx)+Math.abs(e.ty-p.ty)<=3;if(!near)e.cd=1e9;else if(e.cd>1e6)e.cd=260;}});
  F.camX=Math.max(0,Math.min(MW*16-W,Math.round(p.px+8-W/2)));F.camY=Math.max(0,Math.min(MH*16-H,Math.round(p.py+8-H/2)));
  const cx=F.camX,cy=F.camY,x0=cx>>4,y0=cy>>4,x1=x0+(W>>4)+1,y1=y0+(H>>4)+2,th=outTheme(),objs=[];
  /* 1) 地面 */

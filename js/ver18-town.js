@@ -19,10 +19,11 @@ function house(b,x,y,w,h,o){const Wc=ramp(o.wall),Rc=ramp(o.roof),T=ramp(o.trim|
  if(o.chim!=null)part(b,q=>{const cx=x+o.chim,K=ramp('#7a6a6c');q.rect(cx,y-h-rh-7,6,10,K[1]);q.rect(cx,y-h-rh-7,2,10,K[0]);q.rect(cx-1,y-h-rh-8,8,2,K[2]);});
  if(o.awn){const A1=C(o.awn),A2=C('#f4f0e6');for(let i=0;i<w+4;i++){const c=((i/4)|0)%2?A1:A2;b.rect(x-2+i,y-h+5,1,5,c);b.px(x-2+i,y-h+10+((i%4)===1||(i%4)===2?0:-1),c);}b.rect(x-2,y-h+4,w+4,1,C('#3a2a30'));}}
 /* 灯都の街並み */
-function paintTown18(p){const b=new Buf(W,HOME_H),R=rng(18),St=ramp('#8e8aa8');
+function paintTown18(p,mode){const b=new Buf(W,HOME_H),R=rng(18),St=ramp('#8e8aa8');
  gradB(b,0,98,['#060822','#0c1440','#1a2866','#343e82','#5c5294','#8c6a96']);
  for(let i=0;i<70;i++)b.px(R()*W|0,R()*70|0,C(['#ffffff','#c8d0ff','#ffe9a0','#8890c0'][R()*4|0]));
  b.ell(150,17,7,7,C('#fff6d8'));b.ell(152,15,6,6,C('#efe2b0'));b.ell(150,17,7,7,C('#fff6d8'));b.px(147,15,C('#e8d8a0'));b.rect(151,19,2,2,C('#e8d8a0'));b.px(153,14,C('#e8d8a0'));
+ if(mode==='sky')return b;
  /* 遠くの山と奥の家並み */
  for(let x=0;x<W;x++){const h=14+Math.sin(x*.05)*7+Math.sin(x*.13+1)*4;b.rect(x,98-h-10,1,h+10,C('#252a5a'));}
  for(let x=0;x<W;x++){const h=8+Math.sin(x*.09+2)*4+Math.sin(x*.23)*2;b.rect(x,98-h-4,1,h+4,C('#1b1f46'));}
@@ -59,7 +60,7 @@ function paintTown18(p){const b=new Buf(W,HOME_H),R=rng(18),St=ramp('#8e8aa8');
  for(const bx of[70,108]){part(b,q=>{q.rect(bx,96,1,14,C('#c8c8d8'));q.poly([[bx+1,97],[bx+7,98],[bx+7,104],[bx+4,103],[bx+1,105]],Rd[1]);q.px(bx+3,100,Gd[1]);});}
  /* 発展していない街は色がくすむ */
  const t=(1-p)*.72,s=b.d;if(t>.02)for(let i=0;i<s.length;i++){const c=s[i];if(!c)continue;const l=cR(c)*.3+cG(c)*.59+cB(c)*.11,warm=cR(c)>220&&cG(c)>180&&cB(c)<200?.35:1;s[i]=cMix(c,cRGB(l*.92,l*.92,l*1.04),t*warm);}
- return b.canvas();}
+ return mode==='buf'?b:b.canvas();}
 /* 店内 */
 function paintRoom(kind,h){const b=new Buf(W,h),R=rng(kind.length*13+5),wy=Math.round(h*.58),P=({bar:['#6a4630','#8a5e3e'],shop:['#7a6a4a','#9a7a52'],smith:['#5a5a6c','#5a4a40'],eye:['#3a2a5c','#5a4a6a']})[kind],Wl=ramp(P[0]),Fl=ramp(P[1]),Wd=ramp('#7a5234');
  /* 奥の壁 */
@@ -100,6 +101,16 @@ let TOWN18=null,TOWNP=-1;const WALK=[];
 function townImg(){const p=townP();if(!TOWN18||Math.abs(p-TOWNP)>.001){TOWN18=paintTown18(p);TOWNP=p;}return TOWN18;}
 makeTown=function(p=1){const c=document.createElement('canvas');c.width=W;c.height=128;c.getContext('2d').drawImage(paintTown18(p),0,0);return c;};
 TOWN=makeTown(townP());TBG=null;
+/* タイトル：星空の下の灯都 */
+let TBG18=null;
+function titleBg(){if(TBG18)return TBG18;const top=320-HOME_H,b=new Buf(W,320),R=rng(77);gradB(b,0,top+98,['#03040e','#060822','#0c1440','#1a2866','#343e82','#5c5294','#8c6a96']);
+ for(let i=0;i<150;i++)b.px(R()*W|0,R()*(top+40)|0,C(['#ffffff','#c8d0ff','#ffe9a0','#8890c0'][R()*4|0]));
+ const t=paintTown18(1,'buf'),s=paintTown18(1,'sky');for(let y=0;y<HOME_H;y++)for(let x=0;x<W;x++){const c=t.d[y*W+x];if(y>=98||c!==s.d[y*W+x])b.px(x,y+top,c);}return TBG18=b.canvas();}
+drawTitle=function(){const tc=$('#tcv');if(!tc)return;const g=tc.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(titleBg(),0,0);const ly=320-HOME_H+24,a=.5+.2*Math.sin(tick/25);
+ for(let k=4;k>0;k--){g.fillStyle=`rgba(255,226,140,${a*.2})`;const rr=Math.round(40*k/4);g.fillRect(90-rr,ly-Math.round(rr*.5),rr*2,rr);g.fillRect(90-Math.round(rr*.6),ly-rr,Math.round(rr*1.2),rr*2);}
+ const dx=Math.cos(tick/110),al=.18*Math.abs(dx);if(al>.01){g.fillStyle=`rgba(255,240,180,${al})`;const dir=dx>0?1:-1;for(let i=0;i<60;i++){const x=90+dir*i*2,hh=2+i*.4;g.fillRect(dir>0?x:x-2,Math.round(ly-hh/2),2,Math.round(hh));}}
+ if(Math.random()<.02)SHOOT.push({x:Math.random()*W,y:Math.random()*90,l:0});
+ for(let i=SHOOT.length-1;i>=0;i--){const st=SHOOT[i];st.l++;st.x-=2.2;st.y+=1.1;for(let k=0;k<12;k++){g.fillStyle=`rgba(255,255,230,${(1-k/12)*(1-st.l/40)})`;g.fillRect(st.x+k*2|0,st.y-k|0,1,1);}if(st.l>40)SHOOT.splice(i,1);}};
 function lampGlow(cx,cy,r,a){for(let k=4;k>0;k--){ctx.fillStyle=`rgba(255,226,140,${a*.2})`;const rr=Math.round(r*k/4);ctx.fillRect(cx-rr,cy-Math.round(rr*.5),rr*2,rr);ctx.fillRect(cx-Math.round(rr*.6),cy-rr,Math.round(rr*1.2),rr*2);}}
 function drawSprite(key,anim,i,opt,x,y,flip){const f=frameOf(key,anim,i,opt||'');if(!f)return;ctx.fillStyle='rgba(0,0,0,.3)';ctx.fillRect(x-6,y-1,12,2);ctx.fillRect(x-5,y-2,10,1);ctx.fillRect(x-5,y+1,10,1);const dx=flip?x-(f.W-f.ax):x-f.ax,dy=y-f.ay+1;if(flip){ctx.save();ctx.translate(dx+f.W,dy);ctx.scale(-1,1);ctx.drawImage(f.c,0,0);ctx.restore();}else ctx.drawImage(f.c,dx,dy);}
 function drawHome(){const off=H-HOME_H;ctx.drawImage(townImg(),0,off);
@@ -135,7 +146,7 @@ drawWM=function(){const x0=WMS.cur;if(!x0||!WMS.bg)return;ctx.drawImage(WMS.bg,0
 {const _wm=worldMap;worldMap=function(m){TSC='other';if(H!==128)setH(128);_wm(m);};}
 
 /* ---------- ホーム画面 ---------- */
-const HSPOT=[['bar','酒場',4,86,50,38,'tavern'],['smith','鍛冶屋',128,88,48,36,'smith'],['shop','道具屋',0,132,46,34,'shop'],['eye','鑑定屋',136,132,44,34,'appraise'],['star','星詠みの塔',144,18,34,60,'star'],['door','空中庭園',14,36,48,30,'dev']];
+const HSPOT=[['bar','酒場',2,84,52,44,'tavern'],['smith','鍛冶屋',126,86,52,42,'smith'],['shop','道具屋',0,134,48,36,'shop'],['eye','鑑定屋',132,134,44,36,'appraise'],['star','星詠みの塔',132,22,44,58,'star'],['door','空中庭園',12,36,52,30,'dev']];
 function goFac(k){({tavern:()=>tavern(),smith:()=>smith(),shop:()=>shop(),appraise:()=>appraise(),star:()=>openBoard(G.party[0]),dev:()=>devMenu(),party:()=>partyScreen(),rec:()=>saveMenu(),go:()=>worldMap()})[k]();}
 townMenu=function(m){WMS.on=false;TSC='home';if(scene!=='town')show('town');const hh=homeH();if(H!==hh)setH(hh);devBtn(!!G.dev);hud('');$('#stage').style.display='';
  const un=G.inv.filter(i=>i.unid).length,pts=G.members.some(i=>ptsLeft(i)>0),bn=typeof bondReadyN==='function'?bondReadyN():0,qn=QS.filter(q=>!G.q.done[q.id]&&q.ok()).length,gd=G.fac.garden&&G.garden.n,off=H-HOME_H;
@@ -198,3 +209,11 @@ addEventListener('resize',()=>{if(scene==='town'&&TSC==='home'&&G&&homeH()!==H)t
 /* タイトル */
 {const _t=title;title=function(){TSC='other';_t();const v=$('#verL');if(v)v.textContent=VER18;};}
 {const v=$('#verL');if(v)v.textContent=VER18;}
+/* ---------- 開発者メニュー：ver0.18のドット絵とモーション一覧 ---------- */
+function dev18(){log('<b>ver0.18 ドット絵とモーション</b>　全キャラ・全敵の待機／攻撃／詠唱／被弾／勝利などを順に再生');
+ const keys=Object.keys(SPDEF).filter(k=>!/^(vo_|kb|tr_|boss9w)/.test(k)),cw=64,chh=64,cols=5,rows=Math.ceil(keys.length/cols);
+ panel(`<canvas id="g18" width="${cols*cw}" height="${rows*chh}" style="width:100%;image-rendering:pixelated;background:#2a3a2e;border-radius:8px"></canvas><button class="tbtn back wide" data-a="back">戻る</button>`,{back:()=>dvMenu()});
+ const cvs=$('#g18'),g=cvs.getContext('2d');g.imageSmoothingEnabled=false;let t=0;const seq=['idle','idle','atk','hurt','mag','win','guard','charge'];
+ const iv=setInterval(()=>{if(!cvs.isConnected){clearInterval(iv);return;}t++;g.clearRect(0,0,cvs.width,cvs.height);keys.forEach((k,n)=>{const d=SPDEF[k],hum=d.human,an0=seq[(t>>5)%seq.length],an=hum?(an0==='charge'?'awaken':an0):(['atk','hurt','charge'].includes(an0)?an0:'idle'),a=aniOf(d,an),i=a.loop?(t>>2)%a.n:Math.min(a.n-1,(t%32)>>2),f=frameOf(k,an,i,hum&&(t>>8)%2?'{"aw":1}':''),sc=Math.min(1,60/Math.max(f.W,f.H)),x=(n%cols)*cw,y=Math.floor(n/cols)*chh;
+   g.drawImage(f.c,x+((cw-f.W*sc)>>1),y+chh-4-f.H*sc,f.W*sc,f.H*sc);});},50);}
+{const _dv=dvMenu;dvMenu=function(m){_dv(m);const c=$('#cmd'),b=document.createElement('button');b.className='c ready';b.innerHTML='ver0.18 ドット絵と演出<small>全キャラ・全敵のモーション一覧／新マップ・新UI</small>';b.onclick=()=>{SFX.sel();dev18();};c.insertBefore(b,c.firstChild);if(c.children[1])c.children[1].classList.remove('ready');};}

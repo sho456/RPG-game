@@ -509,3 +509,8 @@ button,textarea{font-family:inherit}
 #cut canvas{width:96px;height:96px}
 .rcut canvas{image-rendering:pixelated}
 @media (max-height:600px){.hn{min-height:54px}.hn img{width:22px;height:22px}.hgo{min-height:48px}}
+/* 戦闘結果：勝利ポーズが見えるように上半分は薄く */
+#app[data-sc="battle"] #ov:not(.hide):not(.ttl){background:linear-gradient(180deg,rgba(6,8,18,.12) 0%,rgba(6,8,18,.12) 36%,rgba(6,8,18,.96) 54%);justify-content:flex-end;padding-bottom:calc(env(safe-area-inset-bottom) + 13vh)}
+#app[data-sc="battle"] #ov .logo{text-shadow:0 0 12px #6a7aff,3px 3px 0 #070c28}
+.lab{width:88px;background:linear-gradient(180deg,rgba(29,44,112,.78),rgba(11,19,64,.78))}
+.hsp{align-items:flex-end}
