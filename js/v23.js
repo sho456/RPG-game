@@ -84,7 +84,7 @@ const isBuff=s=>{try{return V20.isBuff(s);}catch(e){return false;}};
 function stHTML(h,max=3){const L=(h.sts||[]);const v=L.slice(0,max).map(s=>`<i class="${isBuff(s)?'bu':'de'}">${STN(s)}${['atk','def','mag','res','spd','crit'].includes(s.k)?(s.v>0?'▲':'▼'):''}</i>`).join('');return v+(L.length>max?`<i class="mo">+${L.length-max}</i>`:'')+(h.guard?'<i class="gd">防御</i>':'');}
 function renderPT(){const el=ensurePT();if(!B)return;const sig=B.heroes.map(h=>h.id).join(',');if(PT.sig!==sig||!el.firstChild){PT.sig=sig;
   el.innerHTML=B.heroes.map((h,i)=>`<div class="pc23" data-i="${i}" style="--ec:${elCol(h.id)}"><div class="r1"><img class="fc" alt=""><div class="nm"><b>${esc(h.name)}</b><span class="st"></span></div></div>
-   <div class="hp"><em>HP</em><b class="hv"></b></div><div class="hb"><u></u><i></i></div><div class="sp"><em>SP</em><b class="sv"></b><div class="sb"><i></i></div></div><div class="ag"><i></i><span></span></div></div>`).join('');}
+   <div class="hp"><em>HP</em><b class="hv"></b></div><div class="hb"><u></u><i></i></div><div class="sp"><em>SP</em><b class="sv"></b><div class="sb"><i></i></div></div><div class="ag"><s><i></i></s><span></span></div></div>`).join('');}
  const cur=B.cur&&B.cur.side===0?B.cur:null,dev=DEV();
  B.heroes.forEach((h,i)=>{const c=el.children[i];if(!c)return;const hp=Math.max(0,h.hp),pc=h.mhp?hp/h.mhp*100:0,low=h.alive&&pc<30,G2=typeof GAUGE!=='undefined'&&GAUGE.includes(h.id);
   const cls=`pc23${cur===h?' cur':''}${h.alive?'':' down'}${low?' low':''}${h.aw?' awk':''}${!h.aw&&h.ag>=100&&h.alive?' full':''}`;if(c.className!==cls)c.className=cls;
@@ -112,8 +112,10 @@ const LIFE=k=>Math.round(k*(speed>=4?.7:speed>=2?.85:1));
 /* 同じ相手への表示は段をずらして積む（重ならない） */
 function slotOf(u){const now=performance.now();u._pp23=(u._pp23||[]).filter(p=>p.end>now&&p.el.isConnected);const used=new Set(u._pp23.map(p=>p.s));let s=0;while(used.has(s))s++;return s;}
 function placePop(el,u,slot){const a=anchor(u),st=$('#stage'),SW=st.offsetWidth,SH=st.offsetHeight,w=el.offsetWidth,h=el.offsetHeight,hero=u.side===0;
- let x,y;if(hero){x=(a.fx-a.w/2-1)*SC-w;y=(a.fy-a.h*.62)*SC-h/2+slot*h*.62;if(slot%2)x-=10;}
- else{x=(a.fx)*SC-w/2+(slot%2?14:-6)*(slot?1:0);y=(a.fy-a.h*.55)*SC-h/2-slot*h*.58;}
+ /* 下の段にいる表示の高さの分だけずらす（重ならない） */
+ const now=performance.now(),off=(u._pp23||[]).filter(p=>p.s<slot&&p.end>now&&p.el.isConnected).reduce((t,p)=>t+p.el.offsetHeight*.9,0);
+ let x,y;if(hero){x=(a.fx-a.w/2-1)*SC-w-(slot%2?8:0);y=(a.fy-a.h*.62)*SC-h/2+off;}
+ else{x=(a.fx)*SC-w/2+(slot%2?12:0);y=(a.fy-a.h*.55)*SC-h/2-off;}
  const xmax=hero?SW-4-w:Math.max(4,Math.min(SW-4,LY.heroL*SC-4)-w);
  x=clamp(x,4,Math.max(4,xmax));y=clamp(y,LY.hudPx+2,Math.max(LY.hudPx+2,SH-LY.botPx-h-2));el.style.transform=`translate(${Math.round(x)}px,${Math.round(y)}px)`;}
 function mkPop(u,cls,inner,life){const L=popLayer(),el=document.createElement('div');el.className='p23 '+(u.side===0?'h ':'e ')+cls;el.innerHTML=`<div class="in">${inner}</div>`;
@@ -121,18 +123,17 @@ function mkPop(u,cls,inner,life){const L=popLayer(),el=document.createElement('d
 function baseFs(u){return u.side===0?clamp(SC*8.6,17,23):clamp(SC*11.5,22,31);}
 function tierOf(u,d){const r=d/Math.max(1,u.mhp||1);return r>=.35?3:r>=.15?2:r>=.05?1:0;}
 const TIERK=[1,1.14,1.32,1.55];
-let LASTLB=null;
 function dmgPop(u,s,kind,el){const v=parseInt(s,10),heal=s[0]==='+',crit=/crit/.test(kind),weak=/weak/.test(kind),psn=/psn/.test(kind),grd=u.side===0&&!heal&&!!u.guard,t=heal?0:tierOf(u,Math.abs(v));
  const fs=Math.round(baseFs(u)*TIERK[t]*(crit?1.18:1)*(heal?.9:1));
  const lb=(crit?'<span class="cr">Critical</span>':'')+(weak?`<span class="wk">Weak${el?`<b>${esc(el)}</b>`:''}</span>`:'')+(grd?'<span class="gd">Guard</span>':'')+(psn?'<span class="sx">毒</span>':'');
  const cls=`dmg t${t}${crit?' crit':''}${weak?' weak':''}${heal?' heal':''}${psn?' psn':''}${grd?' grd':''}`;
  const r=mkPop(u,cls,`<div class="lb">${lb}</div><div class="n" style="font-size:${fs}px">${heal?'+':''}${fmtN(v)}</div>`,LIFE(crit||t>=2?1350:1150));
- r.dmg=1;LASTLB={u,r};if(crit||t>=3){r.el.classList.add('fl');}return r;}
+ r.dmg=1;u._lb23=r;if(crit||t>=3){r.el.classList.add('fl');}return r;}
 function wordPop(u,s,kind){const miss=s==='MISS',brk=/brk/.test(kind)||/^BREAK/.test(s);const fs=Math.round(baseFs(u)*(brk?1.05:.9));
  return mkPop(u,miss?'word miss':'word brk',`<div class="w" style="font-size:${fs}px">${miss?'Miss':'BREAK!!'}</div>`,LIFE(brk?1300:1000));}
 /* 小さな文字（状態・AG+・DELAY など）。直前のダメージ表示があれば、その見出しに加える（Guard／スタン／430 の形） */
 function tagPop(u,s,col,kind){const now=performance.now();
- if(LASTLB&&LASTLB.u===u&&now-LASTLB.r.t<380&&LASTLB.r.el.isConnected&&!/fu/.test(kind||'')){const lb=LASTLB.r.el.querySelector('.lb');if(lb&&lb.children.length<4){lb.insertAdjacentHTML('beforeend',`<span class="sx" style="--c:${col||'#fff'}">${esc(s)}</span>`);placePop(LASTLB.r.el,u,LASTLB.r.s);return;}}
+ const R=u._lb23;if(R&&now-R.t<420&&R.el.isConnected&&!/fu/.test(kind||'')){const lb=R.el.querySelector('.lb');if(lb&&lb.children.length<4){lb.insertAdjacentHTML('beforeend',`<span class="sx">${esc(s)}</span>`);placePop(R.el,u,R.s);return;}}
  const up=/\bup\b/.test(kind||''),dn=/\bdn\b/.test(kind||'');
  mkPop(u,'tag'+(up?' up':dn?' dn':'')+(KANJI.test(s)?' jp':''),`<div class="g" style="--c:${col||'#fff'}">${esc(s)}</div>`,LIFE(1000));}
 const _pop0=V17F.pop;
@@ -159,6 +160,55 @@ function seirinText(u){return new Promise(res=>{const st=$('#stage');let c=$('#s
   try{await seirinText(u);}catch(e){console.error(e);}
   cut.classList.add('mute23');B.flashBg=Math.max(B.flashBg||0,26);
   try{return await _aw(u);}finally{cut.classList.remove('mute23');try{const[x,y]=V19.mid(u);FX19.ring(x,y,'#ffffff',{r1:30,dur:420});}catch(e){}}};}
+
+/* ==================== 6. 探索：テキスト表示の切り替え ====================
+ 右下の「文」ボタンで、下のテキスト欄を表示／非表示にする（設定に保存）。
+ 非表示のときはテキスト欄の分だけマップを縦に広げ、新しい知らせはマップ下部に短く流す（タップでテキスト欄を戻す） */
+const msgHidden=()=>!!(G&&G.set&&G.set.fmsg23);
+function fieldUI(){if(scene!=='field')return;const st=$('#stage');let b=$('#ft23');
+ if(!b){b=document.createElement('button');b.id='ft23';b.type='button';st.appendChild(b);b.addEventListener('pointerdown',e=>e.stopPropagation());
+  b.addEventListener('click',e=>{e.stopPropagation();SFX.sel();G.set.fmsg23=!msgHidden();try{save();}catch(x){}applyFieldMsg(true);});}
+ let k=$('#fk23');if(!k){k=document.createElement('div');k.id='fk23';st.appendChild(k);k.addEventListener('pointerdown',e=>e.stopPropagation());k.addEventListener('click',e=>{e.stopPropagation();G.set.fmsg23=false;try{save();}catch(x){}applyFieldMsg(true);});}
+ const h=msgHidden();b.innerHTML=`<b>文</b><small>${h?'表示':'隠す'}</small>`;b.classList.toggle('off',h);b.setAttribute('aria-label',h?'テキストを表示':'テキストを隠す');}
+function applyFieldMsg(anim){const h=msgHidden()&&scene==='field';app.classList.toggle('fmh23',h);fieldUI();if(!h){const k=$('#fk23');if(k)k.classList.remove('show');}
+ if(scene==='field'&&F){fitField();if(anim)fadeIn();}}
+/* マップの高さ：テキスト欄・仲間の欄・ボタンを除いた残りすべて（16の倍数に切り捨てない＝下に余白を残さない） */
+fitField=function(){if(scene!=='field'||!F)return;const cmd=$('#cmd'),mapH=(typeof MH!=='undefined'?MH:24)*16;let slack=0;
+ /* ボタン欄（#cmd）は残りの高さを埋めて伸びるので、その中の「余り」をマップに回す */
+ try{const kids=[...cmd.children].filter(e=>e.offsetParent);if(kids.length){const cr=cmd.getBoundingClientRect(),bot=Math.max(...kids.map(e=>e.getBoundingClientRect().bottom));slack=cr.bottom-px(getComputedStyle(cmd).paddingBottom)-bot-4;}}catch(e){}
+ const h=clamp(H+Math.floor(slack/SC),144,Math.min(mapH,560));if(h!==H)setH(h);};
+/* テキスト非表示中に届いた知らせを、マップの下に短く出す */
+let FKT=0;
+new MutationObserver(()=>{if(scene!=='field'||!msgHidden())return;const m=$('#msg'),k=$('#fk23');if(!m||!k)return;const html=m.innerHTML.trim();if(!html||k._h===html)return;k._h=html;
+ k.innerHTML=`<span>${html}</span>`;k.classList.remove('show');void k.offsetWidth;k.classList.add('show');clearTimeout(FKT);FKT=setTimeout(()=>k.classList.remove('show'),3600);}).observe($('#msg'),{childList:true,subtree:true,characterData:true});
+{const _ef=enterField;enterField=function(...a){const r=_ef(...a);try{applyFieldMsg(false);}catch(e){console.error(e);}return r;};}
+{const _sh=show;show=function(m){_sh(m);if(m!=='field')app.classList.remove('fmh23');else requestAnimationFrame(()=>{try{applyFieldMsg(false);}catch(e){}});};}
+
+/* ==================== 3. ホーム画面：実際の大きさから配置を決める ====================
+ これまでは各要素を固定の座標で置いていたため、画面が低い・狭いと右メニューと「NEXT」、
+ お知らせ（トースト）と左右の列、DEVボタンと左の列が重なっていた。
+ 上の帯（資源・街名・依頼）と下の帯（出撃・ナビ）を先に測り、その間の高さに左右の列を収める */
+function homeFix(){if(scene!=='town'||TSC!=='home')return;const R=$('#labels .h22');if(!R)return;const rb=R.getBoundingClientRect();if(!rb.height)return;
+ const q=s=>R.querySelector(s),rel=el=>{const r=el.getBoundingClientRect();return{l:r.left-rb.left,t:r.top-rb.top,r:r.right-rb.left,b:r.bottom-rb.top,w:r.width,h:r.height};};
+ const mis=q('.h22mis'),nav=q('.h22nav'),go=q('.h22go'),L=q('.h22left'),Rt=q('.h22right');if(!mis||!nav||!go||!L||!Rt)return;
+ const top=rel(mis).b+8,navT=rel(nav).t,W0=rb.width;
+ /* 下の「NEXT・挑戦・出撃」は幅を左の列の右までに制限 */
+ const nx=q('.h22nx');if(nx)nx.style.maxWidth=Math.max(120,W0-84-6)+'px';
+ const goT=rel(go).t;
+ /* 右のメニュー：上の帯と「NEXT」の間に7つのボタンを収める（足りなければボタンを低く・アイコンを小さく） */
+ const nb=Rt.children.length||1,availR=goT-8-top,bh=clamp(Math.floor((availR-8)/nb),28,46);
+ Rt.style.top=top+'px';Rt.style.setProperty('--bh',bh+'px');Rt.classList.toggle('cmp23',bh<36);Rt.classList.toggle('xs23',bh<31);
+ /* 左の列（道具屋・鍛冶屋・鑑定屋）とDEVボタン */
+ L.style.top=top+'px';const nl=L.children.length||1,devOn=!!G.dev,availL=navT-8-top-(devOn?34:0),gap=clamp(Math.floor((availL-nl*62)/Math.max(1,nl-1)),2,12);
+ L.style.gap=gap+'px';L.classList.toggle('cmp23',availL<nl*62);
+ const dv=$('#devB');if(dv){if(devOn){const lb=rel(L).b;dv.style.top=Math.round(lb+6)+'px';dv.style.bottom='auto';}else{dv.style.top='';}}
+ /* お知らせ：左右の列のあいだ、依頼の下に。はみ出す分は省略し、タップで閉じる */
+ const t=q('.h22toast')||$('#labels .h22toast');if(t){const lr=rel(L).r,rl=rel(Rt).l;t.style.left=Math.round(lr+6)+'px';t.style.width=Math.max(120,Math.round(rl-lr-12))+'px';t.style.top=top+'px';t.style.maxHeight=Math.max(60,Math.round(goT-top-10))+'px';}
+ /* 街を歩く仲間は左右の列とお知らせの下にもぐらないよう、そのまま（絵の一部）。 */}
+{const _tm=townMenu;townMenu=function(m){_tm(m);fadeIn();try{homeFix();requestAnimationFrame(homeFix);setTimeout(homeFix,120);}catch(e){console.error(e);}};}
+addEventListener('resize',()=>{if(scene==='town'&&TSC==='home')requestAnimationFrame(()=>requestAnimationFrame(()=>{try{homeFix();}catch(e){}}));});
+/* お知らせはタップで閉じる */
+document.addEventListener('click',e=>{const t=e.target.closest('.h22toast');if(t)t.classList.remove('show');});
 
 /* 版表示 */
 {const _t=title;title=function(){_t();const v=$('#verL');if(v)v.textContent=VER23;};const v=$('#verL');if(v)v.textContent=VER23;}
