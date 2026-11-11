@@ -1,0 +1,116 @@
+/* ===== ver0.21 ===== */
+/* ---------- 画面サイズ・セーフエリア ----------
+ --sat/--sab：上下のセーフエリア（iPhone の切り欠き・ホームバー）。--apph：実際に見えている高さ（JSで更新）
+ 外側の枠（埋め込み表示）が html に余白を足しても二重にならないよう、セーフエリアは #app だけで処理する */
+:root{--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);--sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px)}
+html{padding:0 !important;height:100%;overflow:hidden;overscroll-behavior:none}
+body{height:100%;overflow:hidden;overscroll-behavior:none;position:fixed;inset:0;width:100%}
+#app{height:100%;height:var(--apph,100dvh);max-height:100dvh;padding-left:max(6px,var(--sal));padding-right:max(6px,var(--sar));min-height:0}
+#app > *{flex-shrink:0}
+#app > #cmd{flex:1 1 auto;min-height:0;flex-shrink:1}
+/* ---------- 横スクロールの修正 ----------
+ 原因：下部固定ボタン（.foot20）の左右の負の余白が #cmd から2pxはみ出し、縦スクロール用の領域が横にも動いていた */
+#app .foot20{margin:6px 0 0;padding:6px 0 4px}
+#cmd,.sbody,.wlist,.swin.v17,#msg,.blist,#app.v20 .blist,#app #ov.rw20ov{overflow-x:hidden;overscroll-behavior-x:none}
+#cmd,.sbody,.wlist,.swin.v17,.blist{touch-action:pan-y}
+#cmd .icard,#cmd .scard,#cmd .slot,#cmd .itile,#cmd .tbtn{max-width:100%;min-width:0}
+#cmd .ibody{min-width:0}
+/* 本当に横へ流す一覧だけ横スクロールを許可 */
+.tvms,.bdm{overflow-x:auto;overflow-y:hidden;touch-action:pan-x pan-y;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tvms::-webkit-scrollbar,.bdm::-webkit-scrollbar{display:none}
+/* ---------- 装備・道具アイコン（24×24 のドット絵。拡大してもぼかさない） ---------- */
+.iic,.ii,.itile img,.cslot img,.peq img,.lb img,.sic,.mt20 img,.wdr img,.slot .iic{image-rendering:pixelated;image-rendering:crisp-edges}
+.ii{width:24px;height:24px;vertical-align:-7px}
+#app .itile img{width:48px;max-width:72%}
+#app .peq img{padding:0}
+
+/* ---------- 戦闘：狙っている敵だけ頭上に情報を出す ---------- */
+#app[data-sc="battle"] #labels .lab,#app[data-sc="battle"] #labels .tgp{display:none !important}
+#tg21{position:absolute;left:0;top:0;z-index:4;min-width:118px;max-width:178px;padding:3px 6px 4px;border-radius:7px;border:1px solid #c8b070;
+ background:linear-gradient(180deg,rgba(18,22,44,.9),rgba(6,8,20,.86));box-shadow:0 2px 6px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.05);
+ font-size:11px;line-height:1.25;color:#fff;text-shadow:1px 1px 0 #000;pointer-events:none;will-change:transform}
+#tg21.up::after{content:'';position:absolute;left:var(--ax,50%);bottom:-6px;margin-left:-5px;border:5px solid transparent;border-bottom:0;border-top-color:#c8b070}
+#tg21.up::before{content:'';position:absolute;left:var(--ax,50%);bottom:-4px;margin-left:-4px;border:4px solid transparent;border-bottom:0;border-top-color:rgba(8,10,24,.95);z-index:1}
+#tg21 .t1{display:flex;align-items:center;gap:4px;white-space:nowrap;min-width:0}
+#tg21 .t1 em{flex:none;font-style:normal;font-size:8px;letter-spacing:1px;color:#1a1000;background:var(--gold,#ffd65a);border-radius:3px;padding:0 3px;text-shadow:none;line-height:12px}
+#tg21 .t1 em.bs{background:#ff4a5a;color:#fff}
+#tg21 .t1 b{font-weight:700;overflow:hidden;text-overflow:ellipsis;min-width:0}
+#tg21 .t1 small{flex:none;font-size:9px;color:#aab0d8}
+#tg21 .t1 .sd{flex:none;margin-left:auto;font-size:10px;color:#cfe3ff}
+#tg21 .t1 .bk{flex:none;margin-left:auto;font-size:9px;color:#fff;background:#d83a3a;border-radius:3px;padding:0 3px;text-shadow:none}
+#tg21 .hpw{display:flex;align-items:center;gap:4px;margin:2px 0 1px}
+#tg21 .hb21{position:relative;flex:1;height:7px;border:1px solid #000;border-radius:2px;overflow:hidden;background:#2a0e14;box-shadow:0 0 0 1px rgba(255,255,255,.12)}
+#tg21 .hb21 s{position:absolute;inset:0;background:#2a0e14}
+#tg21 .hb21 u{position:absolute;left:0;top:0;bottom:0;background:#fff;opacity:.85;transition:width .6s ease .35s}
+#tg21 .hb21 i{position:absolute;left:0;top:0;bottom:0;--c:#e5484d;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 70%,#fff),var(--c) 55%,color-mix(in srgb,var(--c) 70%,#000));transition:width .18s}
+#tg21 .cnt{flex:none;font-style:normal;font-weight:900;font-size:12px;color:var(--c,#fff);min-width:0;letter-spacing:-.5px}
+#tg21 .cnt:empty{display:none}
+#tg21 .pip{display:flex;gap:2px;margin:1px 0 1px}
+#tg21 .pip:empty{display:none}
+#tg21 .pip i{flex:1;height:3px;border-radius:1px;background:var(--c);box-shadow:0 0 0 1px #000;transition:opacity .3s,transform .3s}
+#tg21 .pip i.off{opacity:.18;background:#555}
+#tg21 .pip i.cur{animation:pip21 .9s infinite alternate}
+@keyframes pip21{from{filter:brightness(1)}to{filter:brightness(1.6)}}
+#tg21 .t3{display:flex;flex-wrap:wrap;align-items:center;gap:2px;margin-top:2px}
+#tg21 .t3:empty{display:none}
+#tg21 .t3 .wk{font-size:9px;color:#ffd480;margin-right:1px}
+#tg21 .t3 i{font-style:normal;min-width:15px;height:14px;line-height:13px;text-align:center;font-size:9px;border-radius:3px;padding:0 2px;color:#111;background:var(--c);border:1px solid #fff;text-shadow:none}
+#tg21 .t3 i.tm{border-style:dashed;opacity:.85}
+#tg21 .t3 i.q{background:#1a2040;color:#aab0d8;border-color:#4a5490}
+#tg21 .t3 .tg{display:inline-flex;gap:2px;flex-wrap:wrap}
+#tg21 .t3 .tg .ch{font-size:9px;min-width:0;padding:0 2px;margin:0}
+/* ボス：ゲージを太く、金の縁 */
+#tg21.boss{border-color:#ff8a5a;min-width:150px;max-width:min(236px,64vw);background:linear-gradient(180deg,rgba(48,14,24,.92),rgba(10,6,16,.88))}
+#tg21.boss.up::after{border-top-color:#ff8a5a}
+#tg21.multi .hb21{height:9px}
+/* 1本削り切ったとき：ゲージが白く光って揺れる */
+#tg21.brk21 .hb21{animation:brk21 .55s}
+#tg21.brk21 .cnt{animation:cnt21 .55s}
+@keyframes brk21{0%{box-shadow:0 0 0 1px #fff,0 0 12px #fff;transform:translateX(0)}20%{transform:translateX(-3px)}40%{transform:translateX(3px)}60%{transform:translateX(-2px)}100%{box-shadow:0 0 0 1px rgba(255,255,255,.12);transform:none}}
+@keyframes cnt21{0%{transform:scale(1.9);filter:brightness(2)}100%{transform:none}}
+
+/* ---------- 編成：立ち姿・名前・数値を重ならない配置に ---------- */
+#app .pcards{gap:5px}
+#app .pcd{display:flex;flex-direction:column;padding:0 0 5px;overflow:hidden;min-width:0}
+#app.v20 .pcd .part,#app .pcd .part{flex:none;height:clamp(58px,10.4vh,86px);border-radius:7px 7px 0 0}
+#app .pcd .part img{width:auto;height:100%;max-width:100%;aspect-ratio:1;bottom:0}
+#app .pcd .rk{left:auto;right:3px;top:3px;transform:none;width:24px;height:21px}
+#app .pcd .rk b{font-size:11px}
+#app .pcd .pno{left:3px;top:3px}
+#app .pcd .pnm{display:flex;align-items:center;justify-content:center;gap:3px;margin:4px 3px 0;padding:0;min-width:0;font-size:12px;line-height:16px}
+#app .pcd .pnm .elc{flex:none;margin:0;width:16px;min-width:16px}
+#app .pcd .pnm span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#app .pcd .plv{display:flex;flex-direction:column;align-items:center;margin:1px 3px 0;line-height:1.2;min-width:0}
+#app .pcd .plv b{font-weight:400;font-size:10px;color:#cfd6ff}
+#app .pcd .plv span{display:block;max-width:100%;font-size:9px;color:#aab0d8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#app .pcd .ppw{margin:3px 3px 0}
+#app .pcd .ppw b{font-size:14px}
+#app .pcd .peq{gap:2px;margin:4px 3px 0}
+#app .pcd .pbd{width:auto;height:26px;margin:5px 3px 0;border-radius:13px;flex-direction:row;gap:3px}
+#app .pcd .pbd b{font-size:12px}
+#app .pcd .pbd small{margin:0;font-size:9px}
+#app .pcd.emp{min-height:200px}
+#app .pbt b{text-overflow:ellipsis}
+#app .pbt small{text-overflow:ellipsis}
+
+/* ---------- 星詠み：盤面を画面に合わせ、操作までスクロールなしで ---------- */
+#app[data-sc="board"] #msg{min-height:0;max-height:38px;padding:4px 9px;margin-top:4px;font-size:12px;line-height:1.4;overflow:hidden}
+#app[data-sc="board"] #cmd{padding-top:5px}
+#app[data-sc="board"] .bdh{top:3px;padding:1px 6px 1px 2px}
+#app[data-sc="board"] .bdh img{width:42px;height:42px}
+#app[data-sc="board"] .bdm{padding:1px 0 4px;margin-bottom:4px}
+#app[data-sc="board"] .bdf{width:48px}
+#app[data-sc="board"] .bdf img{width:30px;height:30px}
+#app[data-sc="board"] .bdi{min-height:54px;padding:5px 10px}
+#app[data-sc="board"] .bdi b{font-size:14px;margin:1px 0}
+#app[data-sc="board"] .foot20{margin-top:5px;padding-top:4px}
+#app[data-sc="board"] .bdb{margin-top:5px}
+#app[data-sc="board"] .foot20 .bdb .tbtn{height:38px}
+/* 店・施設タイルの通知バッジが枠の外へ出て横にはみ出さないように */
+#app .ftile i{right:2px;top:-5px}
+/* 道具屋の品のアイコンは2倍のドットで */
+#app.v20 .scard .sic,#app .scard .sic{width:52px;height:52px;padding:0;border-width:2px}
+/* 開発者メニュー：デザイン一覧 */
+.igrid.g21 .itile{display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:auto;padding:4px 2px 3px}
+.igrid.g21 .itile img{width:48px;max-width:none}
+.igrid.g21 .itile small{display:block;font-size:9px;line-height:1.15;color:#cfd3f5;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

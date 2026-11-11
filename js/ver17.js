@@ -185,7 +185,7 @@ openSheet=function(id,tab){if(tab)CTAB=tab;if(!G.members.includes(id))id=G.party
  ovOpen(charHTML(id,CTAB,false)+'<button class="tbtn back wide" data-a="close">閉じる</button>',{tab:k=>{CTAB=k;openSheet(id);},prev:()=>openSheet(ids[(i-1+ids.length)%ids.length]),next:()=>openSheet(ids[(i+1)%ids.length]),close:ovClose});};
 
 /* ==================== 星盤 ==================== */
-drawBoard=function(){const c=bctx,cw=W*SC,ch=224*SC,id=BS.id,N=BOARD[id],U=G.h[id].board,col=elCol(id),cx=cw/2,cy=ch/2+18;
+drawBoard=function(){const c=bctx,cw=W*SC,ch=BCH(),id=BS.id,N=BOARD[id],U=G.h[id].board,col=elCol(id),cx=cw/2,cy=bpos({q:0,r:0})[1];
  const bg=c.createRadialGradient(cx,cy,20,cx,cy,ch*.75);bg.addColorStop(0,'#1c2150');bg.addColorStop(1,'#05060f');c.fillStyle=bg;c.fillRect(0,0,cw,ch);
  BGS.forEach(([x,y,b],i)=>{c.fillStyle=`rgba(200,210,255,${.2+.5*b*(.6+.4*Math.sin(tick/30+i))})`;c.fillRect(x*cw,y*ch,1.5,1.5);});
  /* 星片の軌道（ゆっくり回る） */

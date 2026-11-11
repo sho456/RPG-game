@@ -212,7 +212,7 @@
 .pr20.lock{opacity:.55;filter:grayscale(.6)}.pr20.lock i{background:#5a6290;color:#fff}
 
 /* ---------- 報酬・レベルアップ ---------- */
-#app #ov.rw20ov{justify-content:flex-start !important;padding:calc(env(safe-area-inset-top) + 10px) 10px calc(env(safe-area-inset-bottom) + 10px);overflow-y:auto;background:radial-gradient(ellipse at 50% 0%,rgba(80,60,10,.55),rgba(6,8,18,.96) 55%)}
+#app #ov.rw20ov{justify-content:flex-start !important;padding:calc(var(--sat) + 10px) 10px calc(var(--sab) + 10px);overflow-y:auto;background:radial-gradient(ellipse at 50% 0%,rgba(80,60,10,.55),rgba(6,8,18,.96) 55%)}
 .rw20{width:100%;max-width:400px;display:flex;flex-direction:column;align-items:stretch;gap:7px;margin:0 auto;flex:none}
 .rwB{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;animation:fin20 .4s var(--d) both}.rwB span{font-size:10px;padding:1px 6px;border-radius:3px;background:rgba(90,66,14,.75);border:1px solid #c8a040}.rwB span b{color:#7dffa8;font-weight:400}
 .rwT{display:flex;justify-content:center;gap:2px;font-size:38px;line-height:1;margin:4px 0 2px;position:relative}
