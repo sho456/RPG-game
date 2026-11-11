@@ -78,7 +78,7 @@ BCH=function(){return BCH21||224*SC;};
 bpos=function(n){const cw=W*SC,ch=BCH(),top=56,bot=20,av=ch-top-bot,s=Math.min(cw/(Math.sqrt(3)*7.4),av/10.4);return[cw/2+s*Math.sqrt(3)*(n.q+n.r/2),top+av/2+s*1.5*n.r,s];};
 function boardFit(){if(scene!=='board')return;const c=$('#cmd'),m=$('#msg'),cs=getComputedStyle(c);let need=px(cs.paddingTop)+px(cs.paddingBottom)+px(cs.marginTop);
  for(const k of c.children){const s=getComputedStyle(k);need+=k.offsetHeight+px(s.marginTop)+px(s.marginBottom);}
- const ms=getComputedStyle(m),msgH=m.offsetHeight+px(ms.marginTop)+px(ms.marginBottom),h=clamp(Math.floor(contentH()-msgH-need-4),250,224*SC);
+ const ms=getComputedStyle(m),msgH=m.offsetHeight+px(ms.marginTop)+px(ms.marginBottom),h=clamp(Math.floor(contentH()-msgH-need-4),250,224*SC+90);
  if(h!==BCH21){BCH21=h;fit();}}
 {const _bm=boardMenu;boardMenu=function(m){_bm(m);try{boardFit();}catch(e){console.error(e);}};}
 {const _ob=openBoard;openBoard=function(id,m){BCH21=0;return _ob(id,m);};}
