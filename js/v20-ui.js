@@ -152,7 +152,18 @@ function playReward(ov){const box=ov.querySelector('.rw20');if(!box)return;let s
 /* 次の画面に移ったら報酬画面の装飾を外す */
 {const _sh=show;show=function(m){_sh(m);try{$('#ov').classList.remove('rw20ov');}catch(e){}};}
 
+/* ==================== 開発者メニュー：ver0.20 ==================== */
+function demoReward(){const its=[0,1,2,3,4].map(r=>{const it=genItem(40,r,0,r%2?'w':null,r);it.unid=r===3;return{it,txt:''};});
+ RW={col:false,items:its,r:{xp:12345,gold:6789,tou:420,drops:{kakera:3,kiba:2},sts:['紅玉'],ups:[]},ups:G.party.map(id=>{const s=stats(id),L=G.h[id].lv;return{id,lv0:L,lv1:L+1,party:true,d:STK.map(([k,l])=>[l,k==='spd'?.3:Math.max(1,Math.round(s[k]*.03)),k==='spd'?+s[k].toFixed(1):s[k]]),sk:id===G.party[0]?[(V20.LSK[id]||[[0,'kobu']])[0][1]]:[],ps:id===G.party[1]?[V20.PS[V20.CPS[id][1]]]:[]};})};
+ const ov=$('#ov');ov.classList.remove('hide');ov.classList.add('rw20ov');ov.innerHTML=rewardHTML();$('#cont').onclick=()=>{ov.classList.add('hide');ov.classList.remove('rw20ov');ov.innerHTML='';dvMenu();};playReward(ov);RW.r=null;}
+function dev20(){log('<b>ver0.20</b>　状態効果・パッシブ・新スキル・報酬演出の確認');
+ menu([{l:'状態効果テスト（氷華の妖狐）',s:'激昂・毒・弱体・障壁・反撃',cls:'ready',f:()=>{G.party=['valk','noah','crow','mire'].filter(x=>G.members.includes(x));devBattle([{kind:'boss5',lv:30}],'kouka',{theme:'ice'});}},
+  {l:'鼓舞する敵との戦闘',s:'亡霊騎士・影法師',f:()=>devBattle([{kind:'darkknight',lv:30},{kind:'shade',lv:30},{kind:'shade',lv:30}],'seido',{boss:false})},
+  {l:'報酬・レベルアップ演出',s:'全レアリティの出現演出',f:demoReward},
+  {l:'パッシブ・技の一覧',s:'キャラ詳細「技・覚醒」タブ',f:()=>{enterTown();openSheet(G.party[0],'sk');}},{l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
+{const _dv=dvMenu;dvMenu=function(m){_dv(m);try{addCmd('ver0.20 戦闘の深化・UI刷新','状態効果・パッシブ・報酬演出',dev20,0,'ready');}catch(e){}};}
+
 /* ==================== 版表示 ==================== */
 {const _t=title;title=function(){_t();const v=$('#verL');if(v)v.textContent=VER20;};const v=$('#verL');if(v)v.textContent=VER20;}
 try{document.title='アストラル・ブレイカー '+VER20;}catch(e){}
-return{partyPanel,targetPanel,skillBanner,SFX20};})();
+return{partyPanel,targetPanel,skillBanner,SFX20,demoReward,dev20};})();
