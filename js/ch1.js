@@ -25,9 +25,9 @@ Object.assign(SK,{fire:{n:'ファイア',sp:15,el:'炎',k:'mag',pow:1.4,t:'one',
  zettai:{n:'絶対零度の太陽',k:'mag',el:null,pow:4.2,t:'all',req:'stk3',gaugeAll:1,d:'対消滅3段階で解禁・全体の大魔法'}});
 AW.mire={name:'双極の書架',type:'ゲージ消費',turns:99,cmds:['fira2','blizz2','zettai']};
 BDEF.mire={star:'双極座',sec:[['magP'],['resP'],['spd','crit'],['mhpP'],['defP'],['weakDmg','awDmg']],mask:['3,-2','-1,-2','-3,1','2,1'],
- sp:{'2,-2':{t:'skill',v:'thunder'},'-2,2':{t:'skill',v:'hyouga'},'0,-3':{t:'aw',v:{gaugeSave:5},d:'覚醒ゲージの消費-5'},'3,-3':{t:'aw',v:{noRecoil:1},d:'覚醒の反動を無効'},
+ sp:{'2,-2':{t:'skill',v:'thunder'},'-2,2':{t:'skill',v:'hyouga'},'0,-3':{t:'aw',v:{gaugeSave:5},d:'星臨ゲージの消費-5'},'3,-3':{t:'aw',v:{noRecoil:1},d:'星臨の反動を無効'},
   '3,0':{t:'fork',g:1,v:{magP:12},d:'灼星：魔力+12%'},'0,3':{t:'fork',g:1,v:{mhpP:15},d:'霜星：最大HP+15%'},
-  '-3,0':{t:'fork',g:2,v:{awDmg:20},d:'極星：覚醒中与ダメ+20%'},'-3,3':{t:'fork',g:2,v:{weakDmg:20},d:'看破：弱点ダメ+20%'}}};
+  '-3,0':{t:'fork',g:2,v:{awDmg:20},d:'極星：星臨中与ダメ+20%'},'-3,3':{t:'fork',g:2,v:{weakDmg:20},d:'看破：弱点ダメ+20%'}}};
 BOARD.mire=buildBoard('mire');
 const RESO={'gald,rio':'灯火の城塞','mire,rio':'星火の書','gald,mire':'溶岩の城壁'};
 const HPOS={1:[[130,46]],2:[[120,28],[140,62]],3:[[118,10],[140,44],[120,78]],4:[[116,2],[140,28],[118,56],[142,84]]};

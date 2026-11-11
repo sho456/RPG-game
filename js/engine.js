@@ -56,10 +56,10 @@ const SK={
  chouhatsu:{n:'挑発',sp:15,k:'taunt',t:'self',d:'敵の単体攻撃を引きつける'},
  seikou:{n:'星光斬',sp:0,el:'光',k:'phys',pow:3.0,t:'one',d:'光の大斬撃・単体'},
  ryusei:{n:'流星連斬',sp:0,el:'光',k:'phys',pow:1.4,t:'all',d:'光の斬撃・敵全体'},
- keishou:{n:'継承・城壁崩し',sp:0,el:'地',k:'phys',pow:3,t:'all',req:'gald',d:'ガルドの覚醒を模倣（ガルド覚醒後）'},
+ keishou:{n:'継承・城壁崩し',sp:0,el:'地',k:'phys',pow:3,t:'all',req:'gald',d:'ガルドの星臨を模倣（ガルド星臨後）'},
  tettsui:{n:'鉄槌',sp:0,el:'打',k:'phys',pow:1.5,t:'one',d:'打撃・単体'},
  kenshu:{n:'堅守',k:'kenshu',t:'self',d:'被ダメ半減・蓄積1.5倍'},
- houkai:{n:'城壁崩し',k:'release',t:'all',d:'覚醒解除・蓄積を全体へ放出'}};
+ houkai:{n:'城壁崩し',k:'release',t:'all',d:'星臨解除・蓄積を全体へ放出'}};
 const AW={rio:{name:'灯星継承',type:'ターン制',turns:3,cmds:['seikou','ryusei','keishou']},
  gald:{name:'不落城塞',type:'蓄積型',turns:4,cmds:['tettsui','kenshu','houkai']}};
 const EA={claw:{n:'攻撃',el:'斬',k:'phys',pow:1,t:'one'},bite:{n:'噛みつき',el:'突',k:'phys',pow:1.4,t:'one'},press:{n:'のしかかり',el:'打',k:'phys',pow:1.25,t:'one'},
@@ -154,16 +154,16 @@ async function kill(t){if(t.side===0&&t.legs&&t.legs.includes('kiseki')&&!t._ks)
  else{SFX.ko();log(`${t.name}は倒れた…`);if(t.aw)endAw(t,true);t.ag=0;aliveH().forEach(h=>{if(!h.aw)h.ag=Math.min(100,h.ag+25);});}
  refresh();await wait(300);}
 
-/* ===== 覚醒 ===== */
+/* ===== 星臨 ===== */
 async function awaken(u){const A=AW[u.id];u.aw=true;u.awT=0;u.ag=GAUGE.includes(u.id)?100:0;u.charged=0;u.stk=0;u.lastEl=null;u.store=0;B.awUsed.add(u.id);if(u.id==='shion')aliveE().forEach(e=>{e.ct+=100/e.spd;pop(e,'DELAY','#7fd6ff',true);});if(u.id==='noah')B.domain=true;
  const cut=$('#cut');const c=document.createElement('canvas');c.width=16;c.height=16;c.getContext('2d').drawImage(IMG[u.spr+'_aw'],0,0);
- cut.style.background='';cut.innerHTML='';cut.appendChild(c);const tx=document.createElement('div');tx.innerHTML=`<div class="t">${u.name} ― 覚醒${(u.awLv||1)>1?'・段階'+ROMAN[u.awLv]:''}</div><div class="b">${A.name}</div>`;cut.appendChild(tx);
+ cut.style.background='';cut.innerHTML='';cut.appendChild(c);const tx=document.createElement('div');tx.innerHTML=`<div class="t">${u.name} ― 星臨${(u.awLv||1)>1?'・位階'+ROMAN[u.awLv]:''}</div><div class="b">${A.name}</div>`;cut.appendChild(tx);
  cut.classList.remove('show');void cut.offsetWidth;cut.classList.add('show');B.flashBg=30;SFX.aw();
- log(`<b>${u.name}、覚醒――「${A.name}」！</b>`);refresh();await wait(1150);cut.classList.remove('show');
+ log(`<b>${u.name}、星臨――「${A.name}」！</b>`);refresh();await wait(1150);cut.classList.remove('show');
  if(canReso())log('二つの星片が<b>共鳴</b>している！ 共鳴技が使える');else if(B.heroes.filter(h=>h.aw).length>=2&&!B.reso)log('竜の血は、リオの灯にしか共鳴しない…');}
 function canReso(){if(B.reso)return false;const p=B.heroes.filter(h=>h.aw&&h.alive).slice(0,2);if(p.length<2)return false;return!p.some(h=>h.id==='valk')||p.some(h=>h.id==='rio');}
 
-function endAw(u,silent){u._gk=0;if(u.id==='noah')B.domain=false;u.aw=false;u.awT=0;u.store=0;u.stk=0;u.second=false;if(u.legs&&u.legs.includes('koukagari'))u.ag=50;if(!silent){if(!u.noRecoil)u.ct+=20/spdOf(u)*5;log(`${u.name}の覚醒が解けた（反動で行動が遅れる）`);}refresh();}
+function endAw(u,silent){u._gk=0;if(u.id==='noah')B.domain=false;u.aw=false;u.awT=0;u.store=0;u.stk=0;u.second=false;if(u.legs&&u.legs.includes('koukagari'))u.ag=50;if(!silent){if(!u.noRecoil)u.ct+=20/spdOf(u)*5;log(`${u.name}の星臨が解けた（反動で行動が遅れる）`);}refresh();}
 
 async function release(g){const base=g.store*.9+st(g,'atk')*1.5;log(`<b>城壁崩し！</b> 蓄積した ${Math.round(g.store)} の力を解き放つ！`);
  B.flashBg=20;B.shake=14;SFX.brk();await wait(400);
@@ -269,11 +269,11 @@ function menu(items,list,xc){const c=$('#cmd');if(scene==='town')$('#stage').sty
   b.onclick=()=>{SFX.sel();it.f();};c.appendChild(b);});}
 function chooseRoot(u){return new Promise(res0=>{const res=v=>{B.res=null;res0(v);};B.res=()=>res(autoPick(u));
  const root=()=>{const ready=u.ag>=100&&!u.aw&&B.heroes.filter(h=>h.aw).length<2;
-  const its=[{l:'たたかう',f:()=>pickT(u,ATK(u),root,res)},{l:u.aw?'覚醒技':'スキル',f:()=>skillMenu(u,root,res)},
-   {l:'覚醒',s:u.aw?'発動中':`AG ${Math.floor(u.ag)}%`,cls:'aw'+(ready?' ready':''),dis:!ready,f:async()=>{$('#cmd').innerHTML='';await awaken(u);root();}},
+  const its=[{l:'たたかう',f:()=>pickT(u,ATK(u),root,res)},{l:u.aw?'星臨技':'スキル',f:()=>skillMenu(u,root,res)},
+   {l:'星臨',s:u.aw?'発動中':`AG ${Math.floor(u.ag)}%`,cls:'aw'+(ready?' ready':''),dis:!ready,f:async()=>{$('#cmd').innerHTML='';await awaken(u);root();}},
    {l:'防御',s:'被ダメ半減',f:()=>res({sk:GUARD})},{l:'アイテム',f:()=>itemMenu(u,root,res)}];
   if(canReso())its.push({l:'共鳴技',s:resoName(),cls:'reso',f:()=>res({sk:{k:'reso'}})});
-  else if(u.aw&&u.id==='rio')its.push({l:'覚醒解除',s:'任意で解く',f:()=>{endAw(u);root();}});
+  else if(u.aw&&u.id==='rio')its.push({l:'星臨解除',s:'任意で解く',f:()=>{endAw(u);root();}});
 
   const rs=G.members.filter(id=>!B.heroes.some(h=>h.id===id)&&G.h[id].hp!==0);
   its.push({l:'交代',s:rs.length?'控えと入替':'控えなし',dis:!rs.length||u.swapped||u.aw,f:()=>menu([...rs.map(id=>({l:HB[id].name,s:`Lv${G.h[id].lv}`,f:()=>res({swap:id})})),{l:'戻る',cls:'back',f:root}],true)});
@@ -369,7 +369,7 @@ function draw(){tick++;if(scene==='field'){drawField();requestAnimationFrame(dra
 function bar(cls,v,m,txt){return`<div class="bar ${cls}${cls==='ag'&&v>=100?' full':''}"><i style="width:${Math.max(0,Math.min(100,v/m*100))}%"></i><span>${txt}</span></div>`;}
 function refresh(){if(!B)return;
  $('#party').className='';$('#party').innerHTML=B.heroes.map(h=>`<div class="pc ${B.cur===h?'cur':''} ${h.alive?'':'down'} ${h.aw?'awk':''}"><img class="fc" src="${face(h.id,h.aw)}"><div class="nm">${h.name}${h.aw?`<span class="tag">${AW[h.id].name}${awTag(h)}</span>`:''}${h.taunt>0?'<span class="tag2">挑発中</span>':''}</div>
-  <div class="bars">${bar('hp',h.hp,h.mhp,`HP ${h.hp}`)}${bar('sp',h.sp,100,`SP ${h.sp}`)}${bar('ag',h.ag,100,h.aw?(h.id==='mire'?'ゲージ'+Math.round(h.ag):'覚醒中'):h.ag>=100?'覚醒OK':`AG ${Math.floor(h.ag)}`)}</div></div>`).join('');
+  <div class="bars">${bar('hp',h.hp,h.mhp,`HP ${h.hp}`)}${bar('sp',h.sp,100,`SP ${h.sp}`)}${bar('ag',h.ag,100,h.aw?(h.id==='mire'?'ゲージ'+Math.round(h.ag):'星臨中'):h.ag>=100?'星臨OK':`AG ${Math.floor(h.ag)}`)}</div></div>`).join('');
  $('#labels').innerHTML=aliveE().map(e=>{const unk=e.weak.length-e.known.size;
   return`<div class="lab" style="left:${Math.max(0,(e.x)*SC)}px;top:${Math.max(0,(e.y+(e.boss?-3:6))*SC-32)}px"><div class="n">${e.name} <small style="color:#aab">Lv${e.lv}</small></div><div class="hp"><i style="width:${e.hp/e.mhp*100}%"></i></div>`+
   (e.broken?'<span class="ch brk">BREAK</span>':`<span class="ch sh">◆${e.brk}</span>`)+[...e.known].map(k=>`<span class="ch" style="color:#111;background:${ELC[k]};border-color:${ELC[k]}">${k}</span>`).join('')+'<span class="ch">?</span>'.repeat(unk)+(e.charging?'<span class="ch chg">溜</span>':'')+'</div>';}).join('');
