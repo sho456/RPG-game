@@ -128,14 +128,18 @@ defMon('shroom',{W:80,H:76,AX:40,AY:70,pose:{x:0,y:0,sq:0,ln:0,bl:0,mo:0,sp:0,tn
 defMon('bookghost',{W:80,H:80,AX:40,AY:74,pose:{x:0,y:-8,fl:0,op:0,ws:0,ey:0,ar:0,tl:0,mo:0},
  matsOf:(P,ex)=>({cov:[P.V,PX.tint(P.V,.5)],page:[P.w,PX.mix(P.w,P.q,.55)],ink:P.q,gem:GL(P.o),wisp:[P.p,PX.mix(P.p,P.V,.6)],ws2:[PX.mix(P.p,P.w,.5),P.p],e:P.V,gold:[P.p,PX.tint(P.p,.55)],glow:GL(P.w)}),
  draw(g,p,ex){const X=p.x,Y=p.y,ws=p.ws;
-  if(ex==='spirit'){const cx=X,cy=Y-16;/* 精霊：ゆらめく炎状の体＋腕＋目 */
-   g.part();chain(g,cx+2,cy+9,1.4+Math.sin(ws)*.3,4,3.2,3.4,.6,'wisp',.25*Math.cos(ws),{bias:-.2});
-   g.part();g.limb(cx-7,cy+1,cx-13,cy+5-p.ar*8,2,1,'wisp',{bias:-.1});g.limb(cx+7,cy+1,cx+12.5,cy+6-p.ar*5,2,1,'wisp',{bias:-.3});
-   g.part();g.ell(cx,cy+2,9,9.5,'wisp');g.ell(cx-.5,cy-4,7.6,7.8,'wisp',{spec:1});
-   for(let i=0;i<4;i++){const a=ws+i*1.7,fx=cx-6+i*4+Math.sin(a)*1.2;g.limb(fx,cy-8,fx+Math.sin(a*1.3)*2.2,cy-15-((i*5+Math.round(ws*2))%4)*1.4,2.2,.5,i%2?'ws2':'wisp',{bias:.15});}
-   g.ell(cx-1,cy+2.5,5.5,5.5,'ws2',{bias:-.1,max:4});
-   const ey=Math.round(cy-3),ex2=Math.round(cx-5);g.poly([[ex2-2,ey-1],[ex2+2,ey+.4],[ex2+1,ey+3],[ex2-2,ey+2.4]],'e',{lv:1});g.poly([[ex2+5,ey+.4],[ex2+9,ey-1],[ex2+9,ey+2.4],[ex2+6,ey+3]],'e',{lv:1});
-   g.px(ex2-1,ey+.6,'gem',p.ey?5:4);g.px(ex2+7,ey+.6,'gem',p.ey?5:4);if(p.mo)g.ell(cx-1.5,cy+5,2.6,2*p.mo,'e',{lv:1});return;}
+  if(ex){const cx=X,cy=Y-16,sh=ex==='shade',yu=ex==='yuki';/* 精霊：残り火＝炎の体／影法師＝背の高い影と長い爪／雪霊＝氷の冠と結晶 */
+   g.part();chain(g,cx+2,cy+9,1.4+Math.sin(ws)*.3,sh?6:4,3.2,3.4,.6,'wisp',.25*Math.cos(ws),{bias:-.2});
+   g.part();const ay=sh?13:5,ax=sh?15:13;g.limb(cx-7,cy+1,cx-ax,cy+ay-p.ar*(sh?12:8),2,1,'wisp',{bias:-.1});g.limb(cx+7,cy+1,cx+ax-.5,cy+ay+1-p.ar*(sh?8:5),2,1,'wisp',{bias:-.3});
+   if(sh)for(const[hx2,hy2]of[[cx-ax,cy+ay-p.ar*12],[cx+ax-.5,cy+ay+1-p.ar*8]])for(const d of[-1.6,0,1.6])g.line(hx2+d*.5,hy2,hx2+d*1.4,hy2+4.5,'ws2',4);
+   g.part();g.ell(cx,cy+2,sh?7.5:9,sh?11.5:9.5,'wisp');g.ell(cx-.5,cy-(sh?7:4),sh?6.6:7.6,sh?8.4:7.8,'wisp',{spec:1});
+   if(sh){g.poly([[cx-6,cy-11],[cx-1+Math.sin(ws)*1.2,cy-21],[cx+5,cy-12]],'wisp',{f:(x,y)=>.3-(x-cx)*.08});}
+   else if(yu){for(const[dx,h,w]of[[-5,7,2.2],[0,10,2.8],[5,6.5,2]])g.poly([[cx+dx-w,cy-9.5],[cx+dx,cy-10.5-h],[cx+dx+w,cy-9.5],[cx+dx,cy-7.5]],'ws2',{f:(x,y)=>.6-(x-cx-dx)*.3,spec:1});
+    for(let i=0;i<3;i++){const a=ws*.6+i*2.1;g.px(cx+Math.cos(a)*13,cy-2+Math.sin(a)*8,'glow',5);}}
+   else for(let i=0;i<4;i++){const a=ws+i*1.7,fx=cx-6+i*4+Math.sin(a)*1.2;g.limb(fx,cy-8,fx+Math.sin(a*1.3)*2.2,cy-15-((i*5+Math.round(ws*2))%4)*1.4,2.2,.5,i%2?'ws2':'wisp',{bias:.15});}
+   if(!sh)g.ell(cx-1,cy+2.5,5.5,5.5,'ws2',{bias:-.1,max:4});
+   const ey=Math.round(cy-(sh?7:3)),ex2=Math.round(cx-5);g.poly([[ex2-2,ey-1],[ex2+2,ey+.4],[ex2+1,ey+3],[ex2-2,ey+2.4]],'e',{lv:1});g.poly([[ex2+5,ey+.4],[ex2+9,ey-1],[ex2+9,ey+2.4],[ex2+6,ey+3]],'e',{lv:1});
+   g.px(ex2-1,ey+.6,'gem',p.ey?5:4);g.px(ex2+7,ey+.6,'gem',p.ey?5:4);if(p.mo)g.ell(cx-1.5,cy+(sh?1:5),2.6,2*p.mo,'e',{lv:1});return;}
   const by=Y-14,op=p.op;
   /* 霊体の尾 */
   g.part();chain(g,X+1,by+5,1.5+Math.sin(ws)*.35,5,3,2.6,.5,'wisp',.3*Math.cos(ws*.8),{bias:-.15});

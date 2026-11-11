@@ -17,12 +17,12 @@ function mixPose(a,b,t){const o={};for(const k in b){const x=a[k],y=b[k];o[k]=Ar
 /* 敵ごとの派生形・倍率（色替えでも形や大きさを変える） */
 const KIND={boss5:{extra:'fox',sc:1.75},tower20:{extra:'fox',sc:1.6},firedrake:{extra:'drake'},last2:{extra:'drake',sc:1.9},
  boss9:{rig:'wolf',extra:'dragon',sc:2.3,pal:{g:'#4a2222',G:'#1a0a0a',w:'#ff7038',x:'#ffe040'}},
- jelly:{extra:'jelly'},shade:{extra:'spirit'},yukirei:{extra:'spirit'},ember:{extra:'spirit'},boss3:{extra:'priest'}};
+ jelly:{extra:'jelly'},shade:{extra:'shade'},yukirei:{extra:'yuki'},ember:{extra:'spirit'},boss3:{extra:'priest'},boss6:{extra:'queen'}};
 let look=null;const GS=1.2;/* 全体の表示倍率（ver0.18 の見た目の大きさに合わせる） */
 function setup(u){const lk=look?look(u):null,sk0=sprKey(u),key=sk0+(lk?lk.k:'');let A=u.A;if(A&&A.key===key)return A;const inf=SPRX.info(sk0)||SPRX.info(u.spr);if(!inf){u.A=Object.assign(A||{},{none:1,key});return u.A;}
  const kd=(u.kind||u.spr||'').replace(/^vo_/,''),K=KIND[kd]||{},name=K.rig||inf.rig,R=RIG[name],boss=u.side===1&&u.sc>2;
  A=Object.assign(A||{wx:0,wy:0,kb:0,kbv:0,seed:((u.x|0)*37+(u.y|0)*91+(u.side?700:0))%4000,cur:null,act:null,rel:null,mv:null,flash:0},
-  {none:0,key,rig:R,name,pal:(K.pal||lk)?Object.assign({},inf.pal,K.pal,lk&&lk.pal):inf.pal,palKey:key+(K.pal?'k':''),extra:K.extra||'',sc:GS*(K.sc||(boss?(R.type==='hum'?1.85:1.5)*(u.sc/3):1)),flip:u.side===1});
+  {none:0,key,rig:R,name,pal:(K.pal||lk)?Object.assign({},inf.pal,K.pal,lk&&lk.pal):inf.pal,palKey:key+(K.pal?'k':''),extra:K.extra||'',sc:GS*(K.sc||(boss?(R.type==='hum'?1.85:name==='boss'?1.28:1.5)*(u.sc/3):1)),flip:u.side===1});
  u.A=A;return A;}
 const base=A=>A.rig.type==='hum'?Object.assign({},HUM.D0,A.rig.pose):Object.assign({},A.rig.pose);
 const swapH=(R,p)=>{if(R.wh!=='N'||!p)return p;const o=Object.assign({},p),a=p.hF,b=p.hN;if(a)o.hN=[a[0]+4,a[1]];else delete o.hN;if(b)o.hF=[b[0]-4,b[1]];else delete o.hF;return o;};
@@ -70,7 +70,9 @@ IDLE.shroom=(t,u,A)=>{const{S,U,ev,blink}=mk(t),sp=ev(3300,1000);
  if(A.extra==='jelly'){const c=(t%1700)/1700,pu=c<.2?c/.2:1-(c-.2)/.8;return{y:-7+Math.sin(c*6.283)*2.5-pu*1.5,sq:pu*.7-.2,tn:t/330,ln:S(3400)*1.2,bl:blink(3600)};}/* 海月：傘をすぼめて進み、ゆっくり開く。触手がたなびく */
  return{sq:S(1040)*.4,ln:S(2080)*2.2,st:S(1040)>.3?1:0,ar:U(2080)*.25,sp:sp>=0?1+Math.floor(sp*6):0,bl:blink(3000)};};/* 茸：傘を左右に揺らし、ときどき胞子を散らす */
 IDLE.bookghost=(t,u,A)=>{const{S,U,ev}=mk(t),pg=ev(2900,460);
- if(A.extra==='spirit')return{y:-9+S(1300)*3,ws:t/230,ar:.25+S(900)*.3,ey:U(520)>.5?1:0,x:S(2600)*1.5};/* 精霊：炎のようにゆらめき、漂う */
+ if(A.extra==='shade')return{y:-6+S(2600)*1.5,ws:t/520,ar:.1+U(2600)*.25,ey:U(1300)>.7?1:0,x:S(5200)*2};/* 影法師：ゆっくり伸び縮みし、爪をだらりと下げる */
+ if(A.extra==='yuki')return{y:-9+S(1700)*2.5,ws:t/330,ar:.3+S(1700)*.25,ey:U(600)>.5?1:0,x:S(3400)*2.5};/* 雪霊：ふわりと舞い、結晶がまわりを巡る */
+ if(A.extra)return{y:-9+S(1300)*3,ws:t/230,ar:.25+S(900)*.3,ey:U(520)>.5?1:0,x:S(2600)*1.5};/* 精霊：炎のようにゆらめき、漂う */
  return{y:-8+S(1650)*2.6,ws:t/380,fl:pg>=0?1+Math.floor(pg*3):0,op:U(1650)*1.2,ey:U(700)>.6?1:0,ar:.2+S(1250)*.2,tl:S(700)};};/* 書：宙に浮き、頁がひとりでにめくれ、霊体が揺らぐ */
 IDLE.boss=(t)=>{const{S,U}=mk(t);/* 番人：浮遊。外套が漂い、目と胸の空洞が脈打つ。腕が呼吸のように開く */
  return{y:-5+S(2400)*2.2,cl:S(1400)*2.4,br:U(2400)*1.5,ey:U(800)>.5?1:0,gp:1+S(1800),hF:[-7-U(2400)*1.5,15-U(2400)*1],hN:[6+U(2400)*1.5,15-U(2400,.1)*1],hy:U(2400,.15)*1};};

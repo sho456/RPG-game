@@ -103,6 +103,8 @@ defHum('noah',{
  matsOf:P=>Object.assign(SKIN(P),{hair:[P.k,PX.mix(P.k,P.q,.6)],robe:[P.w,PX.mix(P.w,P.q,.62)],y:[P.y,PX.tint(P.y,.58,1.15,-14)],b:P.q,halo:GL(P.y),wood:[P.y,PX.tint(P.y,.58,1.15,-14)]}),
  legM:'robe',bootM:'b',armM:'robe',handM:'s',torM:'robe',wp:'staff',
  pose:{fF:[-1.8,0],fN:[1.8,0],hF:[-4,5],hN:[.5,6.5],wa:1.5,ln:0},
+ /* 派生：沈みし女王（背に流れる長い髪と冠） */
+ back(g,J,p,c){if(c.extra!=='queen')return;const[hx,hy]=J.hd,s=p.sw;g.poly([[hx+1,hy-3],[hx+7,hy-1],[hx+9+s*.7,hy+8],[hx+11+s*1.6,hy+17],[hx+7+s*1.4,hy+20],[hx+4+s*.8,hy+13],[hx+1.5,hy+6]],'hair',{f:(x,y)=>.35-(x-hx)*.08+((Math.round(x-hx-s*(y-hy)/16)%3)?0:-.3)});},
  itemF(g,J,p){const[x,y]=J.hF,[tx,ty]=staff(g,x,y,p.wa,13,9,'wood'),[dx,dy]=dir(p.wa);/* 環のついた祭杖 */
   const cx=tx+dx*4,cy=ty+dy*4;g.ell(cx,cy,4.2,4.2,'y',{spec:1,bias:.15,clip:(px,py)=>(px-cx)**2+(py-cy)**2>6.2});g.px(cx-.5,cy-.5,'halo',p.fx?5:4);g.px(cx-.5,cy-5.5,'halo',5);},
  torso(g,J,p,c){torso(g,c,J);const[cx,cy]=J.ch,[hx,hy]=J.hip;g.limb(cx-3,cy+1.4,cx+2.6,cy+1.2,1.3,1.3,'y',{bias:.1});g.rect(cx-1.4,cy+2.6,1,hy-cy-2,'y',3);},
@@ -111,7 +113,8 @@ defHum('noah',{
   g.ell(hx+1.5,hy+2.5,5.6,5.2,'hair',{bias:-.1});g.poly([[hx+2,hy+5],[hx+7+s*.4,hy+7.5],[hx+2,hy+8]],'hair',{lv:2});
   g.part();face(g,c,hx,hy,p,{iris:0});cap(g,hx,hy,'hair',{rx:6.5,ry:6.2,fx:-2.9,fy:2.8,frx:4.2,fry:4});
   g.part();g.poly([[hx-6.2,hy-2.5],[hx-6.2,hy+1],[hx-5,hy+1],[hx-4.8,hy-2.5]],'hair',{lv:3});g.rect(hx-4.6,hy-3,6,2.6,'hair',3);g.tone(hx-3,hy-1,-1);g.tone(hx-1,hy-1,-1);/* 切りそろえた前髪 */
-  g.part();g.limb(hx-5.6,hy-4,hx+5.6,hy-4.6,.7,.7,'y',{lv:4});g.px(hx-3,hy-4.8,'halo',5);},
+  g.part();g.limb(hx-5.6,hy-4,hx+5.6,hy-4.6,.7,.7,'y',{lv:4});g.px(hx-3,hy-4.8,'halo',5);
+  if(c.extra==='queen')for(const[dx,h]of[[-4.5,3.5],[-1.5,5.5],[1.5,4.5],[4.5,3]])g.poly([[hx+dx-1.4,hy-4.6],[hx+dx,hy-5-h],[hx+dx+1.4,hy-4.8]],'y',{lv:dx<0?4:3});},
  front(g,J,p){const[hx,hy]=J.hd,a=p.q2||0;/* 頭上の光輪（機巧の印） */
   for(let i=0;i<10;i++){const t=i/10*6.283+a;g.px(hx+.5+Math.cos(t)*5,hy-9.5+Math.sin(t)*1.4,'halo',Math.sin(t)>0?5:4);}}
 });
