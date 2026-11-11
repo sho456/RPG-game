@@ -22,7 +22,7 @@ let look=null;const GS=1.2;/* 全体の表示倍率（ver0.18 の見た目の大
 function setup(u){const lk=look?look(u):null,sk0=sprKey(u),key=sk0+(lk?lk.k:'');let A=u.A;if(A&&A.key===key)return A;const inf=SPRX.info(sk0)||SPRX.info(u.spr);if(!inf){u.A=Object.assign(A||{},{none:1,key});return u.A;}
  const kd=(u.kind||u.spr||'').replace(/^vo_/,''),K=KIND[kd]||{},name=K.rig||inf.rig,R=RIG[name],boss=u.side===1&&u.sc>2;
  A=Object.assign(A||{wx:0,wy:0,kb:0,kbv:0,seed:((u.x|0)*37+(u.y|0)*91+(u.side?700:0))%4000,cur:null,act:null,rel:null,mv:null,flash:0},
-  {none:0,key,rig:R,name,pal:(K.pal||lk)?Object.assign({},inf.pal,K.pal,lk&&lk.pal):inf.pal,palKey:key+(K.pal?'k':''),extra:K.extra||'',sc:GS*(K.sc||(boss?(R.type==='hum'?1.85:name==='boss'?1.28:1.5)*(u.sc/3):1)),flip:u.side===1});
+  {none:0,key,rig:R,name,pal:(K.pal||lk)?Object.assign({},inf.pal,K.pal,lk&&lk.pal):inf.pal,palKey:key+(K.pal?'k':''),extra:K.extra||'',sc:GS*(K.sc||(boss?(R.type==='hum'?1.85:name==='boss'?1.28:1.5)*(u.sc/3):(R.nsc||1))),flip:u.side===1});
  u.A=A;return A;}
 const base=A=>A.rig.type==='hum'?Object.assign({},HUM.D0,A.rig.pose):Object.assign({},A.rig.pose);
 const swapH=(R,p)=>{if(R.wh!=='N'||!p)return p;const o=Object.assign({},p),a=p.hF,b=p.hN;if(a)o.hN=[a[0]+4,a[1]];else delete o.hN;if(b)o.hF=[b[0]-4,b[1]];else delete o.hF;return o;};

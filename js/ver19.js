@@ -13,6 +13,7 @@ const dims=u=>{const A=setup(u);return A.none?{w:20,h:26}:{w:(A.rig.wid||22)*A.s
 const mid=u=>{const[fx,fy]=foot(u),A=u.A||{};return[fx+(A.wx||0),fy-dims(u).h*.5+(A.wy||0)];};
 /* リグの見た目の大きさ（ドット）。演出の位置決めと影に使う */
 for(const[k,w,h,st]of[['slime',28,22,90],['wolf',40,30,90],['golem',46,54,120],['shroom',34,38,100],['bookghost',36,44,100],['boss',44,62,110]])Object.assign(RIG[k],{wid:w,hgt:h,step:st});
+RIG.golem.nsc=.86;/* 通常敵のゴーレムは少し小さく（上部の表示と重ならないように） */
 for(const k in RIG)if(RIG[k].type==='hum')Object.assign(RIG[k],{wid:20,hgt:RIG[k].B.leg+RIG[k].B.tor+15,step:100});
 
 /* ---------- 武器ごとの攻撃モーション（味方・人型の敵 共通） ----------
@@ -247,4 +248,6 @@ function icon(u){const key=sprKey(u),A=setup(u);if(A.none)return null;let c=ICO.
 {const _rf=refresh;refresh=function(){_rf();if(!B||scene!=='battle')return;try{const cs=document.querySelectorAll('#order .o canvas'),pv=preview().slice(0,cs.length);cs.forEach((c,i)=>{const ic=pv[i]&&icon(pv[i]);if(!ic)return;const g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);g.drawImage(ic,(c.width-18)>>1,(c.height-18)>>1);});}catch(e){}};}
 /* 図鑑：新しいドット絵（未発見はシルエット） */
 try{for(const k in IMG){if(/_(w|aw)$/.test(k)||!SPRX.info(k))continue;for(const sil of[0,1])Object.defineProperty(ZIMG,k+(sil?'_w':''),{configurable:true,enumerable:true,get(){const ed=ED[k],c=still(k,48,ed&&!ed.flip);const v=c?(sil?PX.whiteOf(c):c).toDataURL():'';Object.defineProperty(ZIMG,k+(sil?'_w':''),{value:v,writable:true,configurable:true,enumerable:true});return v;}});}}catch(e){}
+/* 版表示 */
+const VER19='ver0.19';{const _t=title;title=function(){_t();const v=$('#verL');if(v)v.textContent=VER19;};const v=$('#verL');if(v)v.textContent=VER19;}
 return{foot,mid,dims,WP,MA,CAST,BOW,VIC,AWK,still,icon,drawBattle};})();
