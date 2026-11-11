@@ -91,7 +91,7 @@
 .p23 .lb .wk{background-image:linear-gradient(180deg,#ffd6ee 0%,#ff6ab8 50%,#d0206e 100%)}
 .p23 .lb .wk b{display:inline-block;margin-left:3px;font-family:"DotGothic16",sans-serif;font-style:normal;font-weight:400;font-size:1.05em;background:linear-gradient(180deg,#fff,#e8e8f8);-webkit-background-clip:text;background-clip:text;color:transparent}
 .p23 .lb .gd{background-image:linear-gradient(180deg,#f0feff 0%,#7fe4ff 50%,#1a8ad0 100%)}
-.p23 .lb .sx{font-family:"DotGothic16",sans-serif;font-style:normal;font-weight:400;font-size:12px;line-height:1.15;letter-spacing:1px;background-image:linear-gradient(180deg,#ffffff,#e4e8ff)}
+.p23 .lb .sb23{font-family:"DotGothic16",sans-serif;font-style:normal;font-weight:400;font-size:12px;line-height:1.15;letter-spacing:1px;background-image:linear-gradient(180deg,#ffffff,#e4e8ff)}
 /* 会心：金色・大きく・揺れる */
 .p23.crit .n{background-image:linear-gradient(180deg,#fffbe0 0%,#ffe36a 40%,#ffb020 70%,#e07000 100%)}
 .p23.crit .in{animation-name:pcr23}
@@ -124,7 +124,7 @@
 #app.v23[data-sc="battle"] #pops .pop.dg{display:none}
 
 /* ==================== 7. 星臨のカットイン（テキスト段） ==================== */
-#sr23{position:absolute;inset:0;z-index:8;display:none;align-items:center;justify-content:center;flex-direction:column;overflow:hidden;pointer-events:none;
+#sr23{position:absolute;inset:0;z-index:40;display:none;align-items:center;justify-content:center;flex-direction:column;overflow:hidden;pointer-events:none;
  background:radial-gradient(ellipse at center,color-mix(in srgb,var(--ec,#ffd65a) 40%,transparent) 0%,rgba(4,6,20,.9) 70%)}
 #sr23.on{display:flex;animation:sri23 calc(.22s * var(--k,1)) ease-out both}
 #sr23.on.out{animation:sro23 calc(.34s * var(--k,1)) ease-in both}
@@ -181,3 +181,64 @@
 #app.v23[data-sc="field"] #fk23.show{opacity:1;transform:none;pointer-events:auto}
 #fk23 span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 #app.v23.fmh23[data-sc="field"] #msg{display:none !important}
+
+/* ==================== 4. 図鑑 ==================== */
+.zt23{margin-bottom:6px}
+.zgrid.z23{grid-template-columns:repeat(auto-fill,minmax(76px,1fr))}
+.zgrid.z23 .ztile{position:relative;font-family:inherit;color:#fff;cursor:pointer;min-width:0}
+.zgrid.z23 .ztile em{position:absolute;left:4px;top:2px;font-style:italic;font-family:var(--dmg);font-weight:700;font-size:10px;color:#aab0d8}
+.zgrid.z23 .ztile:active,.zhc:active,.zic:active{filter:brightness(1.3)}
+.zhg{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:6px;margin-bottom:8px}
+.zhc{position:relative;display:flex;flex-direction:column;align-items:center;padding:6px 4px 6px;border-radius:9px;border:1.5px solid var(--ec);background:linear-gradient(180deg,color-mix(in srgb,var(--ec) 22%,#0a1034),#0a0f30);color:#fff;font-family:inherit;cursor:pointer;min-width:0}
+.zhc img{width:64px;height:64px;image-rendering:pixelated}.zhc b{font-weight:400;font-size:13px;margin-top:2px}.zhc small{font-size:9px;color:#aab0d8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.zhc.un{border-color:#3a4275;background:#0e143a}.zhc.un img{filter:brightness(.2)}
+.zig{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:6px;margin-bottom:8px}
+.zic{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;border-radius:9px;border:1.5px solid #c9a24a;background:linear-gradient(180deg,#2a2210,#0a0f30);color:#fff;font-family:inherit;cursor:pointer;min-width:0}
+.zic img{width:48px;height:48px;image-rendering:pixelated}.zic b{font-weight:400;font-size:11px;text-align:center;line-height:1.2;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.zic small{font-size:9px;color:#ffd98a}
+.zic.un{border-color:#3a4275;background:#0e143a}.zic.un b{color:#667}
+/* 詳細 */
+.zd23{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.zdh{display:flex;align-items:center;gap:8px}
+.zdh .zb{height:30px;padding:0 10px;border-radius:7px;border:1.5px solid #8890b8;background:linear-gradient(180deg,#2c3150,#14172a);color:#fff;font-family:inherit;font-size:12px}
+.zdh b{font-family:var(--dmg);font-style:italic;font-weight:700;font-size:18px;color:#ffe9a0}
+.zdh .nv{margin-left:auto;display:flex;gap:6px}.zdh .nv button{width:38px;height:30px;border-radius:7px;border:1.5px solid var(--g1,#c9a24a);background:linear-gradient(180deg,#22327a,#0d143c);color:#fff;font-size:13px}
+.zdn{display:flex;align-items:center;gap:6px;min-width:0}.zdn b{font-weight:400;font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.zdn small{margin-left:auto;flex:none;font-size:11px;color:#aab0d8}
+.zdn .bs{flex:none;font-style:italic;font-weight:700;font-size:10px;padding:0 5px;border-radius:2px;color:#fff;background:linear-gradient(180deg,#ff5060,#b8182a)}
+.zdn .it{flex:none;font-style:normal;font-size:10px;padding:1px 6px;border-radius:3px;color:#2a1600;background:linear-gradient(180deg,#f6dc8a,#c9962e)}
+.zel{display:inline-flex;align-items:center;justify-content:center;width:20px;height:22px;margin-right:2px;font-style:normal;font-size:11px;color:#111;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 55%,#fff),var(--c));clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
+.zel.off{filter:grayscale(1) brightness(.5)}
+.zv{position:relative;height:clamp(170px,30vh,250px);border-radius:10px;border:2px solid var(--g1,#c9a24a);overflow:hidden;
+ background:radial-gradient(ellipse at 50% 85%,color-mix(in srgb,var(--bg,#3a3a6a) 45%,transparent),transparent 60%),linear-gradient(180deg,#0a0f30,#141c4a 70%,#0a0d24);box-shadow:inset 0 0 0 1px #000}
+.zv canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+.zv.un{display:flex;align-items:center;justify-content:center}.zv.un img,.zv>img{width:120px;height:120px;image-rendering:pixelated}
+.zvl{position:absolute;left:8px;top:6px;font-size:11px;padding:1px 8px;border-radius:9px;background:rgba(0,0,0,.55);border:1px solid rgba(243,210,122,.5);color:#ffe9a0}
+.zm{display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:4px}
+.zm button{height:32px;padding:0 2px;border-radius:7px;border:1.5px solid #4a5490;background:linear-gradient(180deg,#1c2a6e,#0b1240);color:#fff;font-family:inherit;font-size:12px;white-space:nowrap}
+.zm button.on{border-color:#fff1c2;color:#2a1600;background:linear-gradient(180deg,#f6dc8a,#c9962e)}
+.zm .fl{border-color:#2a8a80;background:linear-gradient(180deg,#1d6b74,#0a3040)}
+.zdt{display:flex;gap:4px;border-bottom:1.5px solid rgba(243,210,122,.4);margin-top:2px}
+.zdt button{flex:1;min-width:0;white-space:nowrap;height:32px;border:1.5px solid #4a5490;border-bottom:0;border-radius:8px 8px 0 0;background:#0e143a;color:#aab0d8;font-family:inherit;font-size:12px;padding:0}
+.zdt button.on{border-color:var(--g1,#c9a24a);background:linear-gradient(180deg,#2a3a8a,#141c4a);color:#fff}
+.zbody{min-height:60px}
+.zst{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:4px 0 6px}
+.zst div{display:flex;align-items:baseline;justify-content:space-between;padding:4px 8px;border-radius:6px;background:rgba(20,30,90,.6);border:1px solid #2a3470}
+.zst small{font-size:10px;color:#aab0d8}.zst small i{font-style:italic;font-family:var(--dmg);font-weight:700;color:#ffd65a;margin-left:3px}
+.zst b{font-family:var(--dmg);font-style:italic;font-weight:700;font-size:17px}
+.zsl{display:flex;flex-direction:column;gap:4px;margin-top:4px}
+.zsk{display:grid;grid-template-columns:24px 1fr auto;grid-template-rows:auto auto;column-gap:6px;align-items:center;text-align:left;padding:5px 8px;border-radius:7px;border:1.5px solid #3a4680;background:linear-gradient(180deg,#16205a,#0b1240);color:#fff;font-family:inherit;min-width:0}
+.zsk .el{grid-row:1/3;grid-column:1}.zsk b{grid-column:2;grid-row:1}.zsk em{grid-column:3;grid-row:1}.zsk b{font-weight:400;font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.zsk small{grid-column:2/4;grid-row:2;font-size:10px;color:#aab0d8;line-height:1.35}
+.zsk em{font-style:normal;font-size:10px;color:#ffe9a0;white-space:nowrap}.zsk.off{opacity:.55}
+.zno{font-size:11px;line-height:1.55;color:#cfd3f5;padding:6px 8px;border-radius:6px;background:rgba(10,14,40,.6);border:1px dashed #3a4680;margin-top:4px}
+.zpf{display:flex;gap:8px;align-items:flex-start}.zpf>img{flex:none;width:72px;height:72px;image-rendering:pixelated;border-radius:8px;background:rgba(255,255,255,.05)}.zpf>div{min-width:0;flex:1}
+.zq{font-size:12px;color:#ffe9a0;margin-bottom:4px}
+.zart{display:grid;grid-template-columns:1fr 1fr;gap:6px}.zart figure,.zdots figure{margin:0;display:flex;flex-direction:column;align-items:center;padding:8px 4px;border-radius:8px;background:rgba(20,30,90,.5);border:1px solid #2a3470}
+.zart img{width:min(130px,100%);aspect-ratio:1;image-rendering:pixelated}.zart figure.aw{border-color:var(--g1,#c9a24a);background:linear-gradient(180deg,rgba(90,66,14,.5),rgba(20,30,90,.5))}
+.zart figcaption,.zdots figcaption{font-size:10px;color:#aab0d8;margin-top:3px;text-align:center}
+.zex{display:flex;align-items:center;gap:8px;margin-top:6px}.zex img{width:64px;height:64px;image-rendering:pixelated;border-radius:8px;border:1.5px solid #4a5490}
+.zex div{display:flex;flex-wrap:wrap;gap:4px}.zex button{height:28px;padding:0 10px;border-radius:14px;border:1.5px solid #4a5490;background:#0e143a;color:#fff;font-family:inherit;font-size:11px}.zex button.on{border-color:#fff1c2;background:#3a3010;color:#ffe9a0}
+.zdots{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px}.zdots img{width:64px;height:64px;image-rendering:pixelated}
+.zaw{padding:8px 10px;border-radius:8px;border:1.5px solid var(--g1,#c9a24a);background:linear-gradient(180deg,rgba(90,66,14,.55),rgba(14,20,60,.6))}.zaw b{font-weight:400;font-size:15px;color:#ffe9a0}.zaw small{display:block;font-size:10px;color:#cfd3f5}.zaw p{margin:4px 0 0;font-size:11px;line-height:1.5;color:#e8e8ff}
+.zeq{display:flex;justify-content:center;padding:10px;border-radius:10px;border:2px solid var(--g1,#c9a24a);background:radial-gradient(circle,#2a2a6a,#0a0f30)}.zeq img{width:144px;height:144px;image-rendering:pixelated}
+/* まとめた状態表示：横一列 */
+.p23.tag .in{flex-direction:row;flex-wrap:nowrap;gap:4px;align-items:baseline}
+.p23.tag.h .in{justify-content:flex-end}
