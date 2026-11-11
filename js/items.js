@@ -14,7 +14,7 @@ function genItem(ilv,minR=0,bonus=0,slot=null,rarFix=null){
  const rar=rarFix!=null?rarFix:rollRar(minR,bonus);
  if(!slot){const r=Math.random();slot=r<.28?'w':r<.4?'sub':r<.58?'head':r<.78?'body':'acc';}
  const it={uid:++G.uid,slot,ilv,rar,plus:0,ops:[],unid:rar>=3,lock:false,base:{}};
- if(rar===4){const ks=Object.keys(LEG).filter(k=>LEG[k].slot===slot);it.leg=ks.length?ks[Math.random()*ks.length|0]:Object.keys(LEG)[Math.random()*Object.keys(LEG).length|0];it.slot=slot=LEG[it.leg].slot;}
+ if(rar===4){const al=Object.keys(LEG).filter(k=>!LEG[k].uq),ks=al.filter(k=>LEG[k].slot===slot);it.leg=ks.length?ks[Math.random()*ks.length|0]:al[Math.random()*al.length|0];it.slot=slot=LEG[it.leg].slot;}
  const m=MATL(ilv);
  if(slot==='w'){it.who=(it.leg&&LEG[it.leg].who)||G.members[Math.random()*G.members.length|0];wbase(it,ilv,m);}
  else if(slot==='sub'){if(Math.random()<.5){it.base.def=Math.round(3+ilv*1.1);it.name=m+'の小盾';}else{it.base.res=Math.round(3+ilv*1.2);it.name='灯の護符';}}
@@ -123,11 +123,13 @@ const npos=n=>[90+13*Math.sqrt(3)*(n.q+n.r/2),H/2+13*1.5*n.r];
 const bcv=$('#bcv'),bctx=bcv.getContext('2d');
 const SHORT={atkP:'攻',defP:'防',mhpP:'HP',resP:'精',magP:'魔',spd:'速',crit:'会',weakDmg:'弱',startAG:'AG',awDmg:'覚',spGain:'SP'};
 const BGS=Array.from({length:90},(_,i)=>{const f=v=>v-Math.floor(v);return[f(Math.sin(i*99.7)*1e4),f(Math.sin(i*31.3)*1e4),f(Math.sin(i*7.1)*1e4)];});
-function sizeBoard(){const d=window.devicePixelRatio||1;bcv.width=W*SC*d;bcv.height=224*SC*d;bcv.style.width=W*SC+'px';bcv.style.height=224*SC+'px';bctx.setTransform(d,0,0,d,0,0);}
-function bpos(n){const cw=W*SC,s=cw/(Math.sqrt(3)*7.4);return[cw/2+s*Math.sqrt(3)*(n.q+n.r/2),224*SC/2+18+s*1.5*n.r,s];}
+/* 星盤の表示の高さ（CSS px）。ver0.21 で画面の高さに合わせて変える */
+function BCH(){return 224*SC;}
+function sizeBoard(){const d=window.devicePixelRatio||1;bcv.width=W*SC*d;bcv.height=Math.round(BCH()*d);bcv.style.width=W*SC+'px';bcv.style.height=BCH()+'px';bctx.setTransform(d,0,0,d,0,0);}
+function bpos(n){const cw=W*SC,s=cw/(Math.sqrt(3)*7.4);return[cw/2+s*Math.sqrt(3)*(n.q+n.r/2),BCH()/2+18+s*1.5*n.r,s];}
 function hexPath(c,x,y,r){c.beginPath();for(let i=0;i<6;i++){const a=Math.PI/180*(60*i-30);c.lineTo(x+r*Math.cos(a),y+r*Math.sin(a));}c.closePath();}
 const shade=h=>{const n=parseInt(h.slice(1),16);return`rgb(${(n>>16)*.4|0},${(n>>8&255)*.4|0},${(n&255)*.4|0})`;};
-function drawBoard(){const c=bctx,cw=W*SC,ch=224*SC,id=BS.id,N=BOARD[id],U=G.h[id].board;
+function drawBoard(){const c=bctx,cw=W*SC,ch=BCH(),id=BS.id,N=BOARD[id],U=G.h[id].board;
  const bg=c.createRadialGradient(cw/2,ch/2,20,cw/2,ch/2,ch*.75);bg.addColorStop(0,'#1c2150');bg.addColorStop(1,'#05060f');c.fillStyle=bg;c.fillRect(0,0,cw,ch);
  BGS.forEach(([x,y,b],i)=>{c.fillStyle=`rgba(200,210,255,${.2+.5*b*(.6+.4*Math.sin(tick/30+i))})`;c.fillRect(x*cw,y*ch,1.5,1.5);});
  c.lineCap='round';
