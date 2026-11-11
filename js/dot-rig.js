@@ -23,10 +23,18 @@ function torso(g,c,J,o={}){const B=c.B;g.limb(J.hip[0],J.hip[1]-.5,J.ch[0],J.ch[
 /* 顔：左向き3/4。目は縦2ドット、奥の目は1ドット幅 */
 function face(g,c,hx,hy,p,o={}){const r=c.B.hr,sk=o.skin||'s';g.ell(hx,hy,r-.7,r-.5,sk,{bias:.12});
  const ex=Math.round(hx-1.7),ey=Math.round(hy+.4)+(o.eyeY||0),ec=o.eye||'e';
- if(p.bl||p.ex===1){g.px(ex,ey+1,ec,2);g.px(ex-3,ey+1,ec,2);if(p.ex===1){g.px(ex-1,ey,ec,2);g.px(ex-2,ey+1,ec,2);}}
- else{g.px(ex,ey,ec,3);g.px(ex,ey+1,ec,o.iris?4:3);g.px(ex-3,ey,ec,3);g.px(ex-3,ey+1,ec,o.iris?4:3);if(o.lash){g.px(ex+1,ey,ec,3);}g.tone(ex+1,ey+1,1);}
- if(p.mo||p.ex===2){g.px(ex-2,ey+4,'mouth',3);if(p.ex===2)g.px(ex-1,ey+4,'mouth',3);}
- if(o.blush){g.px(ex+1,ey+3,'blush',3);}
+ const em=p.em||'';/* 会話の表情：h=笑顔 a=怒り s=悲しみ o=驚き */
+ if(em==='h'){g.px(ex,ey,ec,2);g.px(ex-1,ey+1,ec,2);g.px(ex+1,ey+1,ec,2);g.px(ex-3,ey,ec,2);g.px(ex-4,ey+1,ec,2);g.px(ex-2,ey+1,ec,2);}
+ else if(p.bl||p.ex===1){g.px(ex,ey+1,ec,2);g.px(ex-3,ey+1,ec,2);if(p.ex===1){g.px(ex-1,ey,ec,2);g.px(ex-2,ey+1,ec,2);}}
+ else if(em==='s'){g.px(ex,ey+1,ec,3);g.px(ex-3,ey+1,ec,3);g.px(ex+1,ey-1,ec,2);g.px(ex,ey-1,ec,2);g.px(ex-3,ey-1,ec,2);g.px(ex-4,ey-1,ec,2);}
+ else{const tall=em==='o';g.px(ex,ey,ec,3);g.px(ex,ey+1,ec,o.iris?4:3);g.px(ex-3,ey,ec,3);g.px(ex-3,ey+1,ec,o.iris?4:3);if(tall){g.px(ex,ey-1,ec,3);g.px(ex-3,ey-1,ec,3);g.tone(ex,ey,2);g.tone(ex-3,ey,2);}
+  if(o.lash){g.px(ex+1,ey,ec,3);}g.tone(ex+1,ey+1,1);
+  if(em==='a'){g.px(ex,ey-1,ec,2);g.px(ex+1,ey-2,ec,2);g.px(ex-3,ey-1,ec,2);g.px(ex-4,ey-2,ec,2);}}
+ if(em==='h'){g.px(ex-2,ey+4,'mouth',3);g.px(ex-1,ey+4,'mouth',3);g.px(ex-2,ey+5,'mouth',2);}
+ else if(em==='o'){g.px(ex-2,ey+4,'mouth',2);g.px(ex-2,ey+5,'mouth',2);}
+ else if(em==='a'||em==='s'){g.px(ex-2,ey+4,'mouth',2);g.px(ex-1,ey+4,'mouth',2);}
+ else if(p.mo||p.ex===2){g.px(ex-2,ey+4,'mouth',3);if(p.ex===2)g.px(ex-1,ey+4,'mouth',3);}
+ if(o.blush||em==='h'){g.px(ex+1,ey+3,'blush',3);if(em==='h')g.px(ex-4,ey+3,'blush',3);}
  g.tone(ex+3,ey+2,-1);g.tone(ex+3,ey+3,-1);}
 /* 髪：頭を覆うキャップ。顔の窓（楕円）だけ空ける */
 function cap(g,hx,hy,mat,o={}){const fx=hx+(o.fx==null?-2.6:o.fx),fy=hy+(o.fy==null?2.3:o.fy),frx=o.frx||4.6,fry=o.fry||4.2;
@@ -50,16 +58,17 @@ function draw(g,pose,c){const p=Object.assign({},D0,c.pose,pose),J=joints(c,p);J
  for(const k in c.mats){const v=c.mats[k];if(Array.isArray(v)){if(v.length===6)g.def(k,v,null,v.glow);else g.def(k,v[0],v[1],v[2]);}else g.def(k,v);}
  if(c.back){g.part();c.back(g,J,p,c);}
  g.part();if(c.armF)c.armF(g,J,p,c);else arm(g,c,J.sF,J.eF,J.hF,c.armFo);
- if(c.itemF&&!c.itemFront){g.part();c.itemF(g,J,p,c);}
+ const noW=p.noW;/* noW=武器を持たない（探索・街の歩き姿） */
+ if(c.itemF&&!c.itemFront&&!noW){g.part();c.itemF(g,J,p,c);}
  if(!c.noLegs){g.part();leg(g,c,J.hip[0]-c.B.hip,J.hip[1],J.kF,J.aF);g.part();leg(g,c,J.hip[0]+c.B.hip,J.hip[1],J.kN,J.aN);}
  g.part();if(c.torso)c.torso(g,J,p,c);else torso(g,c,J);
  if(c.skirt){g.part();c.skirt(g,J,p,c);}
  if(c.over){c.over(g,J,p,c);}
  g.part();c.head(g,J,p,c);
- if(c.itemN&&c.itemNBack){g.part();c.itemN(g,J,p,c);}
+ if(c.itemN&&c.itemNBack&&!noW){g.part();c.itemN(g,J,p,c);}
  g.part();if(c.armN)c.armN(g,J,p,c);else arm(g,c,J.sN,J.eN,J.hN,c.armNo);
- if(c.itemN&&!c.itemNBack){g.part();c.itemN(g,J,p,c);}
- if(c.itemF&&c.itemFront){g.part();c.itemF(g,J,p,c);}
+ if(c.itemN&&!c.itemNBack&&!noW){g.part();c.itemN(g,J,p,c);}
+ if(c.itemF&&c.itemFront&&!noW){g.part();c.itemF(g,J,p,c);}
  if(c.front){g.part(1);c.front(g,J,p,c);}
  return J;}
 return{D0,B0,dir,joints,leg,arm,torso,face,cap,blade,staff,chain,robe,draw};})();
