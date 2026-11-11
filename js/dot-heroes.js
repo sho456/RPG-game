@@ -1,6 +1,6 @@
 /* ===== ver0.19 味方キャラクターのドット絵定義 =====
  12人それぞれに、体格・髪型・衣装・武器・構えを個別に定義する。
- 配色は既存パレット（PAL の1文字キー）から引くので、覚醒配色や色替えはそのまま反映される */
+ 配色は既存パレット（PAL の1文字キー）から引くので、星臨配色や色替えはそのまま反映される */
 {const{face,cap,blade,staff,dir,arm,leg,torso,chain,robe}=HUM;
 const SKIN=P=>({s:[P.s,PX.mix(PX.tint(P.s,.7),'#8a4a4a',.3)],e:P.e||'#1a1420',mouth:PX.tint(P.s,.5,1.3,-10),blush:PX.mix(P.s,'#e06a6a',.45)});
 const grad=(hx,hy,a=.07,b=.09,c=.3)=>(x,y)=>c-(x-hx)*a-(y-hy)*b;

@@ -34,7 +34,7 @@ function partyPanel(){const P=$('#party'),a=B.cur&&B.cur.side===0?B.cur:(B.lastH
  const ht=`<div class="bp20${a.aw?' awk':''}${my?'':' off'}" style="--ec:${ec}"><i class="ap1" style="display:none"></i>
   <div class="bpL"><div class="bpN">${hexEl(el,ec,'sm')}<b>${a.name}</b><small>Lv${G.h[a.id].lv}　${clsOf(a.id)}</small></div>
    <div class="bpO${a.ag>=100&&!a.aw?' full':''}${a.aw?' on':''}"><em>${a.aw?AW[a.id].name:'OVER DRIVE'}</em><div class="g"><i style="width:${Math.min(100,a.ag)}%"></i></div><span>${ag}</span></div></div>
-  <button id="awB" class="${rdy?'rdy':''}${a.aw?' on':''}" ${rdy?'':'disabled'}>${a.aw?'覚醒中':'覚醒'}<small>${a.aw?awTag(a).trim():rdy?'行動を消費しない':'AG100%で'}</small></button>
+  <button id="awB" class="${rdy?'rdy':''}${a.aw?' on':''}" ${rdy?'':'disabled'}>${a.aw?'星臨中':'星臨'}<small>${a.aw?awTag(a).trim():rdy?'行動を消費しない':'AG100%で'}</small></button>
   <img class="bpF" src="${art(a.id,a.aw)}">
   <div class="bpS"><div class="bx hp${low?' low':''}"><em>HP</em><b>${a.hp}</b><small>/${a.mhp}</small></div><div class="bx sp"><em>SP</em><b>${a.sp}</b><small>/100</small></div><div class="bx ts">${sts||tagH(a)||'<small class="nst">状態異常なし</small>'}</div></div></div>`;
  if(P._h20!==ht||!P.querySelector('.bp20')){P._h20=ht;P.className='act v20';P.innerHTML=ht;}}
@@ -88,11 +88,11 @@ townMenu=function(m){WMS.on=false;TSC='home';if(scene!=='town')show('town');cons
 </div>
   <div class="h20right">${HMENU.map(([g,ic,l])=>`<button data-g20="${g}"><img src="${ICON[ic]}"><small>${l}</small>${bd(badge[g])}</button>`).join('')}</div>`;
  const c=$('#cmd');c.className='home20';c.innerHTML=`<div class="h20act"><div class="h20pt" data-go="party">${G.party.map(id=>{const s=stats(id),h=G.h[id],hp=h.hp??s.mhp;return`<div class="pf" style="--ec:${elCol(id)}"><img src="${face(id)}"><small>Lv${h.lv}</small><i style="width:${Math.max(0,Math.min(100,hp/s.mhp*100))}%"></i></div>`;}).join('')}<em>編成・装備 ▶</em></div>
-  <button class="h20tr${tr?' rdy':''}" data-g20="trial"><b>挑戦</b><small>覚醒の試練</small></button>
+  <button class="h20tr${tr?' rdy':''}" data-g20="trial"><b>挑戦</b><small>星臨の試練</small></button>
   <button class="h20go" data-go="go"><span><b>出撃</b><small>WORLD MAP</small></span></button></div>
   ${(()=>{let w=null;try{w=[...WAREAS].reverse().find(x=>x.need());}catch(e){}const A=w&&AREAS[w.id],nm=w?(w.nm||(A&&A.name)||''):'',rc=w?((A&&A.rec)||(w.rec&&w.rec())||''):'',np=G.members.reduce((a,i)=>a+Math.max(0,ptsLeft(i)),0);
    return`<div class="h20info"><button class="nx" data-go="go"><em>${w?w.ch:''}</em><b>次の目的地：${nm}</b><small>${rc}</small><i>▶</i></button>
-   <div class="tips">${un?`<button data-go="appraise">未鑑定品 <b>${un}</b>個</button>`:''}${np?`<button data-go="star">星ポイント <b>${fmt(np)}</b></button>`:''}${tr?`<button data-g20="trial">覚醒の試練に挑める</button>`:''}${qr?`<button data-g20="quest">報告できる依頼 <b>${qr}</b>件</button>`:''}${bn?`<button data-g20="bond">新しい絆の話 <b>${bn}</b>件</button>`:''}</div></div>`;})()}
+   <div class="tips">${un?`<button data-go="appraise">未鑑定品 <b>${un}</b>個</button>`:''}${np?`<button data-go="star">星ポイント <b>${fmt(np)}</b></button>`:''}${tr?`<button data-g20="trial">星臨の試練に挑める</button>`:''}${qr?`<button data-g20="quest">報告できる依頼 <b>${qr}</b>件</button>`:''}${bn?`<button data-g20="bond">新しい絆の話 <b>${bn}</b>件</button>`:''}</div></div>`;})()}
   <nav class="h20nav">${HNAV.map(([g,ic,l])=>`<button ${g==='home'?'class="on" data-g20="home"':`data-go="${g}"`}><img src="${ICON[ic]}"><b>${l}</b>${bd(badge[g])}</button>`).join('')}</nav>`;
  tip('town');};
 document.addEventListener('click',e=>{const t=e.target.closest('[data-g20]');if(!t||scene!=='town'||t.disabled)return;SFX.sel();goH(t.dataset.g20);});
@@ -160,7 +160,7 @@ function dev20(){log('<b>ver0.20</b>　状態効果・パッシブ・新スキ�
  menu([{l:'状態効果テスト（氷華の妖狐）',s:'激昂・毒・弱体・障壁・反撃',cls:'ready',f:()=>{G.party=['valk','noah','crow','mire'].filter(x=>G.members.includes(x));devBattle([{kind:'boss5',lv:30}],'kouka',{theme:'ice'});}},
   {l:'鼓舞する敵との戦闘',s:'亡霊騎士・影法師',f:()=>devBattle([{kind:'darkknight',lv:30},{kind:'shade',lv:30},{kind:'shade',lv:30}],'seido',{boss:false})},
   {l:'報酬・レベルアップ演出',s:'全レアリティの出現演出',f:demoReward},
-  {l:'パッシブ・技の一覧',s:'キャラ詳細「技・覚醒」タブ',f:()=>{enterTown();openSheet(G.party[0],'sk');}},{l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
+  {l:'パッシブ・技の一覧',s:'キャラ詳細「技・星臨」タブ',f:()=>{enterTown();openSheet(G.party[0],'sk');}},{l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
 {const _dv=dvMenu;dvMenu=function(m){_dv(m);try{addCmd('ver0.20 戦闘の深化・UI刷新','状態効果・パッシブ・報酬演出',dev20,0,'ready');}catch(e){}};}
 
 /* ==================== 版表示 ==================== */

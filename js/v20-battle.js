@@ -63,7 +63,7 @@ const fuQ=(a,t,sk)=>{(B.q20=B.q20||[]).push({a,t,sk:Object.assign({_fu:1},sk)});
 const PS={
  /* --- キャラクター専用 --- */
  c_rio1:{n:'灯火の導き',d:'戦闘開始時、味方全員の攻撃・魔力+8%（3ターン）',start:u=>{aliveH().forEach(h=>{addSt(h,'atk',8,3);addSt(h,'mag',8,3);});}},
- c_rio2:{n:'空白の共鳴',d:'覚醒中の仲間がいる間、自分の与ダメ+20%',out:a=>B.heroes.some(h=>h!==a&&h.aw&&h.alive)?1.2:1},
+ c_rio2:{n:'空白の共鳴',d:'星臨中の仲間がいる間、自分の与ダメ+20%',out:a=>B.heroes.some(h=>h!==a&&h.aw&&h.alive)?1.2:1},
  c_gald1:{n:'鉄壁の誓い',d:'HPが50%以上のとき、受けるダメージ-15%',inc:t=>t.hp>=t.mhp*.5?.85:1},
  c_gald2:{n:'報復の盾',d:'単体攻撃を受けると35%で反撃（打・威力0.8）',hurt:(t,a,d,sk)=>{if(a&&a.side===1&&sk&&sk.t==='one'&&d>0&&Math.random()<.35)(B.cq20=B.cq20||[]).push({a:t,t:a,sk:{n:'報復の盾',el:'打',k:'phys',pow:.8,t:'one',_fu:1}});}},
  c_mire1:{n:'双極循環',d:'直前と違う属性の魔法を使うと与ダメ+20%',out:(a,t,sk)=>sk.k==='mag'&&sk.el&&a._le20&&a._le20!==sk.el?1.2:1,acted:(u,sk)=>{if(sk.k==='mag'&&sk.el)u._le20=sk.el;}},

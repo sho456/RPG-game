@@ -19,7 +19,7 @@ function devStart(){SAVE=DEVKEY;const s=loadSave(),ov=$('#ov');
 const devBack=m=>()=>enterTown(m||'開発：戻った');
 function devBattle(list,area,opts={}){setArea(area);startBattle(list,Object.assign({boss:true,onEnd:devBack('開発：戦闘終了')},opts));}
 function dvMenu(m){log((m||'<b>開発者メニュー</b>　verごとの追加要素へ直行')+goldTxt());
- menu([{l:'ver0.14 クリア後',s:'虚の回廊・竜の巣・セレス・ヴァルク・虚蝕化',cls:'ready',f:dev14},{l:'ver0.13 終章',s:'星核の残響・全共鳴・ラスボス・エンディング',f:dev13},{l:'ver0.12 天への塔',s:'任意階・星核の守護者・レジェンド',f:dev12},{l:'ver0.11 覚醒の深化',s:'試練・覚醒段階',f:dev11},
+ menu([{l:'ver0.14 クリア後',s:'虚の回廊・竜の巣・セレス・ヴァルク・虚蝕化',cls:'ready',f:dev14},{l:'ver0.13 終章',s:'星核の残響・全共鳴・ラスボス・エンディング',f:dev13},{l:'ver0.12 天への塔',s:'任意階・星核の守護者・レジェンド',f:dev12},{l:'ver0.11 星臨の深化',s:'試練・星臨位階',f:dev11},
   {l:'ver0.10 沈んだ王都',s:'王都・王家セット',f:()=>menu([{l:'沈んだ王都へ',cls:'ready',f:()=>enterField('ouito')},{l:'王家セットを受け取る',f:()=>{devRoyal();save();dvMenu('王家セット4部位を受け取った');}},{l:'沈みし女王戦',f:()=>devBattle([{kind:'boss6',lv:37}],'ouito',{theme:'ruin'})},{l:'戻る',cls:'back',f:()=>dvMenu()}],true)},
   {l:'ver0.9 街の発展',s:'施設Lv切替',f:()=>menu([{l:'全施設Lv5',f:()=>{for(const k in G.fac)G.fac[k]=5;save();dvMenu('全施設Lv5');}},{l:'全施設Lv1（庭園なし）',f:()=>{for(const k in G.fac)G.fac[k]=k==='garden'?0:1;save();dvMenu('全施設Lv1に戻した');}},{l:'街の発展を開く',f:()=>devMenu()},{l:'戻る',cls:'back',f:()=>dvMenu()}],true)},
   {l:'エリアへ直行',s:'各章のマップ',f:devAreas},{l:'ボス戦',s:'全ボスと即戦闘',f:devBoss},{l:'育成・所持品',s:'Lv・お金・道具',f:devGrow},
@@ -43,8 +43,8 @@ function dev13(m){log((m||'<b>ver0.13 終章</b>')+`<br><small>残響${echoN()}/
 function dev12(m){log((m||'<b>ver0.12 天への塔</b>　階を選んで直行'));
  menu([...[1,6,10,11,16,20,21,26,30].map(f=>({l:`${f}階`,s:f%10===0?'番人の階':'',f:()=>{G.tower.cp=Math.max(G.tower.cp,26);enterTower(f);}})),{l:'星核の守護者戦',f:()=>{AREAS.tower=makeTowerArea(30);G.tower.cur=30;devBattle([{kind:'boss7',lv:50}],'tower',{theme:'tower'});}},
   {l:'レジェンド全種を受け取る',s:Object.keys(LEG).filter(k=>!LEG[k].uq).length+'種',f:()=>{devLegs();save();dev12('レジェンドを全種受け取った（装備画面で確認）');}},{l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
-function dev11(m){log(m||'<b>ver0.11 覚醒の深化</b>');
- menu([{l:'覚醒の試練',cls:'ready',f:()=>trialMenu()},...[1,2,3].map(n=>({l:`全員の覚醒段階を${ROMAN[n]}に`,f:()=>{G.members.forEach(id=>G.h[id].awLv=n);save();dev11(`全員の覚醒段階を${ROMAN[n]}にした`);}})),{l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
+function dev11(m){log(m||'<b>ver0.11 星臨の深化</b>');
+ menu([{l:'星臨の試練',cls:'ready',f:()=>trialMenu()},...[1,2,3].map(n=>({l:`全員の星臨位階を${ROMAN[n]}に`,f:()=>{G.members.forEach(id=>G.h[id].awLv=n);save();dev11(`全員の星臨位階を${ROMAN[n]}にした`);}})),{l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
 function devAreas(){menu([...Object.keys(AREAS).filter(k=>k!=='tower'&&k!=='kairou').map(k=>({l:AREAS[k].name,s:AREAS[k].rec||'',f:()=>enterField(k)})),{l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
 function devBoss(){const ks=Object.keys(ED).filter(k=>ED[k].boss&&!k.startsWith('tr_')&&!k.startsWith('kb')),ar={boss1:'haido',boss2:'midori',boss3:'seido',boss4:'raimei',boss5:'kouka',boss6:'ouito',boss9:'ryuu'};
  menu([...ks.map(k=>({l:ED[k].name,s:`HP${ED[k].mhp}`,f:()=>devBattle([{kind:k,lv:55}],k.startsWith('last')?'zankyo':ar[k]||'haido',k.startsWith('last')?{theme:'void'}:{})})),{l:'戻る',cls:'back',f:()=>dvMenu()}],true);}

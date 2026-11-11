@@ -1,5 +1,5 @@
 /* ===== ver0.19 ドット絵・待機モーション・戦闘演出の全面強化（戦闘への統合） =====
- 既存の戦闘ロジック（ダメージ計算・行動順・覚醒など）には手を入れず、
+ 既存の戦闘ロジック（ダメージ計算・行動順・星臨など）には手を入れず、
  hit / doAction / enemyTurn / kill … を包んで「見せ方」だけを差し込む。
  1. 戦闘画面の描画（ドットを整数倍で表示・重なり順・影・状態表示）
  2. 攻撃の振り付け（予備動作 → 踏み込み → 攻撃 → 命中・ヒットストップ → 反動 → 復帰）
@@ -199,12 +199,12 @@ function drawU(u,k,p,sx,sy){const A=setup(u);if(A.none)return;
  let img=f.cv;if(A.dead){const kk=(ANIM.now-A.dead.t0)/A.dead.dur;if(kk>=1){A.gone=1;A.dead=null;A.dcv=null;return;}img=dissolve(f,A,kk);if(kk>.25&&Math.random()<.5){const D=dims(u);FX19.part(fx+wx+(Math.random()-.5)*D.w,fy-Math.random()*D.h,(Math.random()-.5)*.4,-.5-Math.random()*.7,Math.random()<.5?'#ffffff':'#c8b0ff',22,0);}}
  else if(A.flash>0){if(A.flash>2)img=SPRX.white(f);A.flash--;}
  if(u.side===0&&!u.alive)ctx.globalAlpha=.78;ctx.drawImage(img,X,Y,f.w*p,f.h*p);ctx.globalAlpha=1;
- /* 状態の表示：覚醒のオーラ／溜め／ブレイク（星が回る）／狙いの枠／行動中の矢印 */
+ /* 状態の表示：星臨のオーラ／溜め／ブレイク（星が回る）／狙いの枠／行動中の矢印 */
  const top=Y0-Math.round(R.hgt*S)*p,hw=Math.round(R.wid*S/2)*p,t=ANIM.now;
  if(u.aw&&u.alive&&Math.random()<.3+.2*(u.awLv||1))B.parts.push({x:fx+wx+(Math.random()-.5)*14,y:fy-2,vy:-.4-Math.random()*.5*(u.awLv||1),l:30,c:(u.awLv||1)>=3&&Math.random()<.4?'#ffffff':(u.awLv||1)>=2&&Math.random()<.3?'#7fd6ff':'#ffe27a'});
  if(u.side===1&&u.alive){if(u.charging&&Math.random()<.6)FX19.part(fx+(Math.random()-.5)*dims(u).w*1.2,fy,(Math.random()-.5)*.3,-.9-Math.random()*.9,Math.random()<.5?'#ffb030':'#ffe27a',20,0,Math.random()<.3?2:1);
   if(u.broken)for(let i=0;i<3;i++){const a=t/260+i*2.094,xx=X0+Math.round(Math.cos(a)*hw*.7/p)*p,yy=top-3*p+Math.round(Math.sin(a)*2)*p;ctx.fillStyle=Math.sin(a)>0?'#ffe14a':'#c8a020';ctx.fillRect(xx-p,yy,3*p,p);ctx.fillRect(xx,yy-p,p,3*p);}
-  if(B.tgt===u&&aliveE().length>1){const q=(Math.floor(t/260)%2)*p,L=4*p,x0=X0-hw-2*p-q,x1=X0+hw+2*p+q,y0=top-2*p-q,y1=Y0+3*p+q;ctx.fillStyle='#ffd65a';for(const[cx,cy,dx,dy]of[[x0,y0,1,1],[x1,y0,-1,1],[x0,y1,1,-1],[x1,y1,-1,-1]]){ctx.fillRect(dx>0?cx:cx-L,dy>0?cy:cy-p,L,p);ctx.fillRect(dx>0?cx:cx-p,dy>0?cy:cy-L,p,L);}}}
+  if(B.tgt===u&&aliveE().length>1&&!B.rt22){const q=(Math.floor(t/260)%2)*p,L=4*p,x0=X0-hw-2*p-q,x1=X0+hw+2*p+q,y0=top-2*p-q,y1=Y0+3*p+q;ctx.fillStyle='#ffd65a';for(const[cx,cy,dx,dy]of[[x0,y0,1,1],[x1,y0,-1,1],[x0,y1,1,-1],[x1,y1,-1,-1]]){ctx.fillRect(dx>0?cx:cx-L,dy>0?cy:cy-p,L,p);ctx.fillRect(dx>0?cx:cx-p,dy>0?cy:cy-L,p,L);}}}
  if(B.cur===u&&u.side===0&&!u._act){const ay=top-6*p+(Math.floor(t/270)%2)*p;ctx.fillStyle='#3a2a08';ctx.fillRect(X0-3*p,ay-p,7*p,p);ctx.fillStyle='#f3c64b';ctx.fillRect(X0-2*p,ay,5*p,p);ctx.fillRect(X0-p,ay+p,3*p,p);ctx.fillRect(X0,ay+2*p,p,p);}}
 function drawBattle(){const k=bK();if(cv.width!==W*k||cv.height!==H*k){cv.width=W*k;cv.height=H*k;}const p=Math.max(1,Math.round(k*2/3));PXL=p/k;DS=Math.round(k/p/1.5*1000)/1000;ANIM.tick();
  let sx=0,sy=0;if(B&&B.shake>0){const m=Math.min(4,1+Math.floor(B.shake/5));sx=((tick&1)?m:-m)*p;sy=(((tick>>1)&1)?1:-1)*Math.ceil(m/2)*p;B.shake--;}

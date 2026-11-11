@@ -241,7 +241,7 @@ button,textarea{font-family:inherit}
 /* ===== ver0.17 快適さ＋UI再構築 ===== */
 :root{--gold:#ffd65a;--ink:#070c28}
 .elc{display:inline-block;min-width:16px;height:16px;line-height:16px;text-align:center;font-style:normal;font-size:10px;color:#101020;background:var(--ec,#c8b0ff);border-radius:50%;margin-right:3px;vertical-align:1px;text-shadow:none}
-/* 覚醒段階のバッジ（星盤の六角形） */
+/* 星臨位階のバッジ（星盤の六角形） */
 .rk{position:absolute;left:50%;top:-10px;transform:translateX(-50%);width:32px;height:28px;z-index:2;display:flex;align-items:center;justify-content:center;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);background:linear-gradient(180deg,#eef2ff,#7f8fc8)}
 .rk b{font-weight:400;font-size:14px;color:#0b1340;text-shadow:none}
 .rk2{background:linear-gradient(180deg,#fff6c8,#d9a020)}.rk3{background:linear-gradient(135deg,#ffb0e0,#fff3b0 40%,#9fe8ff 75%,#c8b0ff)}

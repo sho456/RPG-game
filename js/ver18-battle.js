@@ -67,14 +67,14 @@ drawUnit=function(u){const key=uKey(u),def=SPDEF[key];if(!def)return;const[fx0,f
  const sw=Math.min(40,def.human?16:Math.round(def.w*.42));ctx.fillStyle='rgba(0,0,0,.32)';ctx.fillRect(x-sw/2,y-2,sw,3);ctx.fillRect(x-sw/2+2,y-3,sw-4,1);ctx.fillRect(x-sw/2+2,y+1,sw-4,1);
  const dx=flip?x-(f.W-f.ax):x-f.ax,dy=y-f.ay;
  const put=(img,ox2,oy2)=>{if(flip){ctx.save();ctx.translate(dx+f.W+(ox2||0),dy+(oy2||0));ctx.scale(-1,1);ctx.drawImage(img,0,0);ctx.restore();}else ctx.drawImage(img,dx+(ox2||0),dy+(oy2||0));};
- /* オーラ：覚醒（段階で濃くなる）／敵の溜め／虚蝕 */
+ /* オーラ：星臨（段階で濃くなる）／敵の溜め／虚蝕 */
  let aura=null;if(u.side===0&&u.aw&&u.alive)aura=[def.aw&&def.aw.glow||'#ffe27a',.35+.2*Math.sin(now/6)+.08*(u.awLv||1)];else if(u.side===1&&u.charging)aura=['#ff5030',.45+.35*Math.sin(now/3)];
  if(aura){const t=tintFrame(f,aura[0],'a'+aura[0]);ctx.globalAlpha=Math.max(0,Math.min(1,aura[1]));for(const[ax2,ay2]of[[-1,0],[1,0],[0,-1],[0,1],[-2,0],[2,0],[0,-2]])put(t,ax2,ay2);ctx.globalAlpha=1;}
  if(!u.alive&&u.side===1){const p=u.fade/(u.fadeMax||24);ctx.globalAlpha=Math.max(0,p);put(p>.7?whiteFrame(f):f.c,0,Math.round((1-p)*-6));ctx.globalAlpha=1;if(u.fade%2===0)B.parts.push({x:x-12+Math.random()*24,y:y-4-Math.random()*(def.ay*.7),vy:-.5-Math.random()*.6,l:26,c:u.boss?'#ffb070':'#c8b0ff'});return;}
  const fl=u.flash>0;if(fl)u.flash--;
  if(u.side===1&&u.boss&&u.pb){put(dmgFrame(u,f,key+an+i));}else put(fl&&(u.flash&2)===0?whiteFrame(f):f.c);
  if(fl&&u.flash>4)put(whiteFrame(f));
- /* 覚醒の粒子 */
+ /* 星臨の粒子 */
  if(u.aw&&u.alive&&Math.random()<.22+.18*(u.awLv||1))B.parts.push({x:x-9+Math.random()*18,y:y-3,vy:-.4-Math.random()*.5*(u.awLv||1),l:30,c:(u.awLv||1)>=3&&Math.random()<.4?'#ffffff':(u.awLv||1)>=2&&Math.random()<.3?'#7fd6ff':(def.aw&&def.aw.glow)||'#ffe27a'});
  if(u.side===1&&u.broken&&u.alive){for(let k=0;k<3;k++){const a=now/9+k*2.094;ctx.fillStyle=k?'#ffe27a':'#ffffff';ctx.fillRect(Math.round(x+Math.cos(a)*9),Math.round(y-def.ay+10+Math.sin(a)*3),2,2);}}
  if(u.side===1&&u.charging&&(now>>3)%2){ctx.fillStyle='#ffb030';ctx.fillRect(x-1,y-def.ay+2,3,6);ctx.fillRect(x-1,y-def.ay+10,3,2);}
@@ -157,7 +157,7 @@ function fxHit(a,t,sk,first){const[mx,my]=uMid(t),el=sk.el,k=sk.k==='mag'?(ELFX[
 /* ボス戦の導入：暗転→ボスが姿を現す→名乗り */
 {const _sb=startBattle;startBattle=function(list,opts={}){_sb(list,opts);if(!B)return;B.fx2=[];const boss=B.enemies.find(e=>e.boss);
   if(boss&&(opts.boss||opts.trial||opts.stages)){B.intro=90;B.shake=0;setTimeout(()=>{if(B&&!B.over){B.shake=14;try{SFX.brk();}catch(e){}}},1150);
-   const el=document.createElement('div');el.className='bossin';el.innerHTML=`<small>${opts.trial?'覚醒の試練':'BOSS'}</small><b>${boss.name}</b>`;$('#stage').appendChild(el);setTimeout(()=>el.remove(),2300);}};}
+   const el=document.createElement('div');el.className='bossin';el.innerHTML=`<small>${opts.trial?'星臨の試練':'BOSS'}</small><b>${boss.name}</b>`;$('#stage').appendChild(el);setTimeout(()=>el.remove(),2300);}};}
 if(typeof nextStage==='function'){const _ns=nextStage;nextStage=async function(){await _ns();if(B){B.intro=60;B.enemies.forEach(e=>{e._k=null;});const boss=B.enemies.find(e=>e.boss&&e.alive);if(boss){const el=document.createElement('div');el.className='bossin';el.innerHTML=`<small>BOSS</small><b>${boss.name}</b>`;$('#stage').appendChild(el);setTimeout(()=>el.remove(),2300);}}};}
 /* 交代で入った仲間は駆け込んでくる */
 {const _hero=hero;hero=function(id){const h=_hero(id);h.an={k:'idle',t0:(id.length*17)|0};return h;};}

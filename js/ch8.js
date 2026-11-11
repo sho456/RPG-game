@@ -17,8 +17,8 @@ Object.assign(SK,{
  shuuen:{n:'終焉の針',sp:35,k:'mag',el:null,pow:2.5,t:'one',d:'無属性・単体の大魔法'},
  kokuha:{n:'刻破',k:'mag',el:null,pow:1.9,t:'all',d:'無属性の全体大魔法'},
  tokitome:{n:'時止め',k:'tstop',t:'all',d:'敵全体の時間を止め、行動を大きく遅らせる'},
- makimodoshi:{n:'巻き戻し',k:'rewind',t:'self',req:'snap',d:'円環に記録した瞬間まで味方のHP・SP・戦闘不能を巻き戻す（1戦闘1回・覚醒が解けても使える）'},
- gokuceles:{n:'永劫の円環',k:'mag',el:null,pow:3.2,t:'all',d:'覚醒Ⅲ：無属性の全体大魔法'},
+ makimodoshi:{n:'巻き戻し',k:'rewind',t:'self',req:'snap',d:'円環に記録した瞬間まで味方のHP・SP・戦闘不能を巻き戻す（1戦闘1回・星臨が解けても使える）'},
+ gokuceles:{n:'永劫の円環',k:'mag',el:null,pow:3.2,t:'all',d:'星臨Ⅲ：無属性の全体大魔法'},
  ryuuga:{n:'竜牙斬',sp:15,el:'炎',k:'phys',pow:1.5,t:'one',d:'炎の斬撃・単体'},
  kokuen:{n:'黒炎薙ぎ',sp:30,el:'闇',k:'phys',pow:.95,t:'all',d:'闇の斬撃・敵全体'},
  ryuuhou:{n:'竜の咆哮',sp:25,k:'roar',t:'all',d:'敵全体の行動を遅らせ、味方のAG+15'},
@@ -26,13 +26,13 @@ Object.assign(SK,{
  ryuumetsu:{n:'竜滅斬',sp:35,el:'斬',k:'phys',pow:2.4,t:'one',d:'斬撃・単体の大技'},
  ryuuen:{n:'竜炎',el:'炎',k:'phys',pow:1.5,t:'all',d:'炎の全体攻撃（自動）'},
  meiryuu:{n:'冥竜爪',el:'闇',k:'phys',pow:1.5,t:'all',d:'闇の全体攻撃（自動）'},
- gokuvalk:{n:'終焉竜咆',el:'炎',k:'phys',pow:2.6,t:'all',d:'覚醒Ⅲ：竜の全力・敵全体'}});
+ gokuvalk:{n:'終焉竜咆',el:'炎',k:'phys',pow:2.6,t:'all',d:'星臨Ⅲ：竜の全力・敵全体'}});
 AW.celes={name:'刻の円環',type:'特殊',turns:3,cmds:['kokuha','tokitome','makimodoshi']};
-AW.valk={name:'竜血覚醒',type:'ターン制',turns:3,cmds:['ryuuen','meiryuu']};
-AWD.celes='発動の瞬間の味方全員のHP・SP・戦闘不能を記録。以降の好きな手番で1度だけ「巻き戻し」できる（覚醒が解けても使える）';
+AW.valk={name:'竜血星臨',type:'ターン制',turns:3,cmds:['ryuuen','meiryuu']};
+AWD.celes='発動の瞬間の味方全員のHP・SP・戦闘不能を記録。以降の好きな手番で1度だけ「巻き戻し」できる（星臨が解けても使える）';
 AWD.valk='竜化して与ダメ1.5倍。全体攻撃のみで、行動は自動（制御不能）。共鳴技はリオとだけ組める';
-BDEF.celes=mkB('刻輪座',[['magP'],['resP'],['spd'],['mhpP'],['defP'],['awDmg','crit']],['3,-2','-1,-2','-3,1','2,1'],'ryuusa','shuuen',[[{magP:12},'刻魔：魔力+12%'],[{spd:2},'早鐘：素早さ+2'],[{awDmg:20},'円環：覚醒中与ダメ+20%'],[{resP:15},'悠久：精神+15%']]);
-BDEF.valk=mkB('竜血座',[['atkP'],['mhpP'],['crit'],['defP'],['awDmg'],['spd']],['2,-3','-2,-1','-3,2','1,2'],'gouka','ryuumetsu',[[{atkP:12},'竜爪：攻撃+12%'],[{mhpP:15},'竜鱗：最大HP+15%'],[{awDmg:20},'逆鱗：覚醒中与ダメ+20%'],[{crit:10},'竜眼：会心率+10%']]);
+BDEF.celes=mkB('刻輪座',[['magP'],['resP'],['spd'],['mhpP'],['defP'],['awDmg','crit']],['3,-2','-1,-2','-3,1','2,1'],'ryuusa','shuuen',[[{magP:12},'刻魔：魔力+12%'],[{spd:2},'早鐘：素早さ+2'],[{awDmg:20},'円環：星臨中与ダメ+20%'],[{resP:15},'悠久：精神+15%']]);
+BDEF.valk=mkB('竜血座',[['atkP'],['mhpP'],['crit'],['defP'],['awDmg'],['spd']],['2,-3','-2,-1','-3,2','1,2'],'gouka','ryuumetsu',[[{atkP:12},'竜爪：攻撃+12%'],[{mhpP:15},'竜鱗：最大HP+15%'],[{awDmg:20},'逆鱗：星臨中与ダメ+20%'],[{crit:10},'竜眼：会心率+10%']]);
 BOARD.celes=buildBoard('celes');BOARD.valk=buildBoard('valk');
 Object.assign(RESO,{'celes,rio':'刻灯の円環','celes,mire':'時空の書架','celes,noah':'永劫の祈り','celes,gald':'不朽の城壁','celes,shion':'影時雨','rio,valk':'竜灯の咆哮'});
 Object.assign(RFX,{'celes,rio':{c:'#d8c8ff',fx:'delay'},'celes,noah':{c:'#f0e8ff',el:'光',fx:'revive',m:.6},'rio,valk':{c:'#ff5a30',el:'炎',m:2.2}});
@@ -40,15 +40,15 @@ Object.assign(TRIAL,{celes:['止まった時計の群れが、ひとりきりの
  valk:['竜の血が、仲間ごと焼き尽くせと吠える。','「この炎は喰うためじゃない。並んで燃やすためのものだ」']});
 OWNEL.valk='炎';
 LEG.kokuyomi={n:'刻詠みの砂時計',slot:'w',who:'celes',d:'戦闘開始の瞬間を刻の円環に記録する（巻き戻しが最初から使える）'};
-LEG.ryuuou={n:'竜王の大剣',slot:'w',who:'valk',d:'竜血覚醒中の与ダメが2倍になる（通常1.5倍）'};
+LEG.ryuuou={n:'竜王の大剣',slot:'w',who:'valk',d:'竜血星臨中の与ダメが2倍になる（通常1.5倍）'};
 ITYPE.unshift(['砂時計','staff'],['竜剣','gsword']);
 {const _wb=wbase;wbase=function(it,ilv,m){if(it.who==='celes'){it.base={mag:Math.round(5+ilv*2.6)};it.name=m+'の砂時計';return;}if(it.who==='valk'){it.base={atk:Math.round(7+ilv*2.8)};it.name=m+'の竜剣';return;}_wb(it,ilv,m);};}
 
-/* --- 戦闘：刻の円環（巻き戻し）・竜血覚醒（自動行動） --- */
+/* --- 戦闘：刻の円環（巻き戻し）・竜血星臨（自動行動） --- */
 function snapTake(u,msg){if(B.rewound)return;B.snap={};B.heroes.forEach(h=>B.snap[h.id]={hp:h.hp,alive:h.alive,sp:h.sp});B.awUsed.add('snap');if(!u.skills.includes('makimodoshi'))u.skills.push('makimodoshi');pop(u,'刻を記録','#d8c8ff',true);if(msg)log(msg);}
 {const _aw=awaken;awaken=async function(u){await _aw(u);
  if(u.id==='celes')snapTake(u,'<b>刻の円環</b>――今この瞬間が記録された（巻き戻しは1戦闘1回）');
- if(u.id==='valk'){log('<b>竜血覚醒</b>――ヴァルクの瞳から理性の色が消えた！（行動は自動）');if(B.res&&!auto)B.res();}};}
+ if(u.id==='valk'){log('<b>竜血星臨</b>――ヴァルクの瞳から理性の色が消えた！（行動は自動）');if(B.res&&!auto)B.res();}};}
 {const _sb=startBattle;startBattle=function(list,opts={}){_sb(list,opts);if(VOIDED)BG=desat(BG);
  B.heroes.forEach(h=>{if(h.id==='celes'&&h.legs.includes('kokuyomi'))snapTake(h);});};}
 {const _da=doAction;doAction=async function(u,sk,t){

@@ -35,10 +35,10 @@ Object.assign(SK,{
 AW.shion={name:'影縫いの刻',type:'ターン制',turns:3,cmds:['renei','kagenui2','goudatsu']};
 AW.noah={name:'機巧の聖域',type:'領域型',turns:3,cmds:['seiiki','seikou2']};
 BDEF.shion={star:'疾風座',sec:[['spd','crit'],['atkP'],['weakDmg'],['mhpP'],['defP'],['drop','spGain']],mask:['2,-3','-2,-1','-3,2','2,1'],
- sp:{'2,-2':{t:'skill',v:'kirisame'},'-2,2':{t:'skill',v:'ansatsu'},'0,-3':{t:'aw',v:{awTurn:1},d:'連続行動+1'},'3,-3':{t:'aw',v:{noRecoil:1},d:'覚醒の反動を無効'},
+ sp:{'2,-2':{t:'skill',v:'kirisame'},'-2,2':{t:'skill',v:'ansatsu'},'0,-3':{t:'aw',v:{awTurn:1},d:'連続行動+1'},'3,-3':{t:'aw',v:{noRecoil:1},d:'星臨の反動を無効'},
   '3,0':{t:'fork',g:1,v:{atkP:12},d:'迅刃：攻撃+12%'},'0,3':{t:'fork',g:1,v:{spd:2},d:'疾駆：素早さ+2'},'-3,0':{t:'fork',g:2,v:{drop:15},d:'目利き：ドロップ率+15%'},'-3,3':{t:'fork',g:2,v:{crit:10},d:'急所：会心率+10%'}}};
 BDEF.noah={star:'機巧座',sec:[['resP'],['magP'],['mhpP'],['defP'],['spGain'],['startAG','awDmg']],mask:['3,-1','-1,-2','-2,3','1,2'],
- sp:{'2,-2':{t:'skill',v:'raise'},'-2,2':{t:'skill',v:'holyrain'},'0,-3':{t:'aw',v:{awTurn:1},d:'聖域の持続+1'},'3,-3':{t:'aw',v:{noRecoil:1},d:'覚醒の反動を無効'},
+ sp:{'2,-2':{t:'skill',v:'raise'},'-2,2':{t:'skill',v:'holyrain'},'0,-3':{t:'aw',v:{awTurn:1},d:'聖域の持続+1'},'3,-3':{t:'aw',v:{noRecoil:1},d:'星臨の反動を無効'},
   '3,0':{t:'fork',g:1,v:{resP:15},d:'聖骸：精神+15%'},'0,3':{t:'fork',g:1,v:{mhpP:15},d:'機巧：最大HP+15%'},'-3,0':{t:'fork',g:2,v:{magP:12},d:'神威：魔力+12%'},'-3,3':{t:'fork',g:2,v:{defP:15},d:'鉄甲：防御+15%'}}};
 BOARD.shion=buildBoard('shion');BOARD.noah=buildBoard('noah');
 Object.assign(RESO,{'rio,shion':'閃光迅影','gald,noah':'鉄壁の聖堂','mire,noah':'聖炎の祈り','noah,rio':'星灯の祈り','gald,shion':'影城塞','mire,shion':'風火輪','noah,shion':'影と聖印'});

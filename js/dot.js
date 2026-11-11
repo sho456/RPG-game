@@ -84,7 +84,7 @@ const whiteOf=src=>{const c=document.createElement('canvas');c.width=src.width;c
 return{Buf,ramp,tint,mix,ik,whiteOf,hex2,TH};})();
 
 /* 既存の mk() が作る16×16スプライトに「どのドット絵データを・どの配色で作ったか」を覚えさせ、
-   キーごとに控える（DOT.info）。色替え敵・覚醒配色・虚蝕化配色を、新しい描画でもそのまま引き継ぐため。
+   キーごとに控える（DOT.info）。色替え敵・星臨配色・虚蝕化配色を、新しい描画でもそのまま引き継ぐため。
    ver0.18 が IMG を自前の絵に差し替えても、控えは残る */
 const DOT={info:{},snap(k){const im=IMG[k];if(im&&im._rows)DOT.info[k]={rows:im._rows,pal:im._pal||null};},snapAll(){for(const k in IMG)if(!/_w$/.test(k))DOT.snap(k);}};
 {const _mk=mk;mk=function(rows,over,solid){const c=_mk(rows,over,solid);c._rows=rows;c._pal=over||null;c._solid=solid||null;return c;};

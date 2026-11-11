@@ -170,7 +170,7 @@ function drawHumanoid(b,anim,i,d,opt){const o=opt?JSON.parse(opt):{},R=heroCols(
  /* 前の腕と武器 */
  if(!d.noArms)arm(shF,p.fa||[-5,3],true,d.weapon&&!(o.noW)?d.weapon:null,p.wa??35,wo);
  if(d.front)d.front(b,{ox,oy,by,ln,i,anim,R,p,J,tx,ty,o,shF,shB});
- /* 発光（詠唱・覚醒） */
+ /* 発光（詠唱・星臨） */
  if(p.glow&&d.glowAt!==0){const hx=shF[0]+(p.fa?p.fa[0]:0),hy=shF[1]+(p.fa?p.fa[1]:0),gc=R.glow;b.px(hx-2,hy-3,gc[0]);b.px(hx+2,hy-2,gc[1]);b.px(hx-3,hy+1,gc[1]);b.px(hx+1,hy-5,gc[0]);}
 }
 function regHero(key,d){SPDEF[key]=Object.assign({w:HW,h:HH,ax:HAX,ay:HAY,draw:drawHumanoid,human:1,face:[HAX-10+(d.hdx||0),HAY-(d.hip??7)-(d.tup??8)-d.head.length+(d.hup??2)-2-(d.float?3:0)+Math.max(0,d.head.length-13),18,18]},d);}

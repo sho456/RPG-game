@@ -3,8 +3,8 @@ const RAR=[{n:'コモン',c:'#d8d8d8',m:1},{n:'アンコモン',c:'#6fdc7f',m:2}
 const SLOTN={w:'武器',sub:'副装備',head:'頭',body:'体',acc1:'装飾1',acc2:'装飾2'};
 const SLOTS6=['w','sub','head','body','acc1','acc2'];
 const OPS={atkP:['攻撃','%',3,10],defP:['防御','%',3,10],magP:['魔力','%',3,10],resP:['精神','%',3,10],mhpP:['最大HP','%',4,12],spd:['素早さ','+',.3,1.2],
- crit:['会心率','%',2,8],weakDmg:['弱点ダメ','%',8,25],startAG:['開始時AG','+',8,25],awDmg:['覚醒中与ダメ','%',8,30],spGain:['攻撃時SP','+',3,10],drop:['ドロップ率','%',3,10]};
-const LEG={koukagari:{n:'流星の後篝',slot:'acc',d:'覚醒が解けるときAG50を残す'},shokei:{n:'処刑人の刃',slot:'w',who:'rio',d:'ブレイク中の敵への与ダメ×2.0'},futago:{n:'双子星の首飾り',slot:'acc',d:'共鳴技の威力2倍'}};
+ crit:['会心率','%',2,8],weakDmg:['弱点ダメ','%',8,25],startAG:['開始時AG','+',8,25],awDmg:['星臨中与ダメ','%',8,30],spGain:['攻撃時SP','+',3,10],drop:['ドロップ率','%',3,10]};
+const LEG={koukagari:{n:'流星の後篝',slot:'acc',d:'星臨が解けるときAG50を残す'},shokei:{n:'処刑人の刃',slot:'w',who:'rio',d:'ブレイク中の敵への与ダメ×2.0'},futago:{n:'双子星の首飾り',slot:'acc',d:'共鳴技の威力2倍'}};
 const BN={atk:'攻',def:'防',res:'精',mag:'魔',mhp:'HP',spd:'速'};
 const MATL=l=>l<=2?'銅':l<=5?'鉄':l<=9?'鋼':'星鋼';
 const grp=s=>s.startsWith('acc')?'acc':s;
@@ -81,11 +81,11 @@ const HEXD=[[1,0],[1,-1],[0,-1],[-1,0],[-1,1],[0,1]];
 const SBASE={atkP:4,defP:4,mhpP:5,resP:4,magP:5,spd:.3,crit:3,weakDmg:8,startAG:8,awDmg:10,spGain:3};
 const BDEF={
  rio:{star:'灯火座',sec:[['atkP'],['spd','crit'],['weakDmg','startAG'],['defP'],['mhpP'],['resP','magP']],mask:['2,-3','-1,-2','-3,2','1,2'],
-  sp:{'2,-2':{t:'skill',v:'shiden'},'-2,2':{t:'skill',v:'kibou'},'0,-3':{t:'aw',v:{awTurn:1},d:'覚醒の行動回数+1'},'3,-3':{t:'aw',v:{noRecoil:1},d:'覚醒の反動を無効'},
+  sp:{'2,-2':{t:'skill',v:'shiden'},'-2,2':{t:'skill',v:'kibou'},'0,-3':{t:'aw',v:{awTurn:1},d:'星臨の行動回数+1'},'3,-3':{t:'aw',v:{noRecoil:1},d:'星臨の反動を無効'},
    '3,0':{t:'fork',g:1,v:{atkP:12},d:'剛星：攻撃+12%'},'0,3':{t:'fork',g:1,v:{mhpP:15},d:'柔星：最大HP+15%'},
-   '-3,0':{t:'fork',g:2,v:{awDmg:20},d:'烈星：覚醒中与ダメ+20%'},'-3,3':{t:'fork',g:2,v:{weakDmg:20},d:'狙星：弱点ダメ+20%'}}},
+   '-3,0':{t:'fork',g:2,v:{awDmg:20},d:'烈星：星臨中与ダメ+20%'},'-3,3':{t:'fork',g:2,v:{weakDmg:20},d:'狙星：弱点ダメ+20%'}}},
  gald:{star:'城塞座',sec:[['atkP'],['defP'],['mhpP'],['resP'],['startAG','spGain'],['crit']],mask:['3,-1','-2,-1','-2,3','2,1'],
-  sp:{'2,-2':{t:'skill',v:'gansai'},'-2,2':{t:'skill',v:'ikari'},'0,-3':{t:'aw',v:{awTurn:1},d:'覚醒の行動回数+1'},'3,-3':{t:'aw',v:{storeUp:30},d:'蓄積効率+30%'},
+  sp:{'2,-2':{t:'skill',v:'gansai'},'-2,2':{t:'skill',v:'ikari'},'0,-3':{t:'aw',v:{awTurn:1},d:'星臨の行動回数+1'},'3,-3':{t:'aw',v:{storeUp:30},d:'蓄積効率+30%'},
    '3,0':{t:'fork',g:1,v:{atkP:12},d:'攻城：攻撃+12%'},'0,3':{t:'fork',g:1,v:{defP:15},d:'堅城：防御+15%'},
    '-3,0':{t:'fork',g:2,v:{startAG:25},d:'先陣：開始時AG+25'},'-3,3':{t:'fork',g:2,v:{spGain:8},d:'闘志：攻撃時SP+8'}}}};
 const hexDist=(q,r)=>(Math.abs(q)+Math.abs(r)+Math.abs(q+r))/2;
@@ -149,13 +149,13 @@ function drawBoard(){const c=bctx,cw=W*SC,ch=BCH(),id=BS.id,N=BOARD[id],U=G.h[id
  c.fillStyle='#cfd3f5';c.font='13px -apple-system,"Hiragino Sans",sans-serif';c.fillText(`星ポイント 残り ${ptsLeft(id)}　Lv${G.h[id].lv}`,12,44);}
 function openBoard(id,m){show('board');setH(224);sizeBoard();BS.id=id;if(!BOARD[id][BS.sel])BS.sel=null;boardMenu(m);}
 function boardMenu(m){const id=BS.id,n=BS.sel&&BOARD[id][BS.sel],U=G.h[id].board;
- const info=n?`<b style="color:${NCOL[n.t]}">${{core:'星片',stat:'能力',skill:'技',aw:'覚醒',fork:'分岐（どちらか1つ）'}[n.t]}</b>　${n.d}　<small>必要ポイント${n.cost}・${U.includes(n.k)?'解放済み':canUnlock(id,n.k)?'解放できる':'未接続'}</small>`:'星をタップで詳細。光る輪の星が解放できる。<br><small>青：能力　緑：技　赤：覚醒強化　紫：分岐（どちらか一方）</small>';
+ const info=n?`<b style="color:${NCOL[n.t]}">${{core:'星片',stat:'能力',skill:'技',aw:'星臨',fork:'分岐（どちらか1つ）'}[n.t]}</b>　${n.d}　<small>必要ポイント${n.cost}・${U.includes(n.k)?'解放済み':canUnlock(id,n.k)?'解放できる':'未接続'}</small>`:'星をタップで詳細。光る輪の星が解放できる。<br><small>青：能力　緑：技　赤：星臨強化　紫：分岐（どちらか一方）</small>';
  log((m?m+'<br>':'')+info);
  menu([{l:'解放',s:n?`ポイント${n.cost}`:'星を選ぶ',cls:'ready',dis:!n||!canUnlock(id,n.k)||n.cost>ptsLeft(id),f:()=>{U.push(n.k);SFX.aw();save();boardMenu(`<b>${n.d}</b> を解放した！`);}},
   {l:'おまかせ解放',s:'自動で振り分け',f:()=>{const c=autoUnlock(id);if(c)SFX.aw();save();boardMenu(c?`${c}個の星を解放した`:'解放できる星がない（ポイント不足）');}},
   {l:'リセット',s:'無料でやり直し',f:()=>{G.h[id].board=['0,0'];save();boardMenu('星盤をリセットした');}},
   {l:`${HB[nextM(id)].name}の星盤`,f:()=>{BS.sel=null;openBoard(nextM(id));}},
-  {l:'ジョブ',s:G.h[id].job?JOBS[G.h[id].job].n:'未設定',f:()=>jobMenu(id)},{l:'覚醒の試練',s:'段階'+ROMAN[G.h[id].awLv||1],cls:'ready',f:()=>{enterTown();trialMenu();}},{l:'戻る',cls:'back',f:()=>enterTown()}]);}
+  {l:'ジョブ',s:G.h[id].job?JOBS[G.h[id].job].n:'未設定',f:()=>jobMenu(id)},{l:'星臨の試練',s:'位階'+ROMAN[G.h[id].awLv||1],cls:'ready',f:()=>{enterTown();trialMenu();}},{l:'戻る',cls:'back',f:()=>enterTown()}]);}
 function boardTap(x,y){const N=BOARD[BS.id];let best=null,bd=1e9;for(const k in N){const[nx,ny,s]=bpos(N[k]),d=Math.hypot(nx-x,ny-y);if(d<s*.8&&d<bd){bd=d;best=k;}}if(best){BS.sel=best;SFX.sel();boardMenu();}}
 /* --- ジョブ画面 --- */
 function jobMenu(id,m){const h=G.h[id];

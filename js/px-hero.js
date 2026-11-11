@@ -70,7 +70,7 @@ jin:{pal:{hair:'#7a5030',skin:'#e8b890',eye:'#4a7a3a',cloth:'#6a8a4a',cloth2:'#5
  weapon:'claw',style:{atk:'claw',win:'jump',wa:5,fax:-6,fay:4},
  headTop:(b,c)=>{if(c.o.aw){part(b,q=>{q.poly([[c.hx0+1,c.hy0+2],[c.hx0+2,c.hy0-3],[c.hx0+5,c.hy0+1]],c.R.hair[1]);q.poly([[c.hx0+8,c.hy0+1],[c.hx0+11,c.hy0-3],[c.hx0+12,c.hy0+2]],c.R.hair[2]);});b.px(c.hx0+2,c.hy0-1,c.R.trim[1]);}},
  back:(b,c)=>{if(c.o.aw)tailBack(b,c,c.R.hair,9);},
- /* 相棒ポポ：足元で跳ねる。覚醒中は合体して姿を消す */
+ /* 相棒ポポ：足元で跳ねる。星臨中は合体して姿を消す */
  front:(b,c)=>{if(c.o.aw||c.anim==='down')return;const hop=c.anim==='idle'?[0,2,3,1][c.i%4]:c.anim==='win'?[3,0,3,0][c.i%4]:c.anim==='atk'?[0,2,4,2,0,0][c.i]:0,dx=c.anim==='atk'?[0,-2,-6,-9,-5,-1][c.i]:0,x=HAX-17+dx,y=HAY-8-hop;
   const A=ramp('#e89040'),W=ramp('#f6ead0');part(b,q=>{q.ell(x+4.5,y+5,4.2,3.2,A[1]);q.ell(x+3,y+3,3,2.6,A[1]);q.poly([[x,y+1],[x+1,y-3],[x+3,y+1]],A[1]);q.poly([[x+4,y+1],[x+6,y-3],[x+7,y+2]],A[2]);q.ell(x+4.5,y+6.4,2.4,1.5,W[1]);q.px(x+1,y+3,C('#1a1626'));q.px(x+4,y+3,C('#1a1626'));q.px(x+2,y+4,C('#3a2010'));
    q.line(x+8,y+5,x+11,y+2-(hop?1:0),A[1],2);q.px(x+12,y+1-(hop?1:0),W[1]);q.px(x+1,y-2,W[1]);});}},

@@ -1,4 +1,4 @@
-/* ===== ver0.16 音と絵：エリア別BGM・覚醒BGM切替・戦闘キャラ48×48ドット・ボスの部位破壊演出 ===== */
+/* ===== ver0.16 音と絵：エリア別BGM・星臨BGM切替・戦闘キャラ48×48ドット・ボスの部位破壊演出 ===== */
 
 /* ---------- 1. 戦闘キャラの高解像度ドット（48×48／ボスは64×64） ----------
  元の16×16ドットをScale3x（ボスはScale2x×2）で描き起こし、
@@ -72,7 +72,7 @@ async function partBreak(e){const i=e.pb||0;if(i>=PARTS.length)return;e.pb=i+1;c
 {const _st=stTags;stTags=function(u){const t=_st(u);if(u.side===1&&u.boss&&u.pb)t.push(['破壊'+u.pb+'/'+PARTS.length,'bk']);return t;};}
 
 /* ---------- 3. BGM（Web Audioで即時生成するチップチューン） ----------
- 拠点／フィールド（エリア別・虚蝕化は変調）／通常戦闘／ボス戦／ラスボス／覚醒中／勝利 */
+ 拠点／フィールド（エリア別・虚蝕化は変調）／通常戦闘／ボス戦／ラスボス／星臨中／勝利 */
 let NB=null;function noiseBuf(){if(NB)return NB;NB=AC.createBuffer(1,AC.sampleRate,AC.sampleRate);const d=NB.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;return NB;}
 const PWV={};function pulseW(d){if(PWV[d])return PWV[d];const n=40,re=new Float32Array(n),im=new Float32Array(n);for(let i=1;i<n;i++)re[i]=2/(i*Math.PI)*Math.sin(i*Math.PI*d);return PWV[d]=AC.createPeriodicWave(re,im);}
 const SCL={maj:[0,2,4,5,7,9,11],min:[0,2,3,5,7,8,10],dor:[0,2,3,5,7,9,10],phr:[0,1,3,5,7,8,10],hm:[0,2,3,5,7,8,11],lyd:[0,2,4,6,7,9,11]};
@@ -90,7 +90,7 @@ const SONGS={title:['calm',78,57,'min',[0,5,3,4],[5,3,0,4]],town:['town',100,60,
  'f:haido':['field',112,62,'dor',[0,3,6,0],[2,3,4,4]],'f:midori':['field',98,65,'maj',[0,4,5,3],[3,4,0,0]],'f:seido':['dungeon',76,62,'hm',[0,5,3,4],[0,3,4,4]],
  'f:raimei':['field',126,64,'min',[0,5,6,4],[3,4,5,6]],'f:kouka':['calm',92,61,'min',[0,3,5,4],[5,6,0,0]],'f:ouito':['dungeon',84,63,'dor',[0,1,3,0],[5,3,4,4]],
  'f:tower':['field',110,67,'lyd',[0,1,0,4],[5,3,1,4]],'f:zankyo':['dungeon',72,58,'phr',[0,1,0,6],[5,6,1,0]],'f:kairou':['dungeon',92,57,'hm',[0,5,1,4],[0,3,5,4]],'f:ryuu':['field',118,59,'phr',[0,1,6,0],[5,6,0,1]]};
-const BGMN={title:'タイトル',town:'灯都（拠点）',battle:'通常戦闘',boss:'ボス戦',lastboss:'ラストボス',awaken:'覚醒中',win:'勝利','f:haido':'灰の街道','f:midori':'翠の森','f:seido':'祈りの廃聖堂',
+const BGMN={title:'タイトル',town:'灯都（拠点）',battle:'通常戦闘',boss:'ボス戦',lastboss:'ラストボス',awaken:'星臨中',win:'勝利','f:haido':'灰の街道','f:midori':'翠の森','f:seido':'祈りの廃聖堂',
  'f:raimei':'雷鳴高原','f:kouka':'東方の島','f:ouito':'沈んだ王都','f:tower':'天への塔','f:zankyo':'星核の残響','f:kairou':'虚の回廊','f:ryuu':'竜の巣','v:haido':'虚蝕化エリア（灰の街道）'};
 const BP={whole:()=>[[0,0,16,0]],half:()=>[[0,0,8,0],[8,4,8,0]],quarter:()=>[[0,0,4,0],[4,0,4,0],[8,4,4,0],[12,0,4,0]],
  rf8:()=>[...Array(8)].map((_,i)=>[i*2,i%2?4:0,2,0]),oct8:()=>[...Array(8)].map((_,i)=>[i*2,0,2,i%2]),oct16:()=>[...Array(16)].map((_,i)=>[i,0,1,i%2])};
@@ -141,7 +141,7 @@ setInterval(()=>{const t=$('#ttap');if(t)t.style.display=AC&&AC.state==='running
 
 /* ---------- 開発者メニュー ---------- */
 function dev16(m){BGM.force=null;log((m||'<b>ver0.16 音と絵</b>')+`<br><small>BGM：${BGM.on?'ON':'OFF'}　再生中：${BGMN[BGM.key]||BGM.key||'なし'}</small>`);
- menu([{l:'BGMを試聴する',cls:'ready',s:'エリア別・戦闘・覚醒など全'+Object.keys(BGMN).length+'曲',f:()=>bgmList()},
+ menu([{l:'BGMを試聴する',cls:'ready',s:'エリア別・戦闘・星臨など全'+Object.keys(BGMN).length+'曲',f:()=>bgmList()},
   {l:'ボス戦で部位破壊を見る',s:'氷華の妖狐（ブレイクで部位が砕ける）',f:()=>devBattle([{kind:'boss5',lv:30}],'kouka')},
   {l:'ラスボス戦BGMを聴く',s:'多段階戦の形式で沈みし女王と戦う',f:()=>devBattle([{kind:'boss6',lv:37}],'ouito',{stages:['boss6']})},
   {l:'48×48ドット一覧',s:'仲間の描き直したドット',f:()=>sprGal()},{l:'BGM　'+(BGM.on?'ON → OFF':'OFF → ON'),f:()=>{bgmToggle();dev16();}},{l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
@@ -150,5 +150,5 @@ function bgmList(){log('<b>BGM試聴</b>　選ぶと再生（戻ると通常に�
 function sprGal(){const ids=Object.keys(HB).filter(id=>IMG[id]);
  const im=(k,n)=>{const c=hiImg(IMG[k],n,true);return c?`<img src="${c.toDataURL()}" style="width:${n*1.5}px;height:${n*1.5}px;image-rendering:pixelated">`:'';};
  panel(`<div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center">${ids.map(id=>`<div style="text-align:center;font-size:11px">${im(id,48)}${IMG[id+'_aw']?im(id+'_aw',48):''}<br>${HB[id].name}</div>`).join('')}</div><button class="tbtn back wide" data-a="back">戻る</button>`,{back:()=>dev16()});
- log('<b>48×48ドット</b>　左：通常／右：覚醒');}
-{const _dv=dvMenu;dvMenu=function(m){BGM.force=null;_dv(m);const c=$('#cmd'),b=document.createElement('button');b.className='c ready';b.innerHTML='ver0.16 音と絵<small>エリア別BGM・覚醒BGM・48×48ドット・部位破壊</small>';b.onclick=()=>{SFX.sel();dev16();};c.insertBefore(b,c.firstChild);if(c.children[1])c.children[1].classList.remove('ready');};}
+ log('<b>48×48ドット</b>　左：通常／右：星臨');}
+{const _dv=dvMenu;dvMenu=function(m){BGM.force=null;_dv(m);const c=$('#cmd'),b=document.createElement('button');b.className='c ready';b.innerHTML='ver0.16 音と絵<small>エリア別BGM・星臨BGM・48×48ドット・部位破壊</small>';b.onclick=()=>{SFX.sel();dev16();};c.insertBefore(b,c.firstChild);if(c.children[1])c.children[1].classList.remove('ready');};}

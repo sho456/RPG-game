@@ -1,6 +1,6 @@
 /* ===== ver0.17 快適さ＋UI再構築 =====
  1. 画面の作り替え：編成／キャラ詳細（装備）／星盤／マップ選択／戦闘
- 2. 快適さ：チュートリアル・セーブ3スロット・拾う前フィルター拡張・オートの覚醒設定・テキスト速度 */
+ 2. 快適さ：チュートリアル・セーブ3スロット・拾う前フィルター拡張・オートの星臨設定・テキスト速度 */
 const VER='ver0.18';
 const ELS10=['斬','打','突','炎','氷','雷','風','地','光','闇'];
 const elOf=id=>OWNEL[id]||({valk:'炎'})[id]||null;
@@ -12,7 +12,7 @@ const lsSet=(k,v)=>{try{localStorage.setItem(k,v);}catch(e){}};
 /* 立ち絵（48×48ドットを拡大表示） */
 const ARTC={};
 function art(id,aw){const k=id+(aw?'_aw':'');if(ARTC[k])return ARTC[k];const c=hiImg(IMG[aw&&IMG[id+'_aw']?id+'_aw':id],48,true);return ARTC[k]=c&&c.toDataURL?c.toDataURL():'';}
-/* 戦闘力：能力・覚醒段階・技の数から算出する目安 */
+/* 戦闘力：能力・星臨位階・技の数から算出する目安 */
 function power(id){const s=stats(id),h=G.h[id];return Math.round(s.mhp*.6+Math.max(s.atk,s.mag)*7+Math.min(s.atk,s.mag)*1.5+(s.def+s.res)*3.5+s.spd*18+s.crit*6+s.weakDmg*3+s.awDmg*3+s.startAG*2+(h.awLv||1)*120+skillList(id).length*25);}
 /* 星盤を星座として描く（解放した星が光り、線でつながる） */
 function conSvg(id){const N=BOARD[id],U=G.h[id].board,P=n=>[50+7.4*Math.sqrt(3)*(n.q+n.r/2),50+7.4*1.5*n.r];let ln='',dt='';
@@ -40,17 +40,17 @@ let WMS={on:false,tab:0,sel:null,cur:null,bgs:{}};
  const c=document.createElement('button');c.className='tb';c.id='cfgB';c.textContent='≡';c.onclick=()=>{SFX.sel();cfgOpen();};$('#top').appendChild(c);}
 
 /* ==================== 戦闘画面 ==================== */
-/* 味方は右側に縦一列。HP・覚醒ゲージは各キャラの横に、行動中のキャラは下の大きなパネルに表示 */
+/* 味方は右側に縦一列。HP・星臨ゲージは各キャラの横に、行動中のキャラは下の大きなパネルに表示 */
 Object.assign(HPOS,{1:[[112,46]],2:[[114,24],[108,68]],3:[[114,8],[108,44],[114,80]],4:[[114,1],[108,31],[114,61],[108,91]]});
 let AM='n';const LASTA={};
 const awPolicy=()=>{const p=G.set.autoAw||'save';return p==='any'||(p==='boss'&&!!(B.opts.boss||B.opts.trial))||(p==='brk'&&aliveE().some(e=>e.broken));};
-/* 通常AUTOは設定どおりに覚醒を温存、全力AUTOは覚醒・共鳴技もすぐ使う */
+/* 通常AUTOは設定どおりに星臨を温存、全力AUTOは星臨・共鳴技もすぐ使う */
 {const _ap=autoPick;autoPick=function(u){if(auto&&AM==='n'&&!u.aw&&u.ag>=100&&!awPolicy()){const ag=u.ag;u.ag=99;try{return _ap(u);}finally{u.ag=ag;}}return _ap(u);};}
 const skDis=(u,s)=>{const lock=s.req==='charged'?!u.charged:s.req==='lowhp'?u.hp>u.mhp*.25:s.req==='stk3'?(u.stk||0)<3:s.req&&!B.awUsed.has(s.req);
  return!!((s.sp||0)>u.sp||lock||(s.k==='zen'&&B.zenUsed)||(s.revive&&!B.heroes.some(h=>!h.alive)));};
 function repOK(u){const L=LASTA[u.id];if(!L)return null;let s=L.sk;if(s.basic)s=ATK(u);else if(s.k==='guard'){}else{if(s.k==='item'||s.k==='reso'||s.t==='ally')return null;if(!(u.aw?awCmds(u):u.skills).some(k=>SK[k]===s)||skDis(u,s))return null;}return s;}
 function bbar(force){const b=$('#bbar');if(!b||!G)return;const p=B&&B.pick,l=p&&repOK(p.u),sg=[l?l.n:'',auto,AM,G.set.autoAw].join();if(!force&&b._s===sg)return;b._s=sg;
- b.innerHTML=`<button data-b="rep" ${l?'':'disabled'}>リピート<small>${l?l.n:'前回と同じ行動'}</small></button><button data-b="n" class="${auto&&AM==='n'?'on':''}">通常AUTO<small>覚醒：${AWN[G.set.autoAw]}</small></button><button data-b="f" class="${auto&&AM==='f'?'on':''}">全力AUTO<small>覚醒・共鳴も使う</small></button>`;}
+ b.innerHTML=`<button data-b="rep" ${l?'':'disabled'}>リピート<small>${l?l.n:'前回と同じ行動'}</small></button><button data-b="n" class="${auto&&AM==='n'?'on':''}">通常AUTO<small>星臨：${AWN[G.set.autoAw]}</small></button><button data-b="f" class="${auto&&AM==='f'?'on':''}">全力AUTO<small>星臨・共鳴も使う</small></button>`;}
 const skBadge=s=>{const heal=['heal','healAll','revive','reviveAll','item'].includes(s.k);const el=s.el||(heal?'癒':['phys','mag','rhythm'].includes(s.k)?'無':'補');return[el,ELC[el]||(heal?'#7dffa8':el==='無'?'#d8d8e8':'#9fb4ff')];};
 chooseRoot=function(u){
  if(u.id==='valk'&&u.aw)return(async()=>{log('竜血が暴れる――<b>ヴァルクは止まらない！</b>');await wait(450);return autoPick(u);})();
@@ -63,7 +63,7 @@ chooseRoot=function(u){
    const pool=sk.revive?B.heroes.filter(h=>!h.alive):aliveH();
    sub={t:`<b>${sk.n||ITEMS[sk.id].n}</b>　誰に使う？`,rows:pool.map(t=>({el:'味',ec:elCol(t.id),n:t.name,d:t.alive?`HP ${t.hp}/${t.mhp}`:'戦闘不能',now:1,f:()=>fin(sk,t)}))};draw();};
   const rows=()=>{if(sub)return[...sub.rows,{n:'もどる',cls:'back',now:1,f:()=>{sub=null;draw();}}];const o=[];
-   if(tab==='sk'){if(canReso())o.push({el:'共',ec:'#ff9ad6',n:`共鳴技「${resoName()}」`,d:'二人の覚醒を重ねる大技（1戦闘に1回）',cls:'reso',f:()=>fin({k:'reso'})});
+   if(tab==='sk'){if(canReso())o.push({el:'共',ec:'#ff9ad6',n:`共鳴技「${resoName()}」`,d:'二人の星臨を重ねる大技（1戦闘に1回）',cls:'reso',f:()=>fin({k:'reso'})});
     const a=ATK(u),[ae,ac]=skBadge(a);o.push({el:ae,ec:ac,n:a.n==='攻撃'?'通常攻撃':a.n,d:'SPを使わない基本の攻撃',cost:'SP 0',f:()=>use(a)});
     (u.aw?awCmds(u):u.skills).forEach(k=>{const s=SK[k],[e,c]=skBadge(s);o.push({el:e,ec:c,n:s.n,d:s.d||'',cost:s.sp?'SP '+s.sp:s.gauge?'ゲージ '+s.gauge:'―',ng:(s.sp||0)>u.sp,dis:skDis(u,s),f:()=>use(s)});});}
    if(tab==='it'){const I=G.items,dead=B.heroes.some(h=>!h.alive);Object.keys(ITEMS).filter(k=>(I[k]||0)>0||k==='potion').forEach(k=>{const rv=k==='feather'||k==='tail';
@@ -71,11 +71,11 @@ chooseRoot=function(u){
    if(tab==='op'){const rs=G.members.filter(id=>!B.heroes.some(h=>h.id===id)&&G.h[id].hp!==0),nf=!!B.opts.boss||!!B.opts.event||!!B.opts.trial;
     o.push({el:'守',ec:'#9fd8ff',n:'防御',d:'次の手番まで被ダメージ半減',f:()=>fin(GUARD)});
     o.push({el:'替',ec:'#c8b0ff',n:'交代',d:rs.length?'控えの仲間と入れ替わる（行動を消費しない）':'控えがいない',dis:!rs.length||u.swapped||u.aw,now:1,f:()=>{sub={t:'<b>交代</b>　誰と入れ替わる？',rows:rs.map(id=>({el:elOf(id)||'無',ec:elCol(id),n:HB[id].name,d:`Lv${G.h[id].lv}　${clsOf(id)}`,now:1,f:()=>res({swap:id})}))};draw();}});
-    if(u.aw&&u.id==='rio'&&!canReso())o.push({el:'解',ec:'#ffe27a',n:'覚醒解除',d:'任意で覚醒を解く',f:()=>{endAw(u);sel=-1;draw();}});
+    if(u.aw&&u.id==='rio'&&!canReso())o.push({el:'解',ec:'#ffe27a',n:'星臨解除',d:'任意で星臨を解く',f:()=>{endAw(u);sel=-1;draw();}});
     o.push({el:'逃',ec:'#aab0d8',n:'逃げる',d:nf?'この戦いからは逃げられない':'素早さが高いほど成功しやすい',dis:nf,f:()=>res({flee:1})});}
    return o;};
   const draw=()=>{const c=$('#cmd');c.className='bcmd';sel=-1;if(lock){c.innerHTML='<div class="bwait">…</div>';return;}R=rows();
-   c.innerHTML=(sub?`<div class="bsub">${sub.t}</div>`:`<div class="btabs">${[['sk',u.aw?'覚醒技':'技'],['it','道具'],['op','作戦']].map(([k,l])=>`<button class="${tab===k?'on':''}" data-t="${k}">${l}</button>`).join('')}</div>`)+
+   c.innerHTML=(sub?`<div class="bsub">${sub.t}</div>`:`<div class="btabs">${[['sk',u.aw?'星臨技':'技'],['it','道具'],['op','作戦']].map(([k,l])=>`<button class="${tab===k?'on':''}" data-t="${k}">${l}</button>`).join('')}</div>`)+
     `<div class="blist">${R.map((r,i)=>`<button class="sk ${r.cls||''}" data-i="${i}" ${r.dis?'disabled':''}>${r.el?`<i class="el" style="background:${r.ec}">${r.el}</i>`:''}<span class="nm">${r.n}${r.d?`<small>${r.d}</small>`:''}</span>${r.cost?`<span class="cost${r.ng?' ng':''}">${r.cost}</span>`:''}</button>`).join('')}</div>`;
    c.scrollTop=0;bbar();};
   const head=()=>log(`<b>${u.name}</b>の番${u.aw?`（${AW[u.id].name}：${awTag(u).trim()}）`:''}　<small>技を選ぶ／敵をタップで狙いを変える</small>`);
@@ -104,18 +104,18 @@ refresh=function(){if(!B||scene!=='battle')return;if(!B.tgt||!B.tgt.alive||!B.en
  /* 狙っている敵の弱点一覧 */
  let tp=L.querySelector('.tgp');if(!tp){tp=document.createElement('div');tp.className='tgp';L.appendChild(tp);}const t=B.tgt;tp.style.display=t?'':'none';
  if(t){const unk=t.weak.length-t.known.size;tp.innerHTML=`<div class="tn"><em>TARGET</em><b>${t.name}</b>${t.broken?'<span class="tg bk">BREAK</span>':`<span class="sd">◆${t.brk}</span>`}</div><div class="els">${ELS10.map(e=>`<i${t.known.has(e)?` class="w" style="background:${ELC[e]}"`:''}>${e}</i>`).join('')}${unk?`<u>?×${unk}</u>`:''}</div>`;}
- /* 味方：キャラの横にHP・SP・覚醒ゲージ */
+ /* 味方：キャラの横にHP・SP・星臨ゲージ */
  B.heroes.forEach(h=>{let el=h._pl;if(!el||!el.isConnected){el=document.createElement('div');el.className='hpl';el.innerHTML='<b class="hv"></b><div class="hb"><u></u><i></i></div><div class="ab"><i></i></div><div class="hs"><span></span><em></em></div>';el._h=h;h._pl=el;L.appendChild(el);}
   const pc=Math.max(0,h.hp/h.mhp*100);el.style.left=(h.x+33)*SC+'px';el.style.top=(h.y+6)*SC+'px';el.className='hpl'+(B.cur===h?' cur':'')+(h.alive?'':' down')+(pc<30&&h.alive?' low':'')+(h.aw?' awk':'');
   el.querySelector('.hv').textContent=h.alive?h.hp:'戦闘不能';el.querySelector('.hb i').style.width=pc+'%';el.querySelector('.hb u').style.width=pc+'%';
   const ab=el.querySelector('.ab');ab.querySelector('i').style.width=Math.min(100,h.ag)+'%';ab.classList.toggle('full',h.ag>=100&&!h.aw);
-  el.querySelector('.hs span').textContent='SP'+h.sp;el.querySelector('.hs em').textContent=h.aw?'覚醒':h.ag>=100?'覚醒OK':h.taunt>0?'挑発':h.guard?'防御':'';});
+  el.querySelector('.hs span').textContent='SP'+h.sp;el.querySelector('.hs em').textContent=h.aw?'星臨':h.ag>=100?'星臨OK':h.taunt>0?'挑発':h.guard?'防御':'';});
  /* 行動中のキャラ */
  const P=$('#party'),a=B.cur&&B.cur.side===0?B.cur:(B.lastH&&B.heroes.includes(B.lastH)?B.lastH:B.heroes[0]);B.lastH=a;
  const my=B.cur===a,rdy=my&&!!B.pick&&a.ag>=100&&!a.aw&&B.heroes.filter(h=>h.aw).length<2,low=a.hp<a.mhp*.3;
  const ht=`<div class="ap1"><div class="apl"><div class="apn"><b>${a.name}</b><small>Lv${G.h[a.id].lv}　${clsOf(a.id)}</small></div><div class="tgs">${tagH(a)}</div>
   <div class="apg${a.ag>=100&&!a.aw?' full':''}${a.aw?' on':''}"><em>${a.aw?AW[a.id].name:'ASTRAL GAUGE'}</em><div class="g"><i style="width:${Math.min(100,a.ag)}%"></i></div><span>${a.aw?(GAUGE.includes(a.id)?Math.round(a.ag):'残'+Math.max(0,awN(a)-a.awT)):Math.floor(a.ag)+'%'}</span></div></div>
-  <button id="awB" class="${rdy?'rdy':''}${a.aw?' on':''}" ${rdy?'':'disabled'}>${a.aw?'覚醒中':'覚醒'}<small>${a.aw?'':rdy?'行動を消費しない':'ゲージ100%で'}</small></button><img class="apf" src="${art(a.id,a.aw)}"></div>
+  <button id="awB" class="${rdy?'rdy':''}${a.aw?' on':''}" ${rdy?'':'disabled'}>${a.aw?'星臨中':'星臨'}<small>${a.aw?'':rdy?'行動を消費しない':'ゲージ100%で'}</small></button><img class="apf" src="${art(a.id,a.aw)}"></div>
   <div class="ap2"><div class="bx hp${low?' low':''}"><em>HP</em><b>${a.hp}</b><small>/${a.mhp}</small></div><div class="bx sp"><em>SP</em><b>${a.sp}</b><small>/100</small></div><div class="bx tn"><em>TURN</em><b>${B.turns}</b></div></div>`;
  P.className='act'+(my?'':' off')+(a.aw?' awk':'');if(P._h!==ht||!P.querySelector('.ap1')){P._h=ht;P.innerHTML=ht;}
  /* 行動順 */
@@ -140,7 +140,7 @@ function partyScreen(m){const P=G.party,bench=G.members.filter(id=>!P.includes(i
  panel(`<div class="pshd"><div class="pst"><b>✦ パーティ編成</b><small>${chapter()}　仲間 ${G.members.length}人</small></div><div class="psp"><small>パーティ戦闘力</small><b>${fmt(tot)}</b></div></div>
  <div class="pcards">${P.map(card).join('')}${Array.from({length:4-P.length},()=>`<div class="pcd emp" data-a="e"><b>＋</b><small>空き</small></div>`).join('')}</div>
  ${sel?`<div class="pact"><button class="tbtn gold" data-a="det">詳細・装備</button><button class="tbtn" data-a="bd" data-v="${sel}">星盤</button><button class="tbtn" data-a="rm" ${P.includes(sel)&&P.length>1?'':'disabled'}>控えへ</button><button class="tbtn back" data-a="x">選択解除</button></div>`:''}
- <div class="prs"><em>共鳴技</em>${rs.join('')||'<span class="chp">この編成に固有の共鳴技はない（2人が同時に覚醒すると発動）</span>'}</div>
+ <div class="prs"><em>共鳴技</em>${rs.join('')||'<span class="chp">この編成に固有の共鳴技はない（2人が同時に星臨すると発動）</span>'}</div>
  <div class="ttl2">控え ${bench.length}人</div><div class="pbench">${bench.map(id=>`<div class="pbt${sel===id?' sel':''}" data-a="c" data-v="${id}" style="--ec:${elCol(id)}"><img src="${art(id)}"><b>${HB[id].name}</b><small>Lv${G.h[id].lv}　${fmt(power(id))}</small></div>`).join('')||'<div class="emp" style="grid-column:1/-1">控えの仲間はいない</div>'}</div>
  <div class="tbar2"><button class="tbtn" data-a="inv">持ち物 <small>${G.inv.length}個</small></button><button class="tbtn back" data-a="back">戻る</button></div>`,
  {c:id=>{if(!PSEL){PSEL=id;return partyScreen();}if(PSEL===id){PSEL=null;return equipMenu(id);}
@@ -157,12 +157,12 @@ function charHTML(id,tab,ed){const s=stats(id),h=G.h[id],b=HB[id],A2=AW[id],lv=h
  const slot=sl=>{const it=h.eq[sl]&&findItem(h.eq[sl]);return`<div class="cslot ${it?'r'+it.rar:'emp'}" data-a="pick" data-v="${sl}">${it?`<img src="${itemIcon(it)}">${it.plus?`<b>+${it.plus}</b>`:''}`:'<i>＋</i>'}<small>${SLOTN[sl]}</small></div>`;};
  const row=(k,v,g)=>`<div class="sr"><span>${g?`<i class="g${g}">${g}</i>`:'<i class="gn">◆</i>'}${k}</span><b>${v}</b></div>`;let body='';
  if(tab==='st')body=`<div class="cst"><div class="cl"><div class="cpw"><small>戦闘力</small><b>${fmt(power(id))}</b></div>
-   <div class="cbx">${row('Lv',h.lv)}${row('次のLvまで',nextXP(h.lv)-h.xp)}${row('覚醒段階','<span style="color:#ffe27a">'+'★'.repeat(lv)+'☆'.repeat(3-lv)+'</span>')}</div>
+   <div class="cbx">${row('Lv',h.lv)}${row('次のLvまで',nextXP(h.lv)-h.xp)}${row('星臨位階','<span style="color:#ffe27a">'+'★'.repeat(lv)+'☆'.repeat(3-lv)+'</span>')}</div>
    <div class="cbx">${row('HP',hp+' / '+s.mhp)}${row('開始時AG',s.startAG)}${row('攻撃時SP','+'+(10+s.spGain))}</div></div>
-  <div class="cr cbx">${row('最大HP',s.mhp,b.g.mhp)}${row('攻撃',s.atk,b.g.atk)}${row('防御',s.def,b.g.def)}${row('魔力',s.mag,b.g.mag)}${row('精神',s.res,b.g.res)}${row('素早さ',+s.spd.toFixed(1),b.g.spd)}${row('会心率',(6+s.crit)+'%')}${row('弱点ダメ','+'+s.weakDmg+'%')}${row('覚醒中与ダメ','+'+s.awDmg+'%')}${row('ドロップ率','+'+s.drop+'%')}</div></div>
+  <div class="cr cbx">${row('最大HP',s.mhp,b.g.mhp)}${row('攻撃',s.atk,b.g.atk)}${row('防御',s.def,b.g.def)}${row('魔力',s.mag,b.g.mag)}${row('精神',s.res,b.g.res)}${row('素早さ',+s.spd.toFixed(1),b.g.spd)}${row('会心率',(6+s.crit)+'%')}${row('弱点ダメ','+'+s.weakDmg+'%')}${row('星臨中与ダメ','+'+s.awDmg+'%')}${row('ドロップ率','+'+s.drop+'%')}</div></div>
   <div class="cnote">S〜D は成長のしやすさ${s.atkEl?'　通常攻撃：'+s.atkEl+'属性':''}</div>`;
  if(tab==='eq')body=`<div class="slots">${SLOTS6.map(sl=>{const it=h.eq[sl]&&findItem(h.eq[sl]);return`<div class="slot ${it?'r'+it.rar:''}" data-a="pick" data-v="${sl}"><div class="sln">${SLOTN[sl]}</div>${it?`<img class="iic" src="${itemIcon(it)}"><div class="sit">${iname(it)}<br><small>${mainTxt(it)}</small></div>`:'<div class="sit emp">― なし ―</div>'}</div>`;}).join('')}</div>`;
- if(tab==='sk')body=`<div class="sh2">覚醒「${A2.name}」<small>（${A2.type}・段階${ROMAN[lv]}）</small></div><div class="stx">${AWD[id]||''}<br>${[...A2.cmds,...(lv>=3?['goku'+id]:[])].map(k=>`<b>${SK[k].n}</b>：${SK[k].d||''}`).join('<br>')}</div>
+ if(tab==='sk')body=`<div class="sh2">星臨「${A2.name}」<small>（${A2.type}・位階${ROMAN[lv]}）</small></div><div class="stx">${AWD[id]||''}<br>${[...A2.cmds,...(lv>=3?['goku'+id]:[])].map(k=>`<b>${SK[k].n}</b>：${SK[k].d||''}`).join('<br>')}</div>
   <div class="sh2">技</div><div class="stx">${skillList(id).map(k=>`<b>${SK[k].n}</b> <small>SP${SK[k].sp||0}</small>：${SK[k].d||''}`).join('<br>')}</div>`;
  if(tab==='bd')body=`<div class="sh2">星盤「${BDEF[id].star}」</div><div class="stx">解放した星 ${h.board.length-1}／${Object.keys(BOARD[id]).length-1}　残りポイント <b>${ptsLeft(id)}</b></div>
   <div class="sh2">ジョブ</div><div class="stx">${h.job?JOBS[h.job].n+' Lv'+h.jobs[h.job].lv:'なし'}<br>パッシブ：${learned(id).map(p=>{const[j,i]=p.split(':');return JOBS[j].ps[i][2];}).join('・')||'なし'}</div>
@@ -170,10 +170,10 @@ function charHTML(id,tab,ed){const s=stats(id),h=G.h[id],b=HB[id],A2=AW[id],lv=h
  return`<div class="chd" style="--ec:${elCol(id)}">${rankH(id)}<div class="chn"><small>［${A2.name}］${G.party.includes(id)?'前衛':'控え'}</small><b>${b.name}</b></div><div class="chc"><i class="elc">${elOf(id)||'無'}</i>${clsOf(id)}</div>${ed?'':'<button class="sx" data-a="close">✕</button>'}</div>
  <div class="cart" style="--ec:${elCol(id)}">${conSvg(id)}<div class="ceq l">${SLOTS6.slice(0,3).map(slot).join('')}</div><div class="ceq r">${SLOTS6.slice(3).map(slot).join('')}</div>
   <div class="cped"></div><img class="cspr" src="${art(id)}"><button class="cnav l" data-a="prev">◀</button><button class="cnav r" data-a="next">▶</button></div>
- <div class="ctabs">${[['st','能力値'],['eq','装備'],['sk','技・覚醒'],['bd','星盤・ジョブ']].map(([k,l])=>`<button class="${tab===k?'on':''}" data-a="tab" data-v="${k}">${l}</button>`).join('')}</div><div class="cbody">${body}</div>`;}
+ <div class="ctabs">${[['st','能力値'],['eq','装備'],['sk','技・星臨'],['bd','星盤・ジョブ']].map(([k,l])=>`<button class="${tab===k?'on':''}" data-a="tab" data-v="${k}">${l}</button>`).join('')}</div><div class="cbody">${body}</div>`;}
 equipMenu=function(id,m){if(!G.members.includes(id))id=G.party[0];const ids=G.members,i=ids.indexOf(id),n=bondReadyN();log((m||`<b>${HB[id].name}</b>　装備の枠をタップで着替え`)+goldTxt());
  panel(charHTML(id,CTAB,true)+`<div class="cbtn"><button class="tbtn gold" data-a="best">最強装備</button><button class="tbtn" data-a="inv">持ち物<small>${G.inv.length}個</small></button><button class="tbtn${ptsLeft(id)>0?' gold':''}" data-a="bd">星盤<small>残${ptsLeft(id)}</small></button><button class="tbtn" data-a="job">ジョブ</button>
-  <button class="tbtn" data-a="tr">覚醒の試練<small>段階${ROMAN[G.h[id].awLv||1]}</small></button><button class="tbtn${n?' gold':''}" data-a="bond">絆<small>${n?'新しい話 '+n:'語らい'}</small></button><button class="tbtn back" data-a="back" style="grid-column:span 2">戻る</button></div>`,
+  <button class="tbtn" data-a="tr">星臨の試練<small>位階${ROMAN[G.h[id].awLv||1]}</small></button><button class="tbtn${n?' gold':''}" data-a="bond">絆<small>${n?'新しい話 '+n:'語らい'}</small></button><button class="tbtn back" data-a="back" style="grid-column:span 2">戻る</button></div>`,
  {tab:k=>{CTAB=k;equipMenu(id);},pick:sl=>pickEq(id,sl),prev:()=>equipMenu(ids[(i-1+ids.length)%ids.length]),next:()=>equipMenu(ids[(i+1)%ids.length]),
   best:()=>{bestEquip(id);SFX.aw();save();equipMenu(id,'おすすめの装備にした');},inv:()=>invMenu(),bd:()=>{BFROM='party';BS.sel=null;openBoard(id);},job:()=>{BFROM='party';openBoard(id);jobMenu(id);},tr:()=>trialMenu(),bond:()=>bondMenu(),back:()=>partyScreen()});};
 /* 探索中のステータス（同じ画面を読み取り専用で開く） */
@@ -204,7 +204,7 @@ drawBoard=function(){const c=bctx,cw=W*SC,ch=BCH(),id=BS.id,N=BOARD[id],U=G.h[id
   const lab=n.t==='core'?'★':n.t==='skill'?'技':n.t==='aw'?'醒':n.t==='fork'?'分':SHORT[Object.keys(n.v)[0]];
   c.fillStyle=on?'#10142e':av?nc:'#4a5288';c.font=`bold ${Math.round(s*.42)}px -apple-system,"Hiragino Sans",sans-serif`;c.fillText(lab,x,y+1);}
  c.textAlign='left';c.textBaseline='alphabetic';};
-const NTN={core:'星片',stat:'能力',skill:'技',aw:'覚醒強化',fork:'分岐'};
+const NTN={core:'星片',stat:'能力',skill:'技',aw:'星臨強化',fork:'分岐'};
 boardMenu=function(m){const id=BS.id,n=BS.sel&&BOARD[id][BS.sel],U=G.h[id].board,pl=ptsLeft(id),tot=Object.keys(BOARD[id]).length-1,can=n&&canUnlock(id,n.k)&&n.cost<=pl;
  $('#labels').innerHTML=`<div class="bdh" style="--ec:${elCol(id)}"><img src="${art(id)}"><div class="bdn"><small>星盤「${BDEF[id].star}」</small><b>${HB[id].name}</b><span>Lv${G.h[id].lv}　解放 ${U.length-1}/${tot}</span></div><div class="bdp${pl>0?' rdy':''}"><small>星ポイント</small><b>${pl}</b></div></div>
   <div class="bdl">${Object.keys(NTN).filter(k=>k!=='core').map(k=>`<span><i style="background:${NCOL[k]}"></i>${NTN[k]}</span>`).join('')}</div>`;
@@ -213,7 +213,7 @@ boardMenu=function(m){const id=BS.id,n=BS.sel&&BOARD[id][BS.sel],U=G.h[id].board
  panel(`<div class="bdm">${G.members.map(x=>`<div class="bdf${x===id?' on':''}${ptsLeft(x)>0?' rdy':''}" data-a="m" data-v="${x}" style="--ec:${elCol(x)}"><img src="${art(x)}"><small>${HB[x].name}</small></div>`).join('')}</div>
  <div class="bdi"${n?` style="--nc:${NCOL[n.t]}"`:''}>${n?`<div class="bdt"><i>${NTN[n.t]}${n.t==='fork'?'（どちらか1つ）':''}</i><em class="${st[1]}">${st[0]}</em></div><b>${n.d}</b><small>必要ポイント ${n.cost}</small>`:'<div class="bdt"><i style="--nc:#8890c0">星を選ぶ</i></div><small>盤面の星をタップすると、効果と必要ポイントが表示される。中心の星片からつながる星だけ解放できる。</small>'}</div>
  <div class="bdb"><button class="tbtn gold" data-a="un" ${can?'':'disabled'}>解放${n?`<small>ポイント${n.cost}</small>`:''}</button><button class="tbtn" data-a="auto" ${pl>0?'':'disabled'}>おまかせ<small>自動で振り分け</small></button><button class="tbtn" data-a="rs">リセット<small>無料</small></button></div>
- <div class="bdb"><button class="tbtn" data-a="job">ジョブ<small>${G.h[id].job?JOBS[G.h[id].job].n:'未設定'}</small></button><button class="tbtn" data-a="tr">覚醒の試練<small>段階${ROMAN[G.h[id].awLv||1]}</small></button><button class="tbtn back" data-a="back">戻る</button></div>`,
+ <div class="bdb"><button class="tbtn" data-a="job">ジョブ<small>${G.h[id].job?JOBS[G.h[id].job].n:'未設定'}</small></button><button class="tbtn" data-a="tr">星臨の試練<small>位階${ROMAN[G.h[id].awLv||1]}</small></button><button class="tbtn back" data-a="back">戻る</button></div>`,
  {m:x=>{BS.sel=null;BS.id=x;boardMenu();},un:()=>{U.push(n.k);SFX.aw();save();boardMenu(`<b>${n.d}</b> を解放した！`);},
   auto:()=>{const c=autoUnlock(id);if(c)SFX.aw();save();boardMenu(c?`${c}個の星を解放した`:'解放できる星がない（ポイント不足）');},rs:()=>{G.h[id].board=['0,0'];BS.sel=null;save();boardMenu('星盤をリセットした（ポイントは全て戻る）');},
   job:()=>jobMenu(id),tr:()=>{enterTown();trialMenu();},back:()=>{const f=BFROM;BFROM='town';enterTown();if(f==='party')partyScreen();}});
@@ -281,7 +281,7 @@ function cfgOpen(back){const s=G&&G.set,seg=(k,opts,cur)=>`<div class="seg">${op
  <div class="cfr"><label>テキスト速度<small>会話の文字送り</small></label>${seg('txt',TXS.map((t,i)=>[i,t[0]]),s.txt)}</div>
  <div class="cfr"><label>戦闘速度</label>${seg('spd',[[1,'×1'],[2,'×2'],[4,'×4']],speed)}</div>
  <div class="cfr"><label>コマンド決定<small>技の選び方</small></label>${seg('tap',[[0,'2タップ（確認あり）'],[1,'1タップ']],s.tap1?1:0)}</div>
- <div class="cfr"><label>通常AUTOの覚醒<small>全力AUTOは常にすぐ使う</small></label>${seg('aw',Object.entries(AWN),s.autoAw)}</div>
+ <div class="cfr"><label>通常AUTOの星臨<small>全力AUTOは常にすぐ使う</small></label>${seg('aw',Object.entries(AWN),s.autoAw)}</div>
  <div class="cfr"><label>拾う前フィルター<small>拾った装備を自動で処理する等級</small></label>${seg('fr',FLN.map((n,i)=>[i-1,n]),s.flt.rar)}</div>
  <div class="cfr"><label>フィルターの処理<small>未鑑定・レジェンド・セットは必ず残す</small></label>${seg('fm',[['sell','売却（G）'],['dism','分解（素材）']],s.flt.mode)}</div>
  <div class="cfr"><label>今より強い装備は残す<small>誰かの装備より強ければ処理しない</small></label>${seg('fk',[[1,'ON'],[0,'OFF']],s.flt.keepUp?1:0)}</div>
@@ -308,12 +308,12 @@ const TIPS={
  map:['行き先を選ぶ',['行きたいエリアをタップすると、上に<b>その場所のボスと推奨Lv</b>が出る。','よければ<b>▼出撃▼</b>を押して出発。<b>CLEAR</b>の付いたエリアは何度でも挑める。']],
  field:['探索のしかた',['<b>行きたい場所をタップ</b>すると歩く。宝箱や光る採取ポイントを探そう。','魔物に<b>自分からぶつかると先制攻撃</b>。背後を取られると不利になる。','危なくなったら<b>帰還の灯</b>で灯都へ。下の顔をタップすると仲間の状態を確認できる。']],
  battle:['戦闘のしかた',['上の並びが<b>行動順</b>。自分の番が来たら、下の一覧から<b>技をタップ→もう一度タップ</b>で決定。','<b>敵をタップ</b>すると狙いが変わる。左上に、狙った敵の<b>弱点</b>が出る（?はまだ不明）。','弱点を突いて <b>◆シールド</b> を0にすると <b>BREAK</b>。敵が動けなくなり、大ダメージの好機。','面倒なら下の<b>通常AUTO</b>。同じ行動を繰り返すなら<b>リピート</b>。']],
- awake:['覚醒できる！',['金色の<b>ASTRAL GAUGE</b>が100%になった。<b>覚醒</b>ボタンで発動――<b>行動を消費しない</b>ので、そのまま強力な覚醒技を撃てる。','2人が同時に覚醒すると、<b>共鳴技</b>が使えるようになる。']],
- awake2:['覚醒中',['技の一覧が<b>覚醒技</b>に変わった。覚醒はキャラごとに性質が違う（ターン制・ゲージ消費など）。','効果が切れると反動で少し行動が遅れる。もう1人も覚醒させると<b>共鳴技</b>。']],
+ awake:['星臨できる！',['金色の<b>ASTRAL GAUGE</b>が100%になった。<b>星臨</b>ボタンで発動――<b>行動を消費しない</b>ので、そのまま強力な星臨技を撃てる。','2人が同時に星臨すると、<b>共鳴技</b>が使えるようになる。']],
+ awake2:['星臨中',['技の一覧が<b>星臨技</b>に変わった。星臨はキャラごとに性質が違う（ターン制・ゲージ消費など）。','効果が切れると反動で少し行動が遅れる。もう1人も星臨させると<b>共鳴技</b>。']],
  reso:['共鳴技',['2人の星片が<b>共鳴</b>した！ 技の一番上の<b>共鳴技</b>は、1戦闘に1回だけの切り札。']],
  party:['編成',['カードを<b>タップで選び</b>、入れ替えたい相手をタップ。<b>同じカードをもう一度</b>タップで詳細・装備へ。','カードの背景は、その仲間の<b>星盤</b>。解放した星が光ってつながる。✦ボタンから星盤へ。']],
  board:['星盤',['Lvが上がるともらえる<b>星ポイント</b>で星を解放する。<b>光る輪の星</b>が今解放できる星。','迷ったら<b>おまかせ</b>。<b>リセット</b>は無料なので、気軽に試せる。']],
- how:['遊び方',['<b>灯都</b>で準備 → <b>出撃</b>で各地へ → ボスを倒すと次の章へ。街に戻るとHP全回復＆自動セーブ。','戦闘：弱点で<b>BREAK</b>、ゲージ100%で<b>覚醒</b>（行動を消費しない）、2人覚醒で<b>共鳴技</b>。','育成：<b>編成</b>から装備と<b>星盤</b>。<b>星詠みの塔</b>でジョブと覚醒の試練。','<b>記録・設定</b>：セーブは3スロット。オートの覚醒・拾う前フィルター・テキスト速度を変えられる。']]};
+ how:['遊び方',['<b>灯都</b>で準備 → <b>出撃</b>で各地へ → ボスを倒すと次の章へ。街に戻るとHP全回復＆自動セーブ。','戦闘：弱点で<b>BREAK</b>、ゲージ100%で<b>星臨</b>（行動を消費しない）、2人星臨で<b>共鳴技</b>。','育成：<b>編成</b>から装備と<b>星盤</b>。<b>星詠みの塔</b>でジョブと星臨の試練。','<b>記録・設定</b>：セーブは3スロット。オートの星臨・拾う前フィルター・テキスト速度を変えられる。']]};
 function tip(key){if(!G||G.dev||!G.set||G.set.tut===false||!G.tut||G.tut[key]||!TIPS[key]||$('#tip'))return false;G.tut[key]=1;tipShow(key);return true;}
 function tipShow(key){const[t,pg]=TIPS[key],old=$('#tip');if(old)old.remove();let i=0;const d=document.createElement('div');d.id='tip';$('#app').appendChild(d);
  const fp=scene==='field'&&F?F.pause:null;if(fp!==null)F.pause=true;
@@ -329,7 +329,7 @@ const chapOf=f=>f.boss8?'クリア後':f.boss7?'終章':f.boss6?'第6章':f.boss
 const slotTxt=s=>{if(!s)return'― 記録なし ―';const ps=(s.party||['rio']).filter(id=>s.h&&s.h[id]);return`${chapOf(s.flags||{})}　Lv${Math.max(1,...ps.map(id=>s.h[id].lv))}　${ps.map(id=>HB[id]?HB[id].name:'').join('・')}<small>${fmt(s.gold||0)}G　出撃${s.sorties||0}回</small>`;};
 title=function(){const last=Math.min(2,Math.max(0,+(lsGet('astral_slot')||0)));SAVE=SLOTK[last];show('title');const ov=$('#ov');ov.classList.remove('hide');ov.classList.add('ttl');
  ov.innerHTML=`<canvas id="tcv" width="180" height="320"></canvas><div class="tlogo">ASTRAL<br>BREAKER</div><div class="tsub">〜 星継ぎの灯 〜</div><div class="tmenu" id="tm"></div>
- <div class="note" id="hw" style="display:none"><b>遊び方</b><br>・灯都で準備→「出撃」で各地へ。タップした場所へ歩く。<br>・魔物に<b>自分からぶつかると先制攻撃</b>。宝箱・採取ポイントを探そう。<br>・戦闘：技を2回タップで決定。弱点でブレイク、ゲージ100%で<b>覚醒</b>（行動を消費しない）。2人覚醒で<b>共鳴技</b>。<br>・街に戻るとHP全回復＆自動セーブ。<b>編成</b>で装備と星盤。セーブは3スロット。</div>
+ <div class="note" id="hw" style="display:none"><b>遊び方</b><br>・灯都で準備→「出撃」で各地へ。タップした場所へ歩く。<br>・魔物に<b>自分からぶつかると先制攻撃</b>。宝箱・採取ポイントを探そう。<br>・戦闘：技を2回タップで決定。弱点でブレイク、ゲージ100%で<b>星臨</b>（行動を消費しない）。2人星臨で<b>共鳴技</b>。<br>・街に戻るとHP全回復＆自動セーブ。<b>編成</b>で装備と星盤。セーブは3スロット。</div>
  <div class="tfoot"><button id="devg">開発者モード</button><div class="ver" id="verL">${VER}</div></div>`;
  const tm=$('#tm'),has=()=>SLOTK.some((k,i)=>slotGet(i));
  const main=()=>{tm.className='tmenu';tm.innerHTML=`<button class="big" id="newg">はじめから</button><button class="big gold" id="cont" ${has()?'':'disabled style="opacity:.35"'}>つづきから</button><button class="big" id="howto" style="height:40px;font-size:13px">遊び方</button>`;
@@ -349,7 +349,7 @@ title=function(){const last=Math.min(2,Math.max(0,+(lsGet('astral_slot')||0)));S
     let ok=true;try{localStorage.setItem(SLOTK[x.i],JSON.stringify(G));}catch(e){ok=false;}saveMenu(ok?`スロット${x.i+1}に複製しました。`:'この環境では保存できませんでした。');}})),{l:'戻る',cls:'back',f:()=>saveMenu()}],true);};r();},3);};}
 
 /* ==================== 開発者メニュー ==================== */
-function dev17(m){log((m||'<b>ver0.17 快適さ＋UI再構築</b>')+`<br><small>スロット：${SAVE===DEVKEY?'開発用':slotCur()+1}　覚醒AUTO：${AWN[G.set.autoAw]}　フィルター：${FLN[G.set.flt.rar+1]}</small>`);
+function dev17(m){log((m||'<b>ver0.17 快適さ＋UI再構築</b>')+`<br><small>スロット：${SAVE===DEVKEY?'開発用':slotCur()+1}　星臨AUTO：${AWN[G.set.autoAw]}　フィルター：${FLN[G.set.flt.rar+1]}</small>`);
  menu([{l:'編成画面を開く',cls:'ready',s:'カード・戦闘力・共鳴技・控え',f:()=>partyScreen()},{l:'マップ選択を開く',s:'プレビュー・CLEAR・ドロップ',f:()=>worldMap()},
   {l:'新しい戦闘画面（3体）',s:'狙い・2タップ決定・リピート・AUTO',f:()=>devBattle([{kind:'snowwolf',lv:30},{kind:'yukirei',lv:30},{kind:'onimusha',lv:30}],'kouka',{boss:false})},
   {l:'新しい戦闘画面（ボス）',s:'禁書の守護像',f:()=>devBattle([{kind:'boss2',lv:10}],'midori')},{l:'設定を開く',s:'テキスト速度・オート・フィルター',f:()=>cfgOpen()},
