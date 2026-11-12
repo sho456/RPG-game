@@ -68,11 +68,11 @@ function setMy(v){if(v===MY){clearTimeout(hideT);hideT=0;return;}
  if(!hideT)hideT=setTimeout(()=>{hideT=0;MY=false;app.classList.remove('my25');},90);}
 /* 行動中の味方の頭上の印 */
 function marker(){let m=$('#mk25');if(!m||!m.isConnected){m=document.createElement('div');m.id='mk25';m.innerHTML='<i></i>';stage().appendChild(m);}return m;}
-function tick(){setMy(isMy());const ov=!!B.over;if(app.classList.contains('ov25')!==ov)app.classList.toggle('ov25',ov);if(DOCK){const bp=MY?DOCK:barPx();if(LY.botPx!==bp)LY.botPx=bp;}const m=marker();if(!MY||!B.cur||B.cur.side!==0){if(m.style.display!=='none')m.style.display='none';return;}
+function tick(){gateTick();setMy(isMy());const ov=!!B.over;if(app.classList.contains('ov25')!==ov)app.classList.toggle('ov25',ov);if(DOCK){const bp=MY?DOCK:barPx();if(LY.botPx!==bp)LY.botPx=bp;}const m=marker();if(!MY||!B.cur||B.cur.side!==0){if(m.style.display!=='none')m.style.display='none';return;}
  const b=V24.boxOf(B.cur,false),tf=`translate(${Math.round(b.cx-7)}px,${Math.round(b.t-16)}px)`;if(m._tf!==tf){m._tf=tf;m.style.transform=tf;}if(m.style.display!=='block')m.style.display='block';
  gaugeState();}
 /* 星臨の演出中はパネルを隠す */
-{const _aw=awaken;awaken=async function(u){const on=inB();if(on){app.classList.add('aw25');clearTimeout(hideT);hideT=0;MY=false;app.classList.remove('my25');}try{return await _aw(u);}finally{app.classList.remove('aw25');}};}
+{const _aw=awaken;awaken=async function(u){const on=inB();if(on){app.classList.add('aw25');hideHL();clearTimeout(hideT);hideT=0;MY=false;app.classList.remove('my25');}try{return await _aw(u);}finally{app.classList.remove('aw25');}};}
 
 /* ==================== 4. 星臨ゲージをタップして発動 ==================== */
 function canAw(a){return inB()&&!!B.pick&&B.pick.u===a&&!a.aw&&a.alive&&(DEV()||(a.ag>=100&&B.heroes.filter(x=>x.aw).length<2));}
@@ -124,7 +124,7 @@ const fxSz=()=>({t:Math.round(clamp(SC*6.6,13,15)),n:Math.round(clamp(SC*8.2,16,
 function fxLayer(){let L=$('#fx25');if(!L||!L.isConnected){L=document.createElement('div');L.id='fx25';stage().appendChild(L);}return L;}
 /* キャラごとの積み上げ枠（体の中央に固定） */
 function fxStack(u){const L=fxLayer();let S=u._fx25;if(!S||!S.isConnected){S=document.createElement('div');S.className='fs25';L.appendChild(S);u._fx25=S;}
- const b=V24.boxOf(u,true),st=stage(),cx=clamp(b.cx,30,st.offsetWidth-30),y=Math.max(b.t+b.h*.82,(LY.hudPx||60)+70);S.style.transform=`translate(${Math.round(cx)}px,${Math.round(y)}px)`;return S;}
+ const b=V24.boxOf(u,true),st=stage(),cx=clamp(b.cx,30,st.offsetWidth-30),y=Math.max(b.b-b.h*.02,(LY.hudPx||60)+60);S.style.transform=`translate(${Math.round(cx)}px,${Math.round(y)}px)`;return S;}
 function fxPop(u,s,col,kind){const k=fxKind(s,col,kind),z=fxSz(),S=fxStack(u),row=document.createElement('div');row.className='fl25 '+k;
  let txt=s.replace(/[↑▲]/g,'').replace(/[↓▼]/g,'').trim();
  const num=k==='heal'||(k==='res'&&!KJ.test(txt)),sk='fx25'+(k==='info'&&KJ.test(txt)?'infoJ':(k==='info'?'info':k));
@@ -132,7 +132,7 @@ function fxPop(u,s,col,kind){const k=fxKind(s,col,kind),z=fxSz(),S=fxStack(u),ro
  /* 強化・弱体は文字の前に▲▼の記号（形でも区別できるように） */
  if(k==='buff'||k==='debuff'){const ic=document.createElement('i');ic.className='ar25';row.appendChild(ic);}
  row.appendChild(num?TX24.row(txt,sk,sz):TX24.el(txt,KJ.test(txt)?sk:sk.replace('infoJ','info'),sz));
- S.appendChild(row);while(S.children.length>4)S.firstChild.remove();
+ S.appendChild(row);while(S.children.length>3)S.firstChild.remove();
  const life=Math.round((k==='heal'?1250:1150)*(speed>=4?.7:speed>=2?.85:1));
  setTimeout(()=>{row.classList.add('out');setTimeout(()=>{row.remove();if(S.isConnected&&!S.children.length){S.remove();if(u._fx25===S)u._fx25=null;}},260);},life);}
 V24.HK24.pop=(u,s,col,small,kind)=>{if(!inB()||!u||u.x==null)return false;
@@ -145,12 +145,58 @@ function fxClear(){const L=$('#fx25');if(L)L.innerHTML='';try{B&&[...B.heroes,..
 /* ダメージ数字の配色：参考資料と同じく、通常・弱点は白、Critical は金、回復は緑、毒は紫 */
 try{TX24.STYLE.dmgW=Object.assign({},TX24.STYLE.dmg);TX24.STYLE.dmgWT=Object.assign({},TX24.STYLE.dmgT);TX24.clear();}catch(e){}
 
+/* ==================== 7. 開幕の順序・HP表示のタイミング・ダメージの位置・Critical ==================== */
+const now25=()=>performance.now();
+/* 開幕の表示ゲート：敵の登場演出（ボスの暗転・名乗り）が終わるまで、強化・弱体などの「表示だけ」を預かる。
+ 状態そのものは通常どおりその場で掛かる（戦闘処理には触れない）。演出が終わったら順に表示し、表示し終えてから最初の手番へ */
+const OP={t0:0,on:false,q:[],ready:0};
+const opening=()=>inB()&&OP.on&&(now25()-OP.t0<650||(B.intro>0)||!!document.querySelector('#stage .bossin'));
+function gateStart(){OP.t0=now25();OP.on=true;OP.q=[];OP.ready=0;}
+function gateTick(){if(!OP.on||!inB())return;if(opening())return;OP.on=false;const q=OP.q;OP.q=[];const step=Math.round(170*(speed>=4?.6:speed>=2?.8:1));
+ /* 同じキャラの表示は同時に（積み上がる）、キャラごとに少しずつずらす */
+ const us=[];q.forEach(f=>{if(!us.includes(f.u))us.push(f.u);});
+ q.forEach(f=>{const i=us.indexOf(f.u);setTimeout(()=>{if(inB())try{f();}catch(e){console.error(e);}},i*step);});
+ OP.ready=now25()+(q.length?us.length*step+600:0);showHL(2000);}
+async function gateWait(){while(inB()&&!B.over&&(OP.on||OP.ready>now25()))await new Promise(r=>setTimeout(r,50));}
+/* 敵・味方の手番は、開幕の表示が終わってから（待つのは見せ方だけで、順番や計算は変えない） */
+{const _ht=heroTurn;heroTurn=async function(u){await gateWait();if(inB()&&!B.over)showHL(1900);return _ht(u);};}
+{const _et=enemyTurn;enemyTurn=async function(u){await gateWait();return _et(u);};}
+/* HP／SP（キャラ横）：戦闘開始時と各ターンの開始時だけ表示し、少ししてから消す */
+let hlT=0;
+function showHL(ms){if(!inB())return;app.classList.add('hl25');try{V24.renderHL0();}catch(e){}clearTimeout(hlT);hlT=setTimeout(()=>app.classList.remove('hl25'),Math.round(ms*(speed>=4?.6:speed>=2?.8:1)));}
+function hideHL(){clearTimeout(hlT);app.classList.remove('hl25');}
+/* ダメージ・回復の数字：必ず「その相手の体の上」に置く。同じ相手の数字は上へ積み、別の相手の数字とは重ならない側へ少しずらす
+ （以前は空き場所を画面全体から探していたため、敵が複数いると誰の数字か分かりにくかった） */
+const ovA=(a,b)=>Math.max(0,Math.min(a.r,b.r)-Math.max(a.l,b.l))*Math.max(0,Math.min(a.b,b.b)-Math.max(a.t,b.t));
+V24.HK24.choose=(u,w,h,pri,self)=>{if(!inB())return null;const bd=V24.bounds(),b=V24.boxOf(u),hero=u.side===0;
+ const live=V24.PM.live.filter(p=>p!==self&&!p.gone&&p.R&&p.el.isConnected);
+ let x=hero?b.cx-w*.6:b.cx-w/2,y=hero?b.cy-h*.5:b.t+b.h*.5-h*.5;
+ const fit=(X,Y)=>[clamp(X,bd.l,Math.max(bd.l,bd.r-w)),clamp(Y,bd.t,Math.max(bd.t,bd.b-h))];
+ [x,y]=fit(x,y);
+ /* 同じ相手の古い数字は上へ押し上げる（最新の数字が常に相手の体の上） */
+ let top=y;live.filter(p=>p.u===u).sort((a,b2)=>(b2.t||0)-(a.t||0)).forEach(p=>{const ph=p.R.b-p.R.t+6,ny=Math.max(bd.t,top-ph+6);top=ny;
+  p.y=ny;p.R={l:p.R.l,t:ny+3,r:p.R.r,b:ny+ph-3};p.el.style.transition='transform .16s ease-out';p.el.style.transform=`translate(${Math.round(p.x)}px,${Math.round(ny)}px)`;});
+ /* 別の相手の数字と重なるなら、体の範囲内で上下にずらして最も重ならない位置へ */
+ const others=V24.PM.live.filter(p=>p!==self&&!p.gone&&p.R&&p.u!==u),cost=(X,Y)=>others.reduce((c,p)=>c+ovA({l:X,t:Y,r:X+w,b:Y+h},p.R),0);
+ if(cost(x,y)>0){let best=[x,y,cost(x,y)];for(const dy of[-.35,.35,-.7,.7])for(const dx of[0,-.3,.3]){const[X,Y]=fit(x+dx*w,y+dy*Math.max(h,b.h*.5));const c=cost(X,Y);if(c<best[2])best=[X,Y,c];}[x,y]=best;}
+ return{x,y,R:{l:x+3,t:y+3,r:x+w-3,b:y+h-3},c:0,hard:0};};
+/* 他の相手の数字は消さない（重なりは上の位置選びで避ける） */
+V24.HK24.bump=()=>{};
+/* Critical：大きく（通常の約1.35倍）、白→金→朱の塗り・焦げ茶の太い縁・白い内縁・橙の発光。叩きつける動きと光の輪、画面の小さな揺れ */
+V24.FS24.cr=1.35;
+try{Object.assign(TX24.STYLE.dmgC,{fill:[[0,'#ffffff'],[.28,'#fff6b0'],[.48,'#ffd83a'],[.64,'#ffa018'],[1,'#ff5a10']],ow:.16,oc:'#3a0a00',rw:.05,rc:'#fff8d8',sh:[.05,.08,'rgba(0,0,0,.65)'],gl:.45,glow:'rgba(255,150,40,.95)'});
+ Object.assign(TX24.STYLE.crit,{fill:[[0,'#ffffff'],[.38,'#fff07a'],[.56,'#ffb21c'],[1,'#ff5a0a']],ow:.14,oc:'#3a0a00',rw:.045,rc:'#fff8d8',glow:'rgba(255,150,40,.8)'});TX24.clear();}catch(e){}
+{const _p=V17F.pop;V17F.pop=function(u,t,c,sm,kind,el){if(inB()&&/crit/.test(kind||'')&&!sm){B.shake=Math.max(B.shake||0,5);}
+  /* 開幕の表示ゲート中は、ダメージ以外の表示を預かる */
+  if(OP.on&&opening()&&!/^-?\d+$/.test(String(t))){const f=()=>V17F.pop(u,t,c,sm,kind,el);f.u=u;OP.q.push(f);return;}
+  return _p.apply(this,arguments);};}
+
 /* ==================== 組み込み ==================== */
 {const _rf=refresh;refresh=function(){_rf();if(!inB())return;try{ensureGauge();gaugeState();}catch(e){console.error(e);}};}
-{const _sb=startBattle;startBattle=function(list,opts){MY=false;fxClear();app.classList.remove('my25','aw25');const r=_sb(list,opts);
+{const _sb=startBattle;startBattle=function(list,opts){MY=false;fxClear();hideHL();gateStart();app.classList.remove('my25','aw25');const r=_sb(list,opts);
   /* 書体の読み込みでパネルの高さが変わることがあるので、少し後にもう一度配置する */
   try{requestAnimationFrame(()=>{try{V23.layout(true);}catch(e){}});setTimeout(()=>{try{if(inB())V23.layout(false);}catch(e){}},400);}catch(e){}return r;};}
-{const _sh=show;show=function(m){_sh(m);if(m!=='battle'){MY=false;fxClear();clearTimeout(hideT);hideT=0;app.classList.remove('my25','aw25','ov25');}};}
+{const _sh=show;show=function(m){_sh(m);if(m!=='battle'){MY=false;fxClear();hideHL();OP.on=false;OP.q=[];clearTimeout(hideT);hideT=0;app.classList.remove('my25','aw25','ov25');}};}
 try{document.fonts&&document.fonts.ready.then(()=>{if(inB()){try{V23.layout(false);}catch(e){}}});}catch(e){}
 
 /* ==================== お知らせ・開発者メニュー・版表示 ==================== */

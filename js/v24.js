@@ -48,7 +48,7 @@ function obstacles(u){const o=[];if(!B)return o;
  return o;}
 /* 候補の位置を順に評価して、重なりの最も少ない場所を選ぶ。
  費用：優先度の高い表示との重なり（200）≫ HP表示・味方の絵（40〜50）≫ 同じ優先度の古い表示（20：新しい方を優先して古い方を下げる）≫ 低い優先度（4）＋候補の順番 */
-function choose(u,w,h,pri,self){const bd=bounds(),b=boxOf(u),hero=u.side===0,obs=obstacles(u),live=alive().filter(q=>q!==self),cand=[];
+function choose(u,w,h,pri,self){if(HK24.choose){const r=HK24.choose(u,w,h,pri,self);if(r)return r;}const bd=bounds(),b=boxOf(u),hero=u.side===0,obs=obstacles(u),live=alive().filter(q=>q!==self),cand=[];
  const xmax=hero?bd.r-w:Math.max(bd.l,Math.min(bd.r,(LY.heroL||W*.62)*SC-4)-w);
  if(hero){const x0=b.l-4-w,y0=b.cy-h*.5,sy=h*.55+3,sx=w*.55;
   for(const dy of[0,-1,1,-2,2,-3,3,-4,4])for(const dx of[0,-1,-2,-3,-4])cand.push([x0+dx*sx,y0+dy*sy]);}
@@ -81,7 +81,7 @@ function place(p,tries=0){const el=p.el,w=el.offsetWidth,h=el.offsetHeight,best=
 function arm(p){clearTimeout(p.to1);clearTimeout(p.to2);const left=Math.max(0,p.end-now());p.to1=setTimeout(()=>{if(!p.gone){p.gone=1;p.el.classList.add('out');}},Math.max(0,left-220));p.to2=setTimeout(()=>p.el.remove(),left+40);}
 /* 行が増えて大きくなった表示を置き直す */
 function reflow(p){const w=p.el.offsetWidth,h=p.el.offsetHeight,best=choose(p.u,w,h,p.pri,p);if(best.hard>0)dimHL(best.R,Math.max(200,p.end-now()));p.x=best.x;p.y=best.y;p.R=best.R;p.el.style.transform=`translate(${Math.round(best.x)}px,${Math.round(best.y)}px)`;bump(p,best.R);}
-function bump(p,R){alive().forEach(q=>{if(q!==p&&q.R&&ov(R,q.R)>0)dismiss(q,140);});}
+function bump(p,R){if(HK24.bump)return HK24.bump(p,R);alive().forEach(q=>{if(q!==p&&q.R&&ov(R,q.R)>0)dismiss(q,140);});}
 /* 同じ相手の表示が多すぎるとき（多段攻撃）は古いものから下げる */
 function capUnit(u,max=3){const L=alive().filter(p=>p.u===u&&p.num);if(L.length<max)return;
  /* 優先度の低いもの（Critical 以外）の古い順に下げる */
@@ -102,7 +102,7 @@ const fmt=n=>{n=Math.abs(n|0);return n>=100000?Math.floor(n/10000)+'万':String(
 function lbRow(cls,...cs){const d=document.createElement('div');d.className='lb '+cls;cs.forEach(c=>d.appendChild(c));return d;}
 
 function dmgPop(u,s,kind,el){const v=parseInt(s,10),heal=s[0]==='+',crit=/crit/.test(kind),weak=/weak/.test(kind),psn=/psn/.test(kind),grd=u.side===0&&!heal&&!!u.guard;
- const t=heal?0:tierOf(u,Math.abs(v)),fs=Math.round(numFs(u)*TIER[t]*(crit?1.15:1)*(heal?.92:1));
+ const t=heal?0:tierOf(u,Math.abs(v)),fs=Math.round(numFs(u)*TIER[t]*(crit?(FS24.cr||1.15):1)*(heal?.92:1));
  const sk=heal?'heal':psn?'psn':crit?'dmgC':weak?(t>=3?'dmgWT':'dmgW'):grd?'dmgG':u.side===0?'dmgH':t>=3?'dmgT':'dmg';
  const pri=crit?PRI.crit:heal?PRI.heal:PRI.dmg;capUnit(u);
  const p=make(u,`dmg t${t}${crit?' crit':''}${weak?' weak':''}${heal?' heal':''}${grd?' grd':''}`,pri,(crit||t>=2?1400:1150));

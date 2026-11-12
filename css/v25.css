@@ -28,8 +28,8 @@
 #app.v25[data-sc="battle"] #bp24{position:absolute;z-index:4;left:max(6px,var(--sal));right:max(6px,var(--sar));bottom:calc(var(--sab) + 6px + 46px + 6px + var(--cm25,176px) + 4px);margin:0 !important;height:76px}
 #app.v25[data-sc="battle"] #cmd,#app.v25[data-sc="battle"] #bp24,#app.v25[data-sc="battle"] #hl24{transition:opacity .16s ease,transform .2s cubic-bezier(.2,.9,.3,1)}
 #app.v25[data-sc="battle"]:not(.my25) #cmd,#app.v25[data-sc="battle"]:not(.my25) #bp24{opacity:0;transform:translateY(14px);pointer-events:none;visibility:hidden;transition:opacity .14s ease,transform .14s ease,visibility 0s .14s}
-#app.v25[data-sc="battle"]:not(.my25) #hl24{opacity:0;pointer-events:none}
-#app.v25[data-sc="battle"]:not(.my25) #hl24 .hl{pointer-events:none}
+#app.v25[data-sc="battle"]:not(.hl25) #hl24{opacity:0;pointer-events:none;transition:opacity .35s ease}
+#app.v25[data-sc="battle"]:not(.hl25) #hl24 .hl{pointer-events:none}
 /* 操作部の背後をわずかに暗くして、戦場の上でも読みやすく */
 #app.v25[data-sc="battle"]::after{content:'';position:absolute;left:0;right:0;bottom:0;height:calc(var(--sab) + 58px);z-index:3;pointer-events:none;
  background:linear-gradient(180deg,rgba(2,5,12,0),rgba(2,5,12,.72) 55%,rgba(2,5,12,.9))}
@@ -299,3 +299,24 @@
 #app.v25 #sr23 .tx{margin-top:4px}
 #app.v25 #sr23 .tx .b{font-size:20px}
 .fl25 .ar25{margin-right:-4px;position:relative;z-index:1}
+
+/* ==================== ver0.25 改訂4 ==================== */
+/* HP／SP（キャラ横）：戦闘開始時・各ターン開始時だけ、ふわりと出て少しして消える */
+#app.v25[data-sc="battle"].hl25 #hl24{opacity:1;transition:opacity .18s ease}
+/* Critical：叩きつけて弾み、小さく震える。背後に光の輪 */
+.p24.crit .in{animation:cr25 .6s cubic-bezier(.2,1.25,.35,1) both}
+@keyframes cr25{0%{opacity:0;transform:scale(2.5) rotate(-7deg)}28%{opacity:1;transform:scale(.86) rotate(0)}42%{transform:scale(1.1)}54%{transform:scale(1) translateX(-3px)}66%{transform:translateX(3px)}78%{transform:translateX(-1.5px)}100%{transform:none}}
+.p24.crit .in::before{content:'';position:absolute;left:50%;top:62%;width:24px;height:24px;margin:-12px 0 0 -12px;border-radius:50%;z-index:-1;pointer-events:none;
+ border:3px solid #fff4c8;box-shadow:0 0 14px #ffa020,inset 0 0 10px #ffd060;animation:ring25 .5s ease-out .05s both}
+@keyframes ring25{0%{opacity:1;transform:scale(.4)}100%{opacity:0;transform:scale(5.5)}}
+.p24.crit .lb.cr canvas{animation:crl25 .42s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes crl25{0%{opacity:0;transform:translateY(6px) scale(1.8)}60%{opacity:1}100%{transform:none}}
+@media (prefers-reduced-motion:reduce){.p24.crit .in,.p24.crit .in::before{animation:none}}
+/* 効果の行は詰めて3行まで（上のキャラの足元に届かない） */
+.fs25 .fl25:nth-last-child(2){bottom:17px}
+.fs25 .fl25:nth-last-child(3){bottom:34px}
+/* 行の位置：枠の原点＝行の下端（translateY(-100%) と二重にならないよう top 基準に） */
+.fs25 .fl25{top:0;bottom:auto !important}
+.fs25 .fl25:nth-last-child(2){top:-17px}
+.fs25 .fl25:nth-last-child(3){top:-34px}
+.fs25 .fl25{transition:top .18s ease-out}
