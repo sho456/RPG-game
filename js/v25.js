@@ -52,7 +52,7 @@ let K25=0,SLOT25=[];
 function heroK(h,k){const A=ANIM.setup(h);if(!A||A.none)return;if(A._key25!==A.key||A._sc0==null){A._key25=A.key;A._sc0=A.sc;}h._k25=k;const s=A._sc0*k;if(Math.abs(A.sc-s)>1e-6)A.sc=s;}
 HK23.placeHeroes=(hs,LY)=>{const n=hs.length;hs.forEach(h=>heroK(h,1));let ww=0,hh=0;hs.forEach(h=>{const D=V19.dims(h);ww=Math.max(ww,D.w);hh=Math.max(hh,D.h);});
  const k=clamp(V23.appW()*.112/(hh*SC),.72,1);hs.forEach(h=>heroK(h,k));ww*=k;hh*=k;
- const band=LY.bot-LY.top,s=n>1?Math.min(hh*1.9,(band-hh-4)/(n-1)):0,span=s*(n-1)+hh,top=LY.top+Math.max(2,(band-span)*.55),back=W*.84;
+ const band=LY.bot-LY.top,s=n>1?Math.min(hh*1.9,(band-hh-4)/(n-1)):0,span=s*(n-1)+hh,top=LY.top+Math.max(2,(band-span)*.4),back=W*.84;
  K25=k;SLOT25=[];hs.forEach((h,i)=>{const fy=top+hh+s*i,fx=back-Math.round(W*.035*Math.sin(Math.PI*(i+.5)/n));SLOT25[i]=[fx,fy];h.x=fx-8*h.sc;h.y=Math.round(fy-16*h.sc+2);h._fx23=fx;});
  LY.heroL=Math.min(...hs.map(h=>h._fx23))-ww/2-14;};
 /* 星臨・見た目の切り替えで絵の設定が作り直されても、大きさを保つ */
@@ -95,12 +95,62 @@ document.addEventListener('click',e=>{const od=e.target.closest('#bp24 .od');if(
 /* 下のボタンの再描画のあとで、文字の段組みを整える */
 {const _bb=bbar;bbar=function(f){_bb(f);const b=$('#bbar');if(b)b.classList.add('v25');};}
 
+/* ==================== 6. 効果表示（強化・弱体・状態異常・回復・その他）を敵味方共通の規則で ====================
+ ・位置：対象キャラの体の中央に重ねて出し、続けて起きた効果は上へ積む（最大4行）。味方も敵も同じ
+ ・種類ごとに色と動きを固定：強化＝青＋▲（下から上がる）／弱体＝赤＋▼（上から落ちて揺れる）／
+   状態異常＝紫（弾んで出る）／回復＝緑の数字（ふわりと上がる）／SP・ゲージ等＝金／その他（DELAY・STEAL など）＝白
+ ・大きさ：回復の数字＞効果の文字。端末の倍率に比例し、上限・下限つき
+ ダメージ・Critical・Weak・Guard・Miss・BREAK は ver0.24 の配置（キャラを避ける）のまま */
+const FXS={
+ buff:{font:'jp',fill:[[0,'#ffffff'],[.45,'#d4f0ff'],[.6,'#7cc8ff'],[1,'#2a86e8']],ow:.17,oc:'#04163a',sh:[.03,.06,'rgba(0,0,0,.55)']},
+ debuff:{font:'jp',fill:[[0,'#ffffff'],[.45,'#ffd8de'],[.6,'#ff7a90'],[1,'#e01e44']],ow:.17,oc:'#3a0412',sh:[.03,.06,'rgba(0,0,0,.55)']},
+ ail:{font:'jp',fill:[[0,'#ffffff'],[.45,'#f2deff'],[.6,'#cf96ff'],[1,'#9a48e8']],ow:.17,oc:'#20063a',sh:[.03,.06,'rgba(0,0,0,.55)']},
+ heal:{font:'num',fill:[[0,'#f4fff6'],[.44,'#c8ffd4'],[.56,'#5ee888'],[1,'#14a84a']],ow:.15,oc:'#03260f',sh:[.04,.07,'rgba(0,0,0,.55)']},
+ res:{font:'num',fill:[[0,'#fffbe6'],[.45,'#ffeea0'],[.56,'#ffd040'],[1,'#e09410']],ow:.15,oc:'#2a1600',sh:[.04,.07,'rgba(0,0,0,.55)']},
+ info:{font:'num',fill:[[0,'#ffffff'],[.5,'#f0f4ff'],[1,'#b8c6e6']],ow:.16,oc:'#0a1228',sh:[.04,.07,'rgba(0,0,0,.55)']},
+ infoJ:{font:'jp',fill:[[0,'#ffffff'],[.6,'#ffffff'],[1,'#d4dcf0']],ow:.17,oc:'#0a1228',sh:[.03,.06,'rgba(0,0,0,.55)']}};
+for(const k in FXS)TX24.STYLE['fx25'+k]=FXS[k];
+const KJ=/[぀-ヿ一-鿿]/;
+function fxKind(s,col,kind){const c=String(col||'').toLowerCase(),k=kind||'';
+ if(/^\+\d+$/.test(s))return c==='#ffe27a'?'res':'heal';
+ if(/^(SP|AG|BP|HP)\s*[+＋]/.test(s)||/ゲージ/.test(s))return 'res';
+ if(/[↑▲]|UP\b/.test(s))return 'buff';
+ if(/[↓▼]|DOWN\b|解除|弱点/.test(s))return 'debuff';
+ if(/\bup\b/.test(k))return 'buff';
+ if(/\bdn\b/.test(k))return 'ail';
+ if(/毒|スタン|麻痺|眠|混乱|沈黙|暗闇|石化|挑発/.test(s))return 'ail';
+ return 'info';}
+const fxSz=()=>({t:Math.round(clamp(SC*6.6,13,15)),n:Math.round(clamp(SC*8.2,16,19))});
+function fxLayer(){let L=$('#fx25');if(!L||!L.isConnected){L=document.createElement('div');L.id='fx25';stage().appendChild(L);}return L;}
+/* キャラごとの積み上げ枠（体の中央に固定） */
+function fxStack(u){const L=fxLayer();let S=u._fx25;if(!S||!S.isConnected){S=document.createElement('div');S.className='fs25';L.appendChild(S);u._fx25=S;}
+ const b=V24.boxOf(u,true),st=stage(),cx=clamp(b.cx,30,st.offsetWidth-30),y=Math.max(b.t+b.h*.82,(LY.hudPx||60)+70);S.style.transform=`translate(${Math.round(cx)}px,${Math.round(y)}px)`;return S;}
+function fxPop(u,s,col,kind){const k=fxKind(s,col,kind),z=fxSz(),S=fxStack(u),row=document.createElement('div');row.className='fl25 '+k;
+ let txt=s.replace(/[↑▲]/g,'').replace(/[↓▼]/g,'').trim();
+ const num=k==='heal'||(k==='res'&&!KJ.test(txt)),sk='fx25'+(k==='info'&&KJ.test(txt)?'infoJ':(k==='info'?'info':k));
+ const sz=k==='heal'?z.n:num?Math.round(z.n*.86):z.t;
+ /* 強化・弱体は文字の前に▲▼の記号（形でも区別できるように） */
+ if(k==='buff'||k==='debuff'){const ic=document.createElement('i');ic.className='ar25';row.appendChild(ic);}
+ row.appendChild(num?TX24.row(txt,sk,sz):TX24.el(txt,KJ.test(txt)?sk:sk.replace('infoJ','info'),sz));
+ S.appendChild(row);while(S.children.length>4)S.firstChild.remove();
+ const life=Math.round((k==='heal'?1250:1150)*(speed>=4?.7:speed>=2?.85:1));
+ setTimeout(()=>{row.classList.add('out');setTimeout(()=>{row.remove();if(S.isConnected&&!S.children.length){S.remove();if(u._fx25===S)u._fx25=null;}},260);},life);}
+V24.HK24.pop=(u,s,col,small,kind)=>{if(!inB()||!u||u.x==null)return false;
+ if(s==='MISS'||/brk/.test(kind||'')||/^BREAK/.test(s))return false;
+ if(/^[\-]?\d+$/.test(s))return false;/* ダメージは ver0.24 の表示 */
+ if(!/^\+\d+$/.test(s)&&!small)return false;
+ try{fxPop(u,s,col,kind);return true;}catch(e){console.error(e);return false;}};
+function fxClear(){const L=$('#fx25');if(L)L.innerHTML='';try{B&&[...B.heroes,...B.enemies].forEach(u=>u._fx25=null);}catch(e){}}
+
+/* ダメージ数字の配色：参考資料と同じく、通常・弱点は白、Critical は金、回復は緑、毒は紫 */
+try{TX24.STYLE.dmgW=Object.assign({},TX24.STYLE.dmg);TX24.STYLE.dmgWT=Object.assign({},TX24.STYLE.dmgT);TX24.clear();}catch(e){}
+
 /* ==================== 組み込み ==================== */
 {const _rf=refresh;refresh=function(){_rf();if(!inB())return;try{ensureGauge();gaugeState();}catch(e){console.error(e);}};}
-{const _sb=startBattle;startBattle=function(list,opts){MY=false;app.classList.remove('my25','aw25');const r=_sb(list,opts);
+{const _sb=startBattle;startBattle=function(list,opts){MY=false;fxClear();app.classList.remove('my25','aw25');const r=_sb(list,opts);
   /* 書体の読み込みでパネルの高さが変わることがあるので、少し後にもう一度配置する */
   try{requestAnimationFrame(()=>{try{V23.layout(true);}catch(e){}});setTimeout(()=>{try{if(inB())V23.layout(false);}catch(e){}},400);}catch(e){}return r;};}
-{const _sh=show;show=function(m){_sh(m);if(m!=='battle'){MY=false;clearTimeout(hideT);hideT=0;app.classList.remove('my25','aw25','ov25');}};}
+{const _sh=show;show=function(m){_sh(m);if(m!=='battle'){MY=false;fxClear();clearTimeout(hideT);hideT=0;app.classList.remove('my25','aw25','ov25');}};}
 try{document.fonts&&document.fonts.ready.then(()=>{if(inB()){try{V23.layout(false);}catch(e){}}});}catch(e){}
 
 /* ==================== お知らせ・開発者メニュー・版表示 ==================== */

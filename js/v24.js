@@ -133,6 +133,7 @@ const _pop0=V17F.pop;
 function pop24(u,txt,col,small,kind,el){kind=kind||'';if(!inBattle()||!u||u.x==null)return _pop0(u,txt,col,small,kind,el);
  try{const s=String(txt);
   if(/fu/.test(kind)&&small){skBanner(s,u.side);return;}
+  if(HK24.pop&&HK24.pop(u,s,col,small,kind,el))return;
   if(!small&&/^[+\-]?\d+$/.test(s))return void dmgPop(u,s,kind,el);
   if(s==='MISS'||/brk/.test(kind)||/^BREAK/.test(s))return void wordPop(u,s,kind);
   tagPop(u,s,col,kind);}catch(e){console.error(e);}}

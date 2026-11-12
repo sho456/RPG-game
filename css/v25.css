@@ -254,3 +254,48 @@
 #app.v25 #bp24 .bx.st{flex:1.35}
 #app.v25 #bp24 .bx.st span{gap:2px}
 #app.v25 #bp24 .bx.st i{padding:0 3px;font-size:11px}
+
+/* ==================== ver0.25 改訂3：効果表示（敵味方共通） ==================== */
+#fx25{position:absolute;inset:0;pointer-events:none;z-index:5;overflow:hidden}
+#app:not([data-sc="battle"]) #fx25{display:none}
+/* キャラの体の中央に置く枠。新しい行が下に加わり、古い行は上へ押し上がる */
+.fs25{position:absolute;left:0;top:0;width:0;height:0}
+.fs25>div{position:relative}
+.fs25{display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+.fs25{transform-origin:0 0}
+.fl25{position:relative;display:flex;align-items:center;justify-content:center;gap:1px;height:auto;margin-top:-3px;white-space:nowrap;transform:translate(-50%,-100%);will-change:transform,opacity}
+.fs25 .fl25{position:absolute;left:0;bottom:0}
+.fs25 .fl25:nth-last-child(2){bottom:calc(1.15em + 6px)}
+.fs25 .fl25:nth-last-child(3){bottom:calc(2.3em + 12px)}
+.fs25 .fl25:nth-last-child(4){bottom:calc(3.45em + 18px)}
+.fs25{font-size:14px}
+.fl25 canvas{display:block}
+.fl25{transition:bottom .18s ease-out}
+/* 記号：強化＝青の▲、弱体＝赤の▼（形でも見分けられる） */
+.fl25 .ar25{flex:none;width:12px;height:11px;margin-right:1px;filter:drop-shadow(0 0 1px #000) drop-shadow(1px 1px 0 rgba(0,0,0,.8))}
+.fl25.buff .ar25{background:linear-gradient(180deg,#e8f8ff,#4aa8ff);clip-path:polygon(50% 0,100% 100%,0 100%)}
+.fl25.debuff .ar25{background:linear-gradient(180deg,#ffd0d8,#ff3a5a);clip-path:polygon(0 0,100% 0,50% 100%)}
+/* 動き：強化は下から上がる／弱体は上から落ちて揺れる／状態異常は弾む／回復はふわりと上がる */
+.fl25.buff{animation:fb25 .34s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes fb25{0%{opacity:0;transform:translate(-50%,-30%)}100%{opacity:1;transform:translate(-50%,-100%)}}
+.fl25.debuff{animation:fd25 .42s ease-out both}
+@keyframes fd25{0%{opacity:0;transform:translate(-50%,-170%)}45%{opacity:1;transform:translate(-50%,-100%)}60%{transform:translate(-56%,-100%)}75%{transform:translate(-44%,-100%)}90%{transform:translate(-52%,-100%)}100%{transform:translate(-50%,-100%)}}
+.fl25.ail{animation:fa25 .38s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes fa25{0%{opacity:0;transform:translate(-50%,-100%) scale(1.7)}100%{opacity:1;transform:translate(-50%,-100%) scale(1)}}
+.fl25.heal,.fl25.res{animation:fh25 .45s ease-out both}
+@keyframes fh25{0%{opacity:0;transform:translate(-50%,-20%) scale(.8)}100%{opacity:1;transform:translate(-50%,-100%) scale(1)}}
+.fl25.info{animation:fi25 .25s ease-out both}
+@keyframes fi25{0%{opacity:0;transform:translate(-50%,-80%)}100%{opacity:1;transform:translate(-50%,-100%)}}
+.fl25.out{animation:fo25 .26s ease-in both}
+@keyframes fo25{0%{opacity:1;transform:translate(-50%,-100%)}100%{opacity:0;transform:translate(-50%,-150%)}}
+@media (prefers-reduced-motion:reduce){.fl25{animation:none !important}}
+
+/* ==================== 星臨のカットイン：立ち絵を画面の中ほどへ ==================== */
+/* 立ち絵 → 「星臨」 → 名前 の縦の並びで、上の帯と下のボタンの間の中央にまとめる */
+#app.v25[data-sc="battle"] #sr23{padding-top:calc(var(--hud23,80px) - 30px);box-sizing:border-box;gap:2px}
+#app.v25 #sr23 .pf{position:relative;right:auto;bottom:auto;order:-1;width:112px;height:112px;margin:0 0 -4px;animation-name:srp25}
+@keyframes srp25{from{opacity:0;transform:translateY(16px) scale(.9)}to{opacity:1;transform:none}}
+#app.v25 #sr23 .kj b{font-size:56px}
+#app.v25 #sr23 .tx{margin-top:4px}
+#app.v25 #sr23 .tx .b{font-size:20px}
+.fl25 .ar25{margin-right:-4px;position:relative;z-index:1}
