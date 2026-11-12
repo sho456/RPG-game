@@ -33,30 +33,30 @@ RIO_HEAD = [
  "....SssS....a....",
 ]
 # 胴・脚の文字グリッド：A〜E=上着5階調 / w,x,y,z=襟巻き / g,h,G=金の縁 / k,L,m,n=革 / p,q,r,t=ズボン / S,s=肌 / #=仕切り線
-RIO_B = {
+RIO_B = {   # 添付資料の体型：頭（髪込み）約14行／上着5行＋ベルト／ズボン4行／小さめの靴2行
  'stand': dict(neck=(6, 0), sh=(4, 2), rows=[
-  "....xyzzyx......", "...wxyzzyxw.zy..", "...DxyzyxwBByzx.", "....DgCCBA#Bxw..", "....CgCBBA#CB...", "....ChCBBA#BA...", "....kmGmLk.sS...",
-  "....qrrq#qp.....", "....qrtq#rp.....", "....qrrq#qp.....", "....kmnk#mk.....", "...kLmmk#Lk.....", "..kLmmLkkLmk....", "..kkkkk.kkkk...."]),
+  "....xyzzyx......", "...wxyzzyxw.zy..", "...DxyzyxwBByzx.", "....DgCCBA#Bxw..", "....CgCBBA#CB...", "....ChCBBA#CB...", "....CgCBBA#BA...", "....kmGmLk.sS...",
+  "....BqrqA#qp....", ".....qrq#qp.....", ".....qtq#rp.....", ".....qrq#qp.....", ".....LmL#mL.....", "....LmmL#mmL....", "....kkkk.kkkk..."]),
  'walk0': dict(neck=(6, 0), sh=(4, 2), rows=[
-  "....xyzzyx......", "...wxyzzyxw.zy..", "...DxyzyxwBByzx.", "....DgCCBA#Bxw..", "....CgCBBA#CB...", "....ChCBBA#BA...", "....kmGmLk.sS...",
-  "...qrrq#rqp.....", "..qrtq..#rqp....", ".pqrq....qrqp...", ".kmnk....kmmk...", "kLmmk.....kLmk..", "kLmLk.....kLLmk.", "kkkk.......kkkk."]),
+  "....xyzzyx......", "...wxyzzyxw.zy..", "...DxyzyxwBByzx.", "....DgCCBA#Bxw..", "....CgCBBA#CB...", "....ChCBBA#CB...", "....CgCBBA#BA...", "....kmGmLk.sS...",
+  "...BqrqA#rqp....", "...qrq...#rqp...", "..qtq.....qrp...", "..qrq.....qrq...", "..LmL......mL...", ".LmmL.....LmmL..", ".kkkk.....kkkk.."]),
  'walk2': dict(neck=(6, 0), sh=(4, 2), rows=[
-  "....xyzzyx......", "...wxyzzyxw.zy..", "...DxyzyxwBByzx.", "....DgCCBA#Bxw..", "....CgCBBA#CB...", "....ChCBBA#BA...", "....kmGmLk.sS...",
-  "....qrrq#qp.....", "....qrtrqqp.....", ".....qrrqp......", ".....kmnmk......", "....kLmmLk......", "...kLmmLkmk.....", "...kkkkkkkk....."]),
+  "....xyzzyx......", "...wxyzzyxw.zy..", "...DxyzyxwBByzx.", "....DgCCBA#Bxw..", "....CgCBBA#CB...", "....ChCBBA#CB...", "....CgCBBA#BA...", "....kmGmLk.sS...",
+  "....BqrqAqp.....", ".....qrqqp......", ".....qtrq.......", ".....qrqq.......", ".....LmLm.......", "....LmmLmL......", "....kkkkkk......"]),
  'idle': dict(neck=(7, 0), sh=(5, 2), rows=[
-  ".....xyzzyx.....", "....wxyzzyxw.zy.", "....DxyzyxwBByzx", ".....DgCCBA#Bxw.", ".....CgCBBA#CB..", ".....ChCBBA#CBs.", "....kkmGmLLk.sS.",
-  "....qrrrq#rqp...", "...qrtrq.#rrqp..", "..pqrrq...qrqp..", "..kmnmk...kmmLk.", ".kLmmLk....kLmk.", "kLmmLkk....kLmLk", "kkkkkk.....kkkkk"]),
+  ".....xyzzyx.....", "....wxyzzyxw.zy.", "....DxyzyxwBByzx", ".....DgCCBA#Bxw.", ".....CgCBBA#CB..", ".....ChCBBA#CBs.", ".....CgCBBA#BsS.", "....kkmGmLLk....",
+  "....qrrqA#Bqp...", "...qrtq..#rrqp..", "..pqrq....qrqp..", "..LmL......LmL..", ".LmmL......LmmL.", ".kkkk......kkkk."]),
  'lunge': dict(neck=(6, 0), sh=(4, 2), rows=[
-  "....xyzzyx......", "...xyzzzyw..zyx.", "...DyzyxwBBByzw.", "....DgCBAA#Bx...", ".....CgCBBA#C...", ".....ChCBBA#CB..", ".....kmGmLLk.sS.",
-  "....qrrrq#rrqp..", "..pqrtrq..#rrqp.", ".pqrrq.....qrqp.", ".kmnmk.....kmmLk", "kLmmLk......kLmk", "kLmLkk......kLmk", "kkkkk.......kkkk"]),
+  "....xyzzyx......", "...wxyzzyw..zyx.", "...DxyyxwBBByzw.", "....DgCBAA#Bx...", ".....CgCBBA#C...", ".....ChCBBA#CB..", ".....CgCBBA#BsS.", ".....kmGmLLk....",
+  "....qrrqA.#rqp..", "..pqrtq...#rrqp.", ".pqrq......qrqp.", ".LmL........LmL.", "LmmL........LmmL", "kkkk........kkkk"]),
  'hit': dict(neck=(8, 0), sh=(6, 2), rows=[
-  "......xyzzyx....", ".....xyzzzyw....", "....zDyzyxwBB...", "...xy.DgCBA#B...", "..wx..CgCBBA#C..", "......ChCBBA#CBs", ".....kmGmLLk..sS",
-  ".....qrrq#rqp...", "....qrtq.#rrqp..", "....qrq...qrqp..", "...kmnk...kmmk..", "..kLmmk...kLmk..", "..kLmLk...kLmLk.", "..kkkk....kkkkk."]),
+  "......xyzzyx....", ".....wxyzzyw....", "....zDxyyxwBB...", "...xy.DgCBA#B...", "..wx..CgCBBA#C..", "......ChCBBA#CBs", "......CgCBBA#BsS", ".....kmGmLLk....",
+  ".....qrqA#Bqp...", "....qrtq.#rrqp..", "....qrq...qrqp..", "...LmL.....LmL..", "..LmmL.....LmmL.", "..kkkk.....kkkk."]),
  'kneel': dict(neck=(6, 0), sh=(4, 2), rows=[
-  "....xyzzyx......", "...xyzzzyw.zy...", "...DyzyxwBByzx..", "....DgCBA#Bxw...", "....CgCBBA#CB...", "....ChCBBA#CBs..", "....kmGmLLk.sS..",
-  ".qrrrrq#rqp.....", ".qrtq..qrrrqp...", ".kmnk..kqrrqkmLk", "kLmmLk..kkkkLmmk", "kkkkkk......kkkk"]),
- 'lying': dict(neck=(5, 1), sh=(7, 2), rows=[
-  ".........DDDCB........", ".....xyzDgCCBBkqrrq...", "....xyzzCgCBBAmrtrqpkL", "...wyzyxChCBAAkqrrqpkm", "............kkkkkkkkkk"]),
+  "....xyzzyx......", "...wxyzzyw.zy...", "...DxyyxwBByzx..", "....DgCBA#Bxw...", "....CgCBBA#CB...", "....ChCBBA#CBs..", "....CgCBBA#BsS..", "....kmGmLLk.....",
+  ".qrrrrq#rqp.....", ".qtq...qrrrqp...", ".LmL....qrrqpLmL", "LmmL........LmmL", "kkkk........kkkk"]),
+ 'lying': dict(neck=(6, 2), sh=(9, 3), rows=[
+  "..........DDCB..........", "......xyzDgCCBBA........", ".....xyzzCgCBBAkqrrq....", "....wyzyxChCBBAmqtrqpLmL", "...sSwxwBgCBAAkqrrqpLmmL", "..............kkkkkkkkkk"]),
 }
 RIO_BL = {'A': ('coat', 0), 'B': ('coat', 1), 'C': ('coat', 2), 'D': ('coat', 3), 'E': ('coat', 4), 'w': ('scarf', 0), 'x': ('scarf', 1), 'y': ('scarf', 2), 'z': ('scarf', 3),
           'g': ('gold', 1), 'G': ('gold', 3), 'h': ('gold', 2), 'k': ('leather', 1), 'L': ('leather', 2), 'm': ('leather', 2), 'n': ('leather', 3),
@@ -89,7 +89,7 @@ POSE = {
  'atk2': dict(body='idle', hF=(3, 1.5), wa=5, face='a'), 'atk3': dict(body='lunge', hF=(-6.5, .5), wa=2, face='y', head=(-1, 1)),
  'cast0': dict(body='stand', hF=(-2, -3), wa=88, face='b'), 'cast1': dict(body='stand', hF=(-2, -3.6), wa=88, face='b', head=(0, -1)), 'cast2': dict(body='lunge', hF=(-6, -.5), wa=50, face='y'),
  'hit': dict(body='hit', hF=(-3, 3.5), wa=-40, face='x', head=(1, 0)), 'guard': dict(body='idle', hF=(-4, 1.5), wa=92, face='a'),
- 'weak': dict(body='kneel', hF=(-4.5, .5), wa=-78, face='s', head=(-1, 1)), 'dead': dict(body='lying', hF=(-5, 1), wa=178, face='k', head=(0, 3), armz=2.5),
+ 'weak': dict(body='kneel', hF=(-4.5, .5), wa=-78, face='s', head=(-1, 1)), 'dead': dict(body='lying', hF=(-5, 1), wa=178, face='k', head=(-6, 4), dx=3, armz=2.5),
  'win0': dict(body='stand', hF=(-1.5, -5), wa=92, face='h', dy=-3), 'win1': dict(body='stand', hF=(-1.5, -5), wa=92, face='h'),
  'awk': dict(body='idle', hF=(-3.5, -1), wa=62, face='y', head=(0, -1)),
 }

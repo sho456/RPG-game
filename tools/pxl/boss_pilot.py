@@ -1,117 +1,127 @@
-"""パイロット：黒炎竜ヴォルガノン（ボス・右向き）。なめらかな曲線の輪郭と階調で組む。"""
+"""パイロット：黒炎竜ヴォルガノン（ボス・右向き）。
+ 斜め前から見た低い構え。頭は手前下で大きく口を開け、両翼は奥へ広げる。
+ 筋肉は細長い塊を重ねて彫り、塊ごとに光の筋を入れる（SFC期の大型敵の描き方）。"""
 from core import *
 from kit import *
 
-def wing(c, root, elbow, wrist, tips, z, bias=0, lum=.5, fold=True, arm='scale', mem='mem', bones=True):
-    """蝙蝠型の翼。指先は尖らせ、指の間の縁は内側へえぐった曲線にする。"""
+def wing(c, root, elbow, wrist, tips, tail, z, bias=0, mem='mem', arm='scale', seed=5):
+    """翼：腕骨と指骨、えぐれた膜。膜にはざらつきの模様を入れる。tail=膜が胴へ戻る点。"""
     out = [wrist]
     for i, t in enumerate(tips):
-        nxt = tips[i + 1] if i + 1 < len(tips) else root; pull = wrist if i + 1 < len(tips) else elbow
-        ctrl = ((t[0] + nxt[0]) / 2 * .58 + pull[0] * .42, (t[1] + nxt[1]) / 2 * .58 + pull[1] * .42)
-        out += bez(t, ctrl, nxt, 7)[:-1]
-    out += [root, elbow]
-    c.blob(out, mem, z, depth=2.5, bias=bias + lum - .56, smooth=False)
-    k = c.sel(mem); k &= (c.z == z)
-    c.shade(k, gx=.004, gy=.010, ox=wrist[0] * c.k, oy=wrist[1] * c.k, k=0)                 # 付け根側・下側ほど暗く
-    for i, t in enumerate(tips):                                                            # 指骨（ゆるく反らせる）
-        mid = ((wrist[0] + t[0]) / 2 + (t[1] - wrist[1]) * .06, (wrist[1] + t[1]) / 2 - (t[0] - wrist[0]) * .06)
-        c.curve([wrist, mid, t], [1.7, 1.3, .6], arm, z + .1, bias=bias)
-        if fold and i + 1 < len(tips):
-            n = tips[i + 1]; m2 = ((t[0] + n[0]) / 2 * .6 + wrist[0] * .4, (t[1] + n[1]) / 2 * .6 + wrist[1] * .4)
-            c.stroke([(wrist[0] * .75 + m2[0] * .25, wrist[1] * .75 + m2[1] * .25), (m2[0], m2[1])], -1, mem)
-    if not bones: return c
-    c.curve([root, ((root[0] + elbow[0]) / 2 - 2, (root[1] + elbow[1]) / 2), elbow], [4.6, 3.8, 3.2], arm, z + .2, bias=bias)
-    c.curve([elbow, ((elbow[0] + wrist[0]) / 2 - 1.5, (elbow[1] + wrist[1]) / 2), wrist], [3.2, 2.6, 2.2], arm, z + .2, bias=bias)
-    c.ball(elbow[0], elbow[1], 3.6, 3.6, arm, z + .25, bias=bias)
+        nxt = tips[i + 1] if i + 1 < len(tips) else tail; pull = wrist if i + 1 < len(tips) else elbow
+        ctrl = ((t[0] + nxt[0]) / 2 * .6 + pull[0] * .4, (t[1] + nxt[1]) / 2 * .6 + pull[1] * .4)
+        out += bez(t, ctrl, nxt, 8)[:-1]
+    out += [tail, root, elbow]
+    c.blob(out, mem, z, depth=2, bias=bias - .06, smooth=False)
+    k = c.sel(mem) & (c.z == z)
+    c.shade(k, gx=0, gy=.006, ox=wrist[0], oy=wrist[1]); c.tex_noise(k, amp=.20, seed=seed, cell=1)
+    for i, t in enumerate(tips):
+        mid = ((wrist[0] + t[0]) / 2 + (t[1] - wrist[1]) * .05, (wrist[1] + t[1]) / 2 - (t[0] - wrist[0]) * .05)
+        c.curve([wrist, mid, t], [2.0, 1.5, .7], arm, z + .1, bias=bias + .1)
+    c.curve([root, ((root[0] + elbow[0]) / 2, (root[1] + elbow[1]) / 2 - 2), elbow], [5.5, 4.4, 3.6], arm, z + .2, bias=bias)
+    c.curve([elbow, ((elbow[0] + wrist[0]) / 2, (elbow[1] + wrist[1]) / 2), wrist], [3.6, 3, 2.6], arm, z + .2, bias=bias)
+    c.ball(elbow[0], elbow[1], 4.2, 4.2, arm, z + .25, bias=bias); c.ball(wrist[0], wrist[1], 3.2, 3.2, arm, z + .25, bias=bias)
     return c
 
-def foot(c, x, y, m='scale', z=0, n=3, ln=7, bias=0, bone='bone'):
-    """足先：前へ開く指と鉤爪。"""
+def hook(c, x, y, dx, dy, ln=8, w=2.4, z=0, m='bone', bend=.35):
+    """大きな鉤爪：付け根が太く、先へ細く曲がる。"""
+    L = math.hypot(dx, dy); ux, uy = dx / L, dy / L; nx, ny = -uy, ux
+    pts = [(x, y), (x + ux * ln * .5 + nx * ln * bend * .5, y + uy * ln * .5 + ny * ln * bend * .5), (x + ux * ln + nx * ln * bend, y + uy * ln + ny * ln * bend)]
+    c.curve(pts, [w, w * .7, .5], m, z); return c
+
+def hand(c, x, y, ang, z, n=4, fl=6, cl=7, spread=22, m='scale', bias=0):
+    """手足の先：開いた指と鉤爪。ang=指の向き（度。0=右、90=下）。"""
     for i in range(n):
-        dy = (i - (n - 1) / 2) * 2.4; ex, ey = x + ln - abs(dy) * .5, y + dy + 1.5
-        c.tube([(x, y + dy * .4), (ex, ey)], [2.6, 1.7], m, z + i * .01, bias=bias)
-        c.poly([(ex, ey - 1.4), (ex + 4.4, ey + 1.6), (ex - .5, ey + 1.6)], bone, z + i * .01 + .005, lum=.82 + bias)
+        a = math.radians(ang + (i - (n - 1) / 2) * spread); dx, dy = math.cos(a), math.sin(a)
+        c.tube([(x, y), (x + dx * fl, y + dy * fl)], [2.6, 2.0], m, z + i * .01, bias=bias)
+        hook(c, x + dx * fl, y + dy * fl, dx, dy + .25, cl, 1.9, z + i * .01 + .02)
     return c
 
-SC6 = [.16, .40, .62, .79, .93]
-def volganon(pose=None, k=.82):
-    c = Cv(160, 128, ax=78, ay=122, pose=pose, k=k); c.sep_gap = 9
-    c.mat('scale', ['#0e0810', '#220e18', '#40141e', '#6a1e22', '#9c3426', '#d46a36'], th=SC6)
-    c.mat('plate', ['#1c080c', '#4e120c', '#8e2c0e', '#d0601a', '#f8a63c', '#ffe490'], th=[-.12, .1, .32, .56, .82])
-    c.mat('mem', ['#12061a', '#2c0a20', '#4e1228', '#741e2c', '#9c3632'])
-    c.mat('bone', ['#3a2a30', '#7a6058', '#c0a688', '#f0dcb8', '#fffaf0'], 'metal')
+SC6 = [.14, .40, .62, .80, .94]
+def volganon(pose=None):
+    c = Cv(164, 136, ax=80, ay=130, pose=pose); c.sep_gap = 9
+    c.mat('scale', ['#120a16', '#261020', '#42162a', '#6c1e2e', '#a43430', '#e86c40'], th=SC6)
+    c.mat('plate', ['#3a1612', '#7c3418', '#c0682a', '#eea44e', '#ffd890', '#fff6d8'], th=[-.05, .2, .44, .66, .86])
+    c.mat('mem', ['#180a1c', '#34102a', '#5a1830', '#822834', '#a84238'], th=[.2, .42, .62, .82])
+    c.mat('bone', ['#4a3840', '#8c766c', '#ccb89c', '#f4e6c8', '#ffffff'], 'metal')
     c.mat('fire', ['#ff5a10', '#ffb020', '#fff0a0'], glow=True).mat('eye', ['#ff8a00', '#fff060', '#ffffff'], glow=True)
-    c.mat('mouth', ['#2a0410', '#74101a', '#c8301c']).mat('ink', [OUT, '#2a1018'])
-    G = 142
-    with c.part('wingB', (104, 66)):                                             # 奥の翼（膜だけ覗く）
-        wing(c, (100, 68), (92, 32), (108, 8), [(134, 0), (144, 12), (138, 26)], z=-8, bias=-.3, lum=.3, fold=False, bones=False)
-    with c.part('tail', (44, 102)):                                              # 尾
-        with c.sculpt('scale', z=-4, bias=-.05) as g:
-            g.curve([(52, 100), (30, 112), (12, 110), (4, 94), (10, 78), (24, 72)], [14, 11, 8.5, 6.5, 4.4, 2.2])
-        kk = c.paint([(50, 106), (30, 116), (12, 113), (4, 100), (8, 108), (20, 124), (40, 124), (54, 114)], 'plate', only='scale', smooth=True)
-        c.tex_bands(kk, period=4 * k, amp=.4, ang=62, duty=.3)
-        spikes(c, [(36, 100), (18, 100), (8, 90), (12, 76)], 5, 4.4, 'bone', z=-4.1, every=6.5, lean=.5, side=1, lum=.8)
-        c.blob([(22, 73), (30, 62), (40, 58), (35, 68), (40, 78), (30, 76)], 'bone', z=-3.8, depth=3, smooth=False)
-    with c.part('legB'):                                                         # 奥の脚
-        with c.sculpt('scale', z=-5, bias=-.34) as g:
-            g.ball(64, 106, 12, 13); g.curve([(68, 114), (58, 126), (64, G - 5)], [6.5, 4.6, 3.6])
-            g.curve([(124, 96), (137, 110), (138, 126)], [8, 5.6, 3.8])
-        foot(c, 64, G - 4, z=-5, bias=-.34, ln=6); foot(c, 138, 127, z=-5, bias=-.34, ln=6)
-    with c.part('body'):                                                         # 胴・首の付け根・手前の脚をひと続きに
-        with c.sculpt('scale', z=0, occ=.2) as g:
-            g.ball(62, 98, 22, 21)                                               # 腰
-            g.tube([(64, 96), (86, 92), (108, 88)], [20, 18, 22])                # 胴
-            g.ball(110, 88, 22, 23)                                              # 胸
-            g.curve([(116, 82), (130, 66), (136, 52)], [16, 12.5, 10], e=2)      # 首の付け根
-            g.ball(60, 106, 15, 17, e=5)                                         # 手前の腿
-            g.curve([(70, 120), (58, 131), (67, G - 3)], [7.5, 5.4, 4.4], e=5)
-            g.ball(113, 96, 11, 13, e=5)                                         # 肩
-            g.curve([(114, 100), (106, 117), (114, G - 5)], [9.5, 7, 4.8], e=6)
-        kk = c.paint([(76, 114), (90, 108), (104, 112), (105, 128), (78, 128)], 'plate', only='scale', smooth=True)
-        kk |= c.paint([(127, 104), (130, 86), (138, 92), (136, 108), (130, 116)], 'plate', only='scale', smooth=True)
-        c.tex_bands(kk, period=5.2 * k, amp=.4, ang=97, duty=.28)
-        c.tex_scales(c.sel('scale', 'body') & (c.lum > .34), sx=6 * k, sy=4.4 * k, amp=.16, ang=-10)
-        spikes(c, [(50, 84), (64, 76), (84, 72), (102, 66), (116, 64)], 6.5, 5, 'bone', z=-.1, every=7.5, lean=-.5, side=-1, lum=.8)
-        for p in ([(101, 78), (105, 84), (103, 90), (108, 96)], [(115, 76), (119, 84), (117, 92)], [(64, 86), (68, 93), (66, 100)], [(80, 80), (82, 88)]):
-            c.path(p, 'fire', 0, z=.6)
-        for x, y in ((105, 84), (119, 84), (68, 93)): c.px(x, y, 'fire', 1, .61)
-        foot(c, 67, G - 2, z=.2, ln=8); foot(c, 114, G - 3, z=.2, ln=8)
-    with c.part('wingF', (96, 68)):                                              # 手前の翼
-        wing(c, (98, 70), (72, 40), (86, 14), [(122, 6), (58, 4), (30, 14), (14, 36), (22, 64)], z=1.2)
-        for x, y in ((122, 6), (58, 4), (30, 14), (14, 36), (22, 64)): claw(c, x, y, -.3, -.6, 'bone', 3)
-        c.poly([(84, 14), (88, 4), (90, 14)], 'bone', z=1.5, lum=.8)
-    with c.part('neck', (120, 78)):                                              # 首〜頭
-        with c.sculpt('scale', z=4, occ=.2) as g:
-            g.curve([(120, 80), (132, 64), (138, 48), (148, 42)], [14, 11.5, 9, 8])
-        kk = c.paint([(124, 92), (136, 74), (143, 60), (150, 50), (156, 54), (150, 66), (142, 82), (132, 96)], 'plate', only='scale', z=4, smooth=True)
-        c.tex_bands(kk, period=4.4 * k, amp=.4, ang=30, duty=.3)
-        c.tex_scales(c.sel('scale', 'neck') & (c.lum > .34), sx=6 * k, sy=4.4 * k, amp=.16, ang=-52)
-        spikes(c, [(112, 68), (124, 52), (132, 40), (140, 34)], 6, 4.6, 'bone', z=3.9, every=6.5, lean=-.4, side=-1, lum=.8)
-        with c.part('head', (148, 46)):
-            c.curve([(144, 38), (132, 28), (116, 26), (106, 32)], [3.6, 3, 2, .8], 'bone', z=3.8)
-            c.curve([(148, 36), (140, 22), (126, 14), (116, 14)], [4, 3.4, 2.4, .8], 'bone', z=5.4)
-            for x, y in ((140, 24), (133, 18), (126, 15)): c.stroke([(x - 1, y - 3), (x + 1, y + 3)], -1, 'bone')
-            with c.part('jaw', (150, 56)):
-                c.poly([(150, 54), (180, 58), (178, 68), (154, 66)], 'mouth', z=4.6, lum=.15)
-                with c.sculpt('scale', z=4.8, bias=-.1) as g: g.blob([(146, 56), (158, 62), (174, 65), (181, 66), (178, 72), (160, 72), (148, 64)], depth=4)
-                c.curve([(158, 62), (168, 63), (176, 61)], [2, 1.8, 1.1], 'mouth', z=4.7, bias=.5)
-                for i, x in enumerate((167, 173)): c.poly([(x - 1.2, 66.5), (x, 63), (x + 1.2, 66.5)], 'bone', z=4.9, lum=.85)
-            with c.sculpt('scale', z=5, bias=.06) as g:
-                g.blob([(138, 40), (148, 33), (160, 34), (168, 40), (170, 49), (160, 55), (146, 55), (138, 48)], depth=9)
-                g.blob([(160, 38), (174, 42), (184, 47), (187, 53), (182, 57), (166, 57), (158, 50)], depth=6, e=1)
-                g.ball(183, 49.5, 2.8, 2.4, e=3); g.tube([(149, 38.5), (156, 38.5), (164, 42)], [2.4, 2.6, 1.8], e=5)
-            c.px(184, 50, 'ink', 0, 5.3); c.stroke([(160, 52), (172, 54.5), (184, 55.5)], -2, 'scale'); c.stroke([(162, 40), (174, 44), (184, 47.5)], 1, 'scale')
-            for x, y in ((144, 38), (148, 36), (153, 35), (158, 36), (142, 44), (146, 42)): c.tone(x, y, 1, 'scale')
-            for i, x in enumerate((164, 170, 176)): c.poly([(x - 1.2, 56), (x, 60.5 if i % 2 == 0 else 59), (x + 1.2, 56)], 'bone', z=5.2, lum=.9)
-            c.poly([(182, 56), (184.5, 63), (186, 56)], 'bone', z=5.25, lum=.95)
-            c.poly([(152, 41.5), (162, 43.5), (160, 46), (152, 45)], 'ink', z=5.25, lum=0)
-            c.px(155, 43, 'eye', 0, 6).px(156, 43, 'eye', 2, 6).px(157, 43, 'eye', 1, 6).px(158, 44, 'eye', 1, 6).px(157, 44, 'eye', 0, 6)
-            for x, y in ((141, 43), (144, 49), (148, 53)): c.poly([(x, y), (x - 6.5, y + 2), (x, y + 4)], 'bone', z=5.2, lum=.72)
-            fx = c.pose.get('fx', 0)
-            if fx:
-                for i, (x, y, r) in enumerate(((184, 64, 3), (188, 60, 2.4), (190, 55, 1.8))[:fx + 1]): c.ball(x, y, r, r * 1.3, 'fire', z=6, bias=.3 - i * .3)
+    c.mat('mouth', ['#300612', '#7e121c', '#d83a24', '#ff7a50']).mat('ink', [OUT, '#30101e'])
+    G = 126
+    # ================= 奥：両翼・尾・奥の後ろ脚 =================
+    with c.part('wingR', (100, 52)):
+        wing(c, (100, 54), (122, 36), (114, 10), [(92, 2), (136, 4), (154, 22), (158, 46)], (126, 60), z=-9, bias=-.16, seed=9)
+        hook(c, 114, 9, .4, -1, 9, 2.6, -8.6)
+    with c.part('wingL', (58, 54)):
+        wing(c, (60, 56), (38, 36), (46, 10), [(70, 2), (22, 2), (6, 22), (2, 50)], (36, 64), z=-8, seed=5)
+        hook(c, 45, 9, -.5, -1, 10, 2.8, -7.6)
+    with c.part('tail', (30, 90)):
+        with c.sculpt('scale', z=-6, bias=-.1) as g: g.curve([(36, 92), (18, 104), (5, 96), (6, 80), (16, 72)], [11, 8.5, 6, 4, 2])
+        spikes(c, [(26, 96), (12, 96), (5, 86), (9, 74)], 4.5, 4, 'bone', z=-6.1, every=6, lean=.4, side=1, lum=.8)
+        c.blob([(14, 73), (20, 62), (30, 60), (25, 69), (30, 78), (21, 76)], 'bone', z=-5.8, depth=3, smooth=False)
+    # ================= 胴・四肢をひと続きに彫る =================
+    with c.part('body'):
+        with c.sculpt('scale', z=0, occ=.26) as g:
+            g.ball(64, 60, 27, 22)                                              # 背の盛り上がり
+            g.ball(84, 74, 21, 20, e=2)                                         # 胸
+            g.ball(36, 82, 17, 19, e=3); g.ball(30, 92, 10, 11, e=4)           # 後ろ腿（二つの筋肉）
+            g.curve([(32, 98), (22, 112), (30, G - 3)], [9, 6.4, 5.4], e=4)     # すね
+            g.curve([(88, 66), (98, 80), (104, 92)], [14, 12.5, 11], e=6)       # 首（手前下へ）
+            g.ball(58, 72, 12, 13, e=8); g.curve([(56, 78), (47, 96), (56, G - 6)], [9.5, 8.2, 5.6], e=9)    # 左前脚：肩・上腕〜前腕
+            g.ball(47, 96, 7.2, 6.6, e=10)                                      # ひじ
+            g.ball(106, 62, 10, 10, e=1); g.curve([(108, 64), (126, 70), (138, 82)], [7.5, 6.5, 4.6], e=2)   # 右前脚
+            g.ball(126, 70, 5.6, 5.4, e=3)
+        kk = c.paint([(62, 84), (74, 80), (92, 86), (100, 100), (94, 112), (76, 114), (64, 104)], 'plate', only='scale', smooth=True)   # 腹〜胸の下
+        c.tex_bands(kk, period=4.5, amp=.34, ang=100, duty=.3)
+        c.tex_scales(c.sel('scale', 'body') & (c.lum > .5) & (c.Y < 70), sx=5.5, sy=4, amp=.14, ang=-12)
+        # 筋肉の光の筋・溝（手置き）
+        for p in ([(50, 46), (62, 42), (76, 44)], [(44, 54), (56, 50)], [(54, 68), (60, 64), (66, 68)], [(50, 78), (46, 86)], [(30, 74), (36, 68), (44, 72)], [(28, 84), (30, 94)],
+                  [(90, 62), (98, 72), (103, 84)], [(104, 56), (112, 58)], [(114, 64), (124, 67)], [(130, 72), (136, 79)], [(80, 62), (86, 58)]):
+            c.stroke(p, 1, 'scale', smooth=True)
+        c.tex_scales(c.sel('scale', 'body') & (c.lum > .5) & (c.X < 50) & (c.Y > 66), sx=5.5, sy=4, amp=.14, ang=30)
+        for p in ([(24, 80), (30, 72), (40, 70)], [(22, 96), (26, 104)], [(52, 84), (50, 94)]): c.stroke(p, 1, 'scale', smooth=True)
+        for p in ([(40, 78), (38, 90), (34, 98)], [(46, 76), (50, 70)]): c.stroke(p, -1, 'scale', smooth=True)
+        for p in ([(66, 72), (72, 80)], [(42, 90), (40, 100)], [(74, 50), (84, 56), (88, 64)], [(46, 62), (52, 60)], [(94, 84), (98, 92)], [(118, 72), (122, 76)]):
+            c.stroke(p, -1, 'scale', smooth=True)
+        for p in ([(58, 52), (62, 58), (60, 64), (65, 70)], [(72, 50), (76, 57), (74, 63)], [(40, 78), (44, 85)], [(96, 70), (99, 77)]): c.path(p, 'fire', 0, z=.6)   # 溶岩のひび
+        for x, y in ((62, 58), (76, 57), (44, 85)): c.px(x, y, 'fire', 1, .61)
+        spikes(c, [(40, 50), (52, 41), (66, 38), (80, 42), (90, 50)], 5.5, 4.4, 'bone', z=-.1, every=6.5, lean=-.3, side=-1, lum=.78)        # 背びれ
+        hand(c, 31, G - 2, 12, z=.3, n=3, fl=7, cl=7, spread=22)                # 後ろ足
+        hand(c, 58, G - 4, 16, z=.4, n=4, fl=7, cl=8, spread=20)               # 左前足
+        hand(c, 139, 83, 50, z=.2, n=3, fl=5, cl=7, spread=26, bias=-.05)      # 右前足
+    # ================= 頭（手前） =================
+    with c.part('head', (104, 94)):
+        c.curve([(100, 87), (90, 79), (79, 77), (71, 81)], [3.2, 2.6, 1.8, .7], 'bone', z=4.4)       # 角（奥）
+        c.curve([(104, 85), (98, 73), (87, 67), (77, 68)], [3.6, 3, 2, .7], 'bone', z=6.2)          # 角（手前）
+        for x, y in ((98, 75), (92, 70), (86, 68)): c.stroke([(x - 1, y - 3), (x + 1, y + 3)], -1, 'bone')
+        with c.part('jaw', (104, 106)):                                                             # 下あごと口の中
+            c.poly([(104, 104), (146, 110), (142, 124), (108, 120)], 'mouth', z=4.8, lum=.2)
+            c.curve([(112, 112), (126, 116), (138, 113)], [3, 2.6, 1.6], 'mouth', z=4.9, bias=.5)   # 舌
+            with c.sculpt('scale', z=5.0, bias=-.06) as g:
+                g.curve([(100, 108), (116, 122), (132, 126), (144, 123)], [5, 5.4, 4.4, 2.6])
+            for i, x in enumerate(range(116, 142, 5)): c.poly([(x - .9, 121.5), (x, 117 + (i % 2) * 1.5), (x + .9, 121.5)], 'bone', z=5.1, lum=.86)
+            c.poly([(140.5, 122), (142, 115), (143.5, 122)], 'bone', z=5.12, lum=.95)                 # 下の大牙
+        with c.sculpt('scale', z=5.4, bias=.04, occ=.2) as g:
+            g.ball(106, 95, 13, 10.5)                                                               # 頭蓋
+            g.curve([(110, 96), (128, 101), (146, 106)], [9.5, 7.6, 4.6], e=1)                      # 鼻面
+            g.tube([(104, 89), (114, 89), (124, 93)], [3, 3.4, 2.4], e=7)                           # 眉の隆起
+            g.ball(145, 104, 3.4, 3, e=3); g.ball(100, 102, 6, 5, e=2)                              # 鼻先・頬
+        for i, x in enumerate(range(114, 143, 5)): c.poly([(x - .9, 107.5 + (x - 114) * .09), (x, 112.5 - (i % 2) * 1.8 + (x - 114) * .09), (x + .9, 107.5 + (x - 114) * .09)], 'bone', z=5.6, lum=.92)
+        c.poly([(143.5, 109), (145.5, 117), (147, 109)], 'bone', z=5.62, lum=1.0)                    # 上の大牙
+        c.stroke([(112, 105), (128, 107), (144, 109)], -2, 'scale')                                   # 唇の線
+        c.poly([(108, 92), (120, 94.5), (118, 97.5), (108, 96.5)], 'ink', z=5.7, lum=0)               # 眼窩
+        for x, y, l in ((111, 94, 0), (112, 94, 2), (113, 94, 1), (114, 95, 1), (113, 95, 2), (112, 95, 0), (115, 95, 0)): c.px(x, y, 'eye', l, 6)
+        c.px(146, 103, 'ink', 0, 5.8).px(147, 104, 'ink', 0, 5.8)                                     # 鼻孔
+        c.stroke([(118, 96), (132, 100), (144, 103)], 1, 'scale', smooth=True); c.stroke([(100, 92), (106, 88), (114, 87)], 1, 'scale', smooth=True)
+        for x, y in ((98, 98), (100, 104), (104, 109)): hook(c, x, y, -1, .35, 7, 2, 5.5)             # 頬のとげ
+        for x, y in ((120, 126), (128, 129)): hook(c, x, y, -.2, 1, 4, 1.6, 5.05)                     # あごのとげ
+        fx = c.pose.get('fx', 0)
+        if fx:
+            for i, (x, y, r) in enumerate(((150, 114, 4), (156, 110, 3), (160, 104, 2.2))[:fx + 1]): c.ball(x, y, r, r * 1.3, 'fire', z=7, bias=.3 - i * .3)
     return c
 
+VOL_F = {'idle0': {}, 'idle1': {'head': (0, 1), 'wingL': (0, 0, -3), 'wingR': (0, 0, 3), 'tail': (0, 0, 4)},
+         'atk0': {'head': (-3, -3, -8), 'jaw': (0, 0, 10), 'wingL': (0, 0, -7), 'wingR': (0, 0, 7)}, 'atk1': {'head': (5, 2, 6), 'jaw': (0, 0, 16), 'fx': 2},
+         'hit': {'head': (-4, -3, -12), 'wingL': (0, 0, 6), 'wingR': (0, 0, -6), 'tail': (0, 0, -8)}}
 if __name__ == '__main__':
     import sys
     from mon_pilot import show
