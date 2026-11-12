@@ -23,12 +23,12 @@ const rankH=id=>{const l=G.h[id].awLv||1;return`<div class="rk rk${l}"><b>${ROMA
 function addCmd(l,s,f,idx,cls){const c=$('#cmd'),b=document.createElement('button');b.className='c '+(cls||'');b.innerHTML=l+(s?`<small>${s}</small>`:'');b.onclick=()=>{SFX.sel();f();};c.insertBefore(b,c.children[idx]||null);return b;}
 
 /* ---------- 設定の初期値 ---------- */
-const AWN={save:'温存',boss:'ボス戦のみ',brk:'ブレイク中',any:'いつでも'};
+const AWN={save:'温存',boss:'ボス戦のみ',any:'いつでも'};
 const TXS=[['おそい',46],['ふつう',28],['はやい',12],['一瞬',0]];
 const FLN=['しない','コモン','アンコモン以下','レア以下'];
 {const _mg=migrate;migrate=function(g){const r=_mg(g),s=G.set;
  if(!s.flt)s.flt={rar:s.autoSell?0:-1,mode:'sell',keepUp:true};s.autoSell=false;
- if(!s.autoAw)s.autoAw='save';if(s.txt==null)s.txt=1;if(s.tut==null)s.tut=true;if(s.tap1==null)s.tap1=false;G.tut=G.tut||{};return r;};}
+ if(!s.autoAw||s.autoAw==='brk')s.autoAw=s.autoAw==='brk'?'boss':'save';if(s.txt==null)s.txt=1;if(s.tut==null)s.tut=true;if(s.tap1==null)s.tap1=false;G.tut=G.tut||{};return r;};}
 
 /* ---------- 画面切替の共通処理 ---------- */
 let WMS={on:false,tab:0,sel:null,cur:null,bgs:{}};
@@ -43,7 +43,7 @@ let WMS={on:false,tab:0,sel:null,cur:null,bgs:{}};
 /* 味方は右側に縦一列。HP・星臨ゲージは各キャラの横に、行動中のキャラは下の大きなパネルに表示 */
 Object.assign(HPOS,{1:[[112,46]],2:[[114,24],[108,68]],3:[[114,8],[108,44],[114,80]],4:[[114,1],[108,31],[114,61],[108,91]]});
 let AM='n';const LASTA={};
-const awPolicy=()=>{const p=G.set.autoAw||'save';return p==='any'||(p==='boss'&&!!(B.opts.boss||B.opts.trial))||(p==='brk'&&aliveE().some(e=>e.broken));};
+const awPolicy=()=>{const p=G.set.autoAw||'save';return p==='any'||(p==='boss'&&!!(B.opts.boss||B.opts.trial));};
 /* 通常AUTOは設定どおりに星臨を温存、全力AUTOは星臨・共鳴技もすぐ使う */
 {const _ap=autoPick;autoPick=function(u){if(auto&&AM==='n'&&!u.aw&&u.ag>=100&&!awPolicy()){const ag=u.ag;u.ag=99;try{return _ap(u);}finally{u.ag=ag;}}return _ap(u);};}
 const skDis=(u,s)=>{const lock=s.req==='charged'?!u.charged:s.req==='lowhp'?u.hp>u.mhp*.25:s.req==='stk3'?(u.stk||0)<3:s.req&&!B.awUsed.has(s.req);
@@ -284,13 +284,13 @@ const TIPS={
  town:['灯都ルミナス',['ここが拠点の<b>灯都</b>。帰ってくるたびにHPが全回復し、自動でセーブされる。','<b>出撃</b>：行き先を選んで冒険へ。<br><b>編成</b>：仲間の入れ替え・装備・星盤はここから。','ほかの施設は、冒険で手に入れた物を使うときに。<b>記録・設定</b>で文字の速さやオートの動きを変えられる。']],
  map:['行き先を選ぶ',['行きたいエリアをタップすると、上に<b>その場所のボスと推奨Lv</b>が出る。','よければ<b>▼出撃▼</b>を押して出発。<b>CLEAR</b>の付いたエリアは何度でも挑める。']],
  field:['探索のしかた',['<b>行きたい場所をタップ</b>すると歩く。宝箱や光る採取ポイントを探そう。','魔物に<b>自分からぶつかると先制攻撃</b>。背後を取られると不利になる。','危なくなったら<b>帰還の灯</b>で灯都へ。下の顔をタップすると仲間の状態を確認できる。']],
- battle:['戦闘のしかた',['上の並びが<b>行動順</b>。自分の番が来たら、下の一覧から<b>技をタップ→もう一度タップ</b>で決定。','<b>敵をタップ</b>すると狙いが変わる。左上に、狙った敵の<b>弱点</b>が出る（?はまだ不明）。','弱点を突いて <b>◆シールド</b> を0にすると <b>BREAK</b>。敵が動けなくなり、大ダメージの好機。','面倒なら下の<b>通常AUTO</b>。同じ行動を繰り返すなら<b>リピート</b>。']],
+ battle:['戦闘のしかた',['上の並びが<b>行動順</b>。自分の番が来たら、下の一覧から<b>技をタップ→もう一度タップ</b>で決定。','<b>敵をタップ</b>すると狙いが変わる。左上に、狙った敵の<b>弱点</b>が出る（?はまだ不明）。','弱点を突くと <b>1.7倍</b> の大ダメージ。敵が「溜め」たら次の大技に<b>防御</b>で備えよう。','面倒なら下の<b>通常AUTO</b>。同じ行動を繰り返すなら<b>リピート</b>。']],
  awake:['星臨できる！',['金色の<b>ASTRAL GAUGE</b>が100%になった。<b>星臨</b>ボタンで発動――<b>行動を消費しない</b>ので、そのまま強力な星臨技を撃てる。','2人が同時に星臨すると、<b>共鳴技</b>が使えるようになる。']],
  awake2:['星臨中',['技の一覧が<b>星臨技</b>に変わった。星臨はキャラごとに性質が違う（ターン制・ゲージ消費など）。','効果が切れると反動で少し行動が遅れる。もう1人も星臨させると<b>共鳴技</b>。']],
  reso:['共鳴技',['2人の星片が<b>共鳴</b>した！ 技の一番上の<b>共鳴技</b>は、1戦闘に1回だけの切り札。']],
  party:['編成',['カードを<b>タップで選び</b>、入れ替えたい相手をタップ。<b>同じカードをもう一度</b>タップで詳細・装備へ。','カードの背景は、その仲間の<b>星盤</b>。解放した星が光ってつながる。✦ボタンから星盤へ。']],
  board:['星盤',['Lvが上がるともらえる<b>星ポイント</b>で星を解放する。<b>光る輪の星</b>が今解放できる星。','迷ったら<b>おまかせ</b>。<b>リセット</b>は無料なので、気軽に試せる。']],
- how:['遊び方',['<b>灯都</b>で準備 → <b>出撃</b>で各地へ → ボスを倒すと次の章へ。街に戻るとHP全回復＆自動セーブ。','戦闘：弱点で<b>BREAK</b>、ゲージ100%で<b>星臨</b>（行動を消費しない）、2人星臨で<b>共鳴技</b>。','育成：<b>編成</b>から装備と<b>星盤</b>。<b>星詠みの塔</b>でジョブと星臨の試練。','<b>記録・設定</b>：セーブは3スロット。オートの星臨・拾う前フィルター・テキスト速度を変えられる。']]};
+ how:['遊び方',['<b>灯都</b>で準備 → <b>出撃</b>で各地へ → ボスを倒すと次の章へ。街に戻るとHP全回復＆自動セーブ。','戦闘：弱点を突いて大ダメージ、ゲージ100%で<b>星臨</b>（行動を消費しない）、2人星臨で<b>共鳴技</b>。','育成：<b>編成</b>から装備と<b>星盤</b>。<b>星詠みの塔</b>でジョブと星臨の試練。','<b>記録・設定</b>：セーブは3スロット。オートの星臨・拾う前フィルター・テキスト速度を変えられる。']]};
 function tip(key){if(!G||G.dev||!G.set||G.set.tut===false||!G.tut||G.tut[key]||!TIPS[key]||$('#tip'))return false;G.tut[key]=1;tipShow(key);return true;}
 function tipShow(key){const[t,pg]=TIPS[key],old=$('#tip');if(old)old.remove();let i=0;const d=document.createElement('div');d.id='tip';$('#app').appendChild(d);
  const fp=scene==='field'&&F?F.pause:null;if(fp!==null)F.pause=true;
@@ -306,7 +306,7 @@ const chapOf=f=>f.boss8?'クリア後':f.boss7?'終章':f.boss6?'第6章':f.boss
 const slotTxt=s=>{if(!s)return'― 記録なし ―';const ps=(s.party||['rio']).filter(id=>s.h&&s.h[id]);return`${chapOf(s.flags||{})}　Lv${Math.max(1,...ps.map(id=>s.h[id].lv))}　${ps.map(id=>HB[id]?HB[id].name:'').join('・')}<small>${fmt(s.gold||0)}G　出撃${s.sorties||0}回</small>`;};
 title=function(){const last=Math.min(2,Math.max(0,+(lsGet('astral_slot')||0)));SAVE=SLOTK[last];show('title');const ov=$('#ov');ov.classList.remove('hide');ov.classList.add('ttl');
  ov.innerHTML=`<canvas id="tcv" width="180" height="320"></canvas><div class="tlogo">ASTRAL<br>BREAKER</div><div class="tsub">〜 星継ぎの灯 〜</div><div class="tmenu" id="tm"></div>
- <div class="note" id="hw" style="display:none"><b>遊び方</b><br>・灯都で準備→「出撃」で各地へ。タップした場所へ歩く。<br>・魔物に<b>自分からぶつかると先制攻撃</b>。宝箱・採取ポイントを探そう。<br>・戦闘：技を2回タップで決定。弱点でブレイク、ゲージ100%で<b>星臨</b>（行動を消費しない）。2人星臨で<b>共鳴技</b>。<br>・街に戻るとHP全回復＆自動セーブ。<b>編成</b>で装備と星盤。セーブは3スロット。</div>
+ <div class="note" id="hw" style="display:none"><b>遊び方</b><br>・灯都で準備→「出撃」で各地へ。タップした場所へ歩く。<br>・魔物に<b>自分からぶつかると先制攻撃</b>。宝箱・採取ポイントを探そう。<br>・戦闘：技を2回タップで決定。弱点を突いて大ダメージ、ゲージ100%で<b>星臨</b>（行動を消費しない）。2人星臨で<b>共鳴技</b>。<br>・街に戻るとHP全回復＆自動セーブ。<b>編成</b>で装備と星盤。セーブは3スロット。</div>
  <div class="tfoot"><button id="devg">開発者モード</button><div class="ver" id="verL">${VER}</div></div>`;
  const tm=$('#tm'),has=()=>SLOTK.some((k,i)=>slotGet(i));
  const main=()=>{tm.className='tmenu';tm.innerHTML=`<button class="big" id="newg">はじめから</button><button class="big gold" id="cont" ${has()?'':'disabled style="opacity:.35"'}>つづきから</button><button class="big" id="howto" style="height:40px;font-size:13px">遊び方</button>`;

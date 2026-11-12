@@ -43,7 +43,7 @@ HK23.hudPx=()=>{const hd=$('#bt22 .b22hd'),bt=$('#bt22 .b22btn');let h=0;if(hd&&
 let DOCK=0;
 HK23.botPx=()=>{const st=stage(),bp=$('#bp24');if(!st)return 46;const sh=st.offsetHeight;DOCK=(!bp||!bp.offsetParent)?Math.round(sh*.42):Math.max(46,sh-bp.offsetTop+2);return DOCK;};
 /* 下のボタンだけのときの帯の高さ（ダメージ表示などはここまで下に出せる） */
-const barPx=()=>{const st=stage(),bb=$('#bbar');if(!st||!bb||!bb.offsetParent)return 60;return Math.max(46,st.offsetHeight-bb.offsetTop+4);};
+const barPx=()=>{const st=stage(),bb=$('#bbar');if(!st||!bb||!bb.offsetParent)return 50;return Math.max(40,st.offsetHeight-bb.offsetTop+2);};
 
 /* ==================== 2. 味方：右側に縦一列（参考資料の配置・大きさ） ====================
  参考資料：味方は画面右の縦一列（わずかに弓なり）、1人の背丈は画面幅の約 11%、間隔は背丈の 1.5〜2 倍。
@@ -94,6 +94,9 @@ document.addEventListener('click',e=>{const od=e.target.closest('#bp24 .od');if(
 /* ==================== 5. 下のボタン・技リストの細部 ==================== */
 /* 下のボタンの再描画のあとで、文字の段組みを整える */
 {const _bb=bbar;bbar=function(f){_bb(f);const b=$('#bbar');if(b)b.classList.add('v25');};}
+/* 下のボタンは見た目を小さくした分、ボタン周りの余白（上下）をタップしても真下・真上のボタンが押されるようにする（実質44px相当の当たり判定） */
+{const bb=$('#bbar');if(bb)bb.addEventListener('click',e=>{if(scene!=='battle'||e.target!==bb)return;const x=e.clientX;
+  const btn=[...bb.querySelectorAll('button')].find(b=>{const r=b.getBoundingClientRect();return x>=r.left-3&&x<=r.right+3;});if(btn&&!btn.disabled){e.stopPropagation();btn.click();}},true);}
 
 /* ==================== 6. 効果表示（強化・弱体・状態異常・回復・その他）を敵味方共通の規則で ====================
  ・位置：対象キャラの体の中央に重ねて出し、続けて起きた効果は上へ積む（最大4行）。味方も敵も同じ
@@ -136,7 +139,7 @@ function fxPop(u,s,col,kind){const k=fxKind(s,col,kind),z=fxSz(),S=fxStack(u),ro
  const life=Math.round((k==='heal'?1250:1150)*(speed>=4?.7:speed>=2?.85:1));
  setTimeout(()=>{row.classList.add('out');setTimeout(()=>{row.remove();if(S.isConnected&&!S.children.length){S.remove();if(u._fx25===S)u._fx25=null;}},260);},life);}
 V24.HK24.pop=(u,s,col,small,kind)=>{if(!inB()||!u||u.x==null)return false;
- if(s==='MISS'||/brk/.test(kind||'')||/^BREAK/.test(s))return false;
+ if(s==='MISS')return false;
  if(/^[\-]?\d+$/.test(s))return false;/* ダメージは ver0.24 の表示 */
  if(!/^\+\d+$/.test(s)&&!small)return false;
  try{fxPop(u,s,col,kind);return true;}catch(e){console.error(e);return false;}};
@@ -175,18 +178,20 @@ V24.HK24.choose=(u,w,h,pri,self)=>{if(!inB())return null;const bd=V24.bounds(),b
  [x,y]=fit(x,y);
  /* 同じ相手の古い数字は上へ押し上げる（最新の数字が常に相手の体の上） */
  let top=y;live.filter(p=>p.u===u).sort((a,b2)=>(b2.t||0)-(a.t||0)).forEach(p=>{const ph=p.R.b-p.R.t+6,ny=Math.max(bd.t,top-ph+6);top=ny;
-  p.y=ny;p.R={l:p.R.l,t:ny+3,r:p.R.r,b:ny+ph-3};p.el.style.transition='transform .16s ease-out';p.el.style.transform=`translate(${Math.round(p.x)}px,${Math.round(ny)}px)`;});
+  p.y=ny;p.R={l:p.R.l,t:ny+3,r:p.R.r,b:ny+ph-3};p.el.style.transition='transform .16s ease-out';p.el.style.transform=`translate(${Math.round(p.x)}px,${Math.round(ny)}px)`;
+  /* 押し上げた古い数字が別の相手の数字に掛かるなら、早めに消す（最新の数字を読みやすく） */
+  if(live.some(q=>q.u!==u&&q.R&&ovA(p.R,q.R)>(p.R.r-p.R.l)*(p.R.b-p.R.t)*.12)){p.gone=1;p.el.style.setProperty('--out','140ms');p.el.classList.add('out');setTimeout(()=>p.el.remove(),170);}});
  /* 別の相手の数字と重なるなら、体の範囲内で上下にずらして最も重ならない位置へ */
  const others=V24.PM.live.filter(p=>p!==self&&!p.gone&&p.R&&p.u!==u),cost=(X,Y)=>others.reduce((c,p)=>c+ovA({l:X,t:Y,r:X+w,b:Y+h},p.R),0);
  if(cost(x,y)>0){let best=[x,y,cost(x,y)];for(const dy of[-.35,.35,-.7,.7])for(const dx of[0,-.3,.3]){const[X,Y]=fit(x+dx*w,y+dy*Math.max(h,b.h*.5));const c=cost(X,Y);if(c<best[2])best=[X,Y,c];}[x,y]=best;}
  return{x,y,R:{l:x+3,t:y+3,r:x+w-3,b:y+h-3},c:0,hard:0};};
 /* 他の相手の数字は消さない（重なりは上の位置選びで避ける） */
 V24.HK24.bump=()=>{};
-/* Critical：大きく（通常の約1.35倍）、白→金→朱の塗り・焦げ茶の太い縁・白い内縁・橙の発光。叩きつける動きと光の輪、画面の小さな揺れ */
-V24.FS24.cr=1.35;
-try{Object.assign(TX24.STYLE.dmgC,{fill:[[0,'#ffffff'],[.28,'#fff6b0'],[.48,'#ffd83a'],[.64,'#ffa018'],[1,'#ff5a10']],ow:.16,oc:'#3a0a00',rw:.05,rc:'#fff8d8',sh:[.05,.08,'rgba(0,0,0,.65)'],gl:.45,glow:'rgba(255,150,40,.95)'});
- Object.assign(TX24.STYLE.crit,{fill:[[0,'#ffffff'],[.38,'#fff07a'],[.56,'#ffb21c'],[1,'#ff5a0a']],ow:.14,oc:'#3a0a00',rw:.045,rc:'#fff8d8',glow:'rgba(255,150,40,.8)'});TX24.clear();}catch(e){}
-{const _p=V17F.pop;V17F.pop=function(u,t,c,sm,kind,el){if(inB()&&/crit/.test(kind||'')&&!sm){B.shake=Math.max(B.shake||0,5);}
+/* Critical：数字は通常と同じ色・大きさ。見出しの「Critical」だけ金色で目立たせる */
+V24.FS24.cr=1;
+/* 「Critical」の文字だけ金色（数字は通常ダメージと同じ白） */
+try{Object.assign(TX24.STYLE.crit,{fill:[[0,'#fffbe6'],[.38,'#ffeb8a'],[.56,'#ffc828'],[1,'#d88a00']],ow:.15,oc:'#2a1400',rw:.045,rc:'#fff8d8',sh:[.04,.07,'rgba(0,0,0,.6)'],gl:.35,glow:null});TX24.clear();}catch(e){}
+{const _p=V17F.pop;V17F.pop=function(u,t,c,sm,kind,el){
   /* 開幕の表示ゲート中は、ダメージ以外の表示を預かる */
   if(OP.on&&opening()&&!/^-?\d+$/.test(String(t))){const f=()=>V17F.pop(u,t,c,sm,kind,el);f.u=u;OP.q.push(f);return;}
   return _p.apply(this,arguments);};}
@@ -200,7 +205,7 @@ try{Object.assign(TX24.STYLE.dmgC,{fill:[[0,'#ffffff'],[.28,'#fff6b0'],[.48,'#ff
 try{document.fonts&&document.fonts.ready.then(()=>{if(inB()){try{V23.layout(false);}catch(e){}}});}catch(e){}
 
 /* ==================== お知らせ・開発者メニュー・版表示 ==================== */
-const NEWS25=`<div class="nt"><b>${VER25}</b>　戦闘画面を全面的に作り直しました。<br><small>・戦場を画面いっぱいに広げ、「○○の番」などの説明文を廃止。<br>・行動中キャラのパネル・技リスト・HP表示は、自分の番のときだけ表示。<br>・味方は画面右に縦一列（参考資料の配置）。<br>・「${SEIRIN.n}」ボタンを廃止。満タンで光るゲージをタップすると発動します。<br>・文字の書体・縁取り・配色を一新しました。</small></div>`;
+const NEWS25=`<div class="nt"><b>${VER25}</b>　戦闘画面を全面的に作り直しました。<br><small>・戦場を画面いっぱいに広げ、「○○の番」などの説明文を廃止。<br>・行動中キャラのパネル・技リスト・HP表示は、自分の番のときだけ表示。<br>・味方は画面右に縦一列（参考資料の配置）。<br>・「${SEIRIN.n}」ボタンを廃止。満タンで光るゲージをタップすると発動します。<br>・文字の書体・縁取り・配色を一新しました。<br>・<b>ブレイクを廃止</b>しました。弱点ダメージは1.7倍に強化、敵のHP・溜め攻撃を調整し、ブレイク前提の技・装備・パッシブは新しい効果に置き換えています。<br>・AUTOボタンを小型化し、Criticalの数字は通常と同じ表示に（「Critical」の文字だけ金色）。</small></div>`;
 document.addEventListener('click',e=>{const t=e.target.closest('[data-h22="news"]');if(!t||scene!=='town')return;e.stopPropagation();e.preventDefault();SFX.sel();
  const vn=V22.HM.news||'';ovOpen(`<div class="nw22"><div class="nh"><b>お知らせ</b></div>${vn||''}${NEWS25}${V23.NEWS23||''}</div><button class="tbtn back wide" data-a="close">閉じる</button>`,{close:ovClose});},true);
 function dev25(m){log(m||`<b>${VER25}</b>　戦闘画面の確認`);

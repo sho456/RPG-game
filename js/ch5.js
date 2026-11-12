@@ -2,7 +2,7 @@
 function stTags(u){const t=[];if(u.side===0){if(u.aw)t.push(['星臨','aw']);if(u.ag>=100&&!u.aw)t.push(['AG MAX','ag']);if(u.taunt>0)t.push(['挑発'+u.taunt,'tn']);if(u.guard)t.push(['防御','gd']);
  if(B.domain)t.push(['聖域','dm']);if(B.barrier>0)t.push(['障壁','dm']);if(u.charged)t.push(['充填','ch']);
  if(u.aw){if(u.id==='gald')t.push(['蓄'+Math.round(u.store),'ch']);else if(u.id==='mire')t.push(['対消滅'+(u.stk||0),'ch']);else if(u.id==='balza')t.push(['熱'+u.awT,'ch']);else if(!GAUGE.includes(u.id))t.push(['残'+(awN(u)-u.awT),'ch']);}}
- else{if(u.broken)t.push(['BREAK','bk']);if(u.charging)t.push(['溜め','cg']);if(u.stolen)t.push(['盗済','st']);}return t;}
+ else{if(u.charging)t.push(['溜め','cg']);if(u.stolen)t.push(['盗済','st']);}return t;}
 const tagH=u=>stTags(u).map(([l,c])=>`<span class="tg ${c}">${l}</span>`).join('');
 function refresh(){if(!B)return;const P=$('#party'),key=B.heroes.map(h=>h.id).join();
  if(P.dataset.k!==key||P.className!=='bt'){P.className='bt';P.dataset.k=key;P.innerHTML=B.heroes.map(()=>`<div class="pc"><img class="fc"><div class="nm"><span class="n"></span><div class="tgs"></div></div><div class="bars"><div class="bar hp"><i class="gh"></i><i class="fg"></i><span></span></div><div class="bar sp"><i class="fg"></i><span></span></div><div class="bar ag"><i class="fg"></i><span></span></div></div></div>`).join('');}
@@ -15,7 +15,7 @@ function refresh(){if(!B)return;const P=$('#party'),key=B.heroes.map(h=>h.id).jo
  aliveE().forEach(e=>{let el=e._el;if(!el||!el.isConnected){el=document.createElement('div');el.className='lab';el.innerHTML='<div class="n"></div><div class="hp"><b></b><i></i></div><div class="cs"></div>';el._e=e;e._el=el;L.appendChild(el);}
   el.style.left=Math.max(0,e.x*SC)+'px';el.style.top=Math.max(0,(e.y+(e.boss?-3:6))*SC-32)+'px';el.querySelector('.n').innerHTML=`${e.name} <small>Lv${e.lv}</small>`;
   const pc=e.hp/e.mhp*100;el.querySelector('.hp i').style.width=pc+'%';el.querySelector('.hp b').style.width=pc+'%';const unk=e.weak.length-e.known.size;
-  el.querySelector('.cs').innerHTML=(e.broken?'':`<span class="ch sh">◆${e.brk}</span>`)+[...e.known].map(k=>`<span class="ch el" style="background:${ELC[k]};border-color:${ELC[k]}">${k}</span>`).join('')+'<span class="ch">?</span>'.repeat(unk)+tagH(e);});
+  el.querySelector('.cs').innerHTML=[...e.known].map(k=>`<span class="ch el" style="background:${ELC[k]};border-color:${ELC[k]}">${k}</span>`).join('')+'<span class="ch">?</span>'.repeat(unk)+tagH(e);});
  const o=$('#order');o.innerHTML='';preview().slice(0,7).forEach((u,i)=>{const d=document.createElement('div');d.className='o'+(u.side?' e':'')+(u.aw?' aw':'');const c=document.createElement('canvas');c.width=c.height=18;
   const b=bbox(u.spr);c.getContext('2d').drawImage(IMG[sprKey(u)],b.x,b.y,b.w,b.h,(18-b.w)>>1,(18-b.h)>>1,b.w,b.h);d.appendChild(c);
   const hb=document.createElement('i');hb.className='ob';hb.style.width=`calc(${Math.max(0,u.hp/u.mhp*100)}% - 4px)`;d.appendChild(hb);
@@ -37,10 +37,10 @@ for(const[k,b,pal]of[['drowned','gald',{a:'#3a6a6a',A:'#1a3a3a',r:'#2a5a7a',R:'#
  ['waterslime','slime',{v:'#3a8ad0',V:'#1a4a7a',p:'#8ad0ff'}],['boss6','noah',{w:'#2a4a7a',k:'#a0d0ff',y:'#40e0ff',s:'#a0b8d0',q:'#1a2a4a',e:'#40ffff'}]]){SPR[k]=SPR[b];IMG[k]=mk(SPR[b],pal);IMG[k+'_w']=mk(SPR[b],null,'#ffffff');}
 Object.assign(EA,{deluge:{n:'大海嘯',el:'氷',k:'mag',pow:2.5,t:'all'},tide:{n:'潮の刃',el:'氷',k:'mag',pow:1.2,t:'one'}});
 Object.assign(ED,{
- drowned:{name:'溺れた近衛',mhp:260,atk:80,def:30,mag:20,res:18,spd:11,weak:['雷','光'],brk:5,xp:40,gold:30,drop:[['kiba',.3],['kakera',.2]],acts:[['slash2',.6],['claw',.4]],flip:1},
- jelly:{name:'大海月',mhp:200,atk:40,def:18,mag:84,res:16,spd:12,weak:['雷','斬'],brk:3,xp:38,gold:28,drop:[['kakera',.3]],acts:[['tide',.6],['spore',.4]]},
- waterslime:{name:'水精スライム',mhp:210,atk:66,def:26,mag:60,res:22,spd:9,weak:['雷','地'],brk:3,xp:36,gold:26,drop:[['haiseki',.5]],acts:[['claw',.5],['tide',.5]]},
- boss6:{name:'沈みし女王',mhp:14000,atk:300,def:80,mag:340,res:80,spd:16,weak:['雷','光'],brk:15,sc:3,boss:true,xp:5200,gold:6000,drop:[['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1]],
+ drowned:{name:'溺れた近衛',mhp:260,atk:80,def:30,mag:20,res:18,spd:11,weak:['雷','光'],xp:40,gold:30,drop:[['kiba',.3],['kakera',.2]],acts:[['slash2',.6],['claw',.4]],flip:1},
+ jelly:{name:'大海月',mhp:200,atk:40,def:18,mag:84,res:16,spd:12,weak:['雷','斬'],xp:38,gold:28,drop:[['kakera',.3]],acts:[['tide',.6],['spore',.4]]},
+ waterslime:{name:'水精スライム',mhp:210,atk:66,def:26,mag:60,res:22,spd:9,weak:['雷','地'],xp:36,gold:26,drop:[['haiseki',.5]],acts:[['claw',.5],['tide',.5]]},
+ boss6:{name:'沈みし女王',mhp:14000,atk:300,def:80,mag:340,res:80,spd:16,weak:['雷','光'],sc:3,boss:true,xp:5200,gold:6000,drop:[['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1]],
   ai:{every:3,charge:'deluge',acts:[['curse',.35],['tide',.35],['icewave',.3]],summon:'drowned',sumLv:36},ilv:37,flip:1}});
 const MAP6=["####################","#ooooooo#oBo#ooooCo#","#ooooooo#ooo#oooooo#","#oooCooo##o##oooooo#","#oooooooooooooooooo#","#wwwwww#wwwwww#wwww#","#wwwwww#wwwwww#wwww#","#ooooooooooooooooLo#","#oo~~~oooooooo~~~oo#","#oo~~~oo####oo~~~oo#","#oooooooo#Go#oooooo#","#ooooCooo#oo#oooooo#","#oooooooooooooooooo#","#~~~~~~~~xx~~~~~~~~#","#~~~~~~~~xx~~~~~~~~#","#ooooooooooooooooCo#","#oLoooooooooooooooo#","#oooooo##oo##oooooo#","#######oooooo#######","TTTTTT#oooooo#TTTTTT","TTTTTT#ooSooo#TTTTTT","TTTTTTTTTTTTTTTTTTTT"].map(r=>r.padEnd(20,'T').slice(0,20));
 AREAS.ouito={name:'沈んだ王都',map:MAP6,lv:[31,37],groups:[['waterslime'],['waterslime','jelly'],['drowned'],['jelly','jelly'],['drowned','waterslime'],['drowned','jelly','waterslime']],

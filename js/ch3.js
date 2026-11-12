@@ -43,13 +43,13 @@ for(const[k,b,pal]of[['raiwolf','wolf',{g:'#d8c040',G:'#7a6a20',w:'#fff8c0',x:'#
 Object.assign(EA,{arrow:{n:'狙撃',el:'突',k:'phys',pow:1.3,t:'one'},rain:{n:'五月雨射ち',el:'突',k:'phys',pow:.7,t:'all'},senju:{n:'千呪',el:'闇',k:'mag',pow:2.6,t:'all'},
  meltdown:{n:'溶鉄の奔流',el:'炎',k:'mag',pow:2.4,t:'all'},bolt:{n:'雷撃',el:'雷',k:'mag',pow:1.2,t:'one'}});
 Object.assign(ED,{
- raiwolf:{name:'雷狼',mhp:160,atk:58,def:16,mag:30,res:12,spd:15,weak:['地','氷'],brk:3,xp:24,gold:16,drop:[['kiba',.45]],acts:[['claw',.5],['bite',.3],['bolt',.2]]},
- ironslime:{name:'鉄スライム',mhp:170,atk:50,def:30,mag:20,res:14,spd:7,weak:['雷','打'],brk:3,xp:22,gold:18,drop:[['haiseki',.5]],acts:[['claw',.6],['press',.4]]},
- golemkin:{name:'鉱石ゴーレム',mhp:260,atk:60,def:28,mag:10,res:12,spd:6,weak:['雷','打'],brk:4,xp:28,gold:20,drop:[['haiseki',.5],['kakera',.1]],acts:[['slam',1]],sc:2},
- minerghost:{name:'坑道の亡者',mhp:210,atk:62,def:18,mag:30,res:14,spd:10,weak:['光','炎'],brk:4,xp:26,gold:18,drop:[['kakera',.2]],acts:[['claw',.6],['curse',.4]],flip:1},
- golemboss:{name:'黒鉄の巨像',mhp:5600,atk:330,def:66,mag:220,res:40,spd:15,weak:['雷','氷'],brk:12,sc:3,boss:true,xp:1500,gold:1500,drop:[['kakera',1],['kakera',1],['haiseki',1]],ai:{every:3,charge:'meltdown',acts:[['slam',.7],['claw',.3]],summon:'golemkin',sumLv:20},ilv:20},
- boss4:{name:'虚蝕のクロウ',mhp:8000,atk:190,def:58,mag:250,res:58,spd:13,weak:['光','雷'],brk:12,sc:3,boss:true,xp:2200,gold:2500,drop:[['kakera',1],['kakera',1],['kakera',1],['kakera',1]],ai:{every:3,charge:'senju',acts:[['curse',.4],['wave2',.3],['claw',.3]],summon:'minerghost',sumLv:22},ilv:23,flip:1},
- ernaE:{name:'弓手エルナ',mhp:4200,atk:200,def:48,mag:80,res:48,spd:17,weak:['地','氷'],brk:8,xp:900,gold:0,drop:[],acts:[['arrow',.65],['rain',.35]],flip:1,sc:2}});
+ raiwolf:{name:'雷狼',mhp:160,atk:58,def:16,mag:30,res:12,spd:15,weak:['地','氷'],xp:24,gold:16,drop:[['kiba',.45]],acts:[['claw',.5],['bite',.3],['bolt',.2]]},
+ ironslime:{name:'鉄スライム',mhp:170,atk:50,def:30,mag:20,res:14,spd:7,weak:['雷','打'],xp:22,gold:18,drop:[['haiseki',.5]],acts:[['claw',.6],['press',.4]]},
+ golemkin:{name:'鉱石ゴーレム',mhp:260,atk:60,def:28,mag:10,res:12,spd:6,weak:['雷','打'],xp:28,gold:20,drop:[['haiseki',.5],['kakera',.1]],acts:[['slam',1]],sc:2},
+ minerghost:{name:'坑道の亡者',mhp:210,atk:62,def:18,mag:30,res:14,spd:10,weak:['光','炎'],xp:26,gold:18,drop:[['kakera',.2]],acts:[['claw',.6],['curse',.4]],flip:1},
+ golemboss:{name:'黒鉄の巨像',mhp:5600,atk:330,def:66,mag:220,res:40,spd:15,weak:['雷','氷'],sc:3,boss:true,xp:1500,gold:1500,drop:[['kakera',1],['kakera',1],['haiseki',1]],ai:{every:3,charge:'meltdown',acts:[['slam',.7],['claw',.3]],summon:'golemkin',sumLv:20},ilv:20},
+ boss4:{name:'虚蝕のクロウ',mhp:8000,atk:190,def:58,mag:250,res:58,spd:13,weak:['光','雷'],sc:3,boss:true,xp:2200,gold:2500,drop:[['kakera',1],['kakera',1],['kakera',1],['kakera',1]],ai:{every:3,charge:'senju',acts:[['curse',.4],['wave2',.3],['claw',.3]],summon:'minerghost',sumLv:22},ilv:23,flip:1},
+ ernaE:{name:'弓手エルナ',mhp:4200,atk:200,def:48,mag:80,res:48,spd:17,weak:['地','氷'],xp:900,gold:0,drop:[],acts:[['arrow',.65],['rain',.35]],flip:1,sc:2}});
 ED.boss4b=Object.assign({},ED.boss4,{name:'虚蝕の残影'});ED.ernaE.solo=1;
 HB.erna={name:'エルナ',mhp:210,atk:38,def:18,mag:22,res:18,spd:14,g:{mhp:'C',atk:'A',def:'C',mag:'B',res:'C',spd:'A'},skills:['raiya','nerai','samidare']};
 HB.balza={name:'バルザ',mhp:300,atk:44,def:30,mag:8,res:18,spd:7,g:{mhp:'A',atk:'S',def:'A',mag:'D',res:'C',spd:'D'},skills:['tekkai','netsuda','shuuri']};
@@ -58,7 +58,7 @@ Object.assign(SK,{
  raiya:{n:'雷矢',sp:15,el:'雷',k:'phys',pow:1.4,t:'one',d:'雷属性の射撃'},nerai:{n:'狙い撃ち',sp:25,el:'突',k:'phys',pow:1.9,t:'one',d:'急所を狙う強射'},samidare:{n:'五月雨射ち',sp:30,el:'突',k:'phys',pow:.8,t:'all',d:'突・敵全体'},
  kantsuu:{n:'貫通射',sp:30,el:'突',k:'phys',pow:2.3,t:'one',d:'突・単体の大技'},jinrai:{n:'迅雷',sp:35,el:'雷',k:'phys',pow:1,t:'all',d:'雷・敵全体'},
  raisen:{n:'雷閃',el:'雷',k:'phys',pow:1.5,t:'one',gauge:20,d:'雷の必殺射（ゲージ20）'},juuten:{n:'充填',k:'charge',t:'self',gauge:10,d:'次の手番で天穿を撃てる（ゲージ10）'},
- tenkuu:{n:'天穿',el:'突',k:'phys',pow:4,t:'one',gauge:40,req:'charged',brkAll:1,d:'充填後に解禁・確実にブレイク（ゲージ40）'},
+ tenkuu:{n:'天穿',el:'突',k:'phys',pow:4.4,t:'one',gauge:40,req:'charged',delay:60,d:'充填後に解禁・大打撃＋行動を大きく遅らせる（ゲージ40）'},
  tekkai:{n:'鉄塊落とし',sp:20,el:'打',k:'phys',pow:1.6,t:'one',d:'打撃・単体'},netsuda:{n:'熱打',sp:20,el:'炎',k:'phys',pow:1.4,t:'one',d:'炎属性の打撃'},shuuri:{n:'応急修理',sp:20,k:'guardRegen',t:'self',d:'防御し、HP15%回復'},
  daichi:{n:'大地割り',sp:35,el:'地',k:'phys',pow:1,t:'all',d:'地・敵全体'},gouen:{n:'業炎撃',sp:35,el:'炎',k:'phys',pow:2.2,t:'one',d:'炎・単体の大技'},
  tanda:{n:'鍛打',el:'打',k:'phys',pow:1.4,t:'one',d:'打撃（熱で威力上昇）'},yakiire:{n:'焼入れ',el:'炎',k:'phys',pow:1.1,t:'all',d:'炎・敵全体'},youtetsu:{n:'溶鉄爆砕',k:'release2',t:'all',d:'星臨解除・熱を全体へ（溜めすぎると反動）'},
@@ -70,7 +70,7 @@ AW.erna={name:'天穿つ眼',type:'ゲージ消費',turns:99,cmds:['raisen','juu
 AW.balza={name:'炉心解放',type:'蓄積型',turns:5,cmds:['tanda','yakiire','youtetsu']};
 AW.crow={name:'千の呪言',type:'代償型',turns:3,cmds:['judan','hanten','shikyou']};
 const AWD={rio:'3回の行動の間、全能力+20%。ガルドの星臨後は大技を模倣できる',gald:'味方への攻撃を全て受け止め被ダメ軽減。受けた分を蓄積し「城壁崩し」で放出',mire:'1手番に2回行動。炎と氷を交互に撃つと対消滅が溜まり、3段階で大魔法',
- shion:'敵全体の行動を遅らせ、3回連続で行動。強奪でレア装備を奪う',noah:'聖域を展開。味方が毎ターン回復し、倒れても1度だけ耐える',erna:'全攻撃が会心に。充填後の「天穿」は確実にブレイク',
+ shion:'敵全体の行動を遅らせ、3回連続で行動。強奪でレア装備を奪う',noah:'聖域を展開。味方が毎ターン回復し、倒れても1度だけ耐える',erna:'全攻撃が会心に。充填後の「天穿」で敵の行動を大きく遅らせる',
  balza:'行動ごとに攻撃+15%。溶鉄爆砕で放つが、溜めすぎると反動',crow:'技をHPで払う。HPが低いほど威力上昇。HP25%以下で「死経」解禁'};
 const mkB=(star,sec,mask,s1,s2,f)=>({star,sec,mask,sp:{'2,-2':{t:'skill',v:s1},'-2,2':{t:'skill',v:s2},'0,-3':{t:'aw',v:{awTurn:1},d:'星臨の持続+1'},'3,-3':{t:'aw',v:{noRecoil:1},d:'星臨の反動を無効'},
  '3,0':{t:'fork',g:1,v:f[0][0],d:f[0][1]},'0,3':{t:'fork',g:1,v:f[1][0],d:f[1][1]},'-3,0':{t:'fork',g:2,v:f[2][0],d:f[2][1]},'-3,3':{t:'fork',g:2,v:f[3][0],d:f[3][1]}}});

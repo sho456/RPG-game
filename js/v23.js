@@ -128,7 +128,7 @@ new MutationObserver(()=>{if(scene!=='field'||!msgHidden())return;const m=$('#ms
 
 /* ==================== 4. 図鑑：専用の詳細画面とモーション再生 ====================
  一覧（敵・仲間・装備）→ タップで詳細。詳細では戦闘と同じリグ・同じポーズ定義でドット絵を動かす。
- 敵：待機／攻撃／魔法／溜め／被弾／ブレイク／撃破　仲間：待機／ダッシュ／攻撃／大技／魔法／防御／被弾／瀕死／勝利／戦闘不能／星臨 */
+ 敵：待機／攻撃／魔法／溜め／被弾／撃破　仲間：待機／ダッシュ／攻撃／大技／魔法／防御／被弾／瀕死／勝利／戦闘不能／星臨 */
 const ZK={t:'e',from:'home',cur:null,dt:'info'};
 const ZV={u:null,cv:null,raf:0,busy:0,alpha:1,white:0,label:'待機',parts:[],flip:false,shake:0,run:0};
 const RUN23={ta:.3,cr:2,fF:[-6,2.5],fN:[6.5,0],hF:[2,4],hN:[4,4],sw:2.5};
@@ -169,13 +169,13 @@ function enemyHTML(k){const d=ED[k],s=seenE(k)||DEV(),n=(G.zk.e[k]|0);if(!['info
  let body='';
  if(ZK.dt==='info'){const st=[['HP',d.mhp],['攻撃',d.atk],['防御',d.def],['魔力',d.mag],['精神',d.res],['速さ',d.spd]];
   body=`<div class="zst">${st.map(([a,v])=>`<div><small>${a}</small><b>${v}</b></div>`).join('')}</div>
-  <dl class="dl22"><dt>弱点</dt><dd>${d.weak.map(e=>ELCH(e)).join('')}</dd><dt>シールド</dt><dd>◆${d.brk}</dd><dt>落とす物</dt><dd>${[...new Set((d.drop||[]).map(([m])=>MATS[m]?MATS[m].n:m))].map(esc).join('・')||'なし'}</dd>
+  <dl class="dl22"><dt>弱点</dt><dd>${d.weak.map(e=>ELCH(e)).join('')}</dd><dt>落とす物</dt><dd>${[...new Set((d.drop||[]).map(([m])=>MATS[m]?MATS[m].n:m))].map(esc).join('・')||'なし'}</dd>
   <dt>出現</dt><dd>${habitat(k).map(esc).join('・')||'特別な戦い'}</dd>${d.xp?`<dt>報酬</dt><dd>経験値 ${d.xp}・${d.gold}G</dd>`:''}</dl>`;}
  if(ZK.dt==='sk'){const ai=d.ai,acts=(ai?ai.acts:d.acts)||[],rows=acts.map(([a,w])=>[a,Math.round(w*100)+'%']);if(ai&&ai.charge)rows.push([ai.charge,`${ai.every}ターンごとに溜めて放つ`]);
   body=`<div class="zsl">${rows.map(([a,w])=>{const e=EA[a];if(!e)return'';return`<div class="zsk"><span class="el">${e.el?ELCH(e.el):'<i class="zel" style="--c:#c8c8d8">無</i>'}</span><b>${esc(e.n)}</b><small>${e.k==='mag'?'魔法':'物理'}・${TGT[e.t]||'―'}・威力${e.pow||'―'}</small><em>${esc(w)}</em></div>`;}).join('')}</div>
-  ${ai&&ai.summon&&ED[ai.summon]?`<div class="zno">HPが半分を切ると「${esc(ED[ai.summon].name)}」を呼び出す</div>`:''}<div class="zno">弱点を突いてシールドを0にすると BREAK。溜め中にブレイクすると大技を打ち消せる。</div>`;}
+  ${ai&&ai.summon&&ED[ai.summon]?`<div class="zno">HPが半分を切ると「${esc(ED[ai.summon].name)}」を呼び出す</div>`:''}<div class="zno">弱点を突くと大きなダメージ（1.7倍）。溜めの次の手番は大技が来るので、防御で備えよう。</div>`;}
  if(ZK.dt==='dot')body=`<div class="zdots"><figure><img src="${zimg(k)}" alt=""><figcaption>図鑑用（48×48）</figcaption></figure><figure><img src="${zimg(k,1)}" alt=""><figcaption>未発見のシルエット</figcaption></figure></div><div class="zno">上の再生ボタンで、戦闘中と同じ動き（同じ骨格・同じポーズ）を確認できる。</div>`;
- const mv=[['idle','待機'],['atk','攻撃'],['cast','魔法'],['chg','溜め'],['hit','被弾'],['brk','ブレイク'],['die','撃破']];
+ const mv=[['idle','待機'],['atk','攻撃'],['cast','魔法'],['chg','溜め'],['hit','被弾'],['die','撃破']];
  return head+viewH('#3a1a3a')+motH(mv)+tabsH([['info','能力'],['sk','技'],['dot','ドット絵']])+`<div class="zbody">${body}</div>`;}
 function heroHTML(id){const j=joined(id)||DEV(),P=PROF[id],hb=HB[id];if(!['prof','art','dot','sk','aw'].includes(ZK.dt))ZK.dt='prof';
  const head=`<div class="zdn" style="--ec:${elCol(id)}">${elOf(id)?ELCH(elOf(id)):''}<b>${j?esc(hb.name):'？？？'}</b><small>${j&&G.h[id]?'Lv'+G.h[id].lv+'　'+esc(clsOf(id)):'未加入'}</small></div>`;
@@ -201,7 +201,7 @@ function equipHTML(x){const s=seenI(x)||DEV(),ik=icKey(x),L0=x.k.startsWith('set
 /* ---------- モーション再生（戦闘と同じリグ・ポーズ） ---------- */
 function zvStop(){cancelAnimationFrame(ZV.raf);ZV.raf=0;ZV.cv=null;ZV.u=null;ZV.busy=0;}
 function zvStart(c,type,key){cancelAnimationFrame(ZV.raf);const u=type==='h'?{id:key,side:0,spr:key,name:HB[key].name,x:0,y:0,sc:2,alive:true,hp:100,mhp:100,aw:false,awLv:(G.h[key]&&G.h[key].awLv)||1,guard:false,sts:[]}
-  :{kind:key,side:1,spr:key,name:ED[key].name,x:0,y:0,sc:ED[key].sc||2,alive:true,hp:100,mhp:100,boss:!!ED[key].boss,broken:false,charging:false,sts:[]};
+  :{kind:key,side:1,spr:key,name:ED[key].name,x:0,y:0,sc:ED[key].sc||2,alive:true,hp:100,mhp:100,boss:!!ED[key].boss,charging:false,sts:[]};
  let A;try{A=ANIM.setup(u);}catch(e){A={none:1};}if(A.none){const im=document.createElement('img');im.src=zimg(key);c.replaceWith(im);return;}
  Object.assign(ZV,{u,cv:c,busy:0,alpha:1,white:0,parts:[],flip:false,shake:0,label:'待機'});const loop=()=>{if(!ZV.cv||!ZV.cv.isConnected){zvStop();return;}try{zvDraw();}catch(e){console.error(e);zvStop();return;}ZV.raf=requestAnimationFrame(loop);};ZV.raf=requestAnimationFrame(loop);}
 function zvDraw(){const c=ZV.cv,u=ZV.u,dpr=Math.min(3,devicePixelRatio||1),cw=c.clientWidth,ch=c.clientHeight;if(!cw||!ch)return;const Wd=Math.round(cw*dpr),Hd=Math.round(ch*dpr);if(c.width!==Wd||c.height!==Hd){c.width=Wd;c.height=Hd;}
@@ -216,17 +216,16 @@ function zvDraw(){const c=ZV.cv,u=ZV.u,dpr=Math.min(3,devicePixelRatio||1),cw=c.
  /* 星臨のオーラ・粒子 */
  if(u.aw&&Math.random()<.5)ZV.parts.push({x:(Math.random()-.5)*14,y:0,vx:0,vy:-.35-Math.random()*.5,l:34,c:Math.random()<.3?'#ffffff':'#ffe27a',s:1});
  if(u.charging&&Math.random()<.6)ZV.parts.push({x:(Math.random()-.5)*(R.wid||22),y:0,vx:0,vy:-.8-Math.random(),l:22,c:Math.random()<.5?'#ffb030':'#ffe27a',s:1});
- if(u.broken){const t=performance.now()/260,top=gy-(R.hgt||36)*z-4*z;for(let i=0;i<3;i++){const a=t+i*2.094,xx=cx+Math.cos(a)*(R.wid||22)*.35*z,yy=top+Math.sin(a)*2*z;g.fillStyle=Math.sin(a)>0?'#ffe14a':'#c8a020';g.fillRect(xx-z,yy,3*z,z);g.fillRect(xx,yy-z,z,3*z);}}
  ZV.parts=ZV.parts.filter(p=>p.l-->0);for(const p of ZV.parts){p.x+=p.vx;p.y+=p.vy;p.vy+=p.gr||0;g.globalAlpha=Math.min(1,p.l/12);g.fillStyle=p.c;g.fillRect(Math.round(cx+p.x*z),Math.round(gy-((R.hgt||36)*(p.my||0))*z+p.y*z),p.s*z,p.s*z);}g.globalAlpha=1;}
 function burst(n,col,my=.5,sp=1.6){for(let i=0;i<n;i++){const a=Math.random()*6.283,v=.4+Math.random()*sp;ZV.parts.push({x:(ZV.flip?1:-1)*(ZV.u.side===0?1:-1)*6,y:0,my,vx:Math.cos(a)*v,vy:Math.sin(a)*v,l:16+Math.random()*12|0,c:col[i%col.length],s:i%3?1:2});}}
 const T=ms=>ANIM.T(ms);
 async function zvPlay(k){const u=ZV.u;if(!u||ZV.busy)return;ZV.busy=1;const A=ANIM.setup(u),R=A.rig,hum=R.type==='hum',dir=(u.side===0?-1:1)*(ZV.flip?-1:1);
  const lab=t=>{ZV.label=t;const e=$('#cmd .zvl');if(e)e.textContent=t;};const btn=$('#cmd').querySelector(`.zm [data-v="${k}"]`);$('#cmd').querySelectorAll('.zm button').forEach(b=>b.classList.toggle('on',b===btn));
- const reset=()=>{u.guard=false;u.hp=100;u.alive=true;u.broken=false;u.charging=false;ZV.alpha=1;};
+ const reset=()=>{u.guard=false;u.hp=100;u.alive=true;u.charging=false;ZV.alpha=1;};
  try{const nm=btn?btn.textContent:k;lab(nm);
   if(k==='idle'){reset();ANIM.idle(u,200);}
   else if(k==='low'){reset();u.hp=10;}else if(k==='down'){reset();u.alive=false;}else if(k==='guard'){reset();u.guard=true;}
-  else if(k==='chg'){reset();u.charging=true;}else if(k==='brk'){reset();u.broken=true;burst(14,['#ffe14a','#ffffff']);ZV.shake=8;}
+  else if(k==='chg'){reset();u.charging=true;}
   else if(k==='aw'){reset();u.aw=!u.aw;ANIM.setup(u);if(u.aw){await ANIM.to(u,V19.AWK,220,'back');burst(26,['#ffe27a','#ffffff','#7fd6ff'],.5,2);ZV.white=4;await T(500);}ANIM.idle(u,260);lab(u.aw?SEIRIN.n+'中':'待機');}
   else if(k==='hit'){reset();const M=ANIM.MST[A.name];await ANIM.to(u,hum?ANIM.HST.hit:(M&&M.hit)||{},60);A.kbv=-dir*5;ZV.white=4;burst(8,['#ffffff','#ffd0a0']);await T(320);ANIM.idle(u,200);}
   else if(k==='die'){reset();ZV.white=6;burst(20,['#ffffff','#c8b0ff'],.5,1);for(let i=0;i<=14;i++){ZV.alpha=1-i/14;await sleep(45);}await sleep(500);ZV.alpha=1;ANIM.idle(u,1);}
@@ -275,10 +274,10 @@ const NEWS23=`<div class="nt"><b>${VER23}</b>　戦闘画面を作り直しま�
 function dev23(m){log((m||`<b>${VER23}</b>　戦闘画面・ダメージ表示・${SEIRIN.n}演出・図鑑・探索の確認`));
  menu([{l:'戦闘：ボス＋手下',s:'配置・パーティ情報欄・ダメージ表示',cls:'ready',f:()=>devBattle([{kind:'boss2',lv:10},{kind:'moss',lv:8},{kind:'jadewolf',lv:8}],'midori',{theme:'forest'})},
   {l:'戦闘：大型ボス',s:'演技エリアに収まるか',f:()=>devBattle([{kind:'boss9',lv:60}],'ryuu',{theme:'lava'})},
-  {l:'ダメージ表示の見本',s:'Critical・Weak・Guard・Miss・BREAK',f:()=>{devBattle([{kind:'boss',lv:5},{kind:'slime',lv:5}],'haido');setTimeout(sample,1400);}},
+  {l:'ダメージ表示の見本',s:'Critical・Weak・Guard・Miss',f:()=>{devBattle([{kind:'boss',lv:5},{kind:'slime',lv:5}],'haido');setTimeout(sample,1400);}},
   {l:'図鑑（モーション再生）',f:()=>zkMenu()},{l:'探索（テキスト切り替え）',f:()=>enterField('midori')},{l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
 function sample(){if(!B)return;const e=B.enemies[0],s=B.enemies[1],h=B.heroes;let i=0;const q=[()=>pop(e,128,'#fff',false,''),()=>pop(e,864,'#fff',false,'weak','光'),()=>pop(e,2480,'#fff',false,'crit weak','打'),
-  ()=>{h[1].guard=true;pop(h[1],412,'#f88',false,'hurt');setTimeout(()=>pop(h[1],'スタン','#ffe14a',true,'st20 dn'),40);},()=>pop(h[2],'MISS','#fff',true),()=>{if(s)pop(s,'BREAK!!','#fff',false,'brk');},()=>pop(h[3],'+640','#7dffa8'),()=>{h[1].guard=false;}];
+  ()=>{h[1].guard=true;pop(h[1],412,'#f88',false,'hurt');setTimeout(()=>pop(h[1],'スタン','#ffe14a',true,'st20 dn'),40);},()=>pop(h[2],'MISS','#fff',true),()=>pop(h[3],'+640','#7dffa8'),()=>{h[1].guard=false;}];
  const go=()=>{if(i<q.length){try{q[i++]();}catch(x){}setTimeout(go,520);}};go();}
 {const _dv=dvMenu;dvMenu=function(m){_dv(m);try{addCmd(VER23+' 戦闘画面・図鑑','配置・ダメージ表示・'+SEIRIN.n+'演出・図鑑',dev23,0,'ready');}catch(e){}};}
 

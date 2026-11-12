@@ -79,19 +79,19 @@ for(const[k,b,pal]of[['firedrake','wolf',{g:'#c0402a',G:'#5a1a10',w:'#ffd080',x:
 Object.assign(EA,{dslash:{n:'竜剣・断',el:'斬',k:'phys',pow:1.6,t:'one'},dfire:{n:'黒炎',el:'炎',k:'mag',pow:1.2,t:'all'},dbreath:{n:'竜の息吹',el:'炎',k:'mag',pow:2.7,t:'all'},
  chrono:{n:'時喰らい',el:'闇',k:'mag',pow:2.8,t:'all'},ember:{n:'火の粉',el:'炎',k:'mag',pow:1.1,t:'one'}});
 Object.assign(ED,{
- firedrake:{name:'火竜の仔',mhp:270,atk:88,def:30,mag:40,res:20,spd:15,weak:['氷','突'],brk:4,xp:48,gold:34,drop:[['kiba',.5],['kakera',.2]],acts:[['claw',.5],['bite',.3],['ember',.2]]},
- lavaslime:{name:'溶岩スライム',mhp:280,atk:74,def:34,mag:70,res:24,spd:9,weak:['氷','打'],brk:3,xp:44,gold:30,drop:[['haiseki',.6]],acts:[['claw',.5],['ember',.5]]},
- dragonewt:{name:'竜兵',mhp:300,atk:92,def:36,mag:30,res:22,spd:12,weak:['雷','氷'],brk:5,xp:52,gold:38,drop:[['kiba',.3],['kakera',.25]],acts:[['dslash',.6],['claw',.4]],flip:1},
- ember:{name:'残り火',mhp:220,atk:40,def:20,mag:96,res:18,spd:14,weak:['氷','光'],brk:3,xp:46,gold:32,drop:[['kakera',.3]],acts:[['ember',.6],['dfire',.4]]},
- boss9:{name:'黒炎竜ヴォルガノン',mhp:36000,atk:580,def:120,mag:560,res:104,spd:17,weak:['氷','光'],brk:16,sc:3,boss:true,xp:14000,gold:18000,drop:[['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1]],
+ firedrake:{name:'火竜の仔',mhp:270,atk:88,def:30,mag:40,res:20,spd:15,weak:['氷','突'],xp:48,gold:34,drop:[['kiba',.5],['kakera',.2]],acts:[['claw',.5],['bite',.3],['ember',.2]]},
+ lavaslime:{name:'溶岩スライム',mhp:280,atk:74,def:34,mag:70,res:24,spd:9,weak:['氷','打'],xp:44,gold:30,drop:[['haiseki',.6]],acts:[['claw',.5],['ember',.5]]},
+ dragonewt:{name:'竜兵',mhp:300,atk:92,def:36,mag:30,res:22,spd:12,weak:['雷','氷'],xp:52,gold:38,drop:[['kiba',.3],['kakera',.25]],acts:[['dslash',.6],['claw',.4]],flip:1},
+ ember:{name:'残り火',mhp:220,atk:40,def:20,mag:96,res:18,spd:14,weak:['氷','光'],xp:46,gold:32,drop:[['kakera',.3]],acts:[['ember',.6],['dfire',.4]]},
+ boss9:{name:'黒炎竜ヴォルガノン',mhp:36000,atk:580,def:120,mag:560,res:104,spd:17,weak:['氷','光'],sc:3,boss:true,xp:14000,gold:18000,drop:[['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1]],
   ai:{every:3,charge:'dbreath',acts:[['claw',.35],['dfire',.35],['bite',.3]],summon:'firedrake',sumLv:66},ilv:68},
- valkE:{name:'竜人ヴァルク',mhp:52000,atk:620,def:150,mag:380,res:110,spd:18,weak:['氷','光'],brk:12,xp:1500,gold:0,drop:[],ai:{every:3,charge:'dbreath',acts:[['dslash',.6],['dfire',.4]]},flip:1,sc:2}});
+ valkE:{name:'竜人ヴァルク',mhp:52000,atk:620,def:150,mag:380,res:110,spd:18,weak:['氷','光'],xp:1500,gold:0,drop:[],ai:{every:3,charge:'dbreath',acts:[['dslash',.6],['dfire',.4]]},flip:1,sc:2}});
 const KBASE=[['golemboss','虚ろの巨像'],['boss5','虚ろの妖狐'],['boss3','虚ろの司祭'],['boss6','虚ろの女王']],KEL=['光','闇','炎','氷','雷','風','地','斬','打','突'];
 const kLv=f=>54+f;
 function kBoss(f){const k='kb'+f;if(ED[k])return k;const[bk,nm]=f===30?['boss7','刻喰らいの番人']:KBASE[(f/10-1)%KBASE.length],b=ED[bk],s=f/10-1;
  SPR[k]=SPR[bk];IMG[k]=mk(SPR[bk],f===30?{a:'#d8c8ff',A:'#6a5aa0',o:'#ffe27a',y:'#ffffff',u:'#ffe27a'}:greyPal(SPR[bk]));IMG[k+'_w']=mk(SPR[bk],null,'#ffffff');
  ED[k]={name:nm,mhp:Math.round(30000*(1+s*.6)),atk:Math.round(540+f*10),mag:Math.round(560+f*10),def:Math.round(112+f*1.5),res:Math.round(104+f*1.5),spd:17+Math.min(6,f/20|0),
-  weak:[KEL[(f*3)%10],KEL[(f*7+4)%10]].filter((x,i,a)=>a.indexOf(x)===i),brk:16+Math.min(6,f/20|0),sc:3,boss:true,xp:6000+f*400,gold:10000+f*500,drop:Array(6).fill(['kakera',1]),flip:b.flip,
+  weak:[KEL[(f*3)%10],KEL[(f*7+4)%10]].filter((x,i,a)=>a.indexOf(x)===i),sc:3,boss:true,xp:6000+f*400,gold:10000+f*500,drop:Array(6).fill(['kakera',1]),flip:b.flip,
   ai:{every:3,charge:f===30?'chrono':b.ai.charge,acts:b.ai.acts,summon:voidKind(b.ai.summon),sumLv:kLv(f)},ilv:kLv(f)};return k;}
 
 /* --- 虚の回廊（自動生成・無限階層・10層ごとに番人） --- */

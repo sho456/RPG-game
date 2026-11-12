@@ -14,7 +14,7 @@ ED.tower10=Object.assign({},ED.golemboss,{name:'塔の番兵',mhp:9800,atk:430,m
 ED.tower20=Object.assign({},ED.boss5,{name:'天狐の残照',mhp:14000,atk:360,mag:420,def:96,res:96,ilv:46});
 for(const[k,b,pal]of[['boss7','golem',{a:'#e8e0c0',A:'#a89060',o:'#40e0ff',y:'#ffffff',u:'#40e0ff'}],['tower10','golem',{a:'#6a7aa0',A:'#3a4a70',o:'#ff40a0',y:'#ffd0f0',u:'#ff40a0'}],['tower20','wolf',{g:'#ffe0a0',G:'#c09040',w:'#ffffff',x:'#ff4040'}]]){SPR[k]=SPR[b];IMG[k]=mk(SPR[b],pal);IMG[k+'_w']=mk(SPR[b],null,'#ffffff');}
 EA.starfall={n:'星墜とし',el:'光',k:'mag',pow:2.6,t:'all'};
-ED.boss7={name:'星核の守護者',mhp:20000,atk:360,def:96,mag:390,res:96,spd:17,weak:['闇','雷'],brk:16,sc:3,boss:true,xp:9000,gold:12000,drop:[['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1]],
+ED.boss7={name:'星核の守護者',mhp:20000,atk:360,def:96,mag:390,res:96,spd:17,weak:['闇','雷'],sc:3,boss:true,xp:9000,gold:12000,drop:[['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1]],
  ai:{every:3,charge:'starfall',acts:[['slam',.4],['wave',.3],['curse',.3]],summon:'shade',sumLv:48},ilv:50};
 function genFloor(f){const R=rng(f*977+13),Wd=20,Hd=24,g=Array.from({length:Hd},()=>Array(Wd).fill('#')),rooms=[];
  for(let i=0;i<40&&rooms.length<7;i++){const w=4+(R()*4|0),h=3+(R()*3|0),x=1+(R()*(Wd-w-2)|0),y=1+(R()*(Hd-h-2)|0);if(rooms.some(r=>x<r.x+r.w+1&&x+w+1>r.x&&y<r.y+r.h+1&&y+h+1>r.y))continue;rooms.push({x,y,w,h,cx:x+(w>>1),cy:y+(h>>1)});}

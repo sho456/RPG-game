@@ -40,7 +40,7 @@ function partyPanel(){const P=$('#party'),a=B.cur&&B.cur.side===0?B.cur:(B.lastH
  if(P._h20!==ht||!P.querySelector('.bp20')){P._h20=ht;P.className='act v20';P.innerHTML=ht;}}
 /* 狙っている敵の情報（名前・HP・属性の弱点） */
 function targetPanel(){const tp=$('#labels .tgp'),t=B.tgt;if(!tp||!t)return;const unk=t.weak.length-t.known.size,pc=Math.max(0,t.hp/t.mhp*100),tmp=(t.sts||[]).filter(s=>s.k==='weak').map(s=>s.el);
- const h=`<div class="tn20">${t.boss?'<em class="boss">BOSS</em>':'<em>TARGET</em>'}<b>${t.name}</b>${t.broken?'<span class="bk20">BREAK</span>':`<span class="sd20">◆${t.brk}</span>`}</div>
+ const h=`<div class="tn20">${t.boss?'<em class="boss">BOSS</em>':'<em>TARGET</em>'}<b>${t.name}</b></div>
   <div class="thp20"><i style="width:${pc}%"></i><u style="width:${pc}%"></u></div>
   <div class="els20">${ELS10.map(e=>{const k=t.known.has(e)&&t.weak.includes(e),tm=tmp.includes(e);return`<span class="${k?'w':''}${tm?' tm':''}" style="--c:${ELC[e]}"><i>${e}</i>${k?'<b>▲</b>':''}</span>`;}).join('')}${unk>0?`<u>?×${unk}</u>`:''}</div>
   ${(t.sts||[]).length||t.charging?`<div class="tst20">${tagH(t)}</div>`:''}`;

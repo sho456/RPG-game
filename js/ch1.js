@@ -10,11 +10,11 @@ for(const k of['mire','shroom','bookghost']){IMG[k]=mk(SPR[k]);IMG[k+'_w']=mk(SP
 for(const[k,b,pal]of[['moss','slime',{v:'#4a8a4a',V:'#2a4a2a',p:'#8ad08a'}],['jadewolf','wolf',{g:'#5a8a6a',G:'#2a4a3a',w:'#c8e8c8'}],['boss2','golem',{a:'#9a8f7a',A:'#5e574a'}]]){SPR[k]=SPR[b];IMG[k]=mk(SPR[b],pal);IMG[k+'_w']=mk(SPR[b],null,'#ffffff');}
 Object.assign(EA,{spore:{n:'胞子',el:'風',k:'mag',pow:.8,t:'all'},curse:{n:'呪詛の頁',el:'闇',k:'mag',pow:1.3,t:'one'},slam:{n:'石拳',el:'打',k:'phys',pow:1.2,t:'one'},kinju:{n:'禁呪・灰燼',el:'炎',k:'mag',pow:2.6,t:'all'}});
 Object.assign(ED,{
- moss:{name:'苔スライム',mhp:160,atk:39,def:11,mag:20,res:12,spd:7,weak:['炎','光'],brk:2,xp:12,gold:8,drop:[['haiseki',.3],['kakera',.12]],acts:[['claw',.7],['press',.3]]},
- jadewolf:{name:'翠狼',mhp:140,atk:47,def:13,mag:8,res:10,spd:14,weak:['炎','斬'],brk:3,xp:16,gold:10,drop:[['kiba',.45]],acts:[['claw',.7],['bite',.3]]},
- shroom:{name:'毒茸',mhp:180,atk:40,def:14,mag:34,res:10,spd:8,weak:['炎','斬'],brk:3,xp:15,gold:9,drop:[['haiseki',.3]],acts:[['claw',.6],['spore',.4]]},
- bookghost:{name:'魔導書の亡霊',mhp:150,atk:24,def:16,mag:46,res:8,spd:11,weak:['炎','光'],brk:3,xp:18,gold:12,drop:[['kakera',.25]],acts:[['curse',.7],['claw',.3]]},
- boss2:{name:'禁書の守護像',mhp:3000,atk:122,def:40,mag:106,res:30,spd:9,weak:['氷','雷'],brk:10,sc:3,boss:true,xp:420,gold:600,drop:[['kakera',1],['kakera',1],['kakera',1],['kakera',1]],
+ moss:{name:'苔スライム',mhp:160,atk:39,def:11,mag:20,res:12,spd:7,weak:['炎','光'],xp:12,gold:8,drop:[['haiseki',.3],['kakera',.12]],acts:[['claw',.7],['press',.3]]},
+ jadewolf:{name:'翠狼',mhp:140,atk:47,def:13,mag:8,res:10,spd:14,weak:['炎','斬'],xp:16,gold:10,drop:[['kiba',.45]],acts:[['claw',.7],['bite',.3]]},
+ shroom:{name:'毒茸',mhp:180,atk:40,def:14,mag:34,res:10,spd:8,weak:['炎','斬'],xp:15,gold:9,drop:[['haiseki',.3]],acts:[['claw',.6],['spore',.4]]},
+ bookghost:{name:'魔導書の亡霊',mhp:150,atk:24,def:16,mag:46,res:8,spd:11,weak:['炎','光'],xp:18,gold:12,drop:[['kakera',.25]],acts:[['curse',.7],['claw',.3]]},
+ boss2:{name:'禁書の守護像',mhp:3000,atk:122,def:40,mag:106,res:30,spd:9,weak:['氷','雷'],sc:3,boss:true,xp:420,gold:600,drop:[['kakera',1],['kakera',1],['kakera',1],['kakera',1]],
   ai:{every:3,charge:'kinju',acts:[['slam',.6],['curse',.4]],summon:'bookghost',sumLv:9},ilv:10}});
 ED.slime.acts=[['claw',.7],['press',.3]];ED.wolf.acts=[['claw',.7],['bite',.3]];ED.boss.ai={every:4,charge:'roar',acts:[['claw',.6],['wave',.4]],summon:'slime',sumLv:4};ED.boss.ilv=5;
 HB.mire={name:'ミレイユ',mhp:190,atk:14,def:16,mag:40,res:30,spd:11,g:{mhp:'C',atk:'D',def:'C',mag:'S',res:'A',spd:'B'},skills:['fire','blizz','flamewave']};

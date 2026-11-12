@@ -88,14 +88,14 @@ const BSTORY={
 /* --- 専用ユニーク装備（絆5話の報酬） --- */
 const UQ={rio:['灯継ぎの剣','星臨中の与ダメ+30%'],gald:['誓約の大剣','受けるダメージ-15%'],mire:['双星の魔導書','弱点を突いた魔法の与ダメ+30%'],shion:['家族の双剣','HPが満タンの敵への与ダメ+40%'],
  noah:['心灯の杖','ノアが生存中、味方全員の被ダメ-8%'],balza:['炉心の斧','炎属性の与ダメ+25%'],erna:['落ちぬ星の弓','単体攻撃の与ダメ+25%'],crow:['名を刻む大鎌','自分のHP50%以下で与ダメ+40%'],
- hakua:['雪華の手甲','連撃技の与ダメ+25%'],jin:['二人の爪','与ダメ+15%・被ダメ-10%'],celes:['千年目の砂時計','無属性魔法の与ダメ+30%'],valk:['誓鱗の竜剣','ブレイク中の敵への与ダメ+50%']};
+ hakua:['雪華の手甲','連撃技の与ダメ+25%'],jin:['二人の爪','与ダメ+15%・被ダメ-10%'],celes:['千年目の砂時計','無属性魔法の与ダメ+30%'],valk:['誓鱗の竜剣','HP半分以下の敵への与ダメ+30%']};
 for(const id in UQ)LEG['uq_'+id]={n:UQ[id][0],slot:'w',who:id,uq:1,d:'絆の専用装備：'+UQ[id][1]};
 function uqItem(id){const ilv=Math.max(30,G.h[id]?G.h[id].lv:30),it=genItem(ilv,0,0,'w',4);it.leg='uq_'+id;it.who=id;wbase(it,ilv,'星鋼');
  for(const k in it.base)it.base[k]=Math.round(it.base[k]*1.25);it.name=UQ[id][0];it.unid=false;it.uq=1;return it;}
 {const _ca=calc;calc=function(a,t,sk){const r=_ca(a,t,sk),al=a.legs||[],tl=t.legs||[];let m=1;
  if(al.length){if(al.includes('uq_rio')&&a.aw)m*=1.3;if(al.includes('uq_mire')&&r.weak&&sk.k==='mag')m*=1.3;if(al.includes('uq_shion')&&t.hp>=t.mhp)m*=1.4;
   if(al.includes('uq_balza')&&sk.el==='炎')m*=1.25;if(al.includes('uq_erna')&&sk.t==='one')m*=1.25;if(al.includes('uq_crow')&&a.hp<=a.mhp/2)m*=1.4;
-  if(al.includes('uq_hakua')&&(sk.hits>1||sk.k==='rhythm'))m*=1.25;if(al.includes('uq_jin'))m*=1.15;if(al.includes('uq_celes')&&!sk.el&&sk.k==='mag')m*=1.3;if(al.includes('uq_valk')&&t.broken)m*=1.5;}
+  if(al.includes('uq_hakua')&&(sk.hits>1||sk.k==='rhythm'))m*=1.25;if(al.includes('uq_jin'))m*=1.15;if(al.includes('uq_celes')&&!sk.el&&sk.k==='mag')m*=1.3;if(al.includes('uq_valk')&&t.hp<=t.mhp*.5)m*=1.3;}
  if(t.side===0){if(tl.includes('uq_gald'))m*=.85;if(tl.includes('uq_jin'))m*=.9;if(B&&B.heroes.some(h=>h.alive&&h.legs&&h.legs.includes('uq_noah')))m*=.92;}
  if(m!==1)r.d=Math.max(1,Math.round(r.d*m));return r;};}
 
@@ -152,7 +152,7 @@ function zkMenu(m){G.zk=G.zk||{e:{},i:{}};G.inv.forEach(zkItem);const Z=G.zk,es=
  panel(`<div class="ftabs" style="grid-template-columns:repeat(3,1fr)">${[['e','敵'],['i','装備'],['h','仲間']].map(([k,n])=>`<button class="${ZKT===k?'on':''}" data-a="tab" data-v="${k}">${n}</button>`).join('')}</div>${body}<button class="tbtn back wide" data-a="back">戻る</button>`,
  {tab:k=>{ZKT=k;zkMenu();},e:k=>zkEnemy(k),h:id=>zkHero(id),back:()=>tavern()});}
 function zkEnemy(k){const d=ED[k],n=G.zk.e[k];if(!n){log('<b>？？？</b>　まだ倒したことがない敵');return;}
- log(`<b>${d.name}</b>${d.boss?' <span style="color:#ff7a7a">BOSS</span>':''}　撃破 ${n}体<br><small>HP${d.mhp} 攻${d.atk} 防${d.def} 魔${d.mag} 精${d.res} 速${d.spd}　シールド${d.brk}</small><br>弱点：${d.weak.map(e=>`<span style="color:${ELC[e]}">${e}</span>`).join(' ')}　落とす物：${(d.drop||[]).map(([m])=>MATS[m]?MATS[m].n:m).filter((v,i,a)=>a.indexOf(v)===i).join('・')||'なし'}`);}
+ log(`<b>${d.name}</b>${d.boss?' <span style="color:#ff7a7a">BOSS</span>':''}　撃破 ${n}体<br><small>HP${d.mhp} 攻${d.atk} 防${d.def} 魔${d.mag} 精${d.res} 速${d.spd}</small><br>弱点：${d.weak.map(e=>`<span style="color:${ELC[e]}">${e}</span>`).join(' ')}　落とす物：${(d.drop||[]).map(([m])=>MATS[m]?MATS[m].n:m).filter((v,i,a)=>a.indexOf(v)===i).join('・')||'なし'}`);}
 function zkHero(id){if(!G.members.includes(id)){log('<b>？？？</b>　加入条件：'+PROF[id][3]);return;}const P=PROF[id];
  talk([[id,'n',`${HB[id].name}。${P[0]}。${P[1]}。`],[id,'h',P[2]+'――そんなふうに見えているなら、それでいい。']],()=>zkMenu());}
 

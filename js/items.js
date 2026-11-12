@@ -4,7 +4,7 @@ const SLOTN={w:'武器',sub:'副装備',head:'頭',body:'体',acc1:'装飾1',acc
 const SLOTS6=['w','sub','head','body','acc1','acc2'];
 const OPS={atkP:['攻撃','%',3,10],defP:['防御','%',3,10],magP:['魔力','%',3,10],resP:['精神','%',3,10],mhpP:['最大HP','%',4,12],spd:['素早さ','+',.3,1.2],
  crit:['会心率','%',2,8],weakDmg:['弱点ダメ','%',8,25],startAG:['開始時AG','+',8,25],awDmg:['星臨中与ダメ','%',8,30],spGain:['攻撃時SP','+',3,10],drop:['ドロップ率','%',3,10]};
-const LEG={koukagari:{n:'流星の後篝',slot:'acc',d:'星臨が解けるときAG50を残す'},shokei:{n:'処刑人の刃',slot:'w',who:'rio',d:'ブレイク中の敵への与ダメ×2.0'},futago:{n:'双子星の首飾り',slot:'acc',d:'共鳴技の威力2倍'}};
+const LEG={koukagari:{n:'流星の後篝',slot:'acc',d:'星臨が解けるときAG50を残す'},shokei:{n:'処刑人の刃',slot:'w',who:'rio',d:'弱点を突いたときの与ダメ×1.3'},futago:{n:'双子星の首飾り',slot:'acc',d:'共鳴技の威力2倍'}};
 const BN={atk:'攻',def:'防',res:'精',mag:'魔',mhp:'HP',spd:'速'};
 const MATL=l=>l<=2?'銅':l<=5?'鉄':l<=9?'鋼':'星鋼';
 const grp=s=>s.startsWith('acc')?'acc':s;
@@ -75,7 +75,7 @@ Object.assign(SK,{
 const JOBS={kenshi:{n:'剣士',d:'物理で押し切る',sk:[[1,'nidan'],[4,'reppu']],ps:[[7,{atkP:8},'攻撃+8%'],[10,{crit:5},'会心率+5%']]},
  juukishi:{n:'重騎士',d:'仲間を守る',sk:[[1,'kabau'],[4,'teppeki']],ps:[[7,{defP:10},'防御+10%'],[10,{mhpP:10},'最大HP+10%']]},
  iyashi:{n:'癒し手',d:'回復と支援',sk:[[1,'cure'],[4,'recover']],ps:[[7,{resP:10},'精神+10%'],[10,{spGain:5},'攻撃時SP+5']]},
- kariudo:{n:'狩人',d:'弱点を射抜く',sk:[[1,'hikariya'],[3,'tsuchiya']],ps:[[7,{weakDmg:15},'弱点ダメ+15%'],[10,{brkPlus:1},'ブレイク削り+1']]}};
+ kariudo:{n:'狩人',d:'弱点を射抜く',sk:[[1,'hikariya'],[3,'tsuchiya']],ps:[[7,{weakDmg:15},'弱点ダメ+15%'],[10,{weakDmg:10},'弱点ダメ+10%']]}};
 const jobNext=l=>4+l*3;
 const HEXD=[[1,0],[1,-1],[0,-1],[-1,0],[-1,1],[0,1]];
 const SBASE={atkP:4,defP:4,mhpP:5,resP:4,magP:5,spd:.3,crit:3,weakDmg:8,startAG:8,awDmg:10,spGain:3};

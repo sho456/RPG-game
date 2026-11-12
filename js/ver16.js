@@ -1,4 +1,4 @@
-/* ===== ver0.16 音と絵：エリア別BGM・星臨BGM切替・戦闘キャラ48×48ドット・ボスの部位破壊演出 ===== */
+/* ===== ver0.16 音と絵：エリア別BGM・星臨BGM切替・戦闘キャラ48×48ドット・（部位破壊は ver0.25 で削除）===== */
 
 /* ---------- 1. 戦闘キャラの高解像度ドット（48×48／ボスは64×64） ----------
  元の16×16ドットをScale3x（ボスはScale2x×2）で描き起こし、
@@ -31,7 +31,6 @@ drawUnit=function(u){
  let img=u._hi?(fl?u._hiW:u._hi):hiImg(src,hiN(u),!fl);
  u.ox+=(u.tox-u.ox)*.18;const s=16*u.sc;let x=u.x+Math.round(u.ox),y=u.y;
  if(u.side===1&&u.alive)y+=Math.round(Math.sin(tick/20+u.x)*1);
- if(u.side===1&&u.broken){x+=Math.sin(tick/3)>0?1:0;}
  ctx.fillStyle='rgba(0,0,0,.3)';ctx.fillRect(x+s*.2,y+s-2,s*.6,2);
  if(u.side===0&&!u.alive){ctx.globalAlpha=.55;ctx.save();ctx.translate(x+s/2,y+s-4);ctx.rotate(-Math.PI/2);ctx.drawImage(img,-s/2,-s/2+4,s,s);ctx.restore();ctx.globalAlpha=1;return;}
  if(u.side&&ED[u.kind]&&ED[u.kind].flip){ctx.save();ctx.translate(x+s,y);ctx.scale(-1,1);ctx.drawImage(img,0,0,s,s);ctx.restore();}else ctx.drawImage(img,x,y,s,s);ctx.globalAlpha=1;
@@ -42,34 +41,12 @@ const bK=()=>Math.max(2,Math.min(6,Math.round(SC*(window.devicePixelRatio||1))))
 {const _draw=draw;draw=function(){const k=scene==='battle'?bK():1;if(cv.width!==W*k||cv.height!==H*k){cv.width=W*k;cv.height=H*k;}
  ctx.setTransform(k,0,0,k,0,0);ctx.imageSmoothingEnabled=false;_draw();if(scene==='battle'&&B&&B.deb&&B.deb.length)drawDeb();};}
 
-/* ---------- 2. ボスの部位破壊演出 ----------
- ボスをブレイクするたびに部位（頭部→右腕→左腕）が1つずつ砕ける。
- 砕けた部位はドットが欠け、破片が飛び散る。部位1つにつき攻撃・魔力-10% */
-const PARTS=[['頭部',[.22,0,.78,.36]],['右腕',[0,.3,.34,.78]],['左腕',[.66,.3,1,.78]]];
+/* ---------- 2. 破片の描画（B.deb）----------
+ ver0.25：ブレイク廃止に伴い、ボスの部位破壊は削除。破片の描画処理のみ残す */
 function drawDeb(){ctx.save();B.deb=B.deb.filter(d=>{d.x+=d.vx;d.y+=d.vy;d.vy+=.11;d.l--;if(d.y>d.fy&&d.vy>0){d.y=d.fy;d.vy*=-.3;d.vx*=.55;}
  ctx.globalAlpha=Math.min(1,d.l/18);ctx.fillStyle=d.c;ctx.fillRect(d.x,d.y,d.z,d.z);return d.l>0;});ctx.restore();}
-function sfxPart(){if(!AC)return;tone(90,.4,'sawtooth',.09,30);setTimeout(()=>tone(1500,.08,'square',.04,300),40);setTimeout(()=>tone(700,.12,'square',.04,120),140);noiseHit(.25,.12,600);}
 function noiseHit(d,v,hp){if(!AC)return;const t=AC.currentTime,s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();s.buffer=noiseBuf();f.type='highpass';f.frequency.value=hp;
  g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0008,t+d);s.connect(f).connect(g).connect(AC.destination);s.start(t);s.stop(t+d+.02);}
-async function partBreak(e){const i=e.pb||0;if(i>=PARTS.length)return;e.pb=i+1;const N=hiN(e),[pn,fr]=PARTS[i];
- if(!e._hi){const c=document.createElement('canvas');c.width=c.height=N;c.getContext('2d').drawImage(hiImg(IMG[sprKey(e)],N,true),0,0);e._hi=c;}
- const bb=bbox(e.spr),f=N/16,bx=bb.x*f,by=bb.y*f,bw=bb.w*f,bh=bb.h*f,x0=Math.round(bx+fr[0]*bw),y0=Math.round(by+fr[1]*bh),x1=Math.round(bx+fr[2]*bw),y1=Math.round(by+fr[3]*bh);
- const g=e._hi.getContext('2d'),id=g.getImageData(0,0,N,N),p=id.data,R=rng(e.kind.length*31+i*7+e.lv),cx=(x0+x1)/2,cy=(y0+y1)/2,rad=Math.max(1,Math.max(x1-x0,y1-y0)/2);
- const s=16*e.sc,ds=s/N,flip=ED[e.kind]&&ED[e.kind].flip,deb=B.deb||(B.deb=[]),gone=new Uint8Array(N*N);
- for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++){const k=(y*N+x)*4;if(p[k+3]<20)continue;const dd=Math.hypot(x-cx,y-cy)/rad+R()*.45-Math.abs(Math.sin(x*1.7+y*.9))*.25;
-  if(dd<.85){if(R()<.3&&deb.length<160){const sx=e.x+(flip?N-1-x:x)*ds,sy=e.y+y*ds;deb.push({x:sx,y:sy,vx:(sx-(e.x+s/2))*.035+(R()-.5)*1.4,vy:-1.1-R()*1.8,l:55+R()*35|0,fy:e.y+s-3+R()*12,c:`rgb(${p[k]},${p[k+1]},${p[k+2]})`,z:ds*(R()<.4?3:2)});}
-   p[k+3]=0;gone[y*N+x]=1;}}
- for(let y=Math.max(0,y0-2);y<Math.min(N,y1+2);y++)for(let x=Math.max(0,x0-2);x<Math.min(N,x1+2);x++){const k=(y*N+x)*4;if(p[k+3]<20)continue;
-  let near=false;for(let dy=-2;dy<=2&&!near;dy++)for(let dx=-2;dx<=2;dx++){const xx=x+dx,yy=y+dy;if(xx>=0&&yy>=0&&xx<N&&yy<N&&gone[yy*N+xx]){near=true;break;}}
-  if(near){const hot=R()<.25;p[k]=hot?255:p[k]*.42;p[k+1]=hot?150:p[k+1]*.38;p[k+2]=hot?60:p[k+2]*.42;}}
- g.putImageData(id,0,0);e._hiW=whiteOf(e._hi);
- e.atk=Math.round(e.atk*.9);e.mag=Math.round(e.mag*.9);
- const pcx=e.x+(flip?N-cx:cx)*ds,pcy=e.y+cy*ds;for(let r=0;r<3;r++)B.fx.push({x:pcx,y:pcy,t:-r*3,m:true,c:r?'#ffd080':'#ff7a30'});
- B.shake=20;B.flashBg=12;B.flashCol='#ffb070';sfxPart();
- const el=document.createElement('div');el.className='pbrk';el.innerHTML=`部位破壊！<small>${e.name}の${pn}が砕けた　攻撃・魔力-10%</small>`;$('#stage').appendChild(el);setTimeout(()=>el.remove(),1500);
- pop(e,pn+'破壊','#ffb070',true);log(`<b>部位破壊！</b> ${e.name}の${pn}が砕け散った（攻撃・魔力-10%　${e.pb}/${PARTS.length}）`);await wait(650);}
-{const _db=doBreak;doBreak=async function(t,a){const go=t&&t.side===1&&t.boss&&(t.pb||0)<PARTS.length;await _db(t,a);if(go&&t.alive&&B&&!B.over)await partBreak(t);};}
-{const _st=stTags;stTags=function(u){const t=_st(u);if(u.side===1&&u.boss&&u.pb)t.push(['破壊'+u.pb+'/'+PARTS.length,'bk']);return t;};}
 
 /* ---------- 3. BGM（Web Audioで即時生成するチップチューン） ----------
  拠点／フィールド（エリア別・虚蝕化は変調）／通常戦闘／ボス戦／ラスボス／星臨中／勝利 */
@@ -142,7 +119,6 @@ setInterval(()=>{const t=$('#ttap');if(t)t.style.display=AC&&AC.state==='running
 /* ---------- 開発者メニュー ---------- */
 function dev16(m){BGM.force=null;log((m||'<b>ver0.16 音と絵</b>')+`<br><small>BGM：${BGM.on?'ON':'OFF'}　再生中：${BGMN[BGM.key]||BGM.key||'なし'}</small>`);
  menu([{l:'BGMを試聴する',cls:'ready',s:'エリア別・戦闘・星臨など全'+Object.keys(BGMN).length+'曲',f:()=>bgmList()},
-  {l:'ボス戦で部位破壊を見る',s:'氷華の妖狐（ブレイクで部位が砕ける）',f:()=>devBattle([{kind:'boss5',lv:30}],'kouka')},
   {l:'ラスボス戦BGMを聴く',s:'多段階戦の形式で沈みし女王と戦う',f:()=>devBattle([{kind:'boss6',lv:37}],'ouito',{stages:['boss6']})},
   {l:'48×48ドット一覧',s:'仲間の描き直したドット',f:()=>sprGal()},{l:'BGM　'+(BGM.on?'ON → OFF':'OFF → ON'),f:()=>{bgmToggle();dev16();}},{l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
 function bgmList(){log('<b>BGM試聴</b>　選ぶと再生（戻ると通常に戻る）'+(BGM.force?`<br>♪ ${BGMN[BGM.force]}`:''));

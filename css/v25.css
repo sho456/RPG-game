@@ -24,16 +24,16 @@
 #app.v25[data-sc="battle"] #bbar{position:absolute;z-index:4;left:max(8px,var(--sal));right:max(8px,var(--sar));bottom:calc(var(--sab) + 6px);margin:0 !important;padding:0 !important;
  grid-template-columns:46px 1fr 1fr 1fr !important;gap:6px !important}
 /* 技リスト・行動中キャラのパネル：自分の番だけ表示 */
-#app.v25[data-sc="battle"] #cmd{position:absolute;z-index:4;left:max(6px,var(--sal));right:max(6px,var(--sar));bottom:calc(var(--sab) + 6px + 46px + 6px);height:var(--cm25,176px);margin:0;padding:0 !important;flex:none}
-#app.v25[data-sc="battle"] #bp24{position:absolute;z-index:4;left:max(6px,var(--sal));right:max(6px,var(--sar));bottom:calc(var(--sab) + 6px + 46px + 6px + var(--cm25,176px) + 4px);margin:0 !important;height:76px}
+#app.v25[data-sc="battle"] #cmd{position:absolute;z-index:4;left:max(6px,var(--sal));right:max(6px,var(--sar));bottom:calc(var(--sab) + var(--bbo25,4px) + var(--bbh25,34px) + 6px);height:var(--cm25,176px);margin:0;padding:0 !important;flex:none}
+#app.v25[data-sc="battle"] #bp24{position:absolute;z-index:4;left:max(6px,var(--sal));right:max(6px,var(--sar));bottom:calc(var(--sab) + var(--bbo25,4px) + var(--bbh25,34px) + 6px + var(--cm25,176px) + 4px);margin:0 !important;height:76px}
 #app.v25[data-sc="battle"] #cmd,#app.v25[data-sc="battle"] #bp24,#app.v25[data-sc="battle"] #hl24{transition:opacity .16s ease,transform .2s cubic-bezier(.2,.9,.3,1)}
 #app.v25[data-sc="battle"]:not(.my25) #cmd,#app.v25[data-sc="battle"]:not(.my25) #bp24{opacity:0;transform:translateY(14px);pointer-events:none;visibility:hidden;transition:opacity .14s ease,transform .14s ease,visibility 0s .14s}
 #app.v25[data-sc="battle"]:not(.hl25) #hl24{opacity:0;pointer-events:none;transition:opacity .35s ease}
 #app.v25[data-sc="battle"]:not(.hl25) #hl24 .hl{pointer-events:none}
 /* 操作部の背後をわずかに暗くして、戦場の上でも読みやすく */
-#app.v25[data-sc="battle"]::after{content:'';position:absolute;left:0;right:0;bottom:0;height:calc(var(--sab) + 58px);z-index:3;pointer-events:none;
+#app.v25[data-sc="battle"]::after{content:'';position:absolute;left:0;right:0;bottom:0;height:calc(var(--sab) + 44px);z-index:3;pointer-events:none;
  background:linear-gradient(180deg,rgba(2,5,12,0),rgba(2,5,12,.72) 55%,rgba(2,5,12,.9))}
-#app.v25[data-sc="battle"].my25::after{height:calc(var(--sab) + 58px + var(--cm25,176px) + 92px);transition:height .2s}
+#app.v25[data-sc="battle"].my25::after{height:calc(var(--sab) + 44px + var(--cm25,176px) + 96px);transition:height .2s}
 @media (max-height:700px){#app.v25{--cm25:150px}}
 @media (max-height:620px){#app.v25{--cm25:126px}}
 @media (min-height:800px){#app.v25{--cm25:182px}}
@@ -320,3 +320,24 @@
 .fs25 .fl25:nth-last-child(2){top:-17px}
 .fs25 .fl25:nth-last-child(3){top:-34px}
 .fs25 .fl25{transition:top .18s ease-out}
+
+/* ==================== ver0.25 改訂5 ==================== */
+/* AUTO 等の下のボタン：見た目は小さく（高さ34px・幅は最大330px・中央寄せ）、タップ範囲は上下に広げて44px相当を確保 */
+#app.v25{--bbh25:34px;--bbo25:4px}
+#app.v25[data-sc="battle"] #bbar{left:50%;right:auto;width:min(330px,calc(100% - 16px));transform:translateX(-50%);bottom:calc(var(--sab) + var(--bbo25));
+ grid-template-columns:38px 1fr 1fr 1fr !important;gap:5px !important}
+#app.v25 #bbar.v22 button{position:relative;height:var(--bbh25);font-size:12px;letter-spacing:0;line-height:1.05;padding:0 2px}
+#app.v25 #bbar.v22 button::before{content:'';position:absolute;left:-2px;right:-2px;top:-6px;bottom:-4px}
+#app.v25 #bbar.v22 button small{font-size:8px;line-height:1.1;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+#app.v25 #bbar.v22 .spd{border-radius:6px}
+#app.v25 #bbar.v22 .spd b{font-size:13px}
+#app.v25 #bbar.v22 .spd .ic22{width:12px;height:12px}
+#app.v25 #bbar.v22 .au,#app.v25 #bbar.v22 .rp{clip-path:polygon(6px 0,calc(100% - 6px) 0,100% 50%,calc(100% - 6px) 100%,6px 100%,0 50%)}
+#app.v25 #bbar.v22 .au::before,#app.v25 #bbar.v22 .rp::before{display:none}
+/* clip-path の付いたボタンは外側の当たり判定を作れないので、親の行に余白を持たせて押しやすく */
+#app.v25[data-sc="battle"] #bbar{padding:6px 0 4px !important;margin-bottom:-4px !important}
+@media (max-width:360px){#app.v25 #bbar.v22 button{font-size:11px}}
+/* Critical：数字は通常と同じ（大きさ・色・動き）。見出し「Critical」だけが金色で軽く弾む。残像・光条・光の輪は廃止 */
+.p24.crit .in{animation:none}
+.p24.crit .in::before{display:none}
+.p24 .nm.ec,.p24 .fx{display:none}

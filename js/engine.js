@@ -64,9 +64,9 @@ const AW={rio:{name:'灯星継承',type:'ターン制',turns:3,cmds:['seikou','r
  gald:{name:'不落城塞',type:'蓄積型',turns:4,cmds:['tettsui','kenshu','houkai']}};
 const EA={claw:{n:'攻撃',el:'斬',k:'phys',pow:1,t:'one'},bite:{n:'噛みつき',el:'突',k:'phys',pow:1.4,t:'one'},press:{n:'のしかかり',el:'打',k:'phys',pow:1.25,t:'one'},
  wave:{n:'虚の波動',el:'闇',k:'mag',pow:1.15,t:'all'},roar:{n:'虚滅の咆哮',el:'闇',k:'mag',pow:3.0,t:'all'}};
-const ED={slime:{name:'虚蝕スライム',mhp:150,atk:34,def:10,mag:16,res:14,spd:7,weak:['光','打'],brk:2,xp:10,gold:6,drop:[['haiseki',.25],['kakera',.12]]},
- wolf:{name:'灰狼',mhp:130,atk:40,def:12,mag:8,res:10,spd:13,weak:['地','斬'],brk:3,xp:14,gold:9,drop:[['kiba',.4],['haiseki',.2]]},
- boss:{name:'虚ろの番人',mhp:1250,atk:62,def:26,mag:54,res:20,spd:10,weak:['光','打'],brk:8,sc:3,boss:true,xp:150,gold:200,drop:[['kakera',1],['kakera',1],['kakera',1]]}};
+const ED={slime:{name:'虚蝕スライム',mhp:150,atk:34,def:10,mag:16,res:14,spd:7,weak:['光','打'],xp:10,gold:6,drop:[['haiseki',.25],['kakera',.12]]},
+ wolf:{name:'灰狼',mhp:130,atk:40,def:12,mag:8,res:10,spd:13,weak:['地','斬'],xp:14,gold:9,drop:[['kiba',.4],['haiseki',.2]]},
+ boss:{name:'虚ろの番人',mhp:1250,atk:62,def:26,mag:54,res:20,spd:10,weak:['光','打'],sc:3,boss:true,xp:150,gold:200,drop:[['kakera',1],['kakera',1],['kakera',1]]}};
 const HB={rio:{name:'リオ',mhp:240,atk:36,def:20,mag:28,res:22,spd:12,g:{mhp:'B',atk:'B',def:'B',mag:'B',res:'B',spd:'B'},skills:['koujin','harai','teate']},
  gald:{name:'ガルド',mhp:330,atk:31,def:32,mag:8,res:24,spd:8,g:{mhp:'S',atk:'B',def:'S',mag:'D',res:'A',spd:'D'},skills:['tateuchi','chiretsu','chouhatsu']}};
 const GR={S:.09,A:.08,B:.07,C:.06,D:.05};
@@ -78,12 +78,14 @@ const MATS={haiseki:{n:'灰石',p:10},kiba:{n:'獣の牙',p:15},kakera:{n:'虚�
 const nextXP=l=>Math.round(15*Math.pow(l,1.5));
 function stats(id){const b=HB[id],s=G.h[id],o={},g=gear(id),bo=bonus(id);for(const k in bo)g[k]=(g[k]||0)+bo[k];for(const k of['mhp','atk','def','mag','res','spd']){const v=b[k]*(1+GR[b.g[k]]*(k==='spd'?.3:1)*(s.lv-1))+(g[k]||0);o[k]=k==='spd'?+v.toFixed(2):Math.round(v);}
  for(const k of['atk','def','mag','res','mhp'])if(g[k+'P'])o[k]=Math.round(o[k]*(1+g[k+'P']/100));
- return Object.assign(o,{crit:g.crit||0,weakDmg:g.weakDmg||0,startAG:g.startAG||0,awDmg:g.awDmg||0,spGain:g.spGain||0,drop:g.drop||0,atkEl:g.atkEl||null,legs:g.legs,awTurn:g.awTurn||0,noRecoil:g.noRecoil||0,storeUp:g.storeUp||0,brkPlus:g.brkPlus||0,gaugeSave:g.gaugeSave||0});}
+ return Object.assign(o,{crit:g.crit||0,weakDmg:g.weakDmg||0,startAG:g.startAG||0,awDmg:g.awDmg||0,spGain:g.spGain||0,drop:g.drop||0,atkEl:g.atkEl||null,legs:g.legs,awTurn:g.awTurn||0,noRecoil:g.noRecoil||0,storeUp:g.storeUp||0,gaugeSave:g.gaugeSave||0});}
 function hero(id){const s=stats(id),b=HB[id],pos={x:0,y:0};const hp=G.h[id].hp==null?s.mhp:Math.min(s.mhp,G.h[id].hp);
  return Object.assign({id,side:0,spr:id,name:b.name,skills:skillList(id),sp:50,ag:Math.min(100,s.startAG+(s.legs.includes('senkou')?50:0)),elem:MAG(id)?null:'斬',alive:hp>0,aw:false,awT:0,store:0,taunt:0,ox:0,tox:0,flash:0,sc:2},s,pos,{hp,awLv:G.h[id].awLv||1,awDmg:s.awDmg+((G.h[id].awLv||1)-1)*10});}
 function enemy(kind,lv,x,y,suf=''){const d=ED[kind],L=d.boss?0:lv-1,M={mhp:.7+.17*L,atk:1+.14*L,mag:1+.14*L,def:.8+.1*L,res:.8+.1*L};
- const e={kind,lv,side:1,spr:kind,name:d.name+suf,weak:d.weak,boss:d.boss,brkMax:d.brk,brk:d.brk,known:new Set(G.known[kind]||[]),broken:false,charging:false,turn:0,x,y,ox:0,tox:0,flash:0,fade:0,sc:d.sc||2,alive:true,spd:d.spd};
- for(const k of['mhp','atk','def','mag','res'])e[k]=Math.round(d[k]*M[k]);e.hp=e.mhp;return e;}
+ const e={kind,lv,side:1,spr:kind,name:d.name+suf,weak:d.weak,boss:d.boss,known:new Set(G.known[kind]||[]),charging:false,turn:0,x,y,ox:0,tox:0,flash:0,fade:0,sc:d.sc||2,alive:true,spd:d.spd};
+ for(const k of['mhp','atk','def','mag','res'])e[k]=Math.round(d[k]*M[k]);e.mhp=Math.max(1,Math.round(e.mhp*(d.boss?.93:.88)));
+ /* ver0.25：ブレイク（被ダメ1.5倍・行動遅延・溜め打ち消し）と部位破壊（攻撃・魔力-10%×3）の廃止に合わせ、HPを通常-12%・ボス-7%、ボスの攻撃・魔力を-4% */
+ if(d.boss){e.atk=Math.round(e.atk*.96);e.mag=Math.round(e.mag*.96);}e.hp=e.mhp;return e;}
 
 /* ===== 戦闘 ===== */
 let B=null,G=null,F=null,speed=1,auto=false;
@@ -123,8 +125,8 @@ async function run(){
 
 function calc(a,t,sk){const phys=sk.k!=='mag';const D=st(t,phys?'def':'res');
  let d=(sk.fixed!=null?sk.fixed:st(a,phys?'atk':'mag')*sk.pow)-D*.5;d=Math.max(1,d);
- let weak=false;if(t.weak&&sk.el&&t.weak.includes(sk.el)){d*=1.5*(1+(a.weakDmg||0)/100);weak=true;}if(!phys&&a.legs&&a.legs.includes('taiyou'))d*=1.25;
- if(t.broken)d*=a.legs&&a.legs.includes('shokei')?2:1.5;if(a.aw&&a.awDmg)d*=1+a.awDmg/100;if(a.aw&&a.id==='crow')d*=1+(1-a.hp/a.mhp)*1.5;const crit=(a.aw&&a.id==='erna')||Math.random()<.06+(a.crit||0)/100;if(crit)d*=1.5;d*=.95+Math.random()*.1;return{d:Math.round(d),weak,crit};}
+ let weak=false;if(t.weak&&sk.el&&t.weak.includes(sk.el)){d*=1.7*(1+(a.weakDmg||0)/100);weak=true;}if(!phys&&a.legs&&a.legs.includes('taiyou'))d*=1.25;
+ if(weak&&a.legs&&a.legs.includes('shokei'))d*=1.3;if(a.aw&&a.awDmg)d*=1+a.awDmg/100;if(a.aw&&a.id==='crow')d*=1+(1-a.hp/a.mhp)*1.5;const crit=(a.aw&&a.id==='erna')||Math.random()<.06+(a.crit||0)/100;if(crit)d*=1.5;d*=.95+Math.random()*.1;return{d:Math.round(d),weak,crit};}
 
 function hurt(t,d){if(t.side===0){if(t.legs){if(t.legs.includes('kagerou')&&!t._dodge){t._dodge=1;setTimeout(()=>pop(t,'MISS','#ffffff',true),50);return 0;}if(t.legs.includes('gyokuza'))d*=.85;}if(t.guard)d*=.5;if(t.id==='gald'&&t.aw){t.store+=d*(t.kenshu?1.5:1)*(1+(t.storeUp||0)/100);d*=.55;if(t.kenshu)d*=.5;}
   d=Math.max(1,Math.round(d));if(!t.aw)t.ag=Math.min(100,t.ag+d/t.mhp*60);}
@@ -139,15 +141,11 @@ async function hit(a,t,sk){
  pop(t,d,r.crit?'#ffe14a':r.weak?'#ffb030':(t.side===0?'#ff8a8a':'#ffffff'),false,(r.crit?'crit ':'')+(r.weak?'weak ':'')+(t.side===0?'hurt':''),sk.el);comboAdd(d);
  if(r.weak)SFX.weak();else SFX.hit();if(r.crit)B.fx.push({x:t.x+8*t.sc,y:t.y+8*t.sc,t:0,m:true,c:'#ffe14a'});
  if(r.crit)B.shake=6;
- if(a.side===0){if(!a.aw)a.ag=Math.min(100,a.ag+6+(r.weak?8:0)+(r.crit?4:0));
-  if(r.weak){t.known.add(sk.el);G.known[t.kind]=[...t.known];if(!t.broken&&t.hp>0){t.brk-=1+(a.brkPlus||0);if(t.brk<=0)await doBreak(t,a);}}}
+ if(a.side===0){if(!a.aw)a.ag=Math.min(100,a.ag+6+(r.weak?10:0)+(r.crit?4:0));
+  if(r.weak){t.known.add(sk.el);G.known[t.kind]=[...t.known];}}
  refresh();
  if(t.hp<=0)await kill(t);return d;}
 
-async function doBreak(t,a){t.broken=true;t.brk=0;t.ct+=(t.boss?45:100)/t.spd;SFX.brk();B.shake=12;pop(t,'BREAK!!','#ffffff',false,'brk');
- if(!a.aw)a.ag=Math.min(100,a.ag+20);
- if(t.charging){t.charging=false;log(`<b>ブレイク！</b> ${t.name}の溜めを打ち消した！`);}else log(`<b>ブレイク！</b> ${t.name}の体勢が崩れた（被ダメ1.5倍）`);
- await wait(350);}
 
 async function kill(t){if(t.side===0&&t.legs&&t.legs.includes('kiseki')&&!t._ks){t._ks=1;t.hp=Math.round(t.mhp*.3);pop(t,'奇跡！','#ffe27a');log(`${t.name}は奇跡の指輪で立ち上がった！`);refresh();return;}t.alive=false;
  if(t.side){t.fade=24;SFX.ko();log(`${t.name}を倒した！`);}
@@ -216,7 +214,7 @@ async function doAction(u,sk,t){
  u.sp-=sk.sp||0;u.tox=-10;B.combo={n:0,tot:0};
  if(sk.gauge){u.ag=Math.max(0,u.ag-(sk.gauge-(u.gaugeSave||0)-((u.awLv||1)-1)*3));if(u.lastEl&&sk.el!==u.lastEl){u.stk=Math.min(3,(u.stk||0)+1);pop(u,'対消滅'+u.stk,'#ffb030',true);}u.lastEl=sk.el;}if(sk.gaugeAll)u.ag=0;if(sk.hpCost){const c=Math.round(u.mhp*sk.hpCost);u.hp=Math.max(1,u.hp-c);pop(u,'-'+c,'#b07cff',true);}if(sk.req==='charged')u.charged=0;log(`${u.name}の${sk.n}！`);refresh();await wait(180);
  const ts=sk.t==='all'?aliveE():[t&&t.alive?t:aliveE()[0]];
- for(const e of ts){if(!e)continue;let s2=sk.auto?{...sk,el:sk.auto.find(x=>e.weak.includes(x))||sk.el}:sk;if(sk.basic&&u.legs&&u.legs.includes('tenkyuu'))s2={...s2,hits:2};for(let i=0;i<(s2.hits||1)&&e.alive;i++){const dd=await hit(u,e,s2);if(sk.drain&&dd){const v=Math.round(dd*sk.drain);u.hp=Math.min(u.mhp,u.hp+v);pop(u,'+'+v,'#7dffa8',true);}if(sk.hits)await wait(120);}if(sk.brkAll&&e.alive&&!e.broken){e.brk=0;await doBreak(e,u);}if(sk.steal&&e.alive)doSteal(u,e,sk.steal);if(sk.delay&&e.alive){e.ct+=sk.delay*(e.boss?.4:1)/e.spd;pop(e,'DELAY','#7fd6ff',true);}await wait(140);}
+ for(const e of ts){if(!e)continue;let s2=sk.auto?{...sk,el:sk.auto.find(x=>e.weak.includes(x))||sk.el}:sk;if(sk.basic&&u.legs&&u.legs.includes('tenkyuu'))s2={...s2,hits:2};for(let i=0;i<(s2.hits||1)&&e.alive;i++){const dd=await hit(u,e,s2);if(sk.drain&&dd){const v=Math.round(dd*sk.drain);u.hp=Math.min(u.mhp,u.hp+v);pop(u,'+'+v,'#7dffa8',true);}if(sk.hits)await wait(120);}if(sk.steal&&e.alive)doSteal(u,e,sk.steal);if(sk.delay&&e.alive){e.ct+=sk.delay*(e.boss?.4:1)/e.spd;pop(e,'DELAY','#7fd6ff',true);}await wait(140);}
  if(sk.basic)u.sp=Math.min(100,u.sp+10+(u.spGain||0));
  comboEnd();u.tox=0;setCT(u,sk.w||(sk.t==='all'?1.1:1));await wait(200);}
 
@@ -288,7 +286,7 @@ function pickT(u,sk,back,res){
  if(sk.t==='all'||sk.t==='self')return res({sk});
  const pool=sk.t==='one'?aliveE():(sk.revive?B.heroes.filter(h=>!h.alive):aliveH());
  if(pool.length===1&&sk.t==='one')return res({sk,t:pool[0]});
- menu([...pool.map(t=>({l:t.name,s:`HP ${t.hp}/${t.mhp}`+(t.broken?' BREAK':''),f:()=>res({sk,t})})),{l:'戻る',cls:'back',f:back}],true);}
+ menu([...pool.map(t=>({l:t.name,s:`HP ${t.hp}/${t.mhp}`,f:()=>res({sk,t})})),{l:'戻る',cls:'back',f:back}],true);}
 function itemMenu(u,back,res){const I=G.items,dead=B.heroes.some(h=>!h.alive);
  menu([...Object.keys(ITEMS).filter(k=>(I[k]||0)>0||k==='potion').map(k=>{const rv=k==='feather'||k==='tail';return{ic:k,l:`${ITEMS[k].n} ×${I[k]||0}`,s:ITEMS[k].d,dis:!I[k]||(rv&&!dead),f:()=>pickT(u,{k:'item',id:k,t:'ally',revive:rv},()=>itemMenu(u,back,res),res)};}),
   {l:'戻る',cls:'back',f:back}],true);}
@@ -297,13 +295,12 @@ function itemMenu(u,back,res){const I=G.items,dead=B.heroes.some(h=>!h.alive);
 function pickHero(){const hs=aliveH();const g=hs.find(h=>h.id==='gald');
  if(g&&(g.aw||(g.taunt>0&&Math.random()<.8)))return g;return hs[Math.random()*hs.length|0];}
 async function enemyTurn(e){
- if(e.broken){e.broken=false;e.brk=e.brkMax;}
  e.turn++;let sk;const ai=ED[e.kind].ai,pick=a=>{let r=Math.random();for(const[k,w]of a){if((r-=w)<0)return k;}return a[0][0];};
  if(ai){
-  if(e.charging){sk=EA[ai.charge];e.charging=false;}
+  if(e.charging){sk=Object.assign({},EA[ai.charge]);if(sk.pow)sk.pow*=.85;e.charging=false;}
   else if(!e.summoned&&ai.summon&&e.hp<e.mhp/2){e.summoned=true;log(`${e.name}が<b>眷属を呼び出した</b>！`);
    const s1=enemy(ai.summon,ai.sumLv,78,14,'A'),s2=enemy(ai.summon,ai.sumLv,78,80,'B');[s1,s2].forEach(s=>{setCT(s);B.enemies.push(s);});SFX.warn();setCT(e);refresh();await wait(700);return;}
-  else if(e.turn%ai.every===0){e.charging=true;SFX.warn();pop(e,'溜め！','#ffb030');log(`${e.name}は<b>力を溜めている</b>…！ ブレイクで止めるか、備えろ！`);setCT(e);refresh();await wait(800);return;}
+  else if(e.turn%ai.every===0){e.charging=true;SFX.warn();pop(e,'溜め！','#ffb030');log(`${e.name}は<b>力を溜めている</b>…！ 防御で備えろ！`);setCT(e);refresh();await wait(800);return;}
   else sk=EA[pick(ai.acts)];}
  else sk=EA[pick(ED[e.kind].acts||[['claw',1]])];
  e.tox=10;log(`${e.name}の${sk.n}！`);refresh();await wait(260);
@@ -345,7 +342,6 @@ function drawUnit(u){
  const img=IMG[u.flash>0?u.spr+'_w':sprKey(u)];if(u.flash>0)u.flash--;
  u.ox+=(u.tox-u.ox)*.18;const s=16*u.sc;let x=u.x+Math.round(u.ox),y=u.y;
  if(u.side===1&&u.alive)y+=Math.round(Math.sin(tick/20+u.x)*1);
- if(u.side===1&&u.broken){x+=Math.sin(tick/3)>0?1:0;}
  ctx.fillStyle='rgba(0,0,0,.3)';ctx.fillRect(x+s*.2,y+s-2,s*.6,2);
  if(u.side===0&&!u.alive){ctx.globalAlpha=.55;ctx.save();ctx.translate(x+s/2,y+s-4);ctx.rotate(-Math.PI/2);ctx.drawImage(img,-s/2,-s/2+4,s,s);ctx.restore();ctx.globalAlpha=1;return;}
  if(u.side&&ED[u.kind]&&ED[u.kind].flip){ctx.save();ctx.translate(x+s,y);ctx.scale(-1,1);ctx.drawImage(img,0,0,s,s);ctx.restore();}else ctx.drawImage(img,x,y,s,s);ctx.globalAlpha=1;
@@ -372,7 +368,7 @@ function refresh(){if(!B)return;
   <div class="bars">${bar('hp',h.hp,h.mhp,`HP ${h.hp}`)}${bar('sp',h.sp,100,`SP ${h.sp}`)}${bar('ag',h.ag,100,h.aw?(h.id==='mire'?'ゲージ'+Math.round(h.ag):'星臨中'):h.ag>=100?'星臨OK':`AG ${Math.floor(h.ag)}`)}</div></div>`).join('');
  $('#labels').innerHTML=aliveE().map(e=>{const unk=e.weak.length-e.known.size;
   return`<div class="lab" style="left:${Math.max(0,(e.x)*SC)}px;top:${Math.max(0,(e.y+(e.boss?-3:6))*SC-32)}px"><div class="n">${e.name} <small style="color:#aab">Lv${e.lv}</small></div><div class="hp"><i style="width:${e.hp/e.mhp*100}%"></i></div>`+
-  (e.broken?'<span class="ch brk">BREAK</span>':`<span class="ch sh">◆${e.brk}</span>`)+[...e.known].map(k=>`<span class="ch" style="color:#111;background:${ELC[k]};border-color:${ELC[k]}">${k}</span>`).join('')+'<span class="ch">?</span>'.repeat(unk)+(e.charging?'<span class="ch chg">溜</span>':'')+'</div>';}).join('');
+  [...e.known].map(k=>`<span class="ch" style="color:#111;background:${ELC[k]};border-color:${ELC[k]}">${k}</span>`).join('')+'<span class="ch">?</span>'.repeat(unk)+(e.charging?'<span class="ch chg">溜</span>':'')+'</div>';}).join('');
  const o=$('#order');o.innerHTML='';preview().slice(0,7).forEach(u=>{const d=document.createElement('div');d.className='o'+(u.side?' e':'');const c=document.createElement('canvas');c.width=c.height=18;
   const b=bbox(u.spr);c.getContext('2d').drawImage(IMG[sprKey(u)],b.x,b.y,b.w,b.h,(18-b.w)>>1,(18-b.h)>>1,b.w,b.h);d.appendChild(c);
   const sf=u.side&&/[ABC]$/.test(u.name)?u.name.slice(-1):'';if(sf){const t=document.createElement('b');t.textContent=sf;d.appendChild(t);}o.appendChild(d);});}

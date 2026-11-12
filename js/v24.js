@@ -103,7 +103,7 @@ function lbRow(cls,...cs){const d=document.createElement('div');d.className='lb 
 
 function dmgPop(u,s,kind,el){const v=parseInt(s,10),heal=s[0]==='+',crit=/crit/.test(kind),weak=/weak/.test(kind),psn=/psn/.test(kind),grd=u.side===0&&!heal&&!!u.guard;
  const t=heal?0:tierOf(u,Math.abs(v)),fs=Math.round(numFs(u)*TIER[t]*(crit?(FS24.cr||1.15):1)*(heal?.92:1));
- const sk=heal?'heal':psn?'psn':crit?'dmgC':weak?(t>=3?'dmgWT':'dmgW'):grd?'dmgG':u.side===0?'dmgH':t>=3?'dmgT':'dmg';
+ const sk=heal?'heal':psn?'psn':weak?(t>=3?'dmgWT':'dmgW'):grd?'dmgG':u.side===0?'dmgH':t>=3?'dmgT':'dmg';
  const pri=crit?PRI.crit:heal?PRI.heal:PRI.dmg;capUnit(u);
  const p=make(u,`dmg t${t}${crit?' crit':''}${weak?' weak':''}${heal?' heal':''}${grd?' grd':''}`,pri,(crit||t>=2?1400:1150));
  const lf=Math.round(fs*(FS24.lb||.56));
@@ -111,11 +111,10 @@ function dmgPop(u,s,kind,el){const v=parseInt(s,10),heal=s[0]==='+',crit=/crit/.
  if(weak){const r=lbRow('wk',TX24.el('Weak','weak',lf));if(el&&ELC[el])r.appendChild(TX24.el(el,'elm',Math.round(lf*1.06)));p.in.appendChild(r);}
  if(grd)p.in.appendChild(lbRow('gd',TX24.el('Guard','guard',Math.round(fs*.66))));
  const nm=document.createElement('div');nm.className='nm';nm.appendChild(TX24.row((heal?'+':'')+fmt(v),sk,fs,/万/));p.in.appendChild(nm);
- if(crit&&!RM.matches){const ec=nm.cloneNode(false);ec.className='nm ec';ec.appendChild(TX24.row(fmt(v),sk,fs,/万/));nm.appendChild(ec);p.in.prepend(TX24.burst(fs*3.2));}
  p.num=1;place(p);u._dm24=p;return p;}
 function wordPop(u,s,kind){const miss=s==='MISS',fs=numFs(u);
- const p=make(u,miss?'word miss':'word xbrk',miss?PRI.word:PRI.brk,miss?950:1350);
- p.in.appendChild(miss?TX24.el('Miss','miss',Math.round(fs*.82)):TX24.el('BREAK!!','brk',Math.round(fs*1.02)));place(p);return p;}
+ const p=make(u,'word miss',PRI.word,950);
+ p.in.appendChild(TX24.el('Miss','miss',Math.round(fs*.82)));place(p);return p;}
 /* 小さな表示（状態・AG+・DELAY など）。直前のダメージ表示があれば、その見出しの列に加える（Guard／スタン／430 の形） */
 function tagPop(u,s,col,kind){const t=now(),jp=KANJI.test(s),fs=Math.round(jp?clamp(numFs(u)*.5,12,15):clamp(numFs(u)*.6,13,18)),c0=/^#/.test(col||'')?col:'#ffffff';
  const D=u._dm24;if(D&&!D.gone&&t-D.t<450&&D.el.isConnected&&!/fu/.test(kind||'')){const n=D.in.querySelectorAll('.lb.st').length;if(n<2){
@@ -135,7 +134,7 @@ function pop24(u,txt,col,small,kind,el){kind=kind||'';if(!inBattle()||!u||u.x==n
   if(/fu/.test(kind)&&small){skBanner(s,u.side);return;}
   if(HK24.pop&&HK24.pop(u,s,col,small,kind,el))return;
   if(!small&&/^[+\-]?\d+$/.test(s))return void dmgPop(u,s,kind,el);
-  if(s==='MISS'||/brk/.test(kind)||/^BREAK/.test(s))return void wordPop(u,s,kind);
+  if(s==='MISS')return void wordPop(u,s,kind);
   tagPop(u,s,col,kind);}catch(e){console.error(e);}}
 V17F.pop=pop24;
 /* 連撃数（○HITS と合計）：上の固定帯のすぐ下・左端に固定。参考資料の数字と同じ質感で */
@@ -220,11 +219,11 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-h22="news"
 function stress(){if(!inBattle())return;const E=aliveE(),Hs=B.heroes;let k=0;
  const one=()=>{if(!inBattle())return;E.forEach((e,i)=>{pop(e,Math.round(200+Math.random()*9000),'#fff',false,['','weak','crit weak','crit'][(k+i)%4],['斬','炎','雷','光'][(k+i)%4]);if((k+i)%3===0)pop(e,'MISS','#fff',true);});
   Hs.forEach((h,i)=>{h.guard=(k+i)%2===0;pop(h,Math.round(80+Math.random()*600),'#f88',false,'hurt');if(i%2)setTimeout(()=>pop(h,'スタン','#ffe14a',true,'st20 dn'),30);});
-  if(E[0]&&k%2)pop(E[0],'BREAK!!','#fff',false,'brk');pop(Hs[0],'+'+(300+k*10),'#7dffa8');k++;};
+  pop(Hs[0],'+'+(300+k*10),'#7dffa8');k++;};
  one();const iv=setInterval(()=>{if(k>=6||!inBattle()){clearInterval(iv);B&&B.heroes.forEach(h=>h.guard=false);return;}one();},260);}
 function dev24(m){log(m||`<b>${VER24}</b>　ダメージ表示・HP表示・照準の確認`);
  menu([{l:'ダメージ同時表示の負荷試験',s:'敵3体＋味方4人へ連続で表示',cls:'ready',f:()=>{devBattle([{kind:'slime',lv:5},{kind:'wolf',lv:5},{kind:'shroom',lv:5}],'haido',{boss:false});setTimeout(stress,1300);}},
-  {l:'ボス＋手下で確認',s:'Critical／Weak／Guard／Miss／BREAK',f:()=>{devBattle([{kind:'boss2',lv:10},{kind:'moss',lv:8},{kind:'jadewolf',lv:8}],'midori',{theme:'forest'});setTimeout(stress,1300);}},
+  {l:'ボス＋手下で確認',s:'Critical／Weak／Guard／Miss',f:()=>{devBattle([{kind:'boss2',lv:10},{kind:'moss',lv:8},{kind:'jadewolf',lv:8}],'midori',{theme:'forest'});setTimeout(stress,1300);}},
   {l:'大型ボス',s:'照準の大きさ・表示の位置',f:()=>devBattle([{kind:'boss9',lv:60}],'ryuu',{theme:'lava'})},
   {l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
 {const _dv=dvMenu;dvMenu=function(m){_dv(m);try{addCmd(VER24+' 戦闘演出','ダメージ表示・HP表示・照準',dev24,0,'ready');}catch(e){}};}

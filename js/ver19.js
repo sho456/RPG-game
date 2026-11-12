@@ -156,7 +156,6 @@ function onHurt(t,d){const A=t.A;if(!A||A.none)return;const c=CUR&&CUR.a._act,sk
     if(boss){/* ボス撃破：連鎖する爆発と長い崩壊（ver0.18 の演出を引き継ぐ） */B.shake=30;B.flashBg=30;B.flashCol='#ffffff';try{SFX.brk();}catch(e){}setTimeout(()=>{try{SFX.brk();}catch(e){}},260*SPD[speed]);
      for(let k=0;k<7;k++){const ex=x+(Math.random()-.5)*D.w*.7,ey=y+(Math.random()-.5)*D.h*.6;FX19.burst(ex,ey,k%2?'#ffb070':'#ffffff',{size:1.7,rays:10,delay:k*150});FX19.ring(ex,ey,'#ff9a40',{r1:17,delay:k*150});}await pr;await wait(900);return;}}
    else{A.hitT=(A.hitT||0)+1;to(t,ANIM.HST.dead(A.rig),420,'in');}}return pr;};}
-{const _db=doBreak;doBreak=async function(t,a){const pr=_db(t,a),A=t.A;if(A&&!A.none){const[x,y]=mid(t);FX19.burst(x,y,'#ffffff',{size:2.2,rays:14,dur:340});FX19.ring(x,y,'#7fd6ff',{r1:26,dur:380,thick:2});FX19.ring(x,y,'#ffffff',{r1:18,dur:300,delay:70});FX19.spray(x,y,16,['#ffffff','#7fd6ff','#ffe14a'],2.2,.1,26);A.kbv+=(t.side===0?1:-1)*4;B.flashBg=Math.max(B.flashBg||0,7);}return pr;};}
 {const _aw=V17F.awaken;awaken=async function(u){const pr=_aw(u);B.shake=10;try{const A=setup(u);if(!A.none){const cv2=document.querySelector('#cut canvas');if(cv2)cutArt(cv2,u.spr+'_aw');
    to(u,AWK,220,'back');const[x,y]=mid(u),[fx,fy]=foot(u);FX19.pillar(fx,fy,'#ffe27a');FX19.circle(fx,fy,'#ffe27a',{dur:1200,r:18});FX19.gather(x,y,'#ffe27a',24,600);FX19.ring(x,y,'#ffffff',{r1:26,dur:420,delay:200});}}catch(e){console.error(e);}
   try{return await pr;}finally{idle(u,260);}};}
@@ -168,30 +167,16 @@ pop=function(u,txt,col,small,kind,el){V17F.pop(u,txt,col,small,kind,el);if(!B||!
   if(/^\+\d+$/.test(s))FX19.heal(x,y);else if(s==='REVIVE'||s==='奇跡！')FX19.pillar(...foot(u));else if(/^AG\+|^SP\+|HASTE|充填/.test(s))FX19.buff(x,y,/SP/.test(s)?'#6fb2ff':/HASTE/.test(s)?'#8ff0a8':'#ffe27a');
   else if(s==='DELAY'||s==='凍結'||s==='STOP')FX19.ring(x,y,'#7fd6ff',{r0:15,r1:3,dash:1,dur:340});else if(s==='MISS')FX19.spray(x,y,7,['#ffffff','#c8ffd8'],1.3,0,14);else if(s==='SCAN')FX19.ring(x,y,'#7fd6ff',{r1:15,dash:1});}catch(e){}};
 {const _sb=startBattle;startBattle=function(list,opts={}){FX19.clear();return _sb(list,opts);};}
-/* ボスの部位破壊（ver0.16）：欠けた部位を新しいドット絵に反映する */
-partBreak=async function(e){const i=e.pb||0;if(i>=PARTS.length)return;e.pb=i+1;const[pn,fr]=PARTS[i],A=setup(e);e.atk=Math.round(e.atk*.9);e.mag=Math.round(e.mag*.9);
- if(!A.none){const[fx,fy]=foot(e),D=dims(e),u=(fr[0]+fr[2])/2,v=(fr[1]+fr[3])/2,x=fx+(A.flip?.5-u:u-.5)*D.w,y=fy-D.h*(1-v);
-  FX19.burst(x,y,'#ffb070',{size:2,rays:12,dur:340});FX19.ring(x,y,'#ff7a30',{r1:22,dur:360,thick:2});FX19.ring(x,y,'#ffd080',{r1:15,delay:80});
-  for(let n=0;n<26;n++)FX19.part(x+(Math.random()-.5)*D.w*.4,y+(Math.random()-.5)*D.h*.25,(Math.random()-.5)*3,-1-Math.random()*2.4,['#ffd080','#8a7a8a','#5a4a5a','#ff7a30'][n%4],40+Math.random()*24|0,.16,n%3?1:2);A.kbv-=3;}
- B.shake=20;B.flashBg=12;B.flashCol='#ffb070';sfxPart();
- const el=document.createElement('div');el.className='pbrk';el.innerHTML=`部位破壊！<small>${e.name}の${pn}が砕けた　攻撃・魔力-10%</small>`;$('#stage').appendChild(el);setTimeout(()=>el.remove(),1500);
- pop(e,pn+'破壊','#ffb070',true);log(`<b>部位破壊！</b> ${e.name}の${pn}が砕け散った（攻撃・魔力-10%　${e.pb}/${PARTS.length}）`);await wait(650);};
 
 /* ---------- 描画 ---------- */
 const hash=(x,y,s)=>{let h=(x*374761393+y*668265263+s*1274126177)|0;h=(h^(h>>>13))*1274126177|0;return((h^(h>>>16))>>>0)/4294967296;};
-/* 部位破壊：破壊済みの部位を欠けさせたフレームを作る（フレームごとにキャッシュ） */
-function eroded(f,u,A){const key='e'+u.pb+(A.flip?'f':'')+DS;if(f[key])return f[key];const c=document.createElement('canvas');c.width=f.w;c.height=f.h;const g=c.getContext('2d');g.drawImage(f.cv,0,0);const id=g.getImageData(0,0,f.w,f.h),p=id.data,R=A.rig,w=R.wid*A.sc*DS,h=R.hgt*A.sc*DS,x0=f.ax-w/2,y0=f.ay-h;
- for(let i=0;i<u.pb&&i<PARTS.length;i++){let[a,b,c2,d]=PARTS[i][1];if(A.flip){const t=1-a;a=1-c2;c2=t;}const X0=x0+a*w,X1=x0+c2*w,Y0=y0+b*h,Y1=y0+d*h,cx=(X0+X1)/2,cy=(Y0+Y1)/2,rx=(X1-X0)/2,ry=(Y1-Y0)/2;
-  for(let y=Math.max(0,Y0-3|0);y<Math.min(f.h,Y1+3);y++)for(let x=Math.max(0,X0-3|0);x<Math.min(f.w,X1+3);x++){const k=(y*f.w+x)*4;if(p[k+3]<20)continue;const dd=Math.hypot((x-cx)/rx,(y-cy)/ry)+hash(x>>1,y>>1,i)*.55-Math.abs(Math.sin(x*.9+y*.5))*.2;
-   if(dd<.82)p[k+3]=0;else if(dd<1.08){const hot=hash(x,y,i+9)<.22;p[k]=hot?255:p[k]*.4;p[k+1]=hot?150:p[k+1]*.36;p[k+2]=hot?60:p[k+2]*.42;}}}
- g.putImageData(id,0,0);return f[key]={cv:c,w:f.w,h:f.h,ax:f.ax,ay:f.ay};}
 const BY4=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
 /* 撃破：白く光ったあと、網点のパターンで下から上へ溶けていく */
 function dissolve(f,A,k){const st=Math.floor(k*12);if(A.dcv&&A.dst===st)return A.dcv;const c=A.dcv||(A.dcv=document.createElement('canvas'));c.width=f.w;c.height=f.h;const g=c.getContext('2d');g.drawImage(k<.22?SPRX.white(f):f.cv,0,0);
  if(k>=.22){const id=g.getImageData(0,0,f.w,f.h),p=id.data,kk=(k-.22)/.78;for(let y=0;y<f.h;y++){const yy=1-y/f.h;for(let x=0;x<f.w;x++){const i=(y*f.w+x)*4;if(!p[i+3])continue;if(BY4[(y&3)*4+(x&3)]/16<kk*1.7-yy*.7)p[i+3]=0;else{p[i]=Math.min(255,p[i]+kk*90);p[i+1]=Math.min(255,p[i+1]+kk*70);p[i+2]=Math.min(255,p[i+2]+kk*120);}}}g.putImageData(id,0,0);}A.dst=st;return c;}
 function drawU(u,k,p,sx,sy){const A=setup(u);if(A.none)return;
  if(u.side===1&&!u.alive){if(A.gone)return;if(!A.dead){A.dead={t0:ANIM.now,dur:680*ANIM.SP()};A.dcv=null;}}else if(A.dead||A.gone){A.dead=null;A.gone=0;A.dcv=null;}
- const[wx,wy,hop]=ANIM.world(u),pose=ANIM.poseOf(u);const S=A.sc*DS;let f=SPRX.frame(A.name,pose,A.palKey,A.pal,A.flip,S,A.extra);if(!f)return;if(u.pb)f=eroded(f,u,A);
+ const[wx,wy,hop]=ANIM.world(u),pose=ANIM.poseOf(u);const S=A.sc*DS;let f=SPRX.frame(A.name,pose,A.palKey,A.pal,A.flip,S,A.extra);if(!f)return;
  const[fx,fy]=foot(u),ix=B.intro>0&&u.side===1&&u.boss?-(B.intro/90)*(B.intro/90)*70:0,X0=Math.round((fx+wx+ix)*k/p)*p+sx,Y0=Math.round((fy+wy)*k/p)*p+sy,X=X0-f.ax*p,Y=Y0+Math.round(hop*k/p)*p-f.ay*p,R=A.rig;
  /* 足元の影 */
  if(!A.dead){const sw=Math.round(R.wid*S*.42*(1+hop*.02)),al=u.side===0&&!u.alive?.2:.32;ctx.fillStyle=`rgba(0,0,0,${al})`;ctx.fillRect(X0-(sw-2)*p,Y0-p,(sw*2-4)*p,p);ctx.fillRect(X0-sw*p,Y0,sw*2*p,p*2);ctx.fillRect(X0-(sw-2)*p,Y0+2*p,(sw*2-4)*p,p);}
@@ -199,11 +184,10 @@ function drawU(u,k,p,sx,sy){const A=setup(u);if(A.none)return;
  let img=f.cv;if(A.dead){const kk=(ANIM.now-A.dead.t0)/A.dead.dur;if(kk>=1){A.gone=1;A.dead=null;A.dcv=null;return;}img=dissolve(f,A,kk);if(kk>.25&&Math.random()<.5){const D=dims(u);FX19.part(fx+wx+(Math.random()-.5)*D.w,fy-Math.random()*D.h,(Math.random()-.5)*.4,-.5-Math.random()*.7,Math.random()<.5?'#ffffff':'#c8b0ff',22,0);}}
  else if(A.flash>0){if(A.flash>2)img=SPRX.white(f);A.flash--;}
  if(u.side===0&&!u.alive)ctx.globalAlpha=.78;ctx.drawImage(img,X,Y,f.w*p,f.h*p);ctx.globalAlpha=1;
- /* 状態の表示：星臨のオーラ／溜め／ブレイク（星が回る）／狙いの枠／行動中の矢印 */
+ /* 状態の表示：星臨のオーラ／溜め／狙いの枠／行動中の矢印 */
  const top=Y0-Math.round(R.hgt*S)*p,hw=Math.round(R.wid*S/2)*p,t=ANIM.now;
  if(u.aw&&u.alive&&Math.random()<.3+.2*(u.awLv||1))B.parts.push({x:fx+wx+(Math.random()-.5)*14,y:fy-2,vy:-.4-Math.random()*.5*(u.awLv||1),l:30,c:(u.awLv||1)>=3&&Math.random()<.4?'#ffffff':(u.awLv||1)>=2&&Math.random()<.3?'#7fd6ff':'#ffe27a'});
  if(u.side===1&&u.alive){if(u.charging&&Math.random()<.6)FX19.part(fx+(Math.random()-.5)*dims(u).w*1.2,fy,(Math.random()-.5)*.3,-.9-Math.random()*.9,Math.random()<.5?'#ffb030':'#ffe27a',20,0,Math.random()<.3?2:1);
-  if(u.broken)for(let i=0;i<3;i++){const a=t/260+i*2.094,xx=X0+Math.round(Math.cos(a)*hw*.7/p)*p,yy=top-3*p+Math.round(Math.sin(a)*2)*p;ctx.fillStyle=Math.sin(a)>0?'#ffe14a':'#c8a020';ctx.fillRect(xx-p,yy,3*p,p);ctx.fillRect(xx,yy-p,p,3*p);}
   if(B.tgt===u&&aliveE().length>1&&!B.rt22){const q=(Math.floor(t/260)%2)*p,L=4*p,x0=X0-hw-2*p-q,x1=X0+hw+2*p+q,y0=top-2*p-q,y1=Y0+3*p+q;ctx.fillStyle='#ffd65a';for(const[cx,cy,dx,dy]of[[x0,y0,1,1],[x1,y0,-1,1],[x0,y1,1,-1],[x1,y1,-1,-1]]){ctx.fillRect(dx>0?cx:cx-L,dy>0?cy:cy-p,L,p);ctx.fillRect(dx>0?cx:cx-p,dy>0?cy:cy-L,p,L);}}}
  if(B.cur===u&&u.side===0&&!u._act){const ay=top-6*p+(Math.floor(t/270)%2)*p;ctx.fillStyle='#3a2a08';ctx.fillRect(X0-3*p,ay-p,7*p,p);ctx.fillStyle='#f3c64b';ctx.fillRect(X0-2*p,ay,5*p,p);ctx.fillRect(X0-p,ay+p,3*p,p);ctx.fillRect(X0,ay+2*p,p,p);}}
 function drawBattle(){const k=bK();if(cv.width!==W*k||cv.height!==H*k){cv.width=W*k;cv.height=H*k;}const p=Math.max(1,Math.round(k*2/3));PXL=p/k;DS=Math.round(k/p/1.5*1000)/1000;ANIM.tick();

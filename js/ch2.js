@@ -9,10 +9,10 @@ for(const[k,b,pal]of[['darkknight','gald',{a:'#3a3048',A:'#1e1828',r:'#6a2a8a',R
  ['shade','bookghost',{V:'#1a1a2a',w:'#4a4a6a',q:'#8a8aaa',p:'#6a6a9a',o:'#ff4040'}],['boss3','boss',{v:'#c8b070',V:'#6a5a30',p:'#fff0b0',y:'#ff4040',o:'#ff2020'}]]){SPR[k]=SPR[b];IMG[k]=mk(SPR[b],pal);IMG[k+'_w']=mk(SPR[b],null,'#ffffff');}
 Object.assign(EA,{wave2:{n:'影の波',el:'闇',k:'mag',pow:.9,t:'all'},bell:{n:'終末の鐘',el:'闇',k:'mag',pow:2.8,t:'all'}});
 Object.assign(ED,{
- darkknight:{name:'亡霊騎士',mhp:210,atk:62,def:18,mag:10,res:14,spd:9,weak:['光','雷'],brk:4,xp:20,gold:14,drop:[['kiba',.3],['kakera',.15]],acts:[['claw',.6],['slam',.4]],flip:1},
- cursedslime:{name:'呪縛スライム',mhp:170,atk:54,def:12,mag:42,res:12,spd:8,weak:['炎','光'],brk:2,xp:16,gold:10,drop:[['haiseki',.3]],acts:[['claw',.6],['curse',.4]]},
- shade:{name:'影法師',mhp:150,atk:30,def:14,mag:62,res:10,spd:13,weak:['光','風'],brk:3,xp:19,gold:12,drop:[['kakera',.25]],acts:[['curse',.6],['wave2',.4]]},
- boss3:{name:'虚ろの司祭',mhp:5600,atk:172,def:48,mag:162,res:40,spd:11,weak:['風','炎'],brk:12,sc:3,boss:true,xp:900,gold:1200,drop:[['kakera',1],['kakera',1],['kakera',1],['kakera',1]],
+ darkknight:{name:'亡霊騎士',mhp:210,atk:62,def:18,mag:10,res:14,spd:9,weak:['光','雷'],xp:20,gold:14,drop:[['kiba',.3],['kakera',.15]],acts:[['claw',.6],['slam',.4]],flip:1},
+ cursedslime:{name:'呪縛スライム',mhp:170,atk:54,def:12,mag:42,res:12,spd:8,weak:['炎','光'],xp:16,gold:10,drop:[['haiseki',.3]],acts:[['claw',.6],['curse',.4]]},
+ shade:{name:'影法師',mhp:150,atk:30,def:14,mag:62,res:10,spd:13,weak:['光','風'],xp:19,gold:12,drop:[['kakera',.25]],acts:[['curse',.6],['wave2',.4]]},
+ boss3:{name:'虚ろの司祭',mhp:5600,atk:172,def:48,mag:162,res:40,spd:11,weak:['風','炎'],sc:3,boss:true,xp:900,gold:1200,drop:[['kakera',1],['kakera',1],['kakera',1],['kakera',1]],
   ai:{every:3,charge:'bell',acts:[['claw',.4],['wave',.3],['curse',.3]],summon:'darkknight',sumLv:15},ilv:16}});
 HB.shion={name:'シオン',mhp:200,atk:34,def:16,mag:18,res:16,spd:16,g:{mhp:'C',atk:'A',def:'D',mag:'C',res:'C',spd:'S'},skills:['nusumu','shippu','kagenui']};
 HB.noah={name:'ノア',mhp:230,atk:16,def:22,mag:34,res:40,spd:9,g:{mhp:'B',atk:'D',def:'B',mag:'A',res:'S',spd:'C'},skills:['inori','holy','mamori']};

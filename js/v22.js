@@ -87,9 +87,9 @@ function updHud(){if(!B||scene!=='battle')return;const h=ensureHud();h.classList
  /* 対象 */
  const t=B.tgt&&B.tgt.alive?B.tgt:aliveE()[0],tg=h.querySelector('.b22tg');
  if(!t){tg.innerHTML='';HK='';}else{const kw=t.weak.filter(x=>t.known.has(x)),tmp=(t.sts||[]).filter(s=>s.k==='weak').map(s=>s.el),unk=t.weak.length-t.known.size,multi=aliveE().length>1;let tags='';try{tags=tagH(t);}catch(x){}
-  const k=[t.name,t.lv,t.boss,t.broken,t.brk,kw.join(''),tmp.join(''),unk,tags,multi].join('|');
+  const k=[t.name,t.lv,t.boss,kw.join(''),tmp.join(''),unk,tags,multi].join('|');
   if(k!==HK||!tg.firstChild){HK=k;tg.className='b22tg'+(t.boss?' boss':'');
-   tg.innerHTML=`<div class="nm">${t.boss?'<em class="bs">BOSS</em>':multi?'<em>TARGET</em>':''}<b>${t.name}</b><small>Lv${t.lv}</small>${t.broken?'<span class="bk">BREAK</span>':`<span class="sd" title="シールド">◆${t.brk}</span>`}</div>
+   tg.innerHTML=`<div class="nm">${t.boss?'<em class="bs">BOSS</em>':multi?'<em>TARGET</em>':''}<b>${t.name}</b><small>Lv${t.lv}</small></div>
     <div class="hp"><div class="bar"><s></s><u></u><i></i></div><em class="cnt"></em></div>
     <div class="wk">${ELS10.map(e=>{const w=kw.includes(e),tm=tmp.includes(e);return`<span class="${w?'w':''}${tm?' tm':''}" style="--c:${ELC[e]}"><i>${e}</i><u>${w||tm?WEAKSYM.w:''}</u></span>`;}).join('')}${unk>0?`<span class="q"><i>?</i><u>×${unk}</u></span>`:''}</div>
     ${tags?`<div class="st">${tags}</div>`:''}`;}
@@ -142,7 +142,7 @@ function skInfo(sk,u){const s=sk.basic?Object.assign({},sk,{n:sk.n==='攻撃'?'�
  const pw=s.fixed?'固定':s.pow?`${s.pow}${s.hits>1?' ×'+s.hits+'回':''}`:'―',cost=s.sp?'SP '+s.sp:s.gauge?'ゲージ '+s.gauge:s.gaugeAll?'ゲージ全部':'なし';
  ovOpen(`<div class="inf22" style="--ec:${ec}"><div class="ih">${hx(el,ec)}<b>${esc(s.n||(ITEMS[s.id]&&ITEMS[s.id].n)||'')}</b><span class="tg ${kc}">${kn}</span></div>
   <div class="id">${esc(s.d||(ITEMS[s.id]&&ITEMS[s.id].d)||'')}</div>
-  <dl class="dl22"><dt>属性</dt><dd>${s.el||'なし'}</dd><dt>対象</dt><dd>${TGTN(s)}</dd><dt>威力</dt><dd>${pw}</dd><dt>消費</dt><dd>${cost}</dd>${s.req?`<dt>条件</dt><dd>${reqTxt(s.req)}</dd>`:''}${s.delay?`<dt>追加</dt><dd>敵の行動を遅らせる</dd>`:''}${s.brkAll?`<dt>追加</dt><dd>確実にブレイク</dd>`:''}${s.hpCost?`<dt>代償</dt><dd>HP${Math.round(s.hpCost*100)}%</dd>`:''}</dl>
+  <dl class="dl22"><dt>属性</dt><dd>${s.el||'なし'}</dd><dt>対象</dt><dd>${TGTN(s)}</dd><dt>威力</dt><dd>${pw}</dd><dt>消費</dt><dd>${cost}</dd>${s.req?`<dt>条件</dt><dd>${reqTxt(s.req)}</dd>`:''}${s.delay?`<dt>追加</dt><dd>敵の行動を遅らせる</dd>`:''}${s.hpCost?`<dt>代償</dt><dd>HP${Math.round(s.hpCost*100)}%</dd>`:''}</dl>
   ${u&&B&&B.tgt&&s.el?`<div class="iw">${B.tgt.name}に対して：${B.tgt.weak.includes(s.el)&&B.tgt.known.has(s.el)?'<b class="w">弱点を突ける ▲</b>':B.tgt.known.size>=B.tgt.weak.length?'弱点ではない':'まだ分からない'}</div>`:''}</div>
   <button class="tbtn back wide" data-a="close">閉じる</button>`,{close:ovClose});}
 chooseRoot=function(u){
@@ -330,7 +330,7 @@ function skSrc(id){const o={};(HB[id].skills||[]).forEach(k=>o[k]='初期');cons
  (V20.LSK[id]||[]).forEach(([l,k])=>{if(!o[k])o[k]='Lv'+l;});return o;}
 function skCard(k,o={}){const s=SK[k];if(!s)return'';const[kn,kc]=KINDN(s),[el,ec]=skBadge(s),pw=s.fixed?'固定':s.pow?`${s.pow}${s.hits>1?' ×'+s.hits+'回':''}`:'―',cost=s.sp?'SP '+s.sp:s.gauge?'ゲージ '+s.gauge:s.gaugeAll?'ゲージ全部':'なし';
  return`<div class="sk22 x22${o.lock?' lock':''}${o.cls?' '+o.cls:''}" style="--ec:${ec}"><div class="h">${hx(el,ec,'sm')}<b>${esc(s.n)}</b>${o.tag?`<span class="tg ${o.tc||''}">${o.tag}</span>`:''}<span class="tg ${kc}">${kn}</span>${cost!=='なし'?`<span class="c">${cost}</span>`:''}<i class="ar"></i></div>
-  <div class="d">${esc(s.d||'')}</div><dl class="dl22"><dt>属性</dt><dd>${s.el||'なし'}</dd><dt>種類</dt><dd>${kn}</dd><dt>対象</dt><dd>${TGTN(s)}</dd><dt>威力</dt><dd>${pw}</dd><dt>消費</dt><dd>${cost}</dd>${o.src?`<dt>習得</dt><dd>${o.src}</dd>`:''}${s.req?`<dt>条件</dt><dd>${reqTxt(s.req)}</dd>`:''}${s.delay?'<dt>追加</dt><dd>敵の行動を遅らせる</dd>':''}${s.brkAll?'<dt>追加</dt><dd>確実にブレイク</dd>':''}${s.hpCost?`<dt>代償</dt><dd>HP${Math.round(s.hpCost*100)}%</dd>`:''}</dl></div>`;}
+  <div class="d">${esc(s.d||'')}</div><dl class="dl22"><dt>属性</dt><dd>${s.el||'なし'}</dd><dt>種類</dt><dd>${kn}</dd><dt>対象</dt><dd>${TGTN(s)}</dd><dt>威力</dt><dd>${pw}</dd><dt>消費</dt><dd>${cost}</dd>${o.src?`<dt>習得</dt><dd>${o.src}</dd>`:''}${s.req?`<dt>条件</dt><dd>${reqTxt(s.req)}</dd>`:''}${s.delay?'<dt>追加</dt><dd>敵の行動を遅らせる</dd>':''}${s.hpCost?`<dt>代償</dt><dd>HP${Math.round(s.hpCost*100)}%</dd>`:''}</dl></div>`;}
 function skillsHTML(id){const lv=G.h[id].lv,src=skSrc(id),have=skillList(id),cp=V20.charPS(id),w=G.h[id].eq.w&&findItem(G.h[id].eq.w),wp=V20.wpOf(w);
  const later=(V20.LSK[id]||[]).filter(([l,k])=>!have.includes(k));
  return`<div class="sh22">技 <small>${have.length}種　タップで詳細</small></div>${have.map(k=>skCard(k,{src:src[k]})).join('')}
@@ -404,7 +404,7 @@ function dev22(m){log((m||`<b>ver0.22</b>　画面の全面改良・${SEIRIN.n}�
 {const _dv=dvMenu;dvMenu=function(m){_dv(m);try{addCmd('ver0.22 画面刷新・'+SEIRIN.n,'全データ開放・戦闘無制限・ミッション一括',dev22,0,'ready');}catch(e){}};}
 
 /* ==================== 7. 「星臨」に合わせた説明 ==================== */
-try{TIPS.battle=['戦闘のしかた',['自分の番が来たら、下の一覧から<b>技をタップ→もう一度タップ</b>で決定。<b>ⓘ</b>で技の詳しい性能を見られる。','<b>敵をタップ</b>すると狙いが変わる。左上に狙った敵の<b>HP</b>と<b>弱点</b>（▲）が出る。','弱点を突いて <b>◆シールド</b> を0にすると <b>BREAK</b>。敵が動けなくなり、大ダメージの好機。','左下が<b>行動順</b>。面倒なら下の<b>通常AUTO</b>、同じ行動を繰り返すなら<b>リピート</b>。']];
+try{TIPS.battle=['戦闘のしかた',['自分の番が来たら、下の一覧から<b>技をタップ→もう一度タップ</b>で決定。<b>ⓘ</b>で技の詳しい性能を見られる。','<b>敵をタップ</b>すると狙いが変わる。左上に狙った敵の<b>HP</b>と<b>弱点</b>（▲）が出る。','弱点を突くと <b>1.7倍</b> の大ダメージ。敵が「溜め」たら次の大技に<b>防御</b>で備えよう。','左下が<b>行動順</b>。面倒なら下の<b>通常AUTO</b>、同じ行動を繰り返すなら<b>リピート</b>。']];
  TIPS.awake=[SEIRIN.n+'できる！',[`<b>${SEIRIN.g}（${SEIRIN.ge}／AG）</b>が100%になった。右下の<b>${SEIRIN.n}</b>ボタンで発動――星片に宿る星座をその身に降ろす。<b>行動を消費しない</b>ので、そのまま強力な${SEIRIN.n}技を撃てる。`,`2人が同時に${SEIRIN.n}すると、<b>共鳴技</b>が使えるようになる。`]];}catch(e){}
 
 /* ==================== 版表示 ==================== */

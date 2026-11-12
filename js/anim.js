@@ -2,7 +2,7 @@
  ユニットごとに状態（待機／行動中のポーズ補間／待機への復帰／移動／被弾の反動）を持つ。
  ・待機：リグごとの関数 IDLE[name](t) が、時刻からポーズを返す（呼吸・揺れ・しぐさを層で重ねる）
  ・行動：ANIM.to(u, ポーズ, ms, ease) でキーポーズへ「コマ送り」補間する（40ms刻み。ぼかさない）
- ・状態：瀕死・防御・戦闘不能・ブレイク・溜めは、待機ポーズへの上書きとして表現する
+ ・状態：瀕死・防御・戦闘不能・溜めは、待機ポーズへの上書きとして表現する
  ・区分：Idle / Run(ダッシュ) / Attack / Skill / Magic(Cast) / Guard / Hit / Knockback / Victory / Defeat(瀕死) / Death */
 const ANIM=(()=>{
 const SP=()=>SPD[speed]/1.7;
@@ -89,8 +89,8 @@ const MST={slime:{brk:{sq:.85,lx:2,bl:1},chg:{sq:-.45,mo:.7},hit:{sq:.65,lx:3,bl
  boss:{brk:{y:-1,ln:2.5,hy:4.5,ey:0,gp:0,hF:[-5,17],hN:[5,17]},chg:{gp:2,ey:2,hF:[-10,3],hN:[9,3],y:-8},hit:{ln:-3.5,hy:1.5,ey:0,x:1.5}}};
 function stateMod(u,A,p,t){const R=A.rig;
  if(R.type==='hum'){if(!u.alive)return Object.assign(p,swapH(R,HST.dead(R)));if(u.side===0){if(u.guard)Object.assign(p,swapH(R,HST.guard));else if(u.hp<u.mhp*.25)Object.assign(p,swapH(R,HST.low),{br:(p.br||0)*1.6});}
-  else{if(u.broken)Object.assign(p,swapH(R,HST.low));else if(u.charging)Object.assign(p,{ta:-.15,cr:2,x:(Math.floor(t/60)%2)*.6});}return p;}
- const M=MST[A.name]||{};if(u.broken&&M.brk)Object.assign(p,M.brk,{x:(Math.floor(t/90)%2)*.5});else if(u.charging&&M.chg)Object.assign(p,M.chg,{x:(Math.floor(t/60)%2)*.8});return p;}
+  else{if(u.charging)Object.assign(p,{ta:-.15,cr:2,x:(Math.floor(t/60)%2)*.6});}return p;}
+ const M=MST[A.name]||{};if(u.charging&&M.chg)Object.assign(p,M.chg,{x:(Math.floor(t/60)%2)*.8});return p;}
 
 function poseOf(u){const A=u.A,R=A.rig,b=base(A),stp=R.step||100,st=Math.floor((now+A.seed)/stp)*stp;
  let p=Object.assign(b,(IDLE[A.name]||IDLE._)(st*(u.aw?1.3:1),u,A,Object.assign({},b)));p=stateMod(u,A,p,st);

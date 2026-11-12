@@ -42,9 +42,9 @@ function head(e){let fx,fy,w=20,h=26;try{[fx,fy]=V19.foot(e);const D=V19.dims(e)
 function frame(){if(!B||scene!=='battle'){if(EL)EL.style.display='none';return;}const t=tgtOf(),el=ensure();if(!t||B.over){el.style.display='none';return;}
  const bs=barState(t),multi=bs.n>1,unk=t.weak.length-t.known.size,kw=t.weak.filter(x=>t.known.has(x)),tmp=(t.sts||[]).filter(s=>s.k==='weak').map(s=>s.el),one=B.enemies.filter(e=>e.alive).length===1;
  let tags='';try{tags=tagH(t);}catch(x){}
- const k=[t.name,t.lv,t.boss?1:0,t.broken?1:0,t.brk,kw.join(''),tmp.join(''),unk,tags,bs.n,one?1:0].join('|');
+ const k=[t.name,t.lv,t.boss?1:0,kw.join(''),tmp.join(''),unk,tags,bs.n,one?1:0].join('|');
  if(k!==last.k){last.k=k;el.className=(t.boss?'boss ':'')+(multi?'multi ':'')+(one?'one':'');
-  el.querySelector('.t1').innerHTML=`${t.boss?'<em class="bs">BOSS</em>':one?'':'<em>TARGET</em>'}<b>${t.name}</b><small>Lv${t.lv}</small>${t.broken?'<span class="bk">BREAK</span>':`<span class="sd">◆${t.brk}</span>`}`;
+  el.querySelector('.t1').innerHTML=`${t.boss?'<em class="bs">BOSS</em>':one?'':'<em>TARGET</em>'}<b>${t.name}</b><small>Lv${t.lv}</small>`;
   el.querySelector('.t3').innerHTML=(kw.length||unk||tmp.length?`<span class="wk">弱</span>`:'')+kw.map(x=>`<i class="w" style="--c:${ELC[x]}">${x}</i>`).join('')+tmp.filter(x=>!kw.includes(x)).map(x=>`<i class="w tm" style="--c:${ELC[x]}">${x}</i>`).join('')+(unk>0?`<i class="q">?×${unk}</i>`:'')+(tags?`<span class="tg">${tags}</span>`:'');
   el.querySelector('.pip').innerHTML=multi?Array.from({length:bs.n},(_,i)=>`<i style="--c:${BCOL[i]||BCOL[5]}"></i>`).join(''):'';
   el.style.display='';last.w=el.offsetWidth;last.h=el.offsetHeight;}
