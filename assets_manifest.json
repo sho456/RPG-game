@@ -1,0 +1,1450 @@
+{
+ "note": "Phase0：改修前の全キャラ（待機フレームを戦闘時の実寸で書き出して計測）。vo_*（虚蝕化）・tr_*（幻影）・kb*（回廊の番人）は実行時に生成される派生。街の住人4体（barkeep/shopgirl/smithy/seer）は js/px-hero.js の旧リグ。",
+ "dot_scale": "戦闘：1ドット=round(k*2/3)デバイスpx（約1.33〜1.5CSSpx）／探索・街：1ドット=1論理px（約2.17CSSpx）",
+ "assets": [
+  {
+   "id": "rio",
+   "name": "リオ",
+   "type": "hero",
+   "tier": "ally",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "rio",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    30,
+    44
+   ],
+   "colors": 40,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "rio_aw",
+   "name": "rio_aw",
+   "type": "hero_aw",
+   "tier": "ally",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "rio",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    30,
+    44
+   ],
+   "colors": 40,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "gald",
+   "name": "ガルド",
+   "type": "hero",
+   "tier": "ally",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "gald",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    45,
+    48
+   ],
+   "colors": 30,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "gald_aw",
+   "name": "gald_aw",
+   "type": "hero_aw",
+   "tier": "ally",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "gald",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    45,
+    48
+   ],
+   "colors": 29,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "mire",
+   "name": "ミレイユ",
+   "type": "hero",
+   "tier": "ally",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "mire",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    25,
+    41
+   ],
+   "colors": 33,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "mire_aw",
+   "name": "mire_aw",
+   "type": "hero_aw",
+   "tier": "ally",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "mire",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    25,
+    41
+   ],
+   "colors": 33,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "shion",
+   "name": "シオン",
+   "type": "hero",
+   "tier": "ally",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "shion",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    35,
+    37
+   ],
+   "colors": 35,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "shion_aw",
+   "name": "shion_aw",
+   "type": "hero_aw",
+   "tier": "ally",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "shion",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    35,
+    37
+   ],
+   "colors": 35,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "noah",
+   "name": "ノア",
+   "type": "hero",
+   "tier": "ally",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "noah",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    24,
+    43
+   ],
+   "colors": 26,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "noah_aw",
+   "name": "noah_aw",
+   "type": "hero_aw",
+   "tier": "ally",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "noah",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    24,
+    43
+   ],
+   "colors": 26,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "erna",
+   "name": "エルナ",
+   "type": "hero",
+   "tier": "ally",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "erna",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    31,
+    43
+   ],
+   "colors": 38,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "erna_aw",
+   "name": "erna_aw",
+   "type": "hero_aw",
+   "tier": "ally",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "erna",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    31,
+    43
+   ],
+   "colors": 38,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "balza",
+   "name": "バルザ",
+   "type": "hero",
+   "tier": "ally",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "balza",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    29,
+    37
+   ],
+   "colors": 42,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "balza_aw",
+   "name": "balza_aw",
+   "type": "hero_aw",
+   "tier": "ally",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "balza",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    29,
+    37
+   ],
+   "colors": 42,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "crow",
+   "name": "クロウ",
+   "type": "hero",
+   "tier": "ally",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "crow",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    23,
+    42
+   ],
+   "colors": 32,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "crow_aw",
+   "name": "crow_aw",
+   "type": "hero_aw",
+   "tier": "ally",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "crow",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    23,
+    42
+   ],
+   "colors": 32,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "hakua",
+   "name": "ハクア",
+   "type": "hero",
+   "tier": "ally",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "hakua",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    26,
+    37
+   ],
+   "colors": 30,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "hakua_aw",
+   "name": "hakua_aw",
+   "type": "hero_aw",
+   "tier": "ally",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "hakua",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    26,
+    37
+   ],
+   "colors": 30,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "jin",
+   "name": "ジン",
+   "type": "hero",
+   "tier": "ally",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "jin",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    38,
+    45
+   ],
+   "colors": 42,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "jin_aw",
+   "name": "jin_aw",
+   "type": "hero_aw",
+   "tier": "ally",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "jin",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    38,
+    45
+   ],
+   "colors": 42,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "celes",
+   "name": "セレス",
+   "type": "hero",
+   "tier": "ally",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "celes",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    27,
+    54
+   ],
+   "colors": 33,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "celes_aw",
+   "name": "celes_aw",
+   "type": "hero_aw",
+   "tier": "ally",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "celes",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    27,
+    54
+   ],
+   "colors": 31,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "valk",
+   "name": "ヴァルク",
+   "type": "hero",
+   "tier": "ally",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "valk",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    55,
+    50
+   ],
+   "colors": 42,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "valk_aw",
+   "name": "valk_aw",
+   "type": "hero_aw",
+   "tier": "ally",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "valk",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    55,
+    50
+   ],
+   "colors": 42,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "slime",
+   "name": "虚蝕スライム",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "slime",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    36,
+    27
+   ],
+   "colors": 12,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "wolf",
+   "name": "灰狼",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "wolf",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    60,
+    36
+   ],
+   "colors": 20,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "boss",
+   "name": "虚ろの番人",
+   "type": "enemy",
+   "tier": "boss",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "boss",
+   "variant": "",
+   "scale": 1.536,
+   "bbox_dots": [
+    72,
+    97
+   ],
+   "colors": 24,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "moss",
+   "name": "苔スライム",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "slime",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    36,
+    27
+   ],
+   "colors": 12,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "jadewolf",
+   "name": "翠狼",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "wolf",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    60,
+    36
+   ],
+   "colors": 20,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "shroom",
+   "name": "毒茸",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "shroom",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    42,
+    46
+   ],
+   "colors": 16,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "bookghost",
+   "name": "魔導書の亡霊",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "bookghost",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    42,
+    55
+   ],
+   "colors": 25,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "中",
+   "status": "未着手"
+  },
+  {
+   "id": "boss2",
+   "name": "禁書の守護像",
+   "type": "enemy",
+   "tier": "boss",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "golem",
+   "variant": "",
+   "scale": 1.8,
+   "bbox_dots": [
+    90,
+    94
+   ],
+   "colors": 20,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "darkknight",
+   "name": "亡霊騎士",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "gald",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    45,
+    48
+   ],
+   "colors": 28,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "cursedslime",
+   "name": "呪縛スライム",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "slime",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    36,
+    27
+   ],
+   "colors": 12,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "shade",
+   "name": "影法師",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "bookghost",
+   "variant": "shade",
+   "scale": 1.2,
+   "bbox_dots": [
+    44,
+    57
+   ],
+   "colors": 11,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "boss3",
+   "name": "虚ろの司祭",
+   "type": "enemy",
+   "tier": "boss",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "boss",
+   "variant": "priest",
+   "scale": 1.536,
+   "bbox_dots": [
+    77,
+    102
+   ],
+   "colors": 26,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "raiwolf",
+   "name": "雷狼",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "wolf",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    60,
+    36
+   ],
+   "colors": 20,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "ironslime",
+   "name": "鉄スライム",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "slime",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    36,
+    27
+   ],
+   "colors": 12,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "golemkin",
+   "name": "鉱石ゴーレム",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "golem",
+   "variant": "",
+   "scale": 1.032,
+   "bbox_dots": [
+    52,
+    55
+   ],
+   "colors": 20,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "minerghost",
+   "name": "坑道の亡者",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "gald",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    45,
+    48
+   ],
+   "colors": 27,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "golemboss",
+   "name": "黒鉄の巨像",
+   "type": "enemy",
+   "tier": "boss",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "golem",
+   "variant": "",
+   "scale": 1.8,
+   "bbox_dots": [
+    90,
+    94
+   ],
+   "colors": 20,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "boss4",
+   "name": "虚蝕のクロウ",
+   "type": "enemy",
+   "tier": "boss",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "crow",
+   "variant": "",
+   "scale": 2.22,
+   "bbox_dots": [
+    41,
+    77
+   ],
+   "colors": 30,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "ernaE",
+   "name": "弓手エルナ",
+   "type": "enemy",
+   "tier": "mid",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "erna",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    31,
+    43
+   ],
+   "colors": 38,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "boss4b",
+   "name": "虚蝕の残影",
+   "type": "enemy",
+   "tier": "boss",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "crow",
+   "variant": "",
+   "scale": 2.22,
+   "bbox_dots": [
+    41,
+    77
+   ],
+   "colors": 30,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "snowwolf",
+   "name": "雪狼",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "wolf",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    60,
+    36
+   ],
+   "colors": 17,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "iceslime",
+   "name": "氷スライム",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "slime",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    36,
+    27
+   ],
+   "colors": 12,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "yukirei",
+   "name": "雪霊",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "bookghost",
+   "variant": "yuki",
+   "scale": 1.2,
+   "bbox_dots": [
+    35,
+    50
+   ],
+   "colors": 14,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "onimusha",
+   "name": "鬼武者",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "gald",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    45,
+    48
+   ],
+   "colors": 28,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "boss5",
+   "name": "氷華の妖狐",
+   "type": "enemy",
+   "tier": "boss",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "wolf",
+   "variant": "fox",
+   "scale": 2.1,
+   "bbox_dots": [
+    122,
+    79
+   ],
+   "colors": 17,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "drowned",
+   "name": "溺れた近衛",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "gald",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    45,
+    48
+   ],
+   "colors": 27,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "jelly",
+   "name": "大海月",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "shroom",
+   "variant": "jelly",
+   "scale": 1.2,
+   "bbox_dots": [
+    41,
+    45
+   ],
+   "colors": 18,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "waterslime",
+   "name": "水精スライム",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "slime",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    36,
+    27
+   ],
+   "colors": 12,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "boss6",
+   "name": "沈みし女王",
+   "type": "enemy",
+   "tier": "boss",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "noah",
+   "variant": "queen",
+   "scale": 2.22,
+   "bbox_dots": [
+    50,
+    80
+   ],
+   "colors": 27,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "tower10",
+   "name": "塔の番兵",
+   "type": "enemy",
+   "tier": "boss",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "golem",
+   "variant": "",
+   "scale": 1.8,
+   "bbox_dots": [
+    90,
+    94
+   ],
+   "colors": 20,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "tower20",
+   "name": "天狐の残照",
+   "type": "enemy",
+   "tier": "boss",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "wolf",
+   "variant": "fox",
+   "scale": 1.92,
+   "bbox_dots": [
+    112,
+    72
+   ],
+   "colors": 17,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "boss7",
+   "name": "星核の守護者",
+   "type": "enemy",
+   "tier": "boss",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "golem",
+   "variant": "",
+   "scale": 1.8,
+   "bbox_dots": [
+    90,
+    94
+   ],
+   "colors": 17,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "last1",
+   "name": "星核の残響",
+   "type": "enemy",
+   "tier": "boss",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "golem",
+   "variant": "",
+   "scale": 1.8,
+   "bbox_dots": [
+    90,
+    94
+   ],
+   "colors": 19,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "last2",
+   "name": "虚獣ノクス",
+   "type": "enemy",
+   "tier": "boss",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "wolf",
+   "variant": "drake",
+   "scale": 2.28,
+   "bbox_dots": [
+    133,
+    78
+   ],
+   "colors": 23,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "last3",
+   "name": "虚神ノクス",
+   "type": "enemy",
+   "tier": "boss",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "rio",
+   "variant": "",
+   "scale": 2.22,
+   "bbox_dots": [
+    54,
+    81
+   ],
+   "colors": 39,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "firedrake",
+   "name": "火竜の仔",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "wolf",
+   "variant": "drake",
+   "scale": 1.2,
+   "bbox_dots": [
+    72,
+    42
+   ],
+   "colors": 22,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "lavaslime",
+   "name": "溶岩スライム",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "slime",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    36,
+    27
+   ],
+   "colors": 12,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "dragonewt",
+   "name": "竜兵",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "gald",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    45,
+    48
+   ],
+   "colors": 28,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "ember",
+   "name": "残り火",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "bookghost",
+   "variant": "spirit",
+   "scale": 1.2,
+   "bbox_dots": [
+    35,
+    51
+   ],
+   "colors": 11,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "boss9",
+   "name": "黒炎竜ヴォルガノン",
+   "type": "enemy",
+   "tier": "boss",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "wolf",
+   "variant": "dragon",
+   "scale": 2.76,
+   "bbox_dots": [
+    162,
+    95
+   ],
+   "colors": 23,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "valkE",
+   "name": "竜人ヴァルク",
+   "type": "enemy",
+   "tier": "mid",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "valk",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    55,
+    50
+   ],
+   "colors": 39,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "tr_rio2",
+   "name": "リオの幻影",
+   "type": "enemy",
+   "tier": "boss",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "rio",
+   "variant": "",
+   "scale": 2.22,
+   "bbox_dots": [
+    54,
+    81
+   ],
+   "colors": 40,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "tr_gald2",
+   "name": "ガルドの幻影",
+   "type": "enemy",
+   "tier": "boss",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "gald",
+   "variant": "",
+   "scale": 2.22,
+   "bbox_dots": [
+    81,
+    86
+   ],
+   "colors": 30,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "kb10",
+   "name": "虚ろの巨像",
+   "type": "enemy",
+   "tier": "boss",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "golem",
+   "variant": "",
+   "scale": 1.8,
+   "bbox_dots": [
+    90,
+    94
+   ],
+   "colors": 20,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "kb20",
+   "name": "虚ろの妖狐",
+   "type": "enemy",
+   "tier": "boss",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "wolf",
+   "variant": "",
+   "scale": 1.8,
+   "bbox_dots": [
+    89,
+    54
+   ],
+   "colors": 20,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "kb30",
+   "name": "刻喰らいの番人",
+   "type": "enemy",
+   "tier": "boss",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "golem",
+   "variant": "",
+   "scale": 1.8,
+   "bbox_dots": [
+    90,
+    94
+   ],
+   "colors": 17,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "kb40",
+   "name": "虚ろの女王",
+   "type": "enemy",
+   "tier": "boss",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "noah",
+   "variant": "",
+   "scale": 2.22,
+   "bbox_dots": [
+    42,
+    80
+   ],
+   "colors": 27,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "vo_slime",
+   "name": "虚・虚蝕スライム",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "slime",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    36,
+    27
+   ],
+   "colors": 12,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "vo_golemkin",
+   "name": "虚・鉱石ゴーレム",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "golem",
+   "variant": "",
+   "scale": 1.032,
+   "bbox_dots": [
+    52,
+    55
+   ],
+   "colors": 20,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "vo_yukirei",
+   "name": "虚・雪霊",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "bookghost",
+   "variant": "yuki",
+   "scale": 1.2,
+   "bbox_dots": [
+    35,
+    50
+   ],
+   "colors": 14,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "vo_shade",
+   "name": "虚・影法師",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "bookghost",
+   "variant": "shade",
+   "scale": 1.2,
+   "bbox_dots": [
+    44,
+    57
+   ],
+   "colors": 11,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  },
+  {
+   "id": "vo_drowned",
+   "name": "虚・溺れた近衛",
+   "type": "enemy",
+   "tier": "normal",
+   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "rig": "gald",
+   "variant": "",
+   "scale": 1.2,
+   "bbox_dots": [
+    45,
+    48
+   ],
+   "colors": 28,
+   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "bind": "ED[id]／HB[id] → SPRX.frame()",
+   "quality": "低：色替え・拡大流用",
+   "status": "未着手"
+  }
+ ]
+}
