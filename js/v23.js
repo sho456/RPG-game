@@ -38,14 +38,16 @@ function fadeIn(){const k=scene+'|'+(typeof TSC!=='undefined'?TSC:'');if(k===TRK
 
 /* ==================== 1. 戦闘画面 ==================== */
 const LY={top:40,bot:150,heroL:118,hudPx:80,botPx:46};
+/* ver0.25：後の版が戦場の高さ・上下の帯・味方の配置を差し替えるための入口 */
+const HK23={};
 const CMDMIN=()=>innerHeight<620?128:innerHeight<700?146:innerHeight<800?160:172;
 /* 上の固定帯（敵の名前・HP・弱点）と、下の行動順・星臨ボタンの高さ（画面px） */
 function hudPx(){const hd=$('#bt22 .b22hd'),bt=$('#bt22 .b22btn');let h=0;if(hd&&hd.offsetParent)h=hd.offsetTop+hd.offsetHeight;if(bt&&bt.offsetParent)h=Math.max(h,bt.offsetTop+bt.offsetHeight);return Math.max(h,58);}
 function botPx(){const st=$('#stage'),o=$('#bt22 .b22ord'),a=$('#bt22 .b22aw');if(!st)return 46;const sh=st.offsetHeight;let t=sh;for(const e of[o,a])if(e&&e.offsetParent)t=Math.min(t,e.offsetTop);return Math.max(40,sh-t);}
-function battleH(){const sc=appW()/W,ch=V21.contentH(),used=Math.max(oh($('#msg')),40)+Math.max(oh($('#bp24')),84)+Math.max(oh($('#bbar')),44)+CMDMIN();
+function battleH(){if(HK23.battleH)return HK23.battleH();const sc=appW()/W,ch=V21.contentH(),used=Math.max(oh($('#msg')),40)+Math.max(oh($('#bp24')),84)+Math.max(oh($('#bbar')),44)+CMDMIN();
  return clamp(Math.floor((ch-used)/sc),132,300);}
 /* 味方：右側に縦に並べる。間隔が体の高さより狭いときは2列のジグザグにして、全身が重ならないようにする */
-function placeHeroes(){const hs=B.heroes,n=hs.length;if(!n)return;let hh=0,ww=0;hs.forEach(h=>{const D=V19.dims(h);hh=Math.max(hh,D.h);ww=Math.max(ww,D.w);});
+function placeHeroes(){const hs=B.heroes,n=hs.length;if(!n)return;LY.ebot=null;if(HK23.placeHeroes)return HK23.placeHeroes(hs,LY);let hh=0,ww=0;hs.forEach(h=>{const D=V19.dims(h);hh=Math.max(hh,D.h);ww=Math.max(ww,D.w);});
  const band=LY.bot-LY.top,back=W-12-ww/2,dx=ww+6;
  /* 1列に入るなら1列（ゆるい弓なり）。入らなければ列を増やす（2列＝ジグザグ、さらに狭ければ斜め一列） */
  let c=1;for(;c<n;c++){const k=Math.ceil(n/c);if(k===1||(band-hh)/(k-1)>=hh+2)break;}const k=Math.ceil(n/c),s=k>1?(band-hh)/(k-1):0;
@@ -60,7 +62,7 @@ const ANC={1:[[.5,.62]],2:[[.3,.4],[.68,.8]],3:[[.26,.3],[.7,.56],[.3,.88]],4:[[
 const BANC=[[.86,.22],[.86,.92],[.14,.18],[.14,.96]];
 function eDims(e){const D=V19.dims(e);return{w:D.w,h:D.h};}
 function capScale(e,band,wid){const A=e.A;if(!A||A.none)return;if(A.sc23==null)A.sc23=A.sc;A.sc=A.sc23;e._cap23=0;const D=eDims(e),k=Math.min(1,band*.96/D.h,wid*.96/D.w);if(k<1){A.sc=A.sc23*k;e._cap23=A.sc;}}
-function placeEnemies(full){const x0=3,x1=Math.max(60,LY.heroL-10),band=LY.bot-LY.top,es=B.enemies;
+function placeEnemies(full){const x0=3,x1=Math.max(60,LY.heroL-10),EB=LY.ebot!=null?LY.ebot:LY.bot,band=EB-LY.top,es=B.enemies;
  const fixed=full?[]:es.filter(e=>e._p23&&e.alive),todo=full?es.filter(e=>e.alive||!e._p23):es.filter(e=>!e._p23);if(!todo.length)return;
  const box=e=>{const D=eDims(e),fx=e.x+8*e.sc,fy=e.y+16*e.sc-2;return[fx-D.w/2,fy-D.h,fx+D.w/2,fy];};
  const placed=fixed.map(box),boss=es.some(e=>e.boss&&e.alive),bossT=todo.filter(e=>e.boss),mins=todo.filter(e=>!e.boss);
@@ -70,13 +72,13 @@ function placeEnemies(full){const x0=3,x1=Math.max(60,LY.heroL-10),band=LY.bot-L
   /* 重ならない場所が無ければ、その敵を少しずつ縮めて探し直す（最小72%） */
   let best=null;for(const shrink of[1,.86,.72]){if(shrink<1&&e.A&&!e.A.none){e.A.sc=(e._cap23||e.A.sc23||e.A.sc)*shrink;e._cap23=e.A.sc;}
    const D=eDims(e),fxA=x0+D.w/2+(x1-x0-D.w)*ax,fyA=LY.top+D.h+(band-D.h)*ay;let bc=1e18,bo=0;best=null;
-   for(let fy=LY.top+D.h;fy<=LY.bot+.01;fy+=2)for(let fx=x0+D.w/2;fx<=x1-D.w/2+.01;fx+=2){const b=[fx-D.w/2-2,fy-D.h-2,fx+D.w/2+2,fy+2];let ov=0;
+   for(let fy=LY.top+D.h;fy<=EB+.01;fy+=2)for(let fx=x0+D.w/2;fx<=x1-D.w/2+.01;fx+=2){const b=[fx-D.w/2-2,fy-D.h-2,fx+D.w/2+2,fy+2];let ov=0;
      for(const p of placed){const ix=Math.min(b[2],p[2])-Math.max(b[0],p[0]),iy=Math.min(b[3],p[3])-Math.max(b[1],p[1]);if(ix>0&&iy>0)ov+=ix*iy;}
      const c=ov*60+Math.hypot(fx-fxA,(fy-fyA)*1.2);if(c<bc){bc=c;bo=ov;best=[fx,fy];}}
    if(!best)best=[fxA,fyA];if(bo<=0)break;}
   e.x=best[0]-8*e.sc;e.y=Math.round(best[1]-16*e.sc+2);e._p23=1;placed.push(box(e));}}
 function layout(full=true){if(scene!=='battle'||!B)return;const nh=battleH();if(nh!==H){setH(nh);try{BG=makeBg(V22.BL.th,V22.BL.boss);if(typeof VOIDED!=='undefined'&&VOIDED&&typeof desat==='function')BG=desat(BG);}catch(e){}}else fit();
- LY.hudPx=hudPx();LY.botPx=botPx();LY.top=(LY.hudPx+6)/SC;LY.bot=H-(LY.botPx+3)/SC;if(LY.bot-LY.top<44)LY.bot=LY.top+44;
+ LY.hudPx=(HK23.hudPx||hudPx)();LY.botPx=(HK23.botPx||botPx)();LY.top=(LY.hudPx+6)/SC;LY.bot=H-(LY.botPx+3)/SC;if(LY.bot-LY.top<44)LY.bot=LY.top+44;
  placeHeroes();placeEnemies(full);app.style.setProperty('--hud23',LY.hudPx+'px');app.style.setProperty('--bot23',LY.botPx+'px');refresh();}
 {const _sb=startBattle;startBattle=function(list,opts){const r=_sb(list,opts);try{layout(true);requestAnimationFrame(()=>{try{layout(true);}catch(e){}});}catch(e){console.error(e);}return r;};}
 addEventListener('resize',()=>{if(scene==='battle')requestAnimationFrame(()=>requestAnimationFrame(()=>{try{layout(true);}catch(e){}}));});
@@ -283,4 +285,4 @@ function sample(){if(!B)return;const e=B.enemies[0],s=B.enemies[1],h=B.heroes;le
 /* 版表示 */
 {const _t=title;title=function(){_t();const v=$('#verL');if(v)v.textContent=VER23;};const v=$('#verL');if(v)v.textContent=VER23;}
 try{document.title='アストラル・ブレイカー '+VER23;}catch(e){}
-return{NEWS23,zkDetail,zvPlay,ZV,homeFix,applyFieldMsg,layout,LY,seirinText,fadeIn,placeEnemies,placeHeroes,battleH,esc,clamp,appW,oh,sleep,DEV};})();
+return{HK23,NEWS23,zkDetail,zvPlay,ZV,homeFix,applyFieldMsg,layout,LY,seirinText,fadeIn,placeEnemies,placeHeroes,battleH,esc,clamp,appW,oh,sleep,DEV};})();

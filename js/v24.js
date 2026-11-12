@@ -92,7 +92,10 @@ function make(u,cls,pri,life){const L=layer(),el=document.createElement('div');e
 /* 大きさ（画面px）。戦場の倍率に比例し、上限・下限を設ける */
 /* 演技エリアが低い画面（iPhone SE など）では、エリアの高さに合わせて全体を縮める */
 const fitK=()=>{const bd=bounds();return clamp((bd.b-bd.t)/230,.68,1);};
-const numFs=u=>Math.round((u.side===0?clamp(SC*9,19,25):clamp(SC*12,24,34))*fitK());
+/* 文字の大きさ（倍率・最小・最大）。ver0.25 で参考資料に合わせて調整できるよう外へ出す */
+const FS24={h:[9,19,25],e:[12,24,34],hl:[7.6,15,21],cb:[13,24,34],lb:.56};
+const fsOf=k=>clamp(SC*FS24[k][0],FS24[k][1],FS24[k][2]);
+const numFs=u=>Math.round(fsOf(u.side===0?'h':'e')*fitK());
 const TIER=[1,1.12,1.28,1.45];
 const tierOf=(u,d)=>{const r=d/Math.max(1,u.mhp||1);return r>=.35?3:r>=.15?2:r>=.05?1:0;};
 const fmt=n=>{n=Math.abs(n|0);return n>=100000?Math.floor(n/10000)+'万':String(n);};
@@ -103,7 +106,7 @@ function dmgPop(u,s,kind,el){const v=parseInt(s,10),heal=s[0]==='+',crit=/crit/.
  const sk=heal?'heal':psn?'psn':crit?'dmgC':weak?(t>=3?'dmgWT':'dmgW'):grd?'dmgG':u.side===0?'dmgH':t>=3?'dmgT':'dmg';
  const pri=crit?PRI.crit:heal?PRI.heal:PRI.dmg;capUnit(u);
  const p=make(u,`dmg t${t}${crit?' crit':''}${weak?' weak':''}${heal?' heal':''}${grd?' grd':''}`,pri,(crit||t>=2?1400:1150));
- const lf=Math.round(fs*.56);
+ const lf=Math.round(fs*(FS24.lb||.56));
  if(crit)p.in.appendChild(lbRow('cr',TX24.el('Critical','crit',Math.round(fs*.62))));
  if(weak){const r=lbRow('wk',TX24.el('Weak','weak',lf));if(el&&ELC[el])r.appendChild(TX24.el(el,'elm',Math.round(lf*1.06)));p.in.appendChild(r);}
  if(grd)p.in.appendChild(lbRow('gd',TX24.el('Guard','guard',Math.round(fs*.66))));
@@ -137,7 +140,7 @@ V17F.pop=pop24;
 /* 連撃数（○HITS と合計）：上の固定帯のすぐ下・左端に固定。参考資料の数字と同じ質感で */
 function comboRect(){const c=$('#combo'),bd=bounds(),r=relRect(c);return r?{l:r.l-4,t:r.t-2,r:Math.max(r.r,bd.l+118)+4,b:Math.max(r.b,bd.t+60)+2}:{l:0,t:bd.t-2,r:bd.l+122,b:bd.t+62};}
 comboAdd=function(d){if(!B||!B.combo)return;B.combo.n++;B.combo.tot+=d;if(B.combo.n<2)return;let c=$('#combo');if(!c){c=document.createElement('div');c.id='combo';stage().appendChild(c);}
- const fs=Math.round(clamp(SC*13,24,34)*fitK());c.innerHTML='';const r1=document.createElement('div');r1.className='c1';r1.appendChild(TX24.row(String(B.combo.n),'dmgC',fs));r1.appendChild(TX24.el('HITS','crit',Math.round(fs*.5)));
+ const fs=Math.round(fsOf('cb')*fitK());c.innerHTML='';const r1=document.createElement('div');r1.className='c1';r1.appendChild(TX24.row(String(B.combo.n),'dmgC',fs));r1.appendChild(TX24.el('HITS','crit',Math.round(fs*.5)));
  const r2=document.createElement('div');r2.className='c2';r2.appendChild(TX24.el(fmt(B.combo.tot),'dmg',Math.round(fs*.56)));c.appendChild(r1);c.appendChild(r2);
  c.style.display='block';c.classList.remove('bump');void c.offsetWidth;c.classList.add('bump');};
 /* 技名：上の固定帯のすぐ下、中央に出す（キャラに被らない） */
@@ -149,7 +152,7 @@ function hlLayer(){let L=$('#hl24');if(!L||!L.isConnected){L=document.createElem
   L.addEventListener('click',e=>{const c=e.target.closest('.hl');if(!c||!B)return;const h=B.heroes[+c.dataset.i];if(h){SFX.sel();heroSheet(h);}});}return L;}
 function dimHL(R,life){const L=$('#hl24');if(!L)return;HL.rects.forEach((r,i)=>{const c=L.children[i];if(!c||ov(R,r)<=0)return;c.classList.add('dim');clearTimeout(c._dt);c._dt=setTimeout(()=>c.classList.remove('dim'),life);});}
 const hpStyle=h=>!h.alive?'hpD':h.hp<h.mhp*.25?'hpR':h.hp<h.mhp*.5?'hpY':'hp';
-function renderHL(){const L=hlLayer();if(!B)return;const fs=Math.round(clamp(SC*7.6,15,21)*clamp(fitK()+.1,.82,1)),ss=Math.round(fs*.62);
+function renderHL(){const L=hlLayer();if(!B)return;const fs=Math.round(fsOf('hl')*clamp(fitK()+.1,.82,1)),ss=Math.round(fs*.62);
  if(L.children.length!==B.heroes.length||L._ids!==B.heroes.map(h=>h.id).join()){L._ids=B.heroes.map(h=>h.id).join();L.innerHTML=B.heroes.map((h,i)=>`<div class="hl" data-i="${i}"><span class="v"></span><span class="s"></span></div>`).join('');}
  B.heroes.forEach((h,i)=>{const c=L.children[i],hp=Math.max(0,h.hp|0),sp=DEV()?'∞':String(h.sp|0),st=hpStyle(h),k=hp+'|'+st+'|'+fs;
   if(c._k!==k){c._k=k;const v=c.querySelector('.v');v.innerHTML='';v.appendChild(TX24.el(String(hp),st,fs));}
@@ -157,7 +160,8 @@ function renderHL(){const L=hlLayer();if(!B)return;const fs=Math.round(clamp(SC*
   const cls=`hl${h.alive?'':' down'}${B.cur===h?' cur':''}${h.aw?' awk':''}${h.guard?' gd':''}`;if(c.className!==cls)c.className=cls;});
  placeHL();}
 /* 位置：体の左下（少しだけ絵に掛かる）を第一候補に、他のキャラ・他のHP表示と重ならない場所を選ぶ */
-function placeHL(){const L=$('#hl24');if(!L||!B)return;const bd=bounds(),boxes=B.heroes.map(h=>boxOf(h,true)),rs=[],aw=relRect($('#bt22 .b22aw'));
+const HK24={};
+function placeHL(){const L=$('#hl24');if(!L||!B)return;if(HK24.placeHL){HL.rects=HK24.placeHL(L)||[];return;}const bd=bounds(),boxes=B.heroes.map(h=>boxOf(h,true)),rs=[],aw=relRect($('#bt22 .b22aw'));
  B.heroes.forEach((h,i)=>{const c=L.children[i];if(!c)return;const w=c.offsetWidth,hh=c.offsetHeight,b=boxes[i];
   const cand=[[b.l+b.w*.18-w,b.b-hh+2],[b.l+b.w*.18-w,b.cy-hh*.2],[b.l+b.w*.18-w,b.t],[b.cx-w/2,b.b-4],[b.l-w-2,b.t+b.h*.3],[b.r-b.w*.1,b.b-hh+2],[b.cx-w/2,b.t-hh+6],[b.l-w-2,b.b-hh]];let best=null;
   cand.forEach(([x,y],j)=>{x=clamp(x,bd.l,bd.r-w);y=clamp(y,bd.t,Math.max(bd.t,bd.b-hh));const R=rect(x,y,w,hh,2);let s=j*40+(aw?ov(R,aw)*20:0);
@@ -226,4 +230,4 @@ function dev24(m){log(m||`<b>${VER24}</b>　ダメージ表示・HP表示・照�
 /* 版表示 */
 {const _t=title;title=function(){_t();const v=$('#verL');if(v)v.textContent=VER24;};const v=$('#verL');if(v)v.textContent=VER24;}
 try{document.title='アストラル・ブレイカー '+VER24;}catch(e){}
-return{pop24,dmgPop,wordPop,tagPop,PM,PRI,clearPops,renderHL,renderBP,heroSheet,boxOf,bounds,stress,dev24,HL};})();
+return{HK24,FS24,placeHL,renderHL0:()=>renderHL(),pop24,dmgPop,wordPop,tagPop,PM,PRI,clearPops,renderHL,renderBP,heroSheet,boxOf,bounds,stress,dev24,HL};})();
