@@ -1,5 +1,5 @@
 /* ===== 戦闘表示（ver0.10） ===== */
-function stTags(u){const t=[];if(u.side===0){if(u.aw)t.push(['覚醒','aw']);if(u.ag>=100&&!u.aw)t.push(['AG MAX','ag']);if(u.taunt>0)t.push(['挑発'+u.taunt,'tn']);if(u.guard)t.push(['防御','gd']);
+function stTags(u){const t=[];if(u.side===0){if(u.aw)t.push(['星臨','aw']);if(u.ag>=100&&!u.aw)t.push(['AG MAX','ag']);if(u.taunt>0)t.push(['挑発'+u.taunt,'tn']);if(u.guard)t.push(['防御','gd']);
  if(B.domain)t.push(['聖域','dm']);if(B.barrier>0)t.push(['障壁','dm']);if(u.charged)t.push(['充填','ch']);
  if(u.aw){if(u.id==='gald')t.push(['蓄'+Math.round(u.store),'ch']);else if(u.id==='mire')t.push(['対消滅'+(u.stk||0),'ch']);else if(u.id==='balza')t.push(['熱'+u.awT,'ch']);else if(!GAUGE.includes(u.id))t.push(['残'+(awN(u)-u.awT),'ch']);}}
  else{if(u.broken)t.push(['BREAK','bk']);if(u.charging)t.push(['溜め','cg']);if(u.stolen)t.push(['盗済','st']);}return t;}
@@ -10,7 +10,7 @@ function refresh(){if(!B)return;const P=$('#party'),key=B.heroes.map(h=>h.id).jo
   r.querySelector('.n').textContent=h.name;r.querySelector('.tgs').innerHTML=tagH(h);const[hp,sp,ag]=r.querySelectorAll('.bar'),pc=Math.max(0,h.hp/h.mhp*100);
   hp.querySelector('.fg').style.width=pc+'%';hp.querySelector('.gh').style.width=pc+'%';hp.classList.toggle('low',pc<30&&h.alive);hp.querySelector('span').textContent=`HP ${h.hp}`;
   sp.querySelector('.fg').style.width=h.sp+'%';sp.querySelector('span').textContent=`SP ${h.sp}`;ag.querySelector('.fg').style.width=Math.min(100,h.ag)+'%';ag.classList.toggle('full',h.ag>=100&&!h.aw);
-  ag.querySelector('span').textContent=h.aw?(GAUGE.includes(h.id)?'ゲージ'+Math.round(h.ag):'覚醒中'):h.ag>=100?'覚醒OK':`AG ${Math.floor(h.ag)}`;});
+  ag.querySelector('span').textContent=h.aw?(GAUGE.includes(h.id)?'ゲージ'+Math.round(h.ag):'星臨中'):h.ag>=100?'星臨OK':`AG ${Math.floor(h.ag)}`;});
  const L=$('#labels');[...L.children].forEach(el=>{if(!el._e||!B.enemies.includes(el._e)||!el._e.alive)el.remove();});
  aliveE().forEach(e=>{let el=e._el;if(!el||!el.isConnected){el=document.createElement('div');el.className='lab';el.innerHTML='<div class="n"></div><div class="hp"><b></b><i></i></div><div class="cs"></div>';el._e=e;e._el=el;L.appendChild(el);}
   el.style.left=Math.max(0,e.x*SC)+'px';el.style.top=Math.max(0,(e.y+(e.boss?-3:6))*SC-32)+'px';el.querySelector('.n').innerHTML=`${e.name} <small>Lv${e.lv}</small>`;
@@ -29,7 +29,7 @@ function comboAdd(d){if(!B.combo)return;B.combo.n++;B.combo.tot+=d;if(B.combo.n<
  c.innerHTML=`<b>${B.combo.n}</b>HITS<span>${B.combo.tot}</span>`;c.style.display='block';c.classList.remove('bump');void c.offsetWidth;c.classList.add('bump');}
 function comboEnd(){B.combo=null;const c=$('#combo');if(c)setTimeout(()=>{if(!B||!B.combo)c.style.display='none';},900);}
 /* ===== 第5章：沈んだ王都 ===== */
-const SETS={royal:{n:'王家の遺品',b2:{mhpP:10,defP:10},b4:{awDmg:25,startAG:20},d2:'最大HP+10%・防御+10%',d4:'覚醒中与ダメ+25%・開始時AG+20'}};
+const SETS={royal:{n:'王家の遺品',b2:{mhpP:10,defP:10},b4:{awDmg:25,startAG:20},d2:'最大HP+10%・防御+10%',d4:'星臨中与ダメ+25%・開始時AG+20'}};
 const ROYAL={head:'王家の冠',body:'王家の鎧',sub:'王家の盾',acc:'王家の指輪'};ITYPE.unshift(['冠','circ'],['盾','shield']);
 function royalItem(slot,ilv){const it=genItem(ilv,0,0,slot,3);if(slot==='sub'){it.base={def:Math.round(5+ilv*1.3)};}it.set='royal';it.name=ROYAL[slot];return it;}
 const royalRand=ilv=>royalItem(['head','body','sub','acc'][Math.random()*4|0],ilv);
@@ -57,7 +57,7 @@ Object.assign(SK,{tsume:{n:'爪撃',sp:15,el:'斬',k:'phys',pow:1.3,t:'one',d:'�
  juuou:{n:'獣王撃',el:'地',k:'phys',pow:1.8,t:'one',auto:['風','地'],d:'敵の弱点に合わせて地か風に変わる'},shippuuga:{n:'疾風牙',el:'風',k:'phys',pow:1,t:'all',d:'風・敵全体'},
  houkou:{n:'咆哮',k:'roar',t:'all',d:'敵全体の行動を遅らせ、味方のAG+15'}});
 AW.jin={name:'獣魂合一',type:'ターン制',turns:4,cmds:['juuou','shippuuga','houkou']};AWD.jin='相棒ポポと合体。攻撃と素早さ+30%、獣王撃は敵の弱点に合わせて属性が変わる';
-BDEF.jin=mkB('獣王座',[['atkP'],['mhpP'],['spd'],['defP'],['crit'],['resP']],['3,-2','-2,-1','-2,3','2,1'],'goga','tatsumaki',[[{atkP:12},'猛獣：攻撃+12%'],[{mhpP:15},'巨躯：最大HP+15%'],[{awDmg:20},'野生：覚醒中与ダメ+20%'],[{spd:2},'俊足：素早さ+2']]);
+BDEF.jin=mkB('獣王座',[['atkP'],['mhpP'],['spd'],['defP'],['crit'],['resP']],['3,-2','-2,-1','-2,3','2,1'],'goga','tatsumaki',[[{atkP:12},'猛獣：攻撃+12%'],[{mhpP:15},'巨躯：最大HP+15%'],[{awDmg:20},'野生：星臨中与ダメ+20%'],[{spd:2},'俊足：素早さ+2']]);
 BOARD.jin=buildBoard('jin');IIS.claw=["","..m...m...m.","..m...m...m.","..mm..mm..mm","...mM..mM..M","....MMMMMMM.","....MbbbbbM.",".....bbbbb..",".....bbbbb.."];ITYPE.unshift(['爪','claw']);
 Object.assign(RESO,{'jin,rio':'獣灯の咆哮','gald,jin':'大地の守護獣','jin,shion':'疾風双牙'});
 function jinEvent(){F.pause=true;banner('ジン','#d08030');

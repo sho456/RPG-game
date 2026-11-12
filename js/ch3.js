@@ -61,7 +61,7 @@ Object.assign(SK,{
  tenkuu:{n:'天穿',el:'突',k:'phys',pow:4,t:'one',gauge:40,req:'charged',brkAll:1,d:'充填後に解禁・確実にブレイク（ゲージ40）'},
  tekkai:{n:'鉄塊落とし',sp:20,el:'打',k:'phys',pow:1.6,t:'one',d:'打撃・単体'},netsuda:{n:'熱打',sp:20,el:'炎',k:'phys',pow:1.4,t:'one',d:'炎属性の打撃'},shuuri:{n:'応急修理',sp:20,k:'guardRegen',t:'self',d:'防御し、HP15%回復'},
  daichi:{n:'大地割り',sp:35,el:'地',k:'phys',pow:1,t:'all',d:'地・敵全体'},gouen:{n:'業炎撃',sp:35,el:'炎',k:'phys',pow:2.2,t:'one',d:'炎・単体の大技'},
- tanda:{n:'鍛打',el:'打',k:'phys',pow:1.4,t:'one',d:'打撃（熱で威力上昇）'},yakiire:{n:'焼入れ',el:'炎',k:'phys',pow:1.1,t:'all',d:'炎・敵全体'},youtetsu:{n:'溶鉄爆砕',k:'release2',t:'all',d:'覚醒解除・熱を全体へ（溜めすぎると反動）'},
+ tanda:{n:'鍛打',el:'打',k:'phys',pow:1.4,t:'one',d:'打撃（熱で威力上昇）'},yakiire:{n:'焼入れ',el:'炎',k:'phys',pow:1.1,t:'all',d:'炎・敵全体'},youtetsu:{n:'溶鉄爆砕',k:'release2',t:'all',d:'星臨解除・熱を全体へ（溜めすぎると反動）'},
  noroi:{n:'呪い',sp:15,el:'闇',k:'mag',pow:1.4,t:'one',d:'闇の魔法・単体'},yaminami:{n:'闇の波動',sp:30,el:'闇',k:'mag',pow:.9,t:'all',d:'闇・敵全体'},kyuumei:{n:'吸命',sp:25,el:'闇',k:'mag',pow:1.1,t:'one',drain:.5,d:'与えたダメージの半分を回復'},
  shisen:{n:'死の宣告',sp:35,el:'闇',k:'mag',pow:2.4,t:'one',d:'闇・単体の大技'},yamisaki:{n:'闇裂き',sp:35,el:'闇',k:'mag',pow:1.2,t:'all',d:'闇・敵全体'},
  judan:{n:'呪弾',el:'闇',k:'mag',pow:1.6,t:'one',hpCost:.08,d:'HP8%を払う闇弾'},hanten:{n:'呪詛反転',el:'闇',k:'mag',pow:1,t:'all',delay:30,hpCost:.1,d:'HP10%を払い全体攻撃＋遅延'},
@@ -69,14 +69,14 @@ Object.assign(SK,{
 AW.erna={name:'天穿つ眼',type:'ゲージ消費',turns:99,cmds:['raisen','juuten','tenkuu']};
 AW.balza={name:'炉心解放',type:'蓄積型',turns:5,cmds:['tanda','yakiire','youtetsu']};
 AW.crow={name:'千の呪言',type:'代償型',turns:3,cmds:['judan','hanten','shikyou']};
-const AWD={rio:'3回の行動の間、全能力+20%。ガルドの覚醒後は大技を模倣できる',gald:'味方への攻撃を全て受け止め被ダメ軽減。受けた分を蓄積し「城壁崩し」で放出',mire:'1手番に2回行動。炎と氷を交互に撃つと対消滅が溜まり、3段階で大魔法',
- shion:'敵全体の行動を遅らせ、3回連続で行動。強奪でレア装備を奪う',noah:'領域展開。味方が毎ターン回復し、倒れても1度だけ耐える',erna:'全攻撃が会心に。充填後の「天穿」は確実にブレイク',
+const AWD={rio:'3回の行動の間、全能力+20%。ガルドの星臨後は大技を模倣できる',gald:'味方への攻撃を全て受け止め被ダメ軽減。受けた分を蓄積し「城壁崩し」で放出',mire:'1手番に2回行動。炎と氷を交互に撃つと対消滅が溜まり、3段階で大魔法',
+ shion:'敵全体の行動を遅らせ、3回連続で行動。強奪でレア装備を奪う',noah:'聖域を展開。味方が毎ターン回復し、倒れても1度だけ耐える',erna:'全攻撃が会心に。充填後の「天穿」は確実にブレイク',
  balza:'行動ごとに攻撃+15%。溶鉄爆砕で放つが、溜めすぎると反動',crow:'技をHPで払う。HPが低いほど威力上昇。HP25%以下で「死経」解禁'};
-const mkB=(star,sec,mask,s1,s2,f)=>({star,sec,mask,sp:{'2,-2':{t:'skill',v:s1},'-2,2':{t:'skill',v:s2},'0,-3':{t:'aw',v:{awTurn:1},d:'覚醒の持続+1'},'3,-3':{t:'aw',v:{noRecoil:1},d:'覚醒の反動を無効'},
+const mkB=(star,sec,mask,s1,s2,f)=>({star,sec,mask,sp:{'2,-2':{t:'skill',v:s1},'-2,2':{t:'skill',v:s2},'0,-3':{t:'aw',v:{awTurn:1},d:'星臨の持続+1'},'3,-3':{t:'aw',v:{noRecoil:1},d:'星臨の反動を無効'},
  '3,0':{t:'fork',g:1,v:f[0][0],d:f[0][1]},'0,3':{t:'fork',g:1,v:f[1][0],d:f[1][1]},'-3,0':{t:'fork',g:2,v:f[2][0],d:f[2][1]},'-3,3':{t:'fork',g:2,v:f[3][0],d:f[3][1]}}});
 BDEF.erna=mkB('天弓座',[['atkP'],['crit'],['spd'],['weakDmg'],['mhpP'],['defP']],['3,-2','-1,-2','-3,1','1,2'],'kantsuu','jinrai',[[{atkP:12},'剛弓：攻撃+12%'],[{crit:10},'鷹目：会心率+10%'],[{weakDmg:20},'射抜：弱点ダメ+20%'],[{spd:2},'疾風：素早さ+2']]);
-BDEF.balza=mkB('炉心座',[['atkP'],['defP'],['mhpP'],['resP'],['crit'],['spGain']],['2,-3','-2,-1','-3,2','2,1'],'daichi','gouen',[[{atkP:12},'剛腕：攻撃+12%'],[{defP:15},'鉄肌：防御+15%'],[{awDmg:20},'灼熱：覚醒中与ダメ+20%'],[{mhpP:15},'頑健：最大HP+15%']]);
-BDEF.crow=mkB('冥府座',[['magP'],['mhpP'],['spd'],['resP'],['awDmg'],['crit']],['3,-1','-1,-2','-2,3','1,2'],'shisen','yamisaki',[[{magP:12},'冥魔：魔力+12%'],[{mhpP:15},'不死：最大HP+15%'],[{awDmg:20},'怨嗟：覚醒中与ダメ+20%'],[{weakDmg:20},'呪眼：弱点ダメ+20%']]);
+BDEF.balza=mkB('炉心座',[['atkP'],['defP'],['mhpP'],['resP'],['crit'],['spGain']],['2,-3','-2,-1','-3,2','2,1'],'daichi','gouen',[[{atkP:12},'剛腕：攻撃+12%'],[{defP:15},'鉄肌：防御+15%'],[{awDmg:20},'灼熱：星臨中与ダメ+20%'],[{mhpP:15},'頑健：最大HP+15%']]);
+BDEF.crow=mkB('冥府座',[['magP'],['mhpP'],['spd'],['resP'],['awDmg'],['crit']],['3,-1','-1,-2','-2,3','1,2'],'shisen','yamisaki',[[{magP:12},'冥魔：魔力+12%'],[{mhpP:15},'不死：最大HP+15%'],[{awDmg:20},'怨嗟：星臨中与ダメ+20%'],[{weakDmg:20},'呪眼：弱点ダメ+20%']]);
 ['erna','balza','crow'].forEach(k=>BOARD[k]=buildBoard(k));
 Object.assign(RESO,{'erna,rio':'星穿ちの矢','balza,gald':'鋼鉄の城砦','crow,mire':'冥炎','crow,noah':'贖罪の祈り','balza,erna':'雷火の鏃','crow,shion':'影喰らい'});
 const GAUGE=['mire','erna'];
@@ -101,15 +101,15 @@ let sheetPrev=null;
 function openSheet(id,tab='st'){const ids=G.members,sh=$('#sheet'),s=stats(id),h=G.h[id],A2=AW[id],b=HB[id];
  if(sh.style.display!=='flex'&&scene==='field'){sheetPrev=F.pause;F.pause=true;}
  const row=(k,v)=>`<div class="sr"><span>${k}</span><b>${v}</b></div>`;let body='';
- if(tab==='st')body=`<div class="sgrid">${row('最大HP',s.mhp)}${row('攻撃',s.atk)}${row('防御',s.def)}${row('魔力',s.mag)}${row('精神',s.res)}${row('素早さ',+s.spd.toFixed(1))}${row('会心率',(6+s.crit)+'%')}${row('弱点ダメ','+'+s.weakDmg+'%')}${row('開始時AG',s.startAG)}${row('覚醒中与ダメ','+'+s.awDmg+'%')}${row('攻撃時SP','+'+(10+s.spGain))}${row('ドロップ率','+'+s.drop+'%')}</div>
+ if(tab==='st')body=`<div class="sgrid">${row('最大HP',s.mhp)}${row('攻撃',s.atk)}${row('防御',s.def)}${row('魔力',s.mag)}${row('精神',s.res)}${row('素早さ',+s.spd.toFixed(1))}${row('会心率',(6+s.crit)+'%')}${row('弱点ダメ','+'+s.weakDmg+'%')}${row('開始時AG',s.startAG)}${row('星臨中与ダメ','+'+s.awDmg+'%')}${row('攻撃時SP','+'+(10+s.spGain))}${row('ドロップ率','+'+s.drop+'%')}</div>
  <div class="sh2">成長傾向</div><div class="gro">${['mhp','atk','def','mag','res','spd'].map(k=>`<span>${{mhp:'HP',atk:'攻',def:'防',mag:'魔',res:'精',spd:'速'}[k]}<i class="g${b.g[k]}">${b.g[k]}</i></span>`).join('')}</div>
  <div class="sh2">星盤・ジョブ</div><div class="stx">星盤「${BDEF[id].star}」　解放 ${h.board.length-1}／残りポイント ${ptsLeft(id)}<br>ジョブ：${h.job?JOBS[h.job].n+' Lv'+h.jobs[h.job].lv:'なし'}<br>パッシブ：${learned(id).map(p=>{const[j,i]=p.split(':');return JOBS[j].ps[i][2];}).join('・')||'なし'}${s.atkEl?'<br>通常攻撃：'+s.atkEl+'属性':''}</div>`;
  if(tab==='eq')body=SLOTS6.map(sl=>{const it=h.eq[sl]&&findItem(h.eq[sl]);return`<div class="seq"><div class="sl">${SLOTN[sl]}</div>${it?`<div>${ihtml(it)}<br><small>${detailTxt(it)}</small></div>`:'<div style="color:#667">なし</div>'}</div>`;}).join('');
- if(tab==='sk')body=`<div class="sh2">覚醒「${A2.name}」<small>（${A2.type}・段階${ROMAN[h.awLv||1]}）</small></div><div class="stx">${AWD[id]}<br>${[...A2.cmds,...((h.awLv||1)>=3?['goku'+id]:[])].map(k=>`<b>${SK[k].n}</b>：${SK[k].d||''}`).join('<br>')}</div><div class="sh2">技</div><div class="stx">${skillList(id).map(k=>`<b>${SK[k].n}</b> <small>SP${SK[k].sp||0}</small>：${SK[k].d||''}`).join('<br>')}</div>`;
+ if(tab==='sk')body=`<div class="sh2">星臨「${A2.name}」<small>（${A2.type}・位階${ROMAN[h.awLv||1]}）</small></div><div class="stx">${AWD[id]}<br>${[...A2.cmds,...((h.awLv||1)>=3?['goku'+id]:[])].map(k=>`<b>${SK[k].n}</b>：${SK[k].d||''}`).join('<br>')}</div><div class="sh2">技</div><div class="stx">${skillList(id).map(k=>`<b>${SK[k].n}</b> <small>SP${SK[k].sp||0}</small>：${SK[k].d||''}`).join('<br>')}</div>`;
  const i=ids.indexOf(id),pv=ids[(i-1+ids.length)%ids.length],nx=ids[(i+1)%ids.length],hp=h.hp??s.mhp;
  sh.innerHTML=`<div class="swin"><div class="shead"><canvas id="spt" width="16" height="16"></canvas><div><div class="snm">${b.name} <small>Lv${h.lv}</small></div><div class="ssub">${G.party.includes(id)?'前衛':'控え'}　次のLvまで ${nextXP(h.lv)-h.xp}</div>
  <div class="bar hp" style="margin-top:4px"><i style="width:${Math.min(100,hp/s.mhp*100)}%"></i><span>HP ${hp}/${s.mhp}</span></div><div class="bar sp" style="margin-top:3px"><i style="width:${h.xp/nextXP(h.lv)*100}%"></i><span>EXP</span></div></div><button class="sx" id="sxc">✕</button></div>
- <div class="stabs">${[['st','能力'],['eq','装備'],['sk','技・覚醒']].map(([k,l])=>`<button class="${tab===k?'on':''}" data-t="${k}">${l}</button>`).join('')}</div><div class="sbody">${body}</div>
+ <div class="stabs">${[['st','能力'],['eq','装備'],['sk','技・星臨']].map(([k,l])=>`<button class="${tab===k?'on':''}" data-t="${k}">${l}</button>`).join('')}</div><div class="sbody">${body}</div>
  <div class="snav"><button id="spv">◀ ${HB[pv].name}</button><button id="snx">${HB[nx].name} ▶</button></div></div>`;
  sh.style.display='flex';const c=$('#spt').getContext('2d');c.imageSmoothingEnabled=false;c.drawImage(IMG[id],0,0);
  sh.querySelectorAll('.stabs button').forEach(bt=>bt.onclick=()=>{SFX.sel();openSheet(id,bt.dataset.t);});

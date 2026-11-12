@@ -1,0 +1,156 @@
+/* ===== ver0.24 戦闘演出 ===== */
+:root{--rs-t0:#0b2a30;--rs-t1:#12464a;--rs-t2:#1f6e68;--rs-tl:#a6eedd;--rs-ed:#d6e8ec;--rs-nv0:#050b1c;--rs-nv1:#0b1832;--rs-nv2:#13254a}
+
+/* ---------- ダメージ表示（.p24＝位置／.ot＝消える動き／.in＝出る動き） ---------- */
+#pp24{position:absolute;inset:0;pointer-events:none;z-index:4;overflow:hidden;contain:layout paint}
+.p24{position:absolute;left:0;top:0;white-space:nowrap}
+.p24 .ot{transition:opacity var(--out,.22s) ease-in,transform var(--out,.22s) ease-in}
+.p24.out .ot{opacity:0;transform:translateY(-10px) scale(.96)}
+.p24 .in{position:relative;display:flex;flex-direction:column;align-items:center;transform-origin:50% 70%}
+.p24 canvas{display:block;image-rendering:auto;pointer-events:none}
+.p24 .lb{display:flex;align-items:flex-end;justify-content:center;gap:0;margin-bottom:-5px;position:relative;z-index:1}
+.p24 .lb+.lb{margin-top:-3px}
+.p24 .lb.wk canvas+canvas{margin-left:-4px}
+.p24 .nm{position:relative;margin-top:-3px}
+.tr24{display:block}
+/* 数字：上から落ちて弾む（数字全体で1枚の canvas） */
+.p24 .nm>.tr24{animation:dg24 .38s cubic-bezier(.18,1.55,.4,1) both;animation-delay:.03s}
+@keyframes dg24{0%{opacity:0;transform:translateY(-14px) scale(1.3,1.45)}35%{opacity:1}100%{opacity:1;transform:none}}
+/* 見出しの入り方 */
+.p24 .lb.cr canvas{animation:cr24l .34s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes cr24l{0%{opacity:0;transform:scale(2.1)}60%{opacity:1}100%{transform:none}}
+.p24 .lb.wk canvas{animation:wk24 .32s cubic-bezier(.2,1.35,.4,1) both;animation-delay:.04s}
+@keyframes wk24{0%{opacity:0;transform:translateX(-16px) skewX(-14deg)}100%{opacity:1;transform:none}}
+.p24 .lb.gd canvas{animation:gd24 .36s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes gd24{0%{opacity:0;transform:scale(.45)}55%{opacity:1;transform:scale(1.12)}100%{transform:none}}
+.p24 .lb.st canvas{animation:st24 .28s ease-out both}
+@keyframes st24{0%{opacity:0;transform:translateY(5px)}100%{opacity:1;transform:none}}
+/* Critical：全体が大きく入って白く光り、輝きと残像を伴う */
+.p24.crit .in{animation:cr24 .46s cubic-bezier(.2,1.35,.4,1) both}
+@keyframes cr24{0%{transform:scale(1.7)}45%{transform:scale(.94)}100%{transform:none}}
+.p24 .fx{position:absolute;left:50%;top:62%;z-index:-1;pointer-events:none;transform:translate(-50%,-50%);animation:fx24 .5s ease-out both}
+@keyframes fx24{0%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(0)}25%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1.25) rotate(40deg)}}
+.p24 .nm.ec{position:absolute;left:0;top:0;margin:0;opacity:0;animation:ec24 .5s ease-out both;z-index:-1}
+@keyframes ec24{0%{opacity:.7;transform:translate(-5px,-9px)}100%{opacity:0;transform:translate(-2px,-18px)}}
+/* 大きなダメージ（最大HPの35%以上）の残光は Canvas に描き込む（dmgT／dmgWT。CSS の filter は描画が重いため使わない） */
+/* 回復：下から浮かぶ */
+.p24.heal .in{animation:hl24 .4s ease-out both}
+@keyframes hl24{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:none}}
+/* Miss：横から入り、ふわりと流れる */
+.p24.miss .in{animation:ms24 .95s ease-out both}
+@keyframes ms24{0%{opacity:0;transform:translateX(-12px) skewX(-10deg)}22%{opacity:1;transform:none}100%{transform:translateX(9px)}}
+/* BREAK!!：叩きつけて揺れる */
+.p24.xbrk .in{animation:bk24 .62s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes bk24{0%{opacity:0;transform:scale(2.5) rotate(-8deg)}38%{opacity:1;transform:scale(.92) rotate(0)}50%{transform:translateX(-4px)}62%{transform:translateX(4px)}74%{transform:translateX(-2px)}100%{transform:none}}
+/* 状態表示（攻撃↑ など） */
+.p24.tag .in{flex-direction:row;align-items:flex-end;animation:tg24 .3s ease-out both}
+.p24.tag .in canvas+canvas{margin-left:-2px}
+@keyframes tg24{0%{opacity:0;transform:translateY(7px)}100%{opacity:1;transform:none}}
+.p24.tag.dn .in{animation-name:tg24d}
+@keyframes tg24d{0%{opacity:0;transform:translateY(-7px)}100%{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.p24 .in,.p24 canvas{animation:none !important}.p24 .fx{display:none}}
+
+/* ---------- 戦場のHP表示（キャラの横：大きなHP＋小さなSP） ---------- */
+#hl24{position:absolute;inset:0;pointer-events:none;z-index:1}
+#app:not([data-sc="battle"]) #hl24{display:none}
+#hl24 .hl{position:absolute;left:0;top:0;display:flex;flex-direction:column;align-items:flex-end;pointer-events:auto;cursor:pointer;transition:opacity .2s}
+#hl24 .hl canvas{display:block}
+#hl24 .hl .v{display:block;line-height:0}
+#hl24 .hl .s{display:flex;align-items:flex-end;margin-top:-9px;line-height:0}
+#hl24 .hl .s .sl{margin-right:-5px;opacity:.85}
+#hl24 .hl.down{opacity:.7}
+#hl24 .hl.dim{opacity:.18}
+#hl24 .hl.cur .v{animation:hlc24 .9s ease-in-out infinite alternate}
+@keyframes hlc24{from{filter:none}to{filter:drop-shadow(0 0 4px rgba(150,255,230,.75))}}
+
+/* ---------- 行動中キャラのパネル（参考：名前帯＋立ち絵＋ゲージ／HP・SP・状態の3枠） ---------- */
+#bp24{display:none}
+#app.v24[data-sc="battle"] #pt23{display:none !important}
+#app.v24[data-sc="battle"] #bp24{display:block;position:relative;z-index:4;height:84px;margin-top:5px;box-sizing:border-box;cursor:pointer;
+ border-radius:6px;padding:0;background:linear-gradient(180deg,rgba(6,14,32,.96),rgba(4,9,22,.96));
+ box-shadow:0 0 0 1px #01050e,inset 0 0 0 1px rgba(166,238,221,.16),0 3px 8px rgba(0,0,0,.45)}
+#bp24 .hd{position:relative;height:42px;padding:3px 0 0 3px;box-sizing:border-box}
+/* 名前帯：濃い青緑のグラデーションに明るい縁、右端は斜めに切る */
+#bp24 .np{position:relative;display:flex;align-items:center;gap:6px;height:22px;width:66%;padding:0 22px 0 6px;box-sizing:border-box;
+ background:linear-gradient(180deg,#2c8a7c 0%,#1a6660 45%,#0f4448 100%);clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%);
+ box-shadow:inset 0 1px 0 rgba(220,255,245,.65),inset 0 -1px 0 rgba(0,0,0,.4)}
+#bp24 .np::before{content:'';position:absolute;inset:0;clip-path:inherit;border:1.5px solid var(--rs-tl);border-right:0;border-radius:2px 0 0 2px;pointer-events:none;opacity:.8}
+#bp24 .np .ec{flex:none;display:flex;align-items:center;justify-content:center;width:16px;height:16px;font-style:normal;font-size:10px;line-height:1;color:#111;
+ background:linear-gradient(180deg,color-mix(in srgb,var(--ec) 45%,#fff),var(--ec));clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
+#bp24 .np .ec:empty{display:none}
+#bp24 .np .nm{min-width:0;font-weight:400;font-size:14px;color:#fff;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 0 #062224,1px 0 0 #062224,-1px 0 0 #062224,0 -1px 0 #062224}
+#bp24 .np .lv{flex:none;font-family:var(--num);font-style:italic;font-weight:700;font-size:12px;color:#d8fff4;text-shadow:1px 1px 0 #062224}
+#bp24 .np .rk{flex:none;display:flex;gap:2px;margin-left:auto}
+#bp24 .np .rk i{width:7px;height:7px;background:rgba(0,0,0,.45);clip-path:polygon(50% 0,62% 38%,100% 38%,69% 61%,81% 100%,50% 76%,19% 100%,31% 61%,0 38%,38% 38%)}
+#bp24 .np .rk i.on{background:linear-gradient(180deg,#fff6c0,#ffc83a)}
+/* 星臨ゲージ（参考の OverDrive の位置と質感） */
+#bp24 .od{display:flex;align-items:center;gap:5px;width:66%;height:15px;margin-top:2px;padding-left:4px;box-sizing:border-box}
+#bp24 .od em{flex:none;font-family:var(--num);font-style:italic;font-weight:700;font-size:12px;line-height:1;letter-spacing:.3px;color:#ffe27a;
+ text-shadow:1px 0 0 #3a1c00,-1px 0 0 #3a1c00,0 1px 0 #3a1c00,0 -1px 0 #3a1c00,0 0 5px rgba(255,190,70,.6);max-width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#bp24 .od .g{position:relative;flex:1;min-width:0;height:7px;border-radius:1px;background:linear-gradient(180deg,#05080e,#1a1f2c);box-shadow:0 0 0 1px #000,0 0 0 2px rgba(214,232,236,.45);overflow:hidden}
+#bp24 .od .g i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(180deg,#ffe9a8 0%,#ffb436 45%,#e06a10 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.6);transition:width .3s}
+#bp24 .od span{flex:none;min-width:28px;text-align:right;font-family:var(--num);font-style:italic;font-weight:700;font-size:12px;line-height:1;color:#fff;text-shadow:1px 1px 0 #000,-1px 0 0 #000}
+#bp24.full .od .g i{animation:od24 .55s infinite alternate}
+@keyframes od24{from{filter:none}to{filter:brightness(1.35) drop-shadow(0 0 3px #ffd060)}}
+#bp24.awk .od .g i{background:linear-gradient(180deg,#fffbe0,#ffd65a 45%,#c08a1a)}
+/* 立ち絵：右側に大きく、左端は背景へ溶ける */
+#bp24 .pf{position:absolute;right:0;top:0;width:36%;height:42px;overflow:hidden;border-radius:0 6px 0 0;
+ -webkit-mask:linear-gradient(90deg,transparent 0,#000 36%);mask:linear-gradient(90deg,transparent 0,#000 36%);
+ background:radial-gradient(ellipse at 70% 60%,color-mix(in srgb,var(--ec) 40%,transparent),transparent 70%)}
+#bp24 .pf img{position:absolute;right:4px;top:-14px;width:84px;height:84px;image-rendering:pixelated;object-fit:contain}
+/* HP・SP・状態の3つの枠：濃紺の地に明るい縁（参考の HP／LP／BP 枠） */
+#bp24 .bx3{display:flex;gap:4px;height:36px;padding:3px 4px 4px;box-sizing:border-box;position:relative;z-index:1}
+#bp24 .bx{position:relative;display:flex;align-items:center;gap:4px;min-width:0;padding:0 7px;box-sizing:border-box;border-radius:6px;
+ background:linear-gradient(180deg,#14284a 0%,#0b1834 48%,#071024 100%);box-shadow:0 0 0 1px #01040c,inset 0 0 0 1.5px var(--rs-ed),inset 0 0 0 2.5px #0a1a34,inset 0 7px 6px -4px rgba(255,255,255,.14)}
+#bp24 .bx em{flex:none;font-family:"Nunito",var(--num);font-style:normal;font-weight:900;font-size:12px;color:#fff;letter-spacing:.3px;text-shadow:1px 1px 0 #000}
+#bp24 .bx .v{font-family:"Nunito",var(--num);font-weight:800;font-size:16px;line-height:1;color:#fff;margin-left:auto;letter-spacing:-.2px;text-shadow:0 1px 0 #000,1px 0 0 #000,-1px 0 0 #000,0 -1px 0 #000}
+#bp24 .bx small{flex:none;font-family:"Nunito",var(--num);font-weight:800;font-size:12px;line-height:1;color:#e4ecf8;text-shadow:1px 1px 0 #000}
+#bp24 .bx.hp{flex:1.55}
+#bp24 .bx.sp{flex:1}
+#bp24 .bx.st{flex:1.15;padding:0 5px;overflow:hidden}
+#bp24 .bx.hp s{position:absolute;left:6px;right:6px;bottom:3px;height:2px;border-radius:1px;background:rgba(0,0,0,.6);overflow:hidden;text-decoration:none}
+#bp24 .bx.hp s i{display:block;height:100%;background:linear-gradient(90deg,#3ad46a,#a8ffc0);transition:width .25s}
+#bp24.lowY .bx.hp .v{color:#ffe066}#bp24.lowY .bx.hp s i{background:linear-gradient(90deg,#e0a020,#ffe066)}
+#bp24.lowR .bx.hp .v{color:#ff7a68}#bp24.lowR .bx.hp s i{background:linear-gradient(90deg,#c02018,#ff7a68)}
+#bp24.down .bx.hp .v{color:#8a90a0}
+#bp24 .bx.st span{display:flex;flex-wrap:wrap;gap:2px;max-height:28px;overflow:hidden;align-content:center}
+#bp24 .bx.st i{font-style:normal;font-size:9px;line-height:12px;padding:0 3px;border-radius:2px;color:#fff;background:#2a6a3a;white-space:nowrap}
+#bp24 .bx.st i.de{background:#8a2a3a}#bp24 .bx.st i.mo{background:#3a4070}#bp24 .bx.st i.gd{background:#2a5a9a}
+#bp24 .bx.st .nst{font-size:9px;color:#8a94b8;white-space:nowrap}
+#bp24.off{filter:saturate(.7) brightness(.85)}
+#bp24.awk{box-shadow:0 0 0 1px #01050e,inset 0 0 0 1px rgba(255,214,90,.4),0 0 10px rgba(255,214,90,.25)}
+@media (max-width:360px){#bp24 .np .nm{font-size:13px}#bp24 .bx{padding:0 5px}#bp24 .bx .v{font-size:14px}#bp24 .bx em,#bp24 .bx small{font-size:10px}#bp24 .pf img{width:72px;height:72px;top:-10px}}
+@media (max-height:640px){#app.v24[data-sc="battle"] #bp24{height:78px}#bp24 .hd{height:39px}#bp24 .bx3{height:33px}#bp24 .pf{height:39px}}
+
+/* ---------- 照準：輪＋四方の三角（参考は緑。弱点を突く技では赤くなり Weak） ---------- */
+#rt22{filter:drop-shadow(0 0 3px rgba(0,0,0,.65))}
+#rt22 .r1{border:2.5px solid rgba(120,255,170,.95);border-radius:50%;animation:none;box-shadow:0 0 0 1px rgba(0,40,20,.7),inset 0 0 0 1px rgba(0,40,20,.6),0 0 8px rgba(110,255,170,.55)}
+#rt22 .r2{inset:16%;border:1.5px dashed rgba(170,255,200,.8);border-radius:50%;animation:rt22 6s linear infinite}
+#rt22 .r3{inset:-4px;border-radius:0;animation:rt24 2.4s ease-in-out infinite}
+#rt22 .r3 s{position:absolute;width:10px;height:8px;background:rgba(150,255,190,.98);text-decoration:none}
+#rt22 .r3 s:nth-child(1){left:50%;top:0;margin-left:-5px;clip-path:polygon(0 0,100% 0,50% 100%)}
+#rt22 .r3 s:nth-child(3){left:50%;bottom:0;margin-left:-5px;clip-path:polygon(50% 0,100% 100%,0 100%)}
+#rt22 .r3 s:nth-child(2){right:0;top:50%;width:8px;height:10px;margin-top:-5px;clip-path:polygon(100% 0,100% 100%,0 50%)}
+#rt22 .r3 s:nth-child(4){left:0;top:50%;width:8px;height:10px;margin-top:-5px;clip-path:polygon(0 0,100% 50%,0 100%)}
+@keyframes rt24{0%,100%{transform:scale(1)}50%{transform:scale(.9)}}
+#rt22 b{display:none;position:absolute;left:-12px;top:-12px;transform:none;font-size:0;line-height:0;animation:none}
+#rt22.wk .r1{border-color:rgba(255,90,120,.98);box-shadow:0 0 0 1px rgba(60,0,10,.7),inset 0 0 0 1px rgba(60,0,10,.6),0 0 10px rgba(255,70,110,.75)}
+#rt22.wk .r2{border-color:rgba(255,150,170,.85)}
+#rt22.wk .r3 s{background:rgba(255,120,150,.98)}
+#rt22.wk b{display:block;animation:rtw24 .5s ease-out both}
+@keyframes rtw24{0%{opacity:0;transform:translateX(-8px)}100%{opacity:1;transform:none}}
+
+/* ---------- 行動順は廃止 ---------- */
+#order,.b22ord{display:none !important}
+
+/* ---------- 連撃数：上の帯の直下・左端に固定 ---------- */
+#app.v24 #combo{left:4px;right:auto;top:calc(var(--hud23,80px) + 2px);z-index:4;filter:none;letter-spacing:0;text-align:left}
+#combo .c1{display:flex;align-items:flex-end}
+#combo .c1>canvas+canvas{margin-left:-6px;margin-bottom:2px}
+#combo .c2{margin-top:-8px;margin-left:6px}
+#combo.bump .c1 .tr24{animation:dg24 .26s cubic-bezier(.18,1.55,.4,1) both}
+
+/* ---------- 上の固定帯：敵のHPゲージ（参考：暗い枠＋明るい縁＋上半分の光沢） ---------- */
+#app.v24 .b22tg .bar{border:1px solid #000;border-radius:2px;box-shadow:0 0 0 1px rgba(214,232,236,.55),0 2px 4px rgba(0,0,0,.6)}
+#app.v24 .b22tg .bar::after{content:'';position:absolute;left:0;right:0;top:0;height:46%;background:linear-gradient(180deg,rgba(255,255,255,.5),rgba(255,255,255,0));pointer-events:none}
+#app.v24 .b22tg .nm em.bs{font-family:"Nunito",var(--num);font-weight:900;font-style:italic;letter-spacing:.5px;box-shadow:0 0 0 1px #3a0008}
