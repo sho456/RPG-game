@@ -1,5 +1,5 @@
 {
- "note": "Phase0：改修前の全キャラ（待機フレームを戦闘時の実寸で書き出して計測）。vo_*（虚蝕化）・tr_*（幻影）・kb*（回廊の番人）は実行時に生成される派生。街の住人4体（barkeep/shopgirl/smithy/seer）は js/px-hero.js の旧リグ。",
+ "note": "Phase0：改修前の全キャラ（待機フレームを戦闘時の実寸で書き出して計測）。vo_*（虚蝕化）・tr_*（幻影）・kb*（回廊の番人）は実行時に生成される派生。街の住人4体（barkeep/shopgirl/smithy/seer）は js/px-hero.js の旧リグ。 ／ 2026-11 更新：提供原画方式へ移行。新スプライトは rio(＋星臨・試練の幻影)・wolf(＋虚蝕化)・boss9。",
  "dot_scale": "戦闘：1ドット=round(k*2/3)デバイスpx（約1.33〜1.5CSSpx）／探索・街：1ドット=1論理px（約2.17CSSpx）",
  "assets": [
   {
@@ -7,7 +7,7 @@
    "name": "リオ",
    "type": "hero",
    "tier": "ally",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "rio",
    "variant": "",
    "scale": 1.2,
@@ -16,17 +16,18 @@
     44
    ],
    "colors": 40,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "frames": "味方15（原画7＋派生8）×サイズ9／敵1枚×サイズ8（動きは整数ドットの変形）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "未着手"
+   "quality": "高：提供原画（見本）",
+   "status": "検証済み",
+   "source": "assets_src/originals/hero_swordsman_7poses.png"
   },
   {
    "id": "rio_aw",
    "name": "rio_aw",
    "type": "hero_aw",
    "tier": "ally",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "rio",
    "variant": "",
    "scale": 1.2,
@@ -35,10 +36,11 @@
     44
    ],
    "colors": 40,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "frames": "味方15（原画7＋派生8）×サイズ9／敵1枚×サイズ8（動きは整数ドットの変形）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "未着手"
+   "quality": "高：提供原画（見本）",
+   "status": "検証済み",
+   "source": "assets_src/originals/hero_swordsman_7poses.png"
   },
   {
    "id": "gald",
@@ -57,7 +59,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "gald_aw",
@@ -76,7 +78,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "mire",
@@ -95,7 +97,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "mire_aw",
@@ -114,7 +116,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "shion",
@@ -133,7 +135,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "shion_aw",
@@ -152,7 +154,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "noah",
@@ -171,7 +173,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "noah_aw",
@@ -190,7 +192,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "erna",
@@ -209,7 +211,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "erna_aw",
@@ -228,7 +230,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "balza",
@@ -247,7 +249,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "balza_aw",
@@ -266,7 +268,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "crow",
@@ -285,7 +287,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "crow_aw",
@@ -304,7 +306,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "hakua",
@@ -323,7 +325,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "hakua_aw",
@@ -342,7 +344,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "jin",
@@ -361,7 +363,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "jin_aw",
@@ -380,7 +382,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "celes",
@@ -399,7 +401,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "celes_aw",
@@ -418,7 +420,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "valk",
@@ -437,7 +439,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "valk_aw",
@@ -456,7 +458,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "slime",
@@ -475,14 +477,14 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "wolf",
    "name": "灰狼",
    "type": "enemy",
    "tier": "normal",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "wolf",
    "variant": "",
    "scale": 1.2,
@@ -491,10 +493,11 @@
     36
    ],
    "colors": 20,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "frames": "味方15（原画7＋派生8）×サイズ9／敵1枚×サイズ8（動きは整数ドットの変形）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "未着手"
+   "quality": "高：提供原画（見本）",
+   "status": "検証済み",
+   "source": "assets_src/originals/wolf.png"
   },
   {
    "id": "boss",
@@ -513,7 +516,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "moss",
@@ -532,7 +535,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "jadewolf",
@@ -551,7 +554,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "shroom",
@@ -570,7 +573,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "bookghost",
@@ -589,7 +592,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "中",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "boss2",
@@ -608,7 +611,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "darkknight",
@@ -627,7 +630,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "cursedslime",
@@ -646,7 +649,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "shade",
@@ -665,7 +668,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "boss3",
@@ -684,7 +687,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "raiwolf",
@@ -703,7 +706,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "ironslime",
@@ -722,7 +725,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "golemkin",
@@ -741,7 +744,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "minerghost",
@@ -760,7 +763,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "golemboss",
@@ -779,7 +782,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "boss4",
@@ -798,7 +801,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "ernaE",
@@ -817,7 +820,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "boss4b",
@@ -836,7 +839,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "snowwolf",
@@ -855,7 +858,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "iceslime",
@@ -874,7 +877,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "yukirei",
@@ -893,7 +896,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "onimusha",
@@ -912,7 +915,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "boss5",
@@ -931,7 +934,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "drowned",
@@ -950,7 +953,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "jelly",
@@ -969,7 +972,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "waterslime",
@@ -988,7 +991,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "boss6",
@@ -1007,7 +1010,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "tower10",
@@ -1026,7 +1029,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "tower20",
@@ -1045,7 +1048,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "boss7",
@@ -1064,7 +1067,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "last1",
@@ -1083,7 +1086,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "last2",
@@ -1102,7 +1105,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "last3",
@@ -1121,7 +1124,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "firedrake",
@@ -1140,7 +1143,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "lavaslime",
@@ -1159,7 +1162,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "dragonewt",
@@ -1178,7 +1181,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "ember",
@@ -1197,14 +1200,14 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "boss9",
    "name": "黒炎竜ヴォルガノン",
    "type": "enemy",
    "tier": "boss",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "wolf",
    "variant": "dragon",
    "scale": 2.76,
@@ -1213,10 +1216,11 @@
     95
    ],
    "colors": 23,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "frames": "味方15（原画7＋派生8）×サイズ9／敵1枚×サイズ8（動きは整数ドットの変形）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "quality": "高：提供原画（見本）",
+   "status": "検証済み",
+   "source": "assets_src/originals/boss9_volganon.png"
   },
   {
    "id": "valkE",
@@ -1235,14 +1239,14 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "tr_rio2",
    "name": "リオの幻影",
    "type": "enemy",
    "tier": "boss",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "rio",
    "variant": "",
    "scale": 2.22,
@@ -1251,10 +1255,11 @@
     81
    ],
    "colors": 40,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "frames": "味方15（原画7＋派生8）×サイズ9／敵1枚×サイズ8（動きは整数ドットの変形）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "quality": "高：提供原画（見本）",
+   "status": "検証済み",
+   "source": "assets_src/originals/hero_swordsman_7poses.png"
   },
   {
    "id": "tr_gald2",
@@ -1273,7 +1278,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "kb10",
@@ -1292,7 +1297,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "kb20",
@@ -1311,7 +1316,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "kb30",
@@ -1330,7 +1335,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "kb40",
@@ -1349,7 +1354,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "vo_slime",
@@ -1368,7 +1373,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "vo_golemkin",
@@ -1387,7 +1392,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "vo_yukirei",
@@ -1406,7 +1411,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "vo_shade",
@@ -1425,7 +1430,7 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   },
   {
    "id": "vo_drowned",
@@ -1444,7 +1449,8 @@
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "低：色替え・拡大流用",
-   "status": "未着手"
+   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
   }
- ]
+ ],
+ "old_backup": "assets_backup/old_sprites/（改修前の待機フレームを実寸で保存）"
 }
