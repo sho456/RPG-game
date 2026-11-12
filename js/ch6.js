@@ -6,7 +6,7 @@ ITYPE.unshift(['外套','armor']);
 Object.assign(SK,{kazemai:{n:'疾風の舞',sp:20,k:'haste',t:'self',d:'味方全員の次の手番を早める'},ouen:{n:'応援の舞',sp:25,k:'cheer',t:'self',d:'味方全員のAG+15'},
  megumi:{n:'星の恵み',sp:25,k:'grace',t:'ally',d:'味方1人のAG+40'},hoshiyomi:{n:'星読み',sp:15,k:'scan',t:'self',d:'敵全体の弱点をすべて暴く'}});
 Object.assign(JOBS,{odoriko:{n:'舞踏家',d:'味方を加速させる',sk:[[1,'kazemai'],[4,'ouen']],ps:[[7,{startAG:15},'開始時AG+15'],[10,{spd:1.5},'素早さ+1.5']]},
- seijutsu:{n:'星術師',d:'覚醒を支える（第5章クリアで解放）',lock:()=>!G.flags.boss6,sk:[[1,'megumi'],[4,'hoshiyomi']],ps:[[7,{awDmg:15},'覚醒中与ダメ+15%'],[10,{noRecoil:1},'覚醒の反動を無効']]}});
+ seijutsu:{n:'星術師',d:'星臨を支える（第5章クリアで解放）',lock:()=>!G.flags.boss6,sk:[[1,'megumi'],[4,'hoshiyomi']],ps:[[7,{awDmg:15},'星臨中与ダメ+15%'],[10,{noRecoil:1},'星臨の反動を無効']]}});
 /* --- 天への塔 --- */
 const G_TOWER_DEF={cp:1,cur:1};
 const TMOBS=['raiwolf','golemkin','onimusha','drowned','jelly','snowwolf','darkknight','shade','yukirei','minerghost','iceslime','waterslime'];
