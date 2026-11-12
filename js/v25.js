@@ -19,7 +19,9 @@ const stage=()=>$('#stage');
 
 /* ==================== 文字の大きさ（参考資料の比率） ====================
  参考：幅 390px 換算で、敵へのダメージ数字の高さ ≒ 17px、味方 ≒ 11〜12px、Weak は数字の約 0.75 倍 */
-Object.assign(V24.FS24,{e:[10.8,20,26],h:[7.6,15,18],hl:[6.8,14,16],cb:[11.5,21,28],lb:.74});
+Object.assign(V24.FS24,{e:[9.6,18,22],h:[6.6,13,16],hl:[6.8,14,16],cb:[10.5,19,25],lb:.66});
+/* 大ダメージの拡大率も控えめに（キャラや演出を隠さない） */
+V24.TIER.splice(0,4,1,1.07,1.16,1.28);
 /* 演出文字の書体：Critical／Weak／Guard／Miss／BREAK＝太い斜体の丸ゴシック系（参考資料と同じ系統で、小さくても潰れない）。
  属性の漢字・状態は太い丸ゴシック。ver0.25 初版の明朝・セリフ体は小さいと線が細く読みにくかったため戻す */
 try{
@@ -46,14 +48,17 @@ const barPx=()=>{const st=stage(),bb=$('#bbar');if(!st||!bb||!bb.offsetParent)re
 /* ==================== 2. 味方：右側に縦一列（参考資料の配置・大きさ） ====================
  参考資料：味方は画面右の縦一列（わずかに弓なり）、1人の背丈は画面幅の約 11%、間隔は背丈の 1.5〜2 倍。
  HP／SP の数字はキャラの左下（ver0.24 の配置）。敵はその左側の広い範囲に置く */
+let K25=0,SLOT25=[];
 function heroK(h,k){const A=ANIM.setup(h);if(!A||A.none)return;if(A._key25!==A.key||A._sc0==null){A._key25=A.key;A._sc0=A.sc;}h._k25=k;const s=A._sc0*k;if(Math.abs(A.sc-s)>1e-6)A.sc=s;}
 HK23.placeHeroes=(hs,LY)=>{const n=hs.length;hs.forEach(h=>heroK(h,1));let ww=0,hh=0;hs.forEach(h=>{const D=V19.dims(h);ww=Math.max(ww,D.w);hh=Math.max(hh,D.h);});
  const k=clamp(V23.appW()*.112/(hh*SC),.72,1);hs.forEach(h=>heroK(h,k));ww*=k;hh*=k;
  const band=LY.bot-LY.top,s=n>1?Math.min(hh*1.9,(band-hh-4)/(n-1)):0,span=s*(n-1)+hh,top=LY.top+Math.max(2,(band-span)*.55),back=W*.84;
- hs.forEach((h,i)=>{const fy=top+hh+s*i,fx=back-Math.round(W*.035*Math.sin(Math.PI*(i+.5)/n));h.x=fx-8*h.sc;h.y=Math.round(fy-16*h.sc+2);h._fx23=fx;});
+ K25=k;SLOT25=[];hs.forEach((h,i)=>{const fy=top+hh+s*i,fx=back-Math.round(W*.035*Math.sin(Math.PI*(i+.5)/n));SLOT25[i]=[fx,fy];h.x=fx-8*h.sc;h.y=Math.round(fy-16*h.sc+2);h._fx23=fx;});
  LY.heroL=Math.min(...hs.map(h=>h._fx23))-ww/2-14;};
 /* 星臨・見た目の切り替えで絵の設定が作り直されても、大きさを保つ */
-{const _d=draw;draw=function(){if(scene==='battle'&&B){try{B.heroes.forEach(h=>{if(h._k25)heroK(h,h._k25);});}catch(e){}}_d();if(scene==='battle'&&B){try{tick();}catch(e){if(!draw._e25){draw._e25=1;console.error(e);}}}};}
+/* 交代で加わった味方：同じ縮尺・同じ持ち場に置く（新しい絵は縮尺が未設定のため、登場時だけ大きく見えていた） */
+function fitNew(h,i){if(!K25)return;heroK(h,K25);const sl=SLOT25[i];if(sl&&!h.A?.mv){h.x=sl[0]-8*h.sc;h.y=Math.round(sl[1]-16*h.sc+2);h._fx23=sl[0];}try{V24.renderHL0();}catch(e){}}
+{const _d=draw;draw=function(){if(scene==='battle'&&B){try{B.heroes.forEach((h,i)=>{if(h._k25)heroK(h,h._k25);else fitNew(h,i);});}catch(e){}}_d();if(scene==='battle'&&B){try{tick();}catch(e){if(!draw._e25){draw._e25=1;console.error(e);}}}};}
 
 /* ==================== 3. 自分の番だけ情報を出す ==================== */
 let MY=false,hideT=0;

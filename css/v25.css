@@ -210,3 +210,47 @@
 #app.v25.aw25 #mk25{display:none !important}
 #app.v25[data-sc="battle"] #cut{bottom:calc(var(--sab) + 60px)}
 @media (prefers-reduced-motion:reduce){#app.v25 #bp24.rdy25 .od,#app.v25 #bp24.rdy25 .od .st25,#app.v25 .blist.v22 .sk.sel{animation:none}}
+
+/* ==================== ver0.25 改訂2 ==================== */
+/* 指カーソル：指先を右（選んだ技）へ向ける */
+#app.v25 .blist.v22 .sk .hd{left:1px;width:24px;color:#fff;filter:drop-shadow(0 0 3px rgba(150,255,240,.9)) drop-shadow(1px 1px 0 #000)}
+#app.v25 .blist.v22 .sk .hd .ic22{transform:scaleX(-1)}
+
+/* 星臨ゲージ：行を高く、タップ範囲を広く（上は名前帯の下端まで、下は HP 枠の手前まで） */
+#app.v25[data-sc="battle"] #bp24{height:84px}
+#app.v25 #bp24 .hd{height:48px;padding:3px 0 0 4px}
+#app.v25 #bp24 .pf{height:48px}
+#app.v25 #bp24 .od{width:66%;height:22px;margin-top:3px;padding:0 6px 0 7px;gap:7px;border-radius:11px;background:rgba(2,6,16,.55);box-shadow:0 0 0 1px rgba(143,230,214,.28)}
+#app.v25 #bp24 .od::before{left:-4px;right:-8px;top:-4px;bottom:-6px}
+#app.v25 #bp24 .od .g{height:10px;border-radius:5px;background:linear-gradient(180deg,#02050c,#121a2a);box-shadow:0 0 0 1px #000,0 0 0 2px rgba(143,230,214,.35)}
+#app.v25 #bp24 .od .g i{border-radius:5px;background:linear-gradient(180deg,#d8fbff 0%,#4cc8e6 45%,#16708e 100%)}
+#app.v25 #bp24 .od em{color:#bfeff0}
+#app.v25 #bp24 .od span{font-size:14px;color:#dff6ff}
+#app.v25 #bp24 .od .st25{width:18px;height:18px}
+/* 発動できる：ゲージが青から金に変わり、行全体と星が光る。パネルの縁も金に */
+#app.v25 #bp24.rdy25 .od{background:linear-gradient(180deg,rgba(255,226,122,.34),rgba(150,90,0,.26))}
+#app.v25 #bp24.rdy25 .od .g{box-shadow:0 0 0 1px #2a1600,0 0 0 2px #fff1c4,0 0 12px rgba(255,210,100,1)}
+#app.v25 #bp24.rdy25 .od .g i{background:linear-gradient(180deg,#ffffff 0%,#ffe680 35%,#ffb020 70%,#e07a00 100%)}
+#app.v25 #bp24.rdy25 .od em{color:#fff6cc}
+#app.v25 #bp24.rdy25 .od .st25{width:20px;height:20px}
+#app.v25[data-sc="battle"] #bp24.rdy25{box-shadow:0 0 0 1px #000,inset 0 0 0 1px #ffe9a0,inset 0 0 0 2px #050a16,inset 0 0 0 3px rgba(255,214,90,.35),0 0 14px rgba(255,200,80,.45),0 4px 12px rgba(0,0,0,.55)}
+#app.v25 #bp24.awk .od .g i{background:linear-gradient(180deg,#ffffff,#ffe9a0 40%,#e0a020)}
+
+/* 強化・弱体：パネル・上の帯で同じ札（強化＝青＋▲、弱体＝赤＋▼、その他の状態＝紫、防御＝銀青） */
+#app.v25 #bp24 .bx.st{padding:0 4px}
+#app.v25 #bp24 .bx.st span{flex-wrap:nowrap;gap:3px;max-height:none;overflow:hidden;align-items:center}
+#app.v25 #bp24 .bx.st i,#app.v25 .b22tg .st .tg{display:inline-flex;align-items:center;flex:none;height:18px;padding:0 5px;margin:0;border-radius:3px;border:1px solid;font-family:var(--jp25);font-style:normal;font-weight:800;font-size:11px;line-height:1;letter-spacing:0;color:#fff;
+ text-shadow:0 0 1px #000,1px 1px 0 #000,-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000;white-space:nowrap;animation:none}
+#app.v25 #bp24 .bx.st i.bu,#app.v25 .b22tg .st .tg.bu{background:linear-gradient(180deg,#4aa0f0,#1c5cb4 60%,#123a80);border-color:#b8deff}
+#app.v25 #bp24 .bx.st i.de,#app.v25 .b22tg .st .tg.de{background:linear-gradient(180deg,#f0607a,#b4203c 60%,#781024);border-color:#ffc0ca}
+#app.v25 #bp24 .bx.st i.mo{background:#2a3256;border-color:#8a94c8}
+#app.v25 #bp24 .bx.st i.gd,#app.v25 .b22tg .st .tg.gd{background:linear-gradient(180deg,#7a96b8,#3a5272);border-color:#d8e8ff}
+#app.v25 .b22tg .st{gap:3px;margin-top:4px;max-height:20px;overflow:hidden}
+#app.v25 .b22tg .st .tg{background:linear-gradient(180deg,#8a5ad0,#4a2a88);border-color:#d8c0ff}
+#app.v25 .b22tg .st .tg.bk{background:linear-gradient(180deg,#ff6a5a,#b81c14);border-color:#ffc8c0}
+#app.v25 .b22tg .st .tg.aw,#app.v25 .b22tg .st .tg.ag{color:#2a1600;text-shadow:none;background:linear-gradient(180deg,#fff1c4,#e9c46a);border-color:#fff8e0}
+#app.v25 #bp24 .bx.st .nst{font-size:11px}
+#app.v25 #bp24 .bx.hp{flex:1.4}
+#app.v25 #bp24 .bx.st{flex:1.35}
+#app.v25 #bp24 .bx.st span{gap:2px}
+#app.v25 #bp24 .bx.st i{padding:0 3px;font-size:11px}

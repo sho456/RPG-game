@@ -230,4 +230,4 @@ function dev24(m){log(m||`<b>${VER24}</b>　ダメージ表示・HP表示・照�
 /* 版表示 */
 {const _t=title;title=function(){_t();const v=$('#verL');if(v)v.textContent=VER24;};const v=$('#verL');if(v)v.textContent=VER24;}
 try{document.title='アストラル・ブレイカー '+VER24;}catch(e){}
-return{HK24,FS24,placeHL,renderHL0:()=>renderHL(),pop24,dmgPop,wordPop,tagPop,PM,PRI,clearPops,renderHL,renderBP,heroSheet,boxOf,bounds,stress,dev24,HL};})();
+return{TIER,HK24,FS24,placeHL,renderHL0:()=>renderHL(),pop24,dmgPop,wordPop,tagPop,PM,PRI,clearPops,renderHL,renderBP,heroSheet,boxOf,bounds,stress,dev24,HL};})();
