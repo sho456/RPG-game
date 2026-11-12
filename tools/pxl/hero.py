@@ -61,6 +61,23 @@ class Rig:
         c.blob([(cx - wt, cy + .4), (cx, cy - .6), (cx + wt - .4, cy + .5), (cx + wt - .2, cy + 2.6), (hx + wb, hy + drop), (hx, hy + drop + .5), (hx - wb, hy + drop), (cx - wt + .2, cy + 2.6)], m, z, depth=depth, bias=bias, sub=4)
         return s
 
+    def torso_stamp(s, rows, legend, z=0, dx=0):
+        """手打ちの胴（服）を、胸と腰を結ぶ軸に沿って置く。前傾は行ごとにずらし、倒れた姿勢は横倒しにする。"""
+        c = s.c; (cx, cy), (hx, hy) = s.ch, s.hip; n = len(rows); w = len(rows[0])
+        if abs(math.degrees(s.ln)) < 50:
+            y0, y1 = round(cy - 1), round(hy + 1); span = max(1, y1 - y0)
+            for y in range(y0, y1 + 1):
+                t = (y - y0) / span; r = min(n - 1, int(round(t * (n - 1)))); xc = cx + (hx - cx) * t + dx
+                for i, ch in enumerate(rows[r]):
+                    if ch not in '. ': c.px(round(xc - w / 2 + i), y, legend[ch][0], legend[ch][1], z)
+        else:
+            x0, x1 = round(min(cx, hx) - 1), round(max(cx, hx) + 1); span = max(1, x1 - x0)
+            for x in range(x0, x1 + 1):
+                t = (x - x0) / span if hx > cx else 1 - (x - x0) / span; r = min(n - 1, int(round(t * (n - 1)))); yc = cy + (hy - cy) * t
+                for i, ch in enumerate(rows[r]):
+                    if ch not in '. ': c.px(x, round(yc + w / 2 - 1 - i), legend[ch][0], legend[ch][1], z)
+        return s
+
     def head(s, rows, legend, anchor, z=3, eyes=None, mouth=None, brow='hair'):
         """手打ちの頭を首の付け根に合わせて置く。anchor=(列, 行)：グリッド内の首の付け根。
         eyes=((手前の目 x,y), (奥の目 x,y))：グリッド座標（目の上端）。表情に応じて差し替える。"""
@@ -101,3 +118,24 @@ class Rig:
         top = len(c.mats[c.mi[m]]['cols']) - 1
         c.px(gx + dx * ln * .62 + nx * lit * w * .5 - .5, gy + dy * ln * .62 + ny * lit * w * .5 - .5, m, top, z + .01, raw=True)
         return s
+
+
+class Fig:
+    """手打ちドットで組む味方の 1 フレーム：胴・脚（文字グリッド）＋頭（文字グリッド）＋武器を持つ腕（姿勢から描く）。
+    body: dict(rows, neck=(列,行), sh=(列,行))  frame: dict(body, dx, dy, head=(dx,dy), hF=(dx,dy), wa, face, noW, armz)"""
+    def __init__(s, c, body, F):
+        s.c, s.F = c, F; rows = body['rows']; s.rows = rows
+        s.bx = c.ax - body['neck'][0] + F.get('dx', 0); s.by = c.ay - len(rows) + F.get('dy', 0)
+        s.nk = (s.bx + body['neck'][0] + F.get('head', (0, 0))[0], s.by + body['neck'][1] + F.get('head', (0, 0))[1])
+        s.sF = (s.bx + body['sh'][0] + .5, s.by + body['sh'][1] + .5)
+        hf = F.get('hF', (-1, 5)); a2 = 3.5
+        s.eF, s.hF = ik(*s.sF, s.sF[0] + hf[0], s.sF[1] + hf[1], a2, a2, -1)
+        s.P = dict(face=F.get('face', 'n'), noW=F.get('noW', False), wa=F.get('wa', 70))
+    def body(s, legend, z=0):
+        s.c.stamp(s.bx, s.by, s.rows, legend, z); return s
+    def arm(s, m, hand='skin', z=6, cuff=None, r=(1.4, 1.2)):
+        c = s.c; c.tube([s.sF, s.eF], [r[0] + .2, r[0]], m, z); c.tube([s.eF, s.hF], [r[0], r[1]], m, z)
+        if cuff: c.tube([(s.eF[0] + (s.hF[0] - s.eF[0]) * .62, s.eF[1] + (s.hF[1] - s.eF[1]) * .62), (s.eF[0] + (s.hF[0] - s.eF[0]) * .86, s.eF[1] + (s.hF[1] - s.eF[1]) * .86)], [r[1] + .45] * 2, cuff, z + .05)
+        if hand: c.ball(s.hF[0], s.hF[1], 1.35, 1.35, hand, z + .1)
+        return s
+    head = Rig.head; blade = Rig.blade; dirv = Rig.dirv

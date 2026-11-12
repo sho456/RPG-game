@@ -390,11 +390,76 @@ class Cv:
         s.pal = pal; s.slots = slots; s.glows = glows; s.idx = idx
         return idx, pal
 
+    # ---------- 彫塑（スカルプト）：複数の部品を 1 つの連続した立体面に融合してから光を当てる ----------
+    def sculpt(s, m, z=0, soft=1.0, bias=0.0, occ=0.24, th=None):
+        return Sculpt(s, m, z, soft, bias, occ)
+
+    def paint(s, pts, m, only=None, z=None, raw=False, smooth=False):
+        """既に描いた面の一部を、明るさはそのままに別の素材へ塗り替える（腹・模様・装甲の色分け）。"""
+        P = pts if raw else s.Tp(pts)
+        if smooth: P = catmull(P, True, 6)
+        k = s._polymask(P) & (s.m > 0) & (s.fix < 0)
+        if only is not None: k &= np.isin(s.m, [s.mi[x] for x in ([only] if isinstance(only, str) else only)])
+        if z is not None: k &= np.abs(s.z - z) < 1e-3
+        s.m[k] = s.mi[m]; return k
+
     def image(s, **kw):
         kw.setdefault('sep_gap', s.sep_gap); idx, pal = s.render(**kw)
         lut = np.zeros((len(pal) + 1, 4), np.uint8)
         for i, c in enumerate(pal): lut[i + 1] = (*hex2rgb(c), 255)
         return Image.fromarray(lut[idx], 'RGBA')
+
+
+
+class Sculpt:
+    """with c.sculpt('fur', z=0) as g: g.ball(...); g.tube(...) … → 終了時に陰影を計算して書き込む。
+    e=手前への持ち上げ量（重なる部品の前後関係。段差は線ではなく陰影の折れ目になる）。"""
+    def __init__(g, c, m, z, soft, bias, occ):
+        g.c, g.m, g.z, g.soft, g.bias, g.occ = c, m, z, soft, bias, occ
+        g.H = np.full((c.h, c.w), -1e3, np.float32)
+    def __enter__(g): return g
+    def __exit__(g, *a):
+        if a[0] is None: g.done()
+    def _add(g, h, mask):
+        if not mask.any(): return
+        B = np.where(mask, h, -1e3).astype(np.float32); A = g.H; M = np.maximum(A, B); k = g.soft
+        g.H = (M + np.log(np.exp((A - M) * k) + np.exp((B - M) * k)) / k).astype(np.float32)
+    def ball(g, cx, cy, rx, ry, e=0, rot=0, rz=None):
+        c = g.c; cx, cy = c.T(cx, cy); rx *= c.k; ry *= c.k; a = math.radians(rot) + c._rot(); ca, sa = math.cos(a), math.sin(a)
+        dx, dy = c.X - cx, c.Y - cy; u = (dx * ca + dy * sa) / rx; v = (-dx * sa + dy * ca) / ry
+        r2 = u * u + v * v; rz = min(rx, ry) if rz is None else rz * c.k
+        g._add(e * c.k + rz * np.sqrt(np.clip(1 - r2, 0, 1)), r2 <= 1.0); return g
+    def tube(g, pts, rad, e=0):
+        c = g.c; pts = c.Tp(pts); n = len(pts); rad = [rad * c.k] * n if np.isscalar(rad) else [r * c.k for r in rad]
+        best = np.full((c.h, c.w), -1e3, np.float32)
+        for i in range(n - 1):
+            (x0, y0), (x1, y1) = pts[i], pts[i + 1]; r0, r1 = rad[i], rad[i + 1]
+            vx, vy = x1 - x0, y1 - y0; L2 = vx * vx + vy * vy + 1e-9
+            t = np.clip(((c.X - x0) * vx + (c.Y - y0) * vy) / L2, 0, 1)
+            r = r0 + (r1 - r0) * t + 1e-6; d = np.sqrt((c.X - x0 - vx * t) ** 2 + (c.Y - y0 - vy * t) ** 2) / r
+            h = np.where((d <= 1.0) & (r > 0.3), r * np.sqrt(np.clip(1 - d * d, 0, 1)), -1e3)
+            best = np.maximum(best, h)
+        g._add(best + e * c.k, best > -500); return g
+    def curve(g, pts, rad, e=0, sub=6):
+        P = catmull(pts, False, sub); n = len(pts); rad = [rad] * n if np.isscalar(rad) else list(rad); R = []
+        for i in range(len(P)):
+            t = i / sub; k = min(int(t), n - 2); f = t - k; R.append(rad[k] + (rad[k + 1] - rad[k]) * f)
+        return g.tube(P, R, e)
+    def blob(g, pts, depth=4, e=0, smooth=True, sub=8):
+        c = g.c; P = c.Tp(pts); P = catmull(P, True, sub) if smooth else P; mask = c._polymask(P)
+        R = max(1, depth * c.k); d = _dist_in(mask, int(math.ceil(R))); t = np.clip((d - .5) / R, 0, 1)
+        g._add(e * c.k + _box3(R * np.sqrt(np.clip(1 - (1 - t) ** 2, 0, 1))), mask); return g
+    def done(g):
+        c = g.c; H = g.H; mask = H > -500
+        if not mask.any(): return
+        Hc = np.where(mask, H, -1.2).astype(np.float32)
+        gy, gx = np.gradient(Hc); ln = np.sqrt(gx * gx + gy * gy + 1)
+        lum = (-gx * LIGHT[0] - gy * LIGHT[1] + LIGHT[2]) / ln + g.bias
+        if g.occ:                                    # 左上にある高い面が落とす影（部品の重なりを線でなく陰で見せる）
+            for d in (1, 2, 3):
+                sh = np.roll(np.roll(Hc, d, 0), d, 1); sh[:d, :] = -1.2; sh[:, :d] = -1.2
+                lum -= g.occ * np.clip((sh - Hc - d * 0.9) / 2.5, 0, 1)
+        c._put(mask, g.m, g.z, lum.astype(np.float32)); g.mask = mask
 
 
 def to_image(idx, pal):
