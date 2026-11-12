@@ -269,8 +269,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('.h22toast');if(t
 
 /* ==================== お知らせ・開発者メニュー ==================== */
 const NEWS23=`<div class="nt"><b>${VER23}</b>　戦闘画面を作り直しました。<br><small>・HP／SP／${SEIRIN.g}は画面下の<b>パーティ情報欄</b>に（タップで状態の詳細）。敵の名前・HP・弱点は画面上の固定帯に。<br>・ダメージ表示を一新（Critical／Weak／Guard／Miss／BREAK）。<br>・${SEIRIN.n}は、演出テキストのあとにアニメーションが流れます。<br>・図鑑：タップで専用の詳細画面。ドット絵の動きを再生できます。<br>・探索：右下の「文」でテキストの表示／非表示を切り替え。</small></div>`;
-document.addEventListener('click',e=>{const t=e.target.closest('[data-h22="news"]');if(!t||scene!=='town')return;e.stopPropagation();e.preventDefault();SFX.sel();
- const vn=V22.HM.news||'';ovOpen(`<div class="nw22"><div class="nh"><b>お知らせ</b></div>${vn||'<div class="nn">新しいお知らせはありません</div>'}${NEWS23}</div><button class="tbtn back wide" data-a="close">閉じる</button>`,{close:ovClose});},true);
+/* お知らせの表示は ver0.24（v24.js）で最新版の内容と合わせて行う（以前は版ごとに別々に開き、二重に開いていた） */
 function dev23(m){log((m||`<b>${VER23}</b>　戦闘画面・ダメージ表示・${SEIRIN.n}演出・図鑑・探索の確認`));
  menu([{l:'戦闘：ボス＋手下',s:'配置・パーティ情報欄・ダメージ表示',cls:'ready',f:()=>devBattle([{kind:'boss2',lv:10},{kind:'moss',lv:8},{kind:'jadewolf',lv:8}],'midori',{theme:'forest'})},
   {l:'戦闘：大型ボス',s:'演技エリアに収まるか',f:()=>devBattle([{kind:'boss9',lv:60}],'ryuu',{theme:'lava'})},
@@ -284,4 +283,4 @@ function sample(){if(!B)return;const e=B.enemies[0],s=B.enemies[1],h=B.heroes;le
 /* 版表示 */
 {const _t=title;title=function(){_t();const v=$('#verL');if(v)v.textContent=VER23;};const v=$('#verL');if(v)v.textContent=VER23;}
 try{document.title='アストラル・ブレイカー '+VER23;}catch(e){}
-return{zkDetail,zvPlay,ZV,homeFix,applyFieldMsg,layout,LY,seirinText,fadeIn,placeEnemies,placeHeroes,battleH,esc,clamp,appW,oh,sleep,DEV};})();
+return{NEWS23,zkDetail,zvPlay,ZV,homeFix,applyFieldMsg,layout,LY,seirinText,fadeIn,placeEnemies,placeHeroes,battleH,esc,clamp,appW,oh,sleep,DEV};})();

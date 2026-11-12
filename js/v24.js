@@ -100,7 +100,7 @@ function lbRow(cls,...cs){const d=document.createElement('div');d.className='lb 
 
 function dmgPop(u,s,kind,el){const v=parseInt(s,10),heal=s[0]==='+',crit=/crit/.test(kind),weak=/weak/.test(kind),psn=/psn/.test(kind),grd=u.side===0&&!heal&&!!u.guard;
  const t=heal?0:tierOf(u,Math.abs(v)),fs=Math.round(numFs(u)*TIER[t]*(crit?1.15:1)*(heal?.92:1));
- const sk=heal?'heal':psn?'psn':crit?'dmgC':weak?'dmgW':grd?'dmgG':u.side===0?'dmgH':'dmg';
+ const sk=heal?'heal':psn?'psn':crit?'dmgC':weak?(t>=3?'dmgWT':'dmgW'):grd?'dmgG':u.side===0?'dmgH':t>=3?'dmgT':'dmg';
  const pri=crit?PRI.crit:heal?PRI.heal:PRI.dmg;capUnit(u);
  const p=make(u,`dmg t${t}${crit?' crit':''}${weak?' weak':''}${heal?' heal':''}${grd?' grd':''}`,pri,(crit||t>=2?1400:1150));
  const lf=Math.round(fs*.56);
@@ -108,7 +108,7 @@ function dmgPop(u,s,kind,el){const v=parseInt(s,10),heal=s[0]==='+',crit=/crit/.
  if(weak){const r=lbRow('wk',TX24.el('Weak','weak',lf));if(el&&ELC[el])r.appendChild(TX24.el(el,'elm',Math.round(lf*1.06)));p.in.appendChild(r);}
  if(grd)p.in.appendChild(lbRow('gd',TX24.el('Guard','guard',Math.round(fs*.66))));
  const nm=document.createElement('div');nm.className='nm';nm.appendChild(TX24.row((heal?'+':'')+fmt(v),sk,fs,/万/));p.in.appendChild(nm);
- if(crit&&!RM.matches){const ec=nm.cloneNode(false);ec.className='nm ec';ec.appendChild(TX24.row(fmt(v),sk,fs,/万/));nm.appendChild(ec);const fx=document.createElement('i');fx.className='fx';p.in.prepend(fx);}
+ if(crit&&!RM.matches){const ec=nm.cloneNode(false);ec.className='nm ec';ec.appendChild(TX24.row(fmt(v),sk,fs,/万/));nm.appendChild(ec);p.in.prepend(TX24.burst(fs*3.2));}
  p.num=1;place(p);u._dm24=p;return p;}
 function wordPop(u,s,kind){const miss=s==='MISS',fs=numFs(u);
  const p=make(u,miss?'word miss':'word xbrk',miss?PRI.word:PRI.brk,miss?950:1350);
@@ -210,7 +210,7 @@ try{document.fonts&&document.fonts.ready.then(()=>{TX24.clear();const L=$('#hl24
 /* ==================== お知らせ・開発者メニュー ==================== */
 const NEWS24=`<div class="nt"><b>${VER24}</b>　戦闘演出を改良しました。<br><small>・ダメージ／Critical／Weak／Guard／Miss／BREAK の表示を新しいデザインに。同時に出ても重ならないように自動で配置します。<br>・HPは各キャラの横に、行動中のキャラは画面下のパネルに（タップで状態の詳細）。<br>・行動順の表示を廃止し、戦場を広く使えるようにしました。</small></div>`;
 document.addEventListener('click',e=>{const t=e.target.closest('[data-h22="news"]');if(!t||scene!=='town')return;e.stopPropagation();e.preventDefault();SFX.sel();
- const vn=V22.HM.news||'';ovOpen(`<div class="nw22"><div class="nh"><b>お知らせ</b></div>${vn||''}${NEWS24}</div><button class="tbtn back wide" data-a="close">閉じる</button>`,{close:ovClose});},true);
+ const vn=V22.HM.news||'';ovOpen(`<div class="nw22"><div class="nh"><b>お知らせ</b></div>${vn||''}${NEWS24}${V23.NEWS23||''}</div><button class="tbtn back wide" data-a="close">閉じる</button>`,{close:ovClose});},true);
 /* 同時に大量の表示を出す確認用 */
 function stress(){if(!inBattle())return;const E=aliveE(),Hs=B.heroes;let k=0;
  const one=()=>{if(!inBattle())return;E.forEach((e,i)=>{pop(e,Math.round(200+Math.random()*9000),'#fff',false,['','weak','crit weak','crit'][(k+i)%4],['斬','炎','雷','光'][(k+i)%4]);if((k+i)%3===0)pop(e,'MISS','#fff',true);});

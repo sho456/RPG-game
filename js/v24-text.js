@@ -19,6 +19,8 @@ const STYLE={
  dmgH:{font:'num',fill:[[0,'#ffffff'],[.46,'#ffffff'],[.56,'#ffe6e2'],[1,'#f0a8a0']],ow:.13,oc:'#1c1014',sh:[.04,.07,'rgba(0,0,0,.55)']},
  dmgW:{font:'num',fill:[[0,'#fffef2'],[.42,'#fff3c4'],[.56,'#ffd078'],[1,'#ff9440']],ow:.13,oc:'#2a1000',sh:[.04,.07,'rgba(0,0,0,.55)'],gl:.25},
  dmgC:{font:'num',fill:[[0,'#fffbe2'],[.28,'#ffeb8c'],[.5,'#ffd030'],[.62,'#ffb418'],[1,'#e27206']],ow:.14,oc:'#341600',rw:.04,rc:'#fff0b0',sh:[.05,.08,'rgba(0,0,0,.6)'],gl:.4,glow:'rgba(255,190,60,.55)'},
+ dmgT:{font:'num',fill:[[0,'#ffffff'],[.46,'#ffffff'],[.56,'#e2e8f8'],[1,'#aab6d6']],ow:.13,oc:'#10141f',sh:[.04,.07,'rgba(0,0,0,.55)'],glow:'rgba(255,230,160,.75)'},
+ dmgWT:{font:'num',fill:[[0,'#fffef2'],[.42,'#fff3c4'],[.56,'#ffd078'],[1,'#ff9440']],ow:.13,oc:'#2a1000',sh:[.04,.07,'rgba(0,0,0,.55)'],gl:.25,glow:'rgba(255,200,110,.8)'},
  dmgG:{font:'num',fill:[[0,'#ffffff'],[.46,'#ffffff'],[.56,'#e0f6ff'],[1,'#8ccbf2']],ow:.13,oc:'#081828',sh:[.04,.07,'rgba(0,0,0,.55)']},
  heal:{font:'num',fill:[[0,'#f2fff4'],[.44,'#c6ffd2'],[.56,'#6ae88c'],[1,'#1ca84a']],ow:.13,oc:'#05240f',sh:[.04,.07,'rgba(0,0,0,.5)'],gl:.25},
  psn:{font:'num',fill:[[0,'#fbf0ff'],[.44,'#e6c8ff'],[.56,'#bb86ff'],[1,'#7a34d0']],ow:.13,oc:'#1a0630',sh:[.04,.07,'rgba(0,0,0,.5)']},
@@ -65,18 +67,36 @@ function master(text,sk,size){const dpr=DPR(),key=sk+'|'+size+'|'+dpr+'|'+text;l
  if(S.gl){fg.setTransform(1,0,0,1,0,0);fg.globalCompositeOperation='source-atop';const gg=fg.createLinearGradient(0,top,0,top+(bot-top)*.5);
   gg.addColorStop(0,`rgba(255,255,255,${S.gl})`);gg.addColorStop(1,'rgba(255,255,255,0)');fg.fillStyle=gg;fg.fillRect(0,top-2,W,(bot-top)*.5+2);}
  g.setTransform(1,0,0,1,0,0);g.drawImage(f,0,0);
- m={c,w:W/dpr,h:Hh/dpr,pad:pad/dpr,adv:tw/dpr,base:base/dpr,dpr};
+ m={c,w:W/dpr,h:Hh/dpr,pad:pad/dpr,adv:tw/dpr,base:base/dpr,dpr,key};
  if(ready(F,px)){if(++CN>600){CACHE.clear();CN=0;}CACHE.set(key,m);}
  return m;}
 /* 表示用の canvas（原本の複製）。CSS の大きさは原本の論理サイズ */
 function el(text,sk,size,cls){const m=master(String(text),sk,Math.round(size)),c=document.createElement('canvas');c.width=m.c.width;c.height=m.c.height;
  c.getContext('2d').drawImage(m.c,0,0);c.style.width=m.w+'px';c.style.height=m.h+'px';c.className='tx24'+(cls?' '+cls:'');c._m=m;return c;}
-/* 1文字ずつ別の canvas にした列（数字を1桁ずつ弾ませる用）。縁取りの余白ぶん左へ詰める */
-function row(text,sk,size,small){const r=document.createElement('span');r.className='tr24';let i=0;const ref=master('0',sk,Math.round(size)),gap=ref.h-ref.base;
- for(const ch of String(text)){const sm=small&&small.test(ch),c=el(ch,sk,sm?size*.6:size,'d'+(sm?' sm':''));if(i)c.style.marginLeft=(-c._m.pad*2+size*.02)+'px';
-  if(sm)c.style.marginBottom=Math.round(gap-(c._m.h-c._m.base))+'px';c.style.setProperty('--i',i);r.appendChild(c);i++;}
- return r;}
+/* 数字の列：1文字ずつの原本（キャッシュ）を詰めて並べ、1枚の canvas に合成する。
+ 1桁ごとに別の canvas にすると合成レイヤーが増えて描画が重くなるため（ver0.24 の計測で約1.7倍）、1枚にまとめる。
+ small に当てはまる文字（「万」など）は小さく描き、基準線をそろえる */
+const ROWC=new Map();let RN=0;
+function rowMaster(text,sk,size,small){const dpr=DPR(),key=sk+'|'+size+'|'+dpr+'|'+text+'|'+(small?small.source:'');let m=ROWC.get(key);if(m)return m;
+ const parts=[...text].map(ch=>{const sm=!!(small&&small.test(ch));return master(ch,sk,sm?Math.round(size*.6):size);});
+ const pad=Math.max(...parts.map(q=>q.pad)),base=Math.max(...parts.map(q=>q.base)),below=Math.max(...parts.map(q=>q.h-q.base));
+ let x=0;const pos=parts.map((q,i)=>{const px=x-(q.pad-pad);x+=q.w-q.pad*2+size*.02;return px;});const Wd=x+pad*2-size*.02,Hd=base+below;
+ const c=document.createElement('canvas');c.width=Math.ceil(Wd*dpr);c.height=Math.ceil(Hd*dpr);const g=c.getContext('2d');
+ parts.forEach((q,i)=>g.drawImage(q.c,Math.round((pos[i])*dpr),Math.round((base-q.base)*dpr)));
+ m={c,w:Wd,h:Hd,pad,base,dpr};if(parts.every(q=>CACHE.has(q.key))){if(++RN>300){ROWC.clear();RN=0;}ROWC.set(key,m);}return m;}
+function row(text,sk,size,small){const m=rowMaster(String(text),sk,Math.round(size),small),c=document.createElement('canvas');c.width=m.c.width;c.height=m.c.height;
+ c.getContext('2d').drawImage(m.c,0,0);c.style.width=m.w+'px';c.style.height=m.h+'px';c.className='tx24 tr24';c._m=m;return c;}
+/* Critical の輝き（放射状の光条＋中心の光）。一度だけ描いてキャッシュし、表示側は transform と opacity だけで動かす */
+const BURST={};
+function burst(size){const dpr=DPR(),k=Math.round(size)+'|'+dpr;let m=BURST[k];
+ if(!m){const S=Math.round(size*dpr),c=document.createElement('canvas');c.width=c.height=S;const g=c.getContext('2d'),r=S/2;
+  const rg=g.createRadialGradient(r,r,0,r,r,r);rg.addColorStop(0,'rgba(255,255,255,.95)');rg.addColorStop(.18,'rgba(255,236,150,.7)');rg.addColorStop(.42,'rgba(255,180,50,.26)');rg.addColorStop(.7,'rgba(255,150,40,0)');
+  g.fillStyle=rg;g.fillRect(0,0,S,S);g.translate(r,r);const n=18;
+  for(let i=0;i<n;i++){g.rotate(Math.PI*2/n);const L=r*(i%2?.72:.98),w=r*(i%2?.035:.055),lg=g.createLinearGradient(0,0,L,0);lg.addColorStop(0,'rgba(255,240,170,.75)');lg.addColorStop(1,'rgba(255,200,80,0)');
+   g.fillStyle=lg;g.beginPath();g.moveTo(r*.08,-w);g.lineTo(L,0);g.lineTo(r*.08,w);g.closePath();g.fill();}
+  m=BURST[k]=c;}
+ const c=document.createElement('canvas');c.width=m.width;c.height=m.height;c.getContext('2d').drawImage(m,0,0);c.style.width=c.style.height=Math.round(size)+'px';c.className='fx';return c;}
 /* 書体を先に読み込む（読み込み後は自動的に正しい書体で描かれる） */
 function preload(){try{if(!document.fonts)return;for(const k in FONT){const F=FONT[k];document.fonts.load(fontStr(F,32),k==='jp'?'スタン斬打突炎氷雷風地光闇毒':'0123456789CriticalWeakGuardMissBREAK!+').catch(()=>{});}}catch(e){}}
 preload();
-return{el,row,master,tint,STYLE,FONT,preload,clear:()=>{CACHE.clear();CN=0;}};})();
+return{el,row,master,burst,tint,STYLE,FONT,preload,clear:()=>{CACHE.clear();ROWC.clear();CN=RN=0;}};})();

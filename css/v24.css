@@ -3,7 +3,7 @@
 
 /* ---------- ダメージ表示（.p24＝位置／.ot＝消える動き／.in＝出る動き） ---------- */
 #pp24{position:absolute;inset:0;pointer-events:none;z-index:4;overflow:hidden;contain:layout paint}
-.p24{position:absolute;left:0;top:0;white-space:nowrap;will-change:transform}
+.p24{position:absolute;left:0;top:0;white-space:nowrap}
 .p24 .ot{transition:opacity var(--out,.22s) ease-in,transform var(--out,.22s) ease-in}
 .p24.out .ot{opacity:0;transform:translateY(-10px) scale(.96)}
 .p24 .in{position:relative;display:flex;flex-direction:column;align-items:center;transform-origin:50% 70%}
@@ -12,32 +12,27 @@
 .p24 .lb+.lb{margin-top:-3px}
 .p24 .lb.wk canvas+canvas{margin-left:-4px}
 .p24 .nm{position:relative;margin-top:-3px}
-.tr24{display:inline-flex;align-items:flex-end;white-space:nowrap}
-/* 数字：1桁ずつ上から落ちて弾む */
-.p24 .tr24 .d{animation:dg24 .36s cubic-bezier(.18,1.55,.4,1) both;animation-delay:calc(var(--i,0) * 26ms)}
-@keyframes dg24{0%{opacity:0;transform:translateY(-16px) scale(1.35)}35%{opacity:1}100%{opacity:1;transform:none}}
+.tr24{display:block}
+/* 数字：上から落ちて弾む（数字全体で1枚の canvas） */
+.p24 .nm>.tr24{animation:dg24 .38s cubic-bezier(.18,1.55,.4,1) both;animation-delay:.03s}
+@keyframes dg24{0%{opacity:0;transform:translateY(-14px) scale(1.3,1.45)}35%{opacity:1}100%{opacity:1;transform:none}}
 /* 見出しの入り方 */
 .p24 .lb.cr canvas{animation:cr24l .34s cubic-bezier(.2,1.5,.4,1) both}
-@keyframes cr24l{0%{opacity:0;transform:scale(2.1);filter:brightness(2.6)}60%{opacity:1;filter:brightness(1.6)}100%{transform:none;filter:none}}
+@keyframes cr24l{0%{opacity:0;transform:scale(2.1)}60%{opacity:1}100%{transform:none}}
 .p24 .lb.wk canvas{animation:wk24 .32s cubic-bezier(.2,1.35,.4,1) both;animation-delay:.04s}
 @keyframes wk24{0%{opacity:0;transform:translateX(-16px) skewX(-14deg)}100%{opacity:1;transform:none}}
 .p24 .lb.gd canvas{animation:gd24 .36s cubic-bezier(.2,1.5,.4,1) both}
-@keyframes gd24{0%{opacity:0;transform:scale(.45);filter:brightness(2.4)}55%{opacity:1;transform:scale(1.12)}100%{transform:none;filter:none}}
+@keyframes gd24{0%{opacity:0;transform:scale(.45)}55%{opacity:1;transform:scale(1.12)}100%{transform:none}}
 .p24 .lb.st canvas{animation:st24 .28s ease-out both}
 @keyframes st24{0%{opacity:0;transform:translateY(5px)}100%{opacity:1;transform:none}}
 /* Critical：全体が大きく入って白く光り、輝きと残像を伴う */
 .p24.crit .in{animation:cr24 .46s cubic-bezier(.2,1.35,.4,1) both}
-@keyframes cr24{0%{transform:scale(1.7);filter:brightness(2.4)}45%{transform:scale(.94);filter:brightness(1.35)}100%{transform:none;filter:none}}
-.p24 .fx{position:absolute;left:50%;top:62%;width:150%;aspect-ratio:1;transform:translate(-50%,-50%);z-index:-1;border-radius:50%;pointer-events:none;
- background:radial-gradient(circle,rgba(255,255,255,.95) 0%,rgba(255,236,150,.7) 18%,rgba(255,180,50,.28) 40%,rgba(255,150,40,0) 64%),
- repeating-conic-gradient(from 0deg,rgba(255,230,140,.55) 0deg 4deg,rgba(255,230,140,0) 4deg 22deg);
- -webkit-mask:radial-gradient(circle,#000 30%,transparent 68%);mask:radial-gradient(circle,#000 30%,transparent 68%);animation:fx24 .5s ease-out both}
+@keyframes cr24{0%{transform:scale(1.7)}45%{transform:scale(.94)}100%{transform:none}}
+.p24 .fx{position:absolute;left:50%;top:62%;z-index:-1;pointer-events:none;transform:translate(-50%,-50%);animation:fx24 .5s ease-out both}
 @keyframes fx24{0%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(0)}25%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1.25) rotate(40deg)}}
 .p24 .nm.ec{position:absolute;left:0;top:0;margin:0;opacity:0;animation:ec24 .5s ease-out both;z-index:-1}
 @keyframes ec24{0%{opacity:.7;transform:translate(-5px,-9px)}100%{opacity:0;transform:translate(-2px,-18px)}}
-/* 大きなダメージ（最大HPの35%以上）は残光をつける */
-.p24.t3 .nm>.tr24{filter:drop-shadow(0 0 6px rgba(255,230,160,.65))}
-.p24.crit.t3 .nm>.tr24{filter:drop-shadow(0 0 9px rgba(255,190,60,.85))}
+/* 大きなダメージ（最大HPの35%以上）の残光は Canvas に描き込む（dmgT／dmgWT。CSS の filter は描画が重いため使わない） */
 /* 回復：下から浮かぶ */
 .p24.heal .in{animation:hl24 .4s ease-out both}
 @keyframes hl24{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:none}}
@@ -46,14 +41,14 @@
 @keyframes ms24{0%{opacity:0;transform:translateX(-12px) skewX(-10deg)}22%{opacity:1;transform:none}100%{transform:translateX(9px)}}
 /* BREAK!!：叩きつけて揺れる */
 .p24.xbrk .in{animation:bk24 .62s cubic-bezier(.2,1.3,.4,1) both}
-@keyframes bk24{0%{opacity:0;transform:scale(2.5) rotate(-8deg);filter:brightness(2.6)}38%{opacity:1;transform:scale(.92) rotate(0)}50%{transform:translateX(-4px)}62%{transform:translateX(4px)}74%{transform:translateX(-2px)}100%{transform:none;filter:none}}
+@keyframes bk24{0%{opacity:0;transform:scale(2.5) rotate(-8deg)}38%{opacity:1;transform:scale(.92) rotate(0)}50%{transform:translateX(-4px)}62%{transform:translateX(4px)}74%{transform:translateX(-2px)}100%{transform:none}}
 /* 状態表示（攻撃↑ など） */
 .p24.tag .in{flex-direction:row;align-items:flex-end;animation:tg24 .3s ease-out both}
 .p24.tag .in canvas+canvas{margin-left:-2px}
 @keyframes tg24{0%{opacity:0;transform:translateY(7px)}100%{opacity:1;transform:none}}
 .p24.tag.dn .in{animation-name:tg24d}
 @keyframes tg24d{0%{opacity:0;transform:translateY(-7px)}100%{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.p24 .in,.p24 canvas,.p24 .tr24 .d{animation:none !important}.p24 .fx{display:none}}
+@media (prefers-reduced-motion:reduce){.p24 .in,.p24 canvas{animation:none !important}.p24 .fx{display:none}}
 
 /* ---------- 戦場のHP表示（キャラの横：大きなHP＋小さなSP） ---------- */
 #hl24{position:absolute;inset:0;pointer-events:none;z-index:1}
@@ -151,6 +146,11 @@
 /* ---------- 連撃数：上の帯の直下・左端に固定 ---------- */
 #app.v24 #combo{left:4px;right:auto;top:calc(var(--hud23,80px) + 2px);z-index:4;filter:none;letter-spacing:0;text-align:left}
 #combo .c1{display:flex;align-items:flex-end}
-#combo .c1>canvas{margin-left:-6px;margin-bottom:2px}
+#combo .c1>canvas+canvas{margin-left:-6px;margin-bottom:2px}
 #combo .c2{margin-top:-8px;margin-left:6px}
-#combo.bump .c1 .tr24 .d:last-child{animation:dg24 .26s cubic-bezier(.18,1.55,.4,1) both}
+#combo.bump .c1 .tr24{animation:dg24 .26s cubic-bezier(.18,1.55,.4,1) both}
+
+/* ---------- 上の固定帯：敵のHPゲージ（参考：暗い枠＋明るい縁＋上半分の光沢） ---------- */
+#app.v24 .b22tg .bar{border:1px solid #000;border-radius:2px;box-shadow:0 0 0 1px rgba(214,232,236,.55),0 2px 4px rgba(0,0,0,.6)}
+#app.v24 .b22tg .bar::after{content:'';position:absolute;left:0;right:0;top:0;height:46%;background:linear-gradient(180deg,rgba(255,255,255,.5),rgba(255,255,255,0));pointer-events:none}
+#app.v24 .b22tg .nm em.bs{font-family:"Nunito",var(--num);font-weight:900;font-style:italic;letter-spacing:.5px;box-shadow:0 0 0 1px #3a0008}

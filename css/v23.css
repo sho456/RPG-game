@@ -32,39 +32,6 @@
 #app.v23[data-sc="battle"] #labels .hpl{display:none !important}
 #app.v23[data-sc="battle"] #party{display:none !important}
 
-/* ---------- 下部のパーティ情報欄 ---------- */
-#pt23{display:none}
-#app.v23[data-sc="battle"] #pt23{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin-top:5px;position:relative;z-index:4}
-.pc23{position:relative;min-width:0;min-height:78px;padding:4px 5px 3px;box-sizing:border-box;border-radius:7px;border:1.5px solid #3c4a8a;background:linear-gradient(180deg,#141e58,#0a0f30);
- box-shadow:inset 0 0 0 1px #050820,0 2px 0 rgba(0,0,0,.45);cursor:pointer;overflow:hidden;transition:transform .15s,border-color .15s}
-.pc23::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--ec);opacity:.85}
-.pc23 .r1{display:flex;align-items:center;gap:4px;height:22px;min-width:0}
-.pc23 .fc{flex:none;width:22px;height:22px;image-rendering:pixelated;border-radius:4px;background:rgba(255,255,255,.06)}
-.pc23 .nm{display:flex;flex-direction:column;min-width:0;line-height:1.05}
-.pc23 .nm b{font-weight:400;font-size:11px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:1px 1px 0 #000}
-.pc23 .st{display:flex;gap:1px;height:10px;overflow:hidden}
-.pc23 .st i{font-style:normal;font-size:8px;line-height:10px;padding:0 2px;border-radius:2px;color:#fff;background:#2a6a3a;white-space:nowrap}
-.pc23 .st i.de{background:#8a2a3a}.pc23 .st i.mo{background:#3a4070}.pc23 .st i.gd{background:#2a5a9a}
-.pc23 .hp{display:flex;align-items:baseline;justify-content:space-between;margin-top:2px;line-height:1}
-.pc23 .hp em,.pc23 .sp em{font-style:italic;font-family:var(--dmg);font-weight:700;font-size:10px;color:#9fd8ff;letter-spacing:.5px}
-.pc23 .hv{font-family:var(--dmg);font-style:italic;font-weight:700;font-size:18px;color:#fff;letter-spacing:-.3px;text-shadow:1px 1px 0 #000,-1px 0 0 #000,0 -1px 0 #000}
-.pc23 .hb{position:relative;height:5px;margin-top:1px;border-radius:2px;border:1px solid #000;background:#2a0e14;overflow:hidden}
-.pc23 .hb u{position:absolute;left:0;top:0;bottom:0;background:#fff;opacity:.75;transition:width .6s ease .3s}
-.pc23 .hb i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(180deg,#a8ffb8,#38c060 55%,#1a7a34);transition:width .2s}
-.pc23 .sp{display:flex;align-items:center;gap:3px;margin-top:3px;line-height:1}
-.pc23 .sv{font-family:var(--dmg);font-style:italic;font-weight:700;font-size:11px;color:#cfe3ff;min-width:16px}
-.pc23 .sb{flex:1;height:3px;border-radius:2px;background:#101436;overflow:hidden}.pc23 .sb i{display:block;height:100%;background:linear-gradient(90deg,#4a8aff,#9fd8ff)}
-.pc23 .ag{display:flex;align-items:center;gap:3px;margin-top:3px;height:10px}
-.pc23 .ag s{display:block;flex:1;min-width:0;height:4px;border-radius:2px;background:rgba(0,0,0,.6);box-shadow:0 0 0 1px rgba(243,210,122,.25);overflow:hidden;text-decoration:none}
-.pc23 .ag i{display:block;height:100%;border-radius:2px;background:linear-gradient(90deg,#d9a020,#ffe27a);transition:width .3s}
-.pc23 .ag span{flex:none;font-family:var(--dmg);font-style:italic;font-weight:700;font-size:10px;line-height:1;color:#ffe9a0;text-shadow:1px 1px 0 #000;white-space:nowrap}
-.pc23.cur{border-color:#fff1c2;background:linear-gradient(180deg,#2a3a8a,#101a4a);box-shadow:0 0 0 1px #6a4a12,0 0 10px rgba(243,210,122,.55),inset 0 0 0 1px rgba(255,255,255,.12);transform:translateY(-2px)}
-.pc23.low .hv{color:#ff7a7a}.pc23.low .hb i{background:linear-gradient(180deg,#ffb0a0,#e04a3a 55%,#8a1a10)}
-.pc23.full .ag i{box-shadow:0 0 5px #ffe27a;animation:pulse .5s infinite alternate}
-.pc23.awk{border-color:var(--g2,#f3d27a);background:linear-gradient(180deg,#4a3810,#1a1a40)}
-.pc23.awk .ag i{background:linear-gradient(90deg,#fff3c0,#e8b030)}
-.pc23.down{filter:grayscale(1) brightness(.6)}.pc23.down .hv{color:#888}
-@media (max-width:360px){.pc23{padding:3px 3px 3px 5px}.pc23 .fc{width:18px;height:18px}.pc23 .hv{font-size:16px}.pc23 .nm b{font-size:10px}}
 /* 状態の確認シート */
 .hs23 .hh{display:flex;align-items:center;gap:10px;margin-bottom:8px}.hs23 .hh img{width:64px;height:64px;image-rendering:pixelated;filter:drop-shadow(0 0 6px var(--ec))}
 .hs23 .hh b{display:block;font-weight:400;font-size:18px}.hs23 .hh small{color:var(--tx2,#aab0d8);font-size:11px}
@@ -72,56 +39,7 @@
 .sl23 li span{font-size:11px;color:var(--tx2,#aab0d8)}
 .hs23 .nn{margin-top:8px;font-size:12px;color:var(--tx2,#aab0d8)}
 
-/* ==================== 2. ダメージ・戦闘演出 ====================
- 統一ルール：斜体のコンデンス体／黒の太い縁取り（4方向の影）＋斜め下の落ち影／上から下へのグラデーション。
- 見出し（Critical・Weak・Guard など）は数字の左上に重ねず、数字の上に左寄せで積む */
-#pp23{position:absolute;inset:0;pointer-events:none;z-index:2;overflow:hidden}
-.p23{position:absolute;left:0;top:0;white-space:nowrap;will-change:transform}
-.p23 .in{display:flex;flex-direction:column;align-items:flex-start;transform-origin:30% 70%;animation:pin23 var(--life,1150ms) cubic-bezier(.2,.9,.3,1) both}
-.p23.h .in{align-items:flex-end;transform-origin:90% 60%}
-.p23 .n,.p23 .w,.p23 .lb span{font-family:var(--dmg);font-style:italic;font-weight:700;line-height:.92;letter-spacing:-.5px;
- -webkit-background-clip:text;background-clip:text;color:transparent;
- filter:drop-shadow(1.6px 0 0 #120a02) drop-shadow(-1.6px 0 0 #120a02) drop-shadow(0 1.6px 0 #120a02) drop-shadow(0 -1.6px 0 #120a02) drop-shadow(2px 2.5px 0 rgba(0,0,0,.55))}
-.p23 .n{background-image:linear-gradient(180deg,#ffffff 0%,#ffffff 46%,#dfe6ff 54%,#aebcf0 100%);padding:0 .08em}
-.p23 .n small{font-size:.6em;margin-left:1px}
-.p23 .lb{display:flex;flex-direction:column;align-items:inherit;gap:1px;margin-bottom:3px}
-.p23 .lb:empty{display:none}
-.p23 .lb span{font-size:15px;padding:0 .12em;line-height:1}
-.p23 .lb .cr{font-size:17px;background-image:linear-gradient(180deg,#fff8c8 0%,#ffe060 45%,#ff9a18 100%)}
-.p23 .lb .wk{background-image:linear-gradient(180deg,#ffd6ee 0%,#ff6ab8 50%,#d0206e 100%)}
-.p23 .lb .wk b{display:inline-block;margin-left:3px;font-family:"DotGothic16",sans-serif;font-style:normal;font-weight:400;font-size:1.05em;background:linear-gradient(180deg,#fff,#e8e8f8);-webkit-background-clip:text;background-clip:text;color:transparent}
-.p23 .lb .gd{background-image:linear-gradient(180deg,#f0feff 0%,#7fe4ff 50%,#1a8ad0 100%)}
-.p23 .lb .sb23{font-family:"DotGothic16",sans-serif;font-style:normal;font-weight:400;font-size:12px;line-height:1.15;letter-spacing:1px;background-image:linear-gradient(180deg,#ffffff,#e4e8ff)}
-/* 会心：金色・大きく・揺れる */
-.p23.crit .n{background-image:linear-gradient(180deg,#fffbe0 0%,#ffe36a 40%,#ffb020 70%,#e07000 100%)}
-.p23.crit .in{animation-name:pcr23}
-/* 弱点：数字はオレンジがかった白 */
-.p23.weak:not(.crit) .n{background-image:linear-gradient(180deg,#ffffff 0%,#fff2d8 46%,#ffc890 60%,#ff9a50 100%)}
-/* 味方への被ダメ：白→淡い赤 */
-.p23.h.dmg:not(.heal) .n{background-image:linear-gradient(180deg,#ffffff 0%,#ffffff 46%,#ffe0e0 56%,#ff9a9a 100%)}
-.p23.grd .n{background-image:linear-gradient(180deg,#ffffff 0%,#ffffff 46%,#e0f6ff 56%,#9fd8ff 100%)}
-.p23.heal .n{background-image:linear-gradient(180deg,#f0fff0 0%,#b8ffc8 45%,#40e070 75%,#14a040 100%)}
-.p23.psn .n{background-image:linear-gradient(180deg,#f6e8ff 0%,#d0a0ff 50%,#9040e0 100%)}
-/* 大ダメージほど縁取りを太く・光らせる */
-.p23.t2 .n,.p23.t3 .n{filter:drop-shadow(2px 0 0 #120a02) drop-shadow(-2px 0 0 #120a02) drop-shadow(0 2px 0 #120a02) drop-shadow(0 -2px 0 #120a02) drop-shadow(2px 3px 0 rgba(0,0,0,.6))}
-.p23.t3 .n{filter:drop-shadow(2px 0 0 #120a02) drop-shadow(-2px 0 0 #120a02) drop-shadow(0 2px 0 #120a02) drop-shadow(0 -2px 0 #120a02) drop-shadow(0 0 6px rgba(255,220,120,.85))}
-.p23.fl::before{content:'';position:absolute;left:50%;top:55%;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.95) 0%,rgba(255,230,140,.55) 30%,rgba(255,180,60,0) 66%);animation:fl23 .32s ease-out both;pointer-events:none}
-/* 文字だけの表示（Miss・BREAK） */
-.p23 .w{padding:0 .1em}
-.p23.miss .w{background-image:linear-gradient(180deg,#ffffff 0%,#e8ecf4 48%,#a8b0c4 100%)}
-.p23.brk .w{background-image:linear-gradient(180deg,#fff6d0 0%,#ffcc40 40%,#ff5a20 75%,#c01810 100%);letter-spacing:0}
-.p23.brk .in{animation-name:pbk23}
-/* 小さな表示（状態・AG+・DELAY） */
-.p23.tag .g{font-family:var(--dmg);font-style:italic;font-weight:700;font-size:15px;line-height:1;color:var(--c);letter-spacing:.3px;text-shadow:1.5px 0 0 #000,-1.5px 0 0 #000,0 1.5px 0 #000,0 -1.5px 0 #000,1px 2px 0 rgba(0,0,0,.6)}
-.p23.tag.jp .g{font-family:"DotGothic16",sans-serif;font-style:normal;font-weight:400;font-size:13px}
-.p23.tag .in{animation-name:ptg23}
-@keyframes pin23{0%{opacity:0;transform:translateY(6px) scale(1.7) skewX(-8deg)}10%{opacity:1;transform:translateY(0) scale(.9) skewX(0)}18%{transform:scale(1.07)}26%{transform:scale(1)}78%{opacity:1;transform:translateY(-2px)}100%{opacity:0;transform:translateY(-14px)}}
-@keyframes pcr23{0%{opacity:0;transform:scale(2.3) rotate(-6deg)}9%{opacity:1;transform:scale(.88) rotate(0)}14%{transform:scale(1.12) translateX(-2px)}19%{transform:scale(1) translateX(2px)}24%{transform:translateX(-1px)}30%{transform:none}80%{opacity:1;transform:translateY(-2px)}100%{opacity:0;transform:translateY(-16px)}}
-@keyframes pbk23{0%{opacity:0;transform:scale(2.6)}10%{opacity:1;transform:scale(.9)}16%{transform:scale(1.1) rotate(-3deg)}24%{transform:scale(1) rotate(0)}80%{opacity:1}100%{opacity:0;transform:scale(1.15)}}
-@keyframes ptg23{0%{opacity:0;transform:translateX(-10px)}14%{opacity:1;transform:none}78%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
-@keyframes fl23{from{opacity:1;transform:scale(.2)}to{opacity:0;transform:scale(1.4)}}
-/* 旧来の文字ポップは使わない（念のため） */
-#app.v23[data-sc="battle"] #pops .pop.dg{display:none}
+/* ==================== 2. ダメージ・戦闘演出：ver0.24 で v24.css（.p24）に置き換え ==================== */
 
 /* ==================== 7. 星臨のカットイン（テキスト段） ==================== */
 #sr23{position:absolute;inset:0;z-index:40;display:none;align-items:center;justify-content:center;flex-direction:column;overflow:hidden;pointer-events:none;
@@ -240,5 +158,3 @@
 .zaw{padding:8px 10px;border-radius:8px;border:1.5px solid var(--g1,#c9a24a);background:linear-gradient(180deg,rgba(90,66,14,.55),rgba(14,20,60,.6))}.zaw b{font-weight:400;font-size:15px;color:#ffe9a0}.zaw small{display:block;font-size:10px;color:#cfd3f5}.zaw p{margin:4px 0 0;font-size:11px;line-height:1.5;color:#e8e8ff}
 .zeq{display:flex;justify-content:center;padding:10px;border-radius:10px;border:2px solid var(--g1,#c9a24a);background:radial-gradient(circle,#2a2a6a,#0a0f30)}.zeq img{width:144px;height:144px;image-rendering:pixelated}
 /* まとめた状態表示：横一列 */
-.p23.tag .in{flex-direction:row;flex-wrap:nowrap;gap:4px;align-items:baseline}
-.p23.tag.h .in{justify-content:flex-end}
