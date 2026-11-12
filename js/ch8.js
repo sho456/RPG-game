@@ -17,8 +17,8 @@ Object.assign(SK,{
  shuuen:{n:'終焉の針',sp:35,k:'mag',el:null,pow:2.5,t:'one',d:'無属性・単体の大魔法'},
  kokuha:{n:'刻破',k:'mag',el:null,pow:1.9,t:'all',d:'無属性の全体大魔法'},
  tokitome:{n:'時止め',k:'tstop',t:'all',d:'敵全体の時間を止め、行動を大きく遅らせる'},
- makimodoshi:{n:'巻き戻し',k:'rewind',t:'self',req:'snap',d:'円環に記録した瞬間まで味方のHP・SP・戦闘不能を巻き戻す（1戦闘1回・覚醒が解けても使える）'},
- gokuceles:{n:'永劫の円環',k:'mag',el:null,pow:3.2,t:'all',d:'覚醒Ⅲ：無属性の全体大魔法'},
+ makimodoshi:{n:'巻き戻し',k:'rewind',t:'self',req:'snap',d:'円環に記録した瞬間まで味方のHP・SP・戦闘不能を巻き戻す（1戦闘1回・星臨が解けても使える）'},
+ gokuceles:{n:'永劫の円環',k:'mag',el:null,pow:3.2,t:'all',d:'星臨Ⅲ：無属性の全体大魔法'},
  ryuuga:{n:'竜牙斬',sp:15,el:'炎',k:'phys',pow:1.5,t:'one',d:'炎の斬撃・単体'},
  kokuen:{n:'黒炎薙ぎ',sp:30,el:'闇',k:'phys',pow:.95,t:'all',d:'闇の斬撃・敵全体'},
  ryuuhou:{n:'竜の咆哮',sp:25,k:'roar',t:'all',d:'敵全体の行動を遅らせ、味方のAG+15'},
@@ -26,13 +26,13 @@ Object.assign(SK,{
  ryuumetsu:{n:'竜滅斬',sp:35,el:'斬',k:'phys',pow:2.4,t:'one',d:'斬撃・単体の大技'},
  ryuuen:{n:'竜炎',el:'炎',k:'phys',pow:1.5,t:'all',d:'炎の全体攻撃（自動）'},
  meiryuu:{n:'冥竜爪',el:'闇',k:'phys',pow:1.5,t:'all',d:'闇の全体攻撃（自動）'},
- gokuvalk:{n:'終焉竜咆',el:'炎',k:'phys',pow:2.6,t:'all',d:'覚醒Ⅲ：竜の全力・敵全体'}});
+ gokuvalk:{n:'終焉竜咆',el:'炎',k:'phys',pow:2.6,t:'all',d:'星臨Ⅲ：竜の全力・敵全体'}});
 AW.celes={name:'刻の円環',type:'特殊',turns:3,cmds:['kokuha','tokitome','makimodoshi']};
-AW.valk={name:'竜血覚醒',type:'ターン制',turns:3,cmds:['ryuuen','meiryuu']};
-AWD.celes='発動の瞬間の味方全員のHP・SP・戦闘不能を記録。以降の好きな手番で1度だけ「巻き戻し」できる（覚醒が解けても使える）';
+AW.valk={name:'竜血星臨',type:'ターン制',turns:3,cmds:['ryuuen','meiryuu']};
+AWD.celes='発動の瞬間の味方全員のHP・SP・戦闘不能を記録。以降の好きな手番で1度だけ「巻き戻し」できる（星臨が解けても使える）';
 AWD.valk='竜化して与ダメ1.5倍。全体攻撃のみで、行動は自動（制御不能）。共鳴技はリオとだけ組める';
-BDEF.celes=mkB('刻輪座',[['magP'],['resP'],['spd'],['mhpP'],['defP'],['awDmg','crit']],['3,-2','-1,-2','-3,1','2,1'],'ryuusa','shuuen',[[{magP:12},'刻魔：魔力+12%'],[{spd:2},'早鐘：素早さ+2'],[{awDmg:20},'円環：覚醒中与ダメ+20%'],[{resP:15},'悠久：精神+15%']]);
-BDEF.valk=mkB('竜血座',[['atkP'],['mhpP'],['crit'],['defP'],['awDmg'],['spd']],['2,-3','-2,-1','-3,2','1,2'],'gouka','ryuumetsu',[[{atkP:12},'竜爪：攻撃+12%'],[{mhpP:15},'竜鱗：最大HP+15%'],[{awDmg:20},'逆鱗：覚醒中与ダメ+20%'],[{crit:10},'竜眼：会心率+10%']]);
+BDEF.celes=mkB('刻輪座',[['magP'],['resP'],['spd'],['mhpP'],['defP'],['awDmg','crit']],['3,-2','-1,-2','-3,1','2,1'],'ryuusa','shuuen',[[{magP:12},'刻魔：魔力+12%'],[{spd:2},'早鐘：素早さ+2'],[{awDmg:20},'円環：星臨中与ダメ+20%'],[{resP:15},'悠久：精神+15%']]);
+BDEF.valk=mkB('竜血座',[['atkP'],['mhpP'],['crit'],['defP'],['awDmg'],['spd']],['2,-3','-2,-1','-3,2','1,2'],'gouka','ryuumetsu',[[{atkP:12},'竜爪：攻撃+12%'],[{mhpP:15},'竜鱗：最大HP+15%'],[{awDmg:20},'逆鱗：星臨中与ダメ+20%'],[{crit:10},'竜眼：会心率+10%']]);
 BOARD.celes=buildBoard('celes');BOARD.valk=buildBoard('valk');
 Object.assign(RESO,{'celes,rio':'刻灯の円環','celes,mire':'時空の書架','celes,noah':'永劫の祈り','celes,gald':'不朽の城壁','celes,shion':'影時雨','rio,valk':'竜灯の咆哮'});
 Object.assign(RFX,{'celes,rio':{c:'#d8c8ff',fx:'delay'},'celes,noah':{c:'#f0e8ff',el:'光',fx:'revive',m:.6},'rio,valk':{c:'#ff5a30',el:'炎',m:2.2}});
@@ -40,15 +40,15 @@ Object.assign(TRIAL,{celes:['止まった時計の群れが、ひとりきりの
  valk:['竜の血が、仲間ごと焼き尽くせと吠える。','「この炎は喰うためじゃない。並んで燃やすためのものだ」']});
 OWNEL.valk='炎';
 LEG.kokuyomi={n:'刻詠みの砂時計',slot:'w',who:'celes',d:'戦闘開始の瞬間を刻の円環に記録する（巻き戻しが最初から使える）'};
-LEG.ryuuou={n:'竜王の大剣',slot:'w',who:'valk',d:'竜血覚醒中の与ダメが2倍になる（通常1.5倍）'};
+LEG.ryuuou={n:'竜王の大剣',slot:'w',who:'valk',d:'竜血星臨中の与ダメが2倍になる（通常1.5倍）'};
 ITYPE.unshift(['砂時計','staff'],['竜剣','gsword']);
 {const _wb=wbase;wbase=function(it,ilv,m){if(it.who==='celes'){it.base={mag:Math.round(5+ilv*2.6)};it.name=m+'の砂時計';return;}if(it.who==='valk'){it.base={atk:Math.round(7+ilv*2.8)};it.name=m+'の竜剣';return;}_wb(it,ilv,m);};}
 
-/* --- 戦闘：刻の円環（巻き戻し）・竜血覚醒（自動行動） --- */
+/* --- 戦闘：刻の円環（巻き戻し）・竜血星臨（自動行動） --- */
 function snapTake(u,msg){if(B.rewound)return;B.snap={};B.heroes.forEach(h=>B.snap[h.id]={hp:h.hp,alive:h.alive,sp:h.sp});B.awUsed.add('snap');if(!u.skills.includes('makimodoshi'))u.skills.push('makimodoshi');pop(u,'刻を記録','#d8c8ff',true);if(msg)log(msg);}
 {const _aw=awaken;awaken=async function(u){await _aw(u);
  if(u.id==='celes')snapTake(u,'<b>刻の円環</b>――今この瞬間が記録された（巻き戻しは1戦闘1回）');
- if(u.id==='valk'){log('<b>竜血覚醒</b>――ヴァルクの瞳から理性の色が消えた！（行動は自動）');if(B.res&&!auto)B.res();}};}
+ if(u.id==='valk'){log('<b>竜血星臨</b>――ヴァルクの瞳から理性の色が消えた！（行動は自動）');if(B.res&&!auto)B.res();}};}
 {const _sb=startBattle;startBattle=function(list,opts={}){_sb(list,opts);if(VOIDED)BG=desat(BG);
  B.heroes.forEach(h=>{if(h.id==='celes'&&h.legs.includes('kokuyomi'))snapTake(h);});};}
 {const _da=doAction;doAction=async function(u,sk,t){
@@ -79,19 +79,19 @@ for(const[k,b,pal]of[['firedrake','wolf',{g:'#c0402a',G:'#5a1a10',w:'#ffd080',x:
 Object.assign(EA,{dslash:{n:'竜剣・断',el:'斬',k:'phys',pow:1.6,t:'one'},dfire:{n:'黒炎',el:'炎',k:'mag',pow:1.2,t:'all'},dbreath:{n:'竜の息吹',el:'炎',k:'mag',pow:2.7,t:'all'},
  chrono:{n:'時喰らい',el:'闇',k:'mag',pow:2.8,t:'all'},ember:{n:'火の粉',el:'炎',k:'mag',pow:1.1,t:'one'}});
 Object.assign(ED,{
- firedrake:{name:'火竜の仔',mhp:270,atk:88,def:30,mag:40,res:20,spd:15,weak:['氷','突'],brk:4,xp:48,gold:34,drop:[['kiba',.5],['kakera',.2]],acts:[['claw',.5],['bite',.3],['ember',.2]]},
- lavaslime:{name:'溶岩スライム',mhp:280,atk:74,def:34,mag:70,res:24,spd:9,weak:['氷','打'],brk:3,xp:44,gold:30,drop:[['haiseki',.6]],acts:[['claw',.5],['ember',.5]]},
- dragonewt:{name:'竜兵',mhp:300,atk:92,def:36,mag:30,res:22,spd:12,weak:['雷','氷'],brk:5,xp:52,gold:38,drop:[['kiba',.3],['kakera',.25]],acts:[['dslash',.6],['claw',.4]],flip:1},
- ember:{name:'残り火',mhp:220,atk:40,def:20,mag:96,res:18,spd:14,weak:['氷','光'],brk:3,xp:46,gold:32,drop:[['kakera',.3]],acts:[['ember',.6],['dfire',.4]]},
- boss9:{name:'黒炎竜ヴォルガノン',mhp:36000,atk:580,def:120,mag:560,res:104,spd:17,weak:['氷','光'],brk:16,sc:3,boss:true,xp:14000,gold:18000,drop:[['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1]],
+ firedrake:{name:'火竜の仔',mhp:270,atk:88,def:30,mag:40,res:20,spd:15,weak:['氷','突'],xp:48,gold:34,drop:[['kiba',.5],['kakera',.2]],acts:[['claw',.5],['bite',.3],['ember',.2]]},
+ lavaslime:{name:'溶岩スライム',mhp:280,atk:74,def:34,mag:70,res:24,spd:9,weak:['氷','打'],xp:44,gold:30,drop:[['haiseki',.6]],acts:[['claw',.5],['ember',.5]]},
+ dragonewt:{name:'竜兵',mhp:300,atk:92,def:36,mag:30,res:22,spd:12,weak:['雷','氷'],xp:52,gold:38,drop:[['kiba',.3],['kakera',.25]],acts:[['dslash',.6],['claw',.4]],flip:1},
+ ember:{name:'残り火',mhp:220,atk:40,def:20,mag:96,res:18,spd:14,weak:['氷','光'],xp:46,gold:32,drop:[['kakera',.3]],acts:[['ember',.6],['dfire',.4]]},
+ boss9:{name:'黒炎竜ヴォルガノン',mhp:36000,atk:580,def:120,mag:560,res:104,spd:17,weak:['氷','光'],sc:3,boss:true,xp:14000,gold:18000,drop:[['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1]],
   ai:{every:3,charge:'dbreath',acts:[['claw',.35],['dfire',.35],['bite',.3]],summon:'firedrake',sumLv:66},ilv:68},
- valkE:{name:'竜人ヴァルク',mhp:52000,atk:620,def:150,mag:380,res:110,spd:18,weak:['氷','光'],brk:12,xp:1500,gold:0,drop:[],ai:{every:3,charge:'dbreath',acts:[['dslash',.6],['dfire',.4]]},flip:1,sc:2}});
+ valkE:{name:'竜人ヴァルク',mhp:52000,atk:620,def:150,mag:380,res:110,spd:18,weak:['氷','光'],xp:1500,gold:0,drop:[],ai:{every:3,charge:'dbreath',acts:[['dslash',.6],['dfire',.4]]},flip:1,sc:2}});
 const KBASE=[['golemboss','虚ろの巨像'],['boss5','虚ろの妖狐'],['boss3','虚ろの司祭'],['boss6','虚ろの女王']],KEL=['光','闇','炎','氷','雷','風','地','斬','打','突'];
 const kLv=f=>54+f;
 function kBoss(f){const k='kb'+f;if(ED[k])return k;const[bk,nm]=f===30?['boss7','刻喰らいの番人']:KBASE[(f/10-1)%KBASE.length],b=ED[bk],s=f/10-1;
  SPR[k]=SPR[bk];IMG[k]=mk(SPR[bk],f===30?{a:'#d8c8ff',A:'#6a5aa0',o:'#ffe27a',y:'#ffffff',u:'#ffe27a'}:greyPal(SPR[bk]));IMG[k+'_w']=mk(SPR[bk],null,'#ffffff');
  ED[k]={name:nm,mhp:Math.round(30000*(1+s*.6)),atk:Math.round(540+f*10),mag:Math.round(560+f*10),def:Math.round(112+f*1.5),res:Math.round(104+f*1.5),spd:17+Math.min(6,f/20|0),
-  weak:[KEL[(f*3)%10],KEL[(f*7+4)%10]].filter((x,i,a)=>a.indexOf(x)===i),brk:16+Math.min(6,f/20|0),sc:3,boss:true,xp:6000+f*400,gold:10000+f*500,drop:Array(6).fill(['kakera',1]),flip:b.flip,
+  weak:[KEL[(f*3)%10],KEL[(f*7+4)%10]].filter((x,i,a)=>a.indexOf(x)===i),sc:3,boss:true,xp:6000+f*400,gold:10000+f*500,drop:Array(6).fill(['kakera',1]),flip:b.flip,
   ai:{every:3,charge:f===30?'chrono':b.ai.charge,acts:b.ai.acts,summon:voidKind(b.ai.summon),sumLv:kLv(f)},ilv:kLv(f)};return k;}
 
 /* --- 虚の回廊（自動生成・無限階層・10層ごとに番人） --- */

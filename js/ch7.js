@@ -4,16 +4,16 @@ for(const[k,b,pal]of[['last1','golem',{a:'#d8d0ff',A:'#7060c0',o:'#ffffff',y:'#f
 EA.voidend={n:'虚無の終焉',el:'闇',k:'mag',pow:2.7,t:'all'};
 EA.eclipse={n:'星蝕',el:'闇',k:'phys',pow:2.4,t:'all'};
 const LASTD={boss:true,sc:3,drop:[['kakera',1],['kakera',1],['kakera',1]],xp:0,gold:0,ilv:55};
-ED.last1=Object.assign({},LASTD,{name:'星核の残響',mhp:18000,atk:400,def:104,mag:430,res:100,spd:17,weak:['闇','雷'],brk:16,ai:{every:3,charge:'starfall',acts:[['slam',.4],['wave',.3],['curse',.3]],summon:'shade',sumLv:52},
+ED.last1=Object.assign({},LASTD,{name:'星核の残響',mhp:18000,atk:400,def:104,mag:430,res:100,spd:17,weak:['闇','雷'],ai:{every:3,charge:'starfall',acts:[['slam',.4],['wave',.3],['curse',.3]],summon:'shade',sumLv:52},
  intro:'星核の残響が砕け、虚の奥から黒い獣が這い出した――'});
-ED.last2=Object.assign({},LASTD,{name:'虚獣ノクス',mhp:21000,atk:470,def:100,mag:430,res:96,spd:19,weak:['光','炎'],brk:15,ai:{every:3,charge:'eclipse',acts:[['claw',.4],['slam',.3],['curse',.3]],summon:'shade',sumLv:52},
+ED.last2=Object.assign({},LASTD,{name:'虚獣ノクス',mhp:21000,atk:470,def:100,mag:430,res:96,spd:19,weak:['光','炎'],ai:{every:3,charge:'eclipse',acts:[['claw',.4],['slam',.3],['curse',.3]],summon:'shade',sumLv:52},
  intro:'ノクス「器よ……その空白、我がもらい受ける」<br>獣の影が、リオと同じ姿へと形を変えていく――'});
-ED.last3=Object.assign({},LASTD,{name:'虚神ノクス',mhp:27000,atk:480,def:108,mag:510,res:104,spd:18,weak:['光'],brk:18,flip:1,xp:12000,gold:20000,drop:[['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1]],
+ED.last3=Object.assign({},LASTD,{name:'虚神ノクス',mhp:27000,atk:480,def:108,mag:510,res:104,spd:18,weak:['光'],flip:1,xp:12000,gold:20000,drop:[['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1]],
  ai:{every:3,charge:'voidend',acts:[['mirror',.35],['curse',.35],['wave',.3]],summon:'shade',sumLv:54},ilv:58});
-SK.zenkyo={n:'全共鳴',k:'zen',t:'all',d:'終の覚醒：仲間全員の灯を束ねる大技。全員のAGを力に変える（1戦闘1回）'};
+SK.zenkyo={n:'全共鳴',k:'zen',t:'all',d:'終の星臨：仲間全員の灯を束ねる大技。全員のAGを力に変える（1戦闘1回）'};
 const ECHO={a:['<b>残響Ⅰ</b>――大灯が初めて灯った夜。','灯守たちは、光の中から泣き声を聞いた。<br>星の雫に包まれた赤子。胸には、何の色も持たない星片。','「この子は星に選ばれたのか、星に捨てられたのか」<br>――それが、リオという名の始まりだった。'],
  b:['<b>残響Ⅱ</b>――ガルドの声がする。','「空白の星片……欠けているんじゃない。まだ、誰の色にも染まっていないだけだ」','だからリオは、誰の灯とも共鳴できた。<br>ミレイユの炎とも、ハクアの氷とも、クロウの闇とさえも。'],
- c:['<b>残響Ⅲ</b>――星核そのものの声が響く。','「わたしは星核。千年前、虚に喰われかけたわたしは、最後の光をひとつの命に託した」','「空白の星片は、わたし自身。すべての灯をつなぎ直すための器――それがおまえ」','リオ「……借り物の光でも、みんなの灯をつなげるなら。それが俺の光だ」<br><b style="color:#ffe27a">リオは終の覚醒「全共鳴」を会得した！</b>']};
+ c:['<b>残響Ⅲ</b>――星核そのものの声が響く。','「わたしは星核。千年前、虚に喰われかけたわたしは、最後の光をひとつの命に託した」','「空白の星片は、わたし自身。すべての灯をつなぎ直すための器――それがおまえ」','リオ「……借り物の光でも、みんなの灯をつなげるなら。それが俺の光だ」<br><b style="color:#ffe27a">リオは終の星臨「全共鳴」を会得した！</b>']};
 const echoN=()=>Object.keys(G.flags.echo||{}).length;
 function echoEvent(x,y){const k=x+','+y,seen=G.flags.echo=G.flags.echo||{};if(seen[k])return;const id=['a','b','c'][echoN()];seen[k]=1;F.pause=true;F.flash=10;SFX.aw();
  const pg=ECHO[id];let i=0;const step=()=>{if(i<pg.length){log(pg[i++]);menu([{l:'▶ 次へ',cls:'ready',f:step}]);}else{if(id==='c')G.flags.zenkyo=1;save();fieldMenu(echoN()>=3?'<b>星核の扉が開いた。</b>最奥へ向かおう。':`残響はあと${3-echoN()}つ。`);}};step();}

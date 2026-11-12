@@ -6,7 +6,7 @@ ITYPE.unshift(['外套','armor']);
 Object.assign(SK,{kazemai:{n:'疾風の舞',sp:20,k:'haste',t:'self',d:'味方全員の次の手番を早める'},ouen:{n:'応援の舞',sp:25,k:'cheer',t:'self',d:'味方全員のAG+15'},
  megumi:{n:'星の恵み',sp:25,k:'grace',t:'ally',d:'味方1人のAG+40'},hoshiyomi:{n:'星読み',sp:15,k:'scan',t:'self',d:'敵全体の弱点をすべて暴く'}});
 Object.assign(JOBS,{odoriko:{n:'舞踏家',d:'味方を加速させる',sk:[[1,'kazemai'],[4,'ouen']],ps:[[7,{startAG:15},'開始時AG+15'],[10,{spd:1.5},'素早さ+1.5']]},
- seijutsu:{n:'星術師',d:'覚醒を支える（第5章クリアで解放）',lock:()=>!G.flags.boss6,sk:[[1,'megumi'],[4,'hoshiyomi']],ps:[[7,{awDmg:15},'覚醒中与ダメ+15%'],[10,{noRecoil:1},'覚醒の反動を無効']]}});
+ seijutsu:{n:'星術師',d:'星臨を支える（第5章クリアで解放）',lock:()=>!G.flags.boss6,sk:[[1,'megumi'],[4,'hoshiyomi']],ps:[[7,{awDmg:15},'星臨中与ダメ+15%'],[10,{noRecoil:1},'星臨の反動を無効']]}});
 /* --- 天への塔 --- */
 const G_TOWER_DEF={cp:1,cur:1};
 const TMOBS=['raiwolf','golemkin','onimusha','drowned','jelly','snowwolf','darkknight','shade','yukirei','minerghost','iceslime','waterslime'];
@@ -14,7 +14,7 @@ ED.tower10=Object.assign({},ED.golemboss,{name:'塔の番兵',mhp:9800,atk:430,m
 ED.tower20=Object.assign({},ED.boss5,{name:'天狐の残照',mhp:14000,atk:360,mag:420,def:96,res:96,ilv:46});
 for(const[k,b,pal]of[['boss7','golem',{a:'#e8e0c0',A:'#a89060',o:'#40e0ff',y:'#ffffff',u:'#40e0ff'}],['tower10','golem',{a:'#6a7aa0',A:'#3a4a70',o:'#ff40a0',y:'#ffd0f0',u:'#ff40a0'}],['tower20','wolf',{g:'#ffe0a0',G:'#c09040',w:'#ffffff',x:'#ff4040'}]]){SPR[k]=SPR[b];IMG[k]=mk(SPR[b],pal);IMG[k+'_w']=mk(SPR[b],null,'#ffffff');}
 EA.starfall={n:'星墜とし',el:'光',k:'mag',pow:2.6,t:'all'};
-ED.boss7={name:'星核の守護者',mhp:20000,atk:360,def:96,mag:390,res:96,spd:17,weak:['闇','雷'],brk:16,sc:3,boss:true,xp:9000,gold:12000,drop:[['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1]],
+ED.boss7={name:'星核の守護者',mhp:20000,atk:360,def:96,mag:390,res:96,spd:17,weak:['闇','雷'],sc:3,boss:true,xp:9000,gold:12000,drop:[['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1]],
  ai:{every:3,charge:'starfall',acts:[['slam',.4],['wave',.3],['curse',.3]],summon:'shade',sumLv:48},ilv:50};
 function genFloor(f){const R=rng(f*977+13),Wd=20,Hd=24,g=Array.from({length:Hd},()=>Array(Wd).fill('#')),rooms=[];
  for(let i=0;i<40&&rooms.length<7;i++){const w=4+(R()*4|0),h=3+(R()*3|0),x=1+(R()*(Wd-w-2)|0),y=1+(R()*(Hd-h-2)|0);if(rooms.some(r=>x<r.x+r.w+1&&x+w+1>r.x&&y<r.y+r.h+1&&y+h+1>r.y))continue;rooms.push({x,y,w,h,cx:x+(w>>1),cy:y+(h>>1)});}
