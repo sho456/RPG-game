@@ -1,13 +1,14 @@
 /* ===== ver0.25 戦闘画面の全面リデザイン ===== */
 :root{
- --jp25:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
- --lt25:"Cinzel","Trajan Pro","Times New Roman",serif;
+ /* 書体：小さくても潰れない太い丸ゴシック（和文）＋斜体のコンデンス体（欧文ラベル・数字） */
+ --jp25:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Hiragino Sans","Noto Sans JP",sans-serif;
+ --lt25:"Barlow Condensed","Arial Narrow",sans-serif;
  --nm25:"Barlow Condensed","Arial Narrow",sans-serif;
  /* 配色：深い濃紺の地 × 金の縁 × 星の青緑 */
  --ink25:#040914;--nv25:#0a1730;--nv25b:#11264a;
  --au25:#e9c46a;--au25l:#fff1c4;--au25d:#8a5f16;
  --tl25:#8fe6d6;--tl25d:#1b5f5c;
- --ol25:0 0 1px #000,1px 1px 0 #000,-1px 1px 0 #000,1px -1px 0 #000,-1px -1px 0 #000,0 2px 3px rgba(0,0,0,.7);
+ --ol25:0 0 1px #000,1px 1px 0 #000,-1px 1px 0 #000,1px -1px 0 #000,-1px -1px 0 #000,0 1px 0 #000,0 -1px 0 #000,1px 0 0 #000,-1px 0 0 #000,0 2px 3px rgba(0,0,0,.7);
  --olg25:0 0 1px #2a1600,1px 1px 0 #2a1600,-1px 1px 0 #2a1600,1px -1px 0 #2a1600,-1px -1px 0 #2a1600,0 0 6px rgba(255,200,90,.35);
  --frame25:0 0 0 1px #000,inset 0 0 0 1px rgba(233,196,106,.85),inset 0 0 0 2px #050a16,inset 0 0 0 3px rgba(233,196,106,.22);
 }
@@ -43,15 +44,15 @@
 #app.v25 #bt22 .b22hd::after{bottom:6px;height:1px;background:linear-gradient(90deg,rgba(233,196,106,.85),rgba(233,196,106,.25) 65%,transparent)}
 #app.v25 .b22rt{height:18px;gap:10px;padding:0 30px 0 10px;border-top:0;font-style:normal;
  background:linear-gradient(90deg,rgba(10,23,48,.95) 0%,rgba(10,23,48,.8) 70%,rgba(10,23,48,0));box-shadow:inset 0 1px 0 rgba(233,196,106,.55),inset 0 -1px 0 rgba(233,196,106,.25)}
-#app.v25 .b22rt small{font-family:var(--lt25);font-weight:700;font-size:9px;letter-spacing:1.2px;color:var(--au25);margin-right:4px;text-shadow:var(--ol25)}
-#app.v25 .b22rt b{font-family:var(--nm25);font-style:italic;font-weight:700;font-size:16px;line-height:18px;color:#fff;text-shadow:var(--ol25)}
+#app.v25 .b22rt small{font-family:var(--lt25);font-style:italic;font-weight:700;font-size:12px;letter-spacing:.6px;color:var(--au25l);margin-right:4px;text-shadow:var(--ol25)}
+#app.v25 .b22rt b{font-family:var(--nm25);font-style:italic;font-weight:700;font-size:18px;line-height:18px;color:#fff;text-shadow:var(--ol25)}
 #app.v25 .b22tg{margin:5px 0 0 10px}
 #app.v25 .b22tg .nm{gap:6px}
-#app.v25 .b22tg .nm b{font-family:var(--jp25);font-weight:800;font-size:15px;letter-spacing:.06em;color:#fff;text-shadow:var(--ol25)}
-#app.v25 .b22tg .nm small{font-family:var(--lt25);font-weight:700;font-size:10px;color:#d8e4ff;text-shadow:var(--ol25)}
-#app.v25 .b22tg .nm em{font-family:var(--lt25);font-style:normal;font-weight:900;font-size:9px;letter-spacing:1px;line-height:14px;padding:0 5px;border-radius:1px;color:#2a1600;
+#app.v25 .b22tg .nm b{font-family:var(--jp25);font-weight:800;font-size:16px;letter-spacing:.02em;color:#fff;text-shadow:var(--ol25)}
+#app.v25 .b22tg .nm small{font-family:var(--lt25);font-style:italic;font-weight:700;font-size:13px;color:#e6eeff;text-shadow:var(--ol25)}
+#app.v25 .b22tg .nm em{font-family:var(--lt25);font-style:italic;font-weight:700;font-size:12px;letter-spacing:.5px;line-height:15px;padding:0 6px;border-radius:1px;color:#2a1600;
  background:linear-gradient(180deg,var(--au25l),var(--au25) 55%,#b8862a);box-shadow:0 0 0 1px #2a1600}
-#app.v25 .b22tg .nm em.bs{font-family:var(--lt25);font-style:normal;color:#fff;background:linear-gradient(180deg,#ff7080,#c0182c 55%,#7a0614);box-shadow:0 0 0 1px #2a0008,inset 0 1px 0 rgba(255,255,255,.4);text-shadow:0 1px 0 #3a0008}
+#app.v25 .b22tg .nm em.bs{font-family:var(--lt25);font-style:italic;color:#fff;background:linear-gradient(180deg,#ff7080,#c0182c 55%,#7a0614);box-shadow:0 0 0 1px #2a0008,inset 0 1px 0 rgba(255,255,255,.4);text-shadow:0 1px 0 #3a0008}
 #app.v25 .b22tg .nm .sd{font-family:var(--nm25);font-style:italic;font-weight:700;font-size:12px;background:rgba(4,9,20,.85);border-color:#8fb0ff}
 #app.v25 .b22tg .hp{margin-top:3px}
 #app.v25 .b22tg .bar{height:8px;border-radius:0;box-shadow:0 0 0 1px rgba(233,196,106,.7),0 2px 4px rgba(0,0,0,.6)}
@@ -59,7 +60,7 @@
 #app.v25 .b22tg .cnt{font-family:var(--nm25);font-size:15px;text-shadow:var(--ol25)}
 #app.v25 .b22tg .wk{gap:2px;margin-top:4px}
 #app.v25 .b22tg .wk span{width:18px}
-#app.v25 .b22tg .wk span i{width:17px;height:19px;font-family:var(--jp25);font-weight:800;font-size:10px;color:#7c83a6;background:linear-gradient(180deg,#2a3050,#141830)}
+#app.v25 .b22tg .wk span i{width:17px;height:19px;font-family:var(--jp25);font-weight:800;font-size:11px;color:#9aa2c4;background:linear-gradient(180deg,#2a3050,#141830)}
 #app.v25 .b22tg .wk span.w i,#app.v25 .b22tg .wk span.tm i{color:#111}
 /* 右上：速度・メニュー（金の縁の丸ボタン） */
 #app.v25 .b22btn{top:calc(var(--sat) + 4px);right:8px;gap:8px}
@@ -73,13 +74,11 @@
  box-shadow:none}
 #app.v25 #skn20::before,#app.v25 #skn20::after{content:'';position:absolute;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,var(--au25) 25%,var(--au25l) 50%,var(--au25) 75%,transparent)}
 #app.v25 #skn20::before{top:0}#app.v25 #skn20::after{bottom:0}
-#app.v25 #skn20 b{font-family:var(--jp25);font-weight:800;font-size:15px;letter-spacing:.12em;color:#fff;text-shadow:var(--ol25),0 0 8px rgba(143,230,214,.45)}
+#app.v25 #skn20 b{font-family:var(--jp25);font-weight:800;font-size:16px;letter-spacing:.06em;color:#fff;text-shadow:var(--ol25),0 0 8px rgba(143,230,214,.45)}
 #app.v25 #skn20.e{background:linear-gradient(90deg,transparent,rgba(30,4,10,.92) 18%,rgba(70,10,22,.95) 50%,rgba(30,4,10,.92) 82%,transparent);border:0}
 #app.v25 #skn20.e::before,#app.v25 #skn20.e::after{background:linear-gradient(90deg,transparent,#ff7a8a 30%,#ffd0d6 50%,#ff7a8a 70%,transparent)}
 
 /* ==================== 戦場：足元の HP／SP・行動中の印 ==================== */
-#app.v25 #hl24 .hl{flex-direction:row;align-items:flex-end;gap:2px}
-#app.v25 #hl24 .hl .s{margin:0 0 1px 0}
 #app.v25 #hl24 .hl.cur .v{animation:none}
 #app.v25 #hl24 .hl:not(.cur){opacity:.82}
 #app.v25 #hl24 .hl.down{opacity:.5}
@@ -96,27 +95,23 @@
 #app.v25 #bp24 .np{width:64%;height:20px;gap:6px;padding:0 20px 0 5px;background:linear-gradient(180deg,#2a7f78 0%,#16524f 50%,#0c3434 100%);
  box-shadow:inset 0 1px 0 rgba(220,255,245,.55),inset 0 -1px 0 rgba(0,0,0,.45)}
 #app.v25 #bp24 .np::before{border-color:rgba(233,196,106,.9);border-width:1px}
-#app.v25 #bp24 .np .nm{font-family:var(--jp25);font-weight:800;font-size:15px;letter-spacing:.02em;text-shadow:var(--ol25)}
-#app.v25 #bp24 .np .lv{font-family:var(--lt25);font-style:normal;font-weight:700;font-size:10px;letter-spacing:.5px;color:var(--au25l);text-shadow:var(--ol25)}
+#app.v25 #bp24 .np .nm{font-family:var(--jp25);font-weight:800;font-size:16px;letter-spacing:.02em;text-shadow:var(--ol25)}
+#app.v25 #bp24 .np .lv{font-family:var(--lt25);font-style:italic;font-weight:700;font-size:13px;letter-spacing:.3px;color:var(--au25l);text-shadow:var(--ol25)}
 /* 星臨ゲージ：これ自体が発動のボタン（ゲージ全体＋上下の余白がタップ範囲） */
 #app.v25 #bp24 .od{position:relative;width:64%;height:16px;margin-top:2px;padding:0 4px 0 5px;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;z-index:2}
 #app.v25 #bp24 .od::before{content:"";position:absolute;left:-4px;right:-6px;top:-6px;bottom:-3px}
-#app.v25 #bp24 .od em{font-family:var(--lt25);font-style:normal;font-weight:700;font-size:9px;letter-spacing:1px;color:var(--au25);text-shadow:var(--olg25);max-width:40%}
+#app.v25 #bp24 .od em{font-family:var(--lt25);font-style:italic;font-weight:700;font-size:12px;letter-spacing:.4px;color:var(--au25l);text-shadow:var(--ol25);max-width:42%}
 #app.v25 #bp24 .od .g{height:8px;border-radius:0;background:linear-gradient(180deg,#03060c,#141a28);box-shadow:0 0 0 1px #000,0 0 0 2px rgba(233,196,106,.45)}
 #app.v25 #bp24 .od .g i{background:linear-gradient(180deg,#fff1b8 0%,#f5b83a 45%,#c86a0c 100%)}
 #app.v25 #bp24 .od span{font-family:var(--nm25);font-size:13px;min-width:30px;text-shadow:var(--ol25)}
-#app.v25 #bp24 .od .tp25{display:none}
 #app.v25 #bp24 .od .sh25{position:absolute;top:0;bottom:0;left:-40%;width:35%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.9),transparent);transform:skewX(-20deg);opacity:0;text-decoration:none}
-/* 発動できる：金色に光り、TAP の印と光の走り */
+/* 発動できる：ゲージが金色に脈打ち、光が走り、端の星が明るく回る（文字の説明は出さない） */
 #app.v25 #bp24.rdy25 .od .g{box-shadow:0 0 0 1px #2a1600,0 0 0 2px var(--au25l),0 0 10px rgba(255,210,100,.9)}
 #app.v25 #bp24.rdy25 .od .g i{background:linear-gradient(180deg,#fffbe6 0%,#ffe27a 40%,#f0a020 100%);animation:none}
 #app.v25 #bp24.rdy25 .od .sh25{opacity:1;animation:sh25 1.4s ease-in-out infinite}
 @keyframes sh25{0%{left:-40%}60%,100%{left:120%}}
 #app.v25 #bp24.rdy25 .od em{color:var(--au25l);text-shadow:var(--olg25),0 0 8px rgba(255,220,120,.9)}
 #app.v25 #bp24.rdy25 .od span{display:none}
-#app.v25 #bp24.rdy25 .od .tp25{display:flex;align-items:center;justify-content:center;flex:none;height:16px;padding:0 7px;border-radius:8px;font-family:var(--lt25);font-weight:900;font-size:10px;letter-spacing:1.5px;color:#2a1600;
- background:linear-gradient(180deg,#fffbe0,var(--au25) 60%,#b8862a);box-shadow:0 0 0 1px #2a1600,0 0 8px rgba(255,210,100,.9);animation:tp25 .8s ease-in-out infinite alternate}
-@keyframes tp25{from{transform:scale(1)}to{transform:scale(1.1);box-shadow:0 0 0 1px #2a1600,0 0 14px rgba(255,220,120,1)}}
 #app.v25 #bp24.rdy25 .od:active .g{transform:scaleY(1.25)}
 /* 発動できないのにタップ：小さく揺れる */
 #app.v25 #bp24 .od.ng25 .g{animation:ng25 .3s}
@@ -138,41 +133,38 @@
 #app.v25 #bp24 .bx3{height:34px;padding:2px 5px 5px;gap:5px}
 #app.v25 #bp24 .bx{border-radius:3px;background:linear-gradient(180deg,#132a50 0%,#0a1834 50%,#060f22 100%);
  box-shadow:0 0 0 1px #01040c,inset 0 0 0 1px rgba(214,232,236,.75),inset 0 0 0 2px #081630,inset 0 8px 6px -5px rgba(255,255,255,.14)}
-#app.v25 #bp24 .bx em{font-family:var(--lt25);font-weight:900;font-size:11px;letter-spacing:.5px;color:var(--au25l);text-shadow:var(--ol25)}
+#app.v25 #bp24 .bx em{font-family:var(--lt25);font-style:italic;font-weight:700;font-size:14px;letter-spacing:.3px;color:var(--au25l);text-shadow:var(--ol25)}
 #app.v25 #bp24 .bx .v{font-family:var(--nm25);font-style:italic;font-weight:700;font-size:19px;letter-spacing:.2px;text-shadow:var(--ol25)}
 #app.v25 #bp24 .bx small{font-family:var(--nm25);font-style:italic;font-weight:600;font-size:13px;color:#c8d4ec;text-shadow:var(--ol25)}
-#app.v25 #bp24 .bx.st i{font-family:var(--jp25);font-weight:800;font-size:10px;line-height:13px;border-radius:1px}
-#app.v25 #bp24 .bx.st .nst{font-family:var(--jp25);font-weight:700;font-size:10px;color:#8a94b8}
+#app.v25 #bp24 .bx.st i{font-family:var(--jp25);font-weight:800;font-size:11px;line-height:14px;border-radius:2px}
+#app.v25 #bp24 .bx.st .nst{font-family:var(--jp25);font-weight:800;font-size:11px;color:#a8b2d4}
 
 /* ==================== 技リスト ==================== */
 #app.v25[data-sc="battle"] #cmd.bcmd.v22{display:flex;flex-direction:column;overflow:hidden}
 #app.v25 .btabs.v22{height:26px;gap:4px;padding:0 0 0 2px}
 #app.v25 .btabs.v22 button{flex:0 1 86px;height:24px;border-radius:3px 3px 0 0;border:1px solid rgba(233,196,106,.45);border-bottom:0;background:linear-gradient(180deg,#0f2440,#071226);
- font-family:var(--jp25);font-weight:700;font-size:13px;letter-spacing:.12em;color:#9fb2d0;text-shadow:var(--ol25)}
+ font-family:var(--jp25);font-weight:800;font-size:14px;letter-spacing:.08em;color:#b8c6e2;text-shadow:var(--ol25)}
 #app.v25 .btabs.v22 button.on{height:26px;border-color:var(--au25);color:#fff;background:linear-gradient(180deg,#2a7f78,#12403e);box-shadow:inset 0 1px 0 rgba(220,255,245,.5)}
-#app.v25 .btabs.v22 .dvt{font-family:var(--lt25);font-weight:700}
+#app.v25 .btabs.v22 .dvt{font-family:var(--lt25);font-style:italic;font-weight:700}
 #app.v25 .bsub.v22{font-family:var(--jp25);font-weight:700;font-size:13px;border:1px solid var(--au25);border-bottom:0;border-radius:3px 3px 0 0;background:linear-gradient(90deg,#16524f,#071226)}
 #app.v25 .blist.v22{gap:3px;padding:5px 5px 6px;border:0;border-radius:0 4px 4px 4px;background:linear-gradient(180deg,rgba(10,23,48,.97),rgba(4,9,20,.97));box-shadow:var(--frame25)}
 #app.v25 .blist.v22 .sk{height:40px;min-height:40px;gap:8px;padding:0 5px 0 28px;border-radius:2px;border:0;
  background:linear-gradient(180deg,rgba(28,62,104,.55),rgba(10,26,54,.55));box-shadow:inset 0 0 0 1px rgba(143,230,214,.18),inset 0 1px 0 rgba(255,255,255,.06);
- font-family:var(--jp25);font-weight:800;font-size:15px;letter-spacing:.05em;color:#fff;text-shadow:var(--ol25)}
+ font-family:var(--jp25);font-weight:800;font-size:16px;letter-spacing:.02em;color:#fff;text-shadow:var(--ol25)}
 #app.v25 .blist.v22 .sk .hd{left:2px;width:22px}
 #app.v25 .blist.v22 .sk .el.hx20{width:21px;height:23px;font-family:var(--jp25);font-weight:800}
 #app.v25 .blist.v22 .sk .cost{font-family:var(--nm25);font-size:18px;text-shadow:var(--ol25)}
-#app.v25 .blist.v22 .sk .cost small{font-family:var(--lt25);font-style:normal;font-weight:700;font-size:10px;letter-spacing:.5px;color:var(--au25)}
+#app.v25 .blist.v22 .sk .cost small{font-family:var(--lt25);font-style:italic;font-weight:700;font-size:13px;letter-spacing:.3px;color:var(--au25l)}
 #app.v25 .blist.v22 .sk .cost.ng{color:#ff7a7a}
-#app.v25 .blist.v22 .sk .inf{width:24px;height:24px;border:1.5px solid var(--au25l);background:radial-gradient(circle at 35% 28%,#3ad0b0,#11695c 60%,#06332e);font-family:var(--lt25);font-style:normal;font-size:13px;
+#app.v25 .blist.v22 .sk .inf{width:24px;height:24px;border:1.5px solid var(--au25l);background:radial-gradient(circle at 35% 28%,#3ad0b0,#11695c 60%,#06332e);font-family:var(--lt25);font-style:italic;font-size:13px;
  box-shadow:0 0 0 1px #2a1a00,0 1px 3px rgba(0,0,0,.6)}
 #app.v25 .blist.v22 .sk.sel{background:linear-gradient(180deg,rgba(46,140,150,.7),rgba(14,62,82,.7));box-shadow:inset 0 0 0 1px var(--tl25),0 0 0 1px rgba(143,230,214,.5),0 0 10px rgba(120,230,220,.55),inset 0 0 14px rgba(150,240,255,.25)}
-/* 説明文の欄を廃止したので、選んだ技には「もう一度で決定」の小さな印 */
-#app.v25 .blist.v22 .sk.sel .nm::after{content:'もう一度で決定';display:inline-block;margin-left:7px;padding:0 5px;vertical-align:2px;font-family:var(--jp25);font-weight:700;font-size:9px;letter-spacing:.05em;line-height:14px;border-radius:7px;color:#2a1600;
- background:linear-gradient(180deg,var(--au25l),var(--au25));text-shadow:none;box-shadow:0 0 0 1px #2a1600}
 #app.v25 .blist.v22 .sk.reso{box-shadow:inset 0 0 0 1px #ff9ad6,0 0 8px rgba(255,154,214,.4)}
 #app.v25 .blist.v22 .sk:disabled{opacity:.4}
 
 /* ==================== 下のボタン ==================== */
-#app.v25 #bbar.v22 button{height:44px;border-radius:4px;font-family:var(--jp25);font-weight:800;font-size:13px;letter-spacing:.06em;line-height:1.1}
-#app.v25 #bbar.v22 button small{font-family:var(--jp25);font-weight:700;font-size:8px;letter-spacing:0;opacity:.9}
+#app.v25 #bbar.v22 button{height:44px;border-radius:4px;font-family:var(--jp25);font-weight:800;font-size:14px;letter-spacing:.02em;line-height:1.15}
+#app.v25 #bbar.v22 button small{font-family:var(--jp25);font-weight:800;font-size:9px;letter-spacing:0;opacity:1}
 #app.v25 #bbar.v22 .spd{border:1.5px solid var(--au25l);border-radius:4px;background:linear-gradient(180deg,#2a8f80,#0c4a42);box-shadow:0 0 0 1px #2a1a00,inset 0 1px 0 rgba(255,255,255,.3)}
 #app.v25 #bbar.v22 .spd b{font-family:var(--nm25);text-shadow:var(--ol25)}
 #app.v25 #bbar.v22 .au{border:1px solid #fff4cc;clip-path:polygon(8px 0,calc(100% - 8px) 0,100% 50%,calc(100% - 8px) 100%,8px 100%,0 50%);border-radius:0;
@@ -186,8 +178,35 @@
 #app.v25 #bp24 .np .rk i{width:8px;height:8px}
 /* 和文はプロポーショナル字幅（しっぽり明朝の palt）で詰める */
 #app.v25 #bp24 .np .nm,#app.v25 .b22tg .nm b,#app.v25 .blist.v22 .sk,#app.v25 #skn20 b,#app.v25 #bbar.v22 button,#app.v25 .btabs.v22 button,#app.v25 .bsub.v22{font-feature-settings:"palt" 1}
-#app.v25 .blist.v22 .sk .inf{font-family:"Playfair Display",Georgia,serif;font-style:italic;font-weight:900;font-size:14px}
+#app.v25 .blist.v22 .sk .inf{font-family:Georgia,"Times New Roman",serif;font-style:italic;font-weight:900;font-size:15px}
 /* HP などの枠はゲージのタップ範囲より手前（誤って星臨を発動しない） */
 #app.v25 #bp24 .bx3{z-index:3}
 /* 勝敗の表示中は上の帯を隠す（VICTORY と重ねない） */
 #app.v25.ov25 #bt22 .b22hd,#app.v25.ov25 #mk25{opacity:0;transition:opacity .2s}
+
+/* ==================== ver0.25 改訂 ==================== */
+/* 星臨ゲージ端の星：普段は暗い星、満タンで光って回る＝押せる合図 */
+#app.v25 #bp24 .od .st25{flex:none;width:16px;height:16px;background:linear-gradient(180deg,#5a5a6a,#2a2a36);clip-path:polygon(50% 0,62% 36%,100% 38%,70% 60%,80% 100%,50% 76%,20% 100%,30% 60%,0 38%,38% 36%);opacity:.75}
+#app.v25 #bp24.rdy25 .od .st25{opacity:1;background:radial-gradient(circle at 50% 45%,#ffffff,#fff1b0 35%,#ffc838 70%,#d08a10);filter:drop-shadow(0 0 4px #ffd65a) drop-shadow(0 0 2px #fff);animation:st25 1.6s linear infinite}
+@keyframes st25{0%{transform:rotate(0) scale(1)}25%{transform:rotate(90deg) scale(1.22)}50%{transform:rotate(180deg) scale(1)}75%{transform:rotate(270deg) scale(1.22)}100%{transform:rotate(360deg) scale(1)}}
+#app.v25 #bp24.awk .od .st25{opacity:1;background:linear-gradient(180deg,#fffbe6,#ffd65a)}
+/* 満タン：ゲージの行全体が金の札のように浮き上がり、ゆっくり明滅（タップできる部品だと分かる形） */
+#app.v25 #bp24.rdy25 .od{border-radius:9px;background:linear-gradient(180deg,rgba(255,226,122,.28),rgba(160,100,10,.18));box-shadow:0 0 0 1px rgba(255,226,122,.85),0 0 10px rgba(255,200,80,.55);animation:od25 1.1s ease-in-out infinite alternate}
+@keyframes od25{from{box-shadow:0 0 0 1px rgba(255,226,122,.7),0 0 6px rgba(255,200,80,.35)}to{box-shadow:0 0 0 1px #fff1c4,0 0 16px rgba(255,210,100,.95)}}
+#app.v25 #bp24.rdy25 .od:active{transform:scale(.97)}
+/* 選んだ技：もう一度押すと決まることを、行の明滅と指カーソルで示す */
+#app.v25 .blist.v22 .sk.sel{animation:sel25 .75s ease-in-out infinite alternate}
+@keyframes sel25{from{box-shadow:inset 0 0 0 1px var(--tl25),0 0 0 1px rgba(143,230,214,.45),0 0 6px rgba(120,230,220,.4)}to{box-shadow:inset 0 0 0 2px #e8fffb,0 0 0 1px rgba(200,255,245,.9),0 0 16px rgba(140,240,230,.9)}}
+#app.v25 .blist.v22 .sk.sel .hd{opacity:1}
+/* HP の数字（戦場）：参考資料の位置＝キャラの左下 */
+#app.v25 #hl24 .hl.cur{z-index:1}
+/* 星臨の演出：上の帯〜下のボタンの間だけに表示し、ボタンに重ねない。パネル類は演出の間すぐ隠す */
+#app.v25[data-sc="battle"] #sr23{top:0;bottom:calc(var(--sab) + 60px);inset-inline:0}
+#app.v25 #sr23 .pf{bottom:10px;right:10px;width:84px;height:84px}
+#app.v25 #sr23 .kj b{font-family:var(--jp25);font-weight:800}
+#app.v25 #sr23 .tx .t{font-family:var(--jp25);font-weight:800;font-size:12px;text-shadow:var(--ol25)}
+#app.v25 #sr23 .tx .b{font-family:var(--jp25);font-weight:800}
+#app.v25[data-sc="battle"].aw25 #cmd,#app.v25[data-sc="battle"].aw25 #bp24,#app.v25[data-sc="battle"].aw25 #hl24{opacity:0 !important;visibility:hidden !important;transition:none !important}
+#app.v25.aw25 #mk25{display:none !important}
+#app.v25[data-sc="battle"] #cut{bottom:calc(var(--sab) + 60px)}
+@media (prefers-reduced-motion:reduce){#app.v25 #bp24.rdy25 .od,#app.v25 #bp24.rdy25 .od .st25,#app.v25 .blist.v22 .sk.sel{animation:none}}
