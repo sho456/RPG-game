@@ -245,7 +245,6 @@ function icon(u){const key=sprKey(u),A=setup(u);if(A.none)return null;let c=ICO.
  if(R.type==='hum'){const f=SPRX.frame(A.name,pose,A.palKey,A.pal,A.flip,1,A.extra),hy=R.B.leg+R.B.tor+R.B.hr-3;g.drawImage(f.cv,Math.round(9-f.ax+(A.flip?-1:1)),Math.round(10+hy-f.ay));}
  else{const sc=Math.min(.62,17/Math.max(R.wid,R.hgt)),f=SPRX.frame(A.name,pose,A.palKey,A.pal,A.flip,sc,A.extra);g.drawImage(f.cv,Math.round(9-f.ax),Math.round(17-f.ay));}
  ICO.set(key,c);return c;}
-{const _rf=refresh;refresh=function(){_rf();if(!B||scene!=='battle')return;try{const cs=document.querySelectorAll('#order .o canvas'),pv=preview().slice(0,cs.length);cs.forEach((c,i)=>{const ic=pv[i]&&icon(pv[i]);if(!ic)return;const g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);g.drawImage(ic,(c.width-18)>>1,(c.height-18)>>1);});}catch(e){}};}
 /* 図鑑：新しいドット絵（未発見はシルエット） */
 try{for(const k in IMG){if(/_(w|aw)$/.test(k)||!SPRX.info(k))continue;for(const sil of[0,1])Object.defineProperty(ZIMG,k+(sil?'_w':''),{configurable:true,enumerable:true,get(){const ed=ED[k],c=still(k,48,ed&&!ed.flip);const v=c?(sil?PX.whiteOf(c):c).toDataURL():'';Object.defineProperty(ZIMG,k+(sil?'_w':''),{value:v,writable:true,configurable:true,enumerable:true});return v;}});}}catch(e){}
 /* 版表示 */

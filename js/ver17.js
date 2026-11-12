@@ -90,39 +90,16 @@ $('#cmd').addEventListener('click',e=>{const c=$('#cmd');if(!c.classList.contain
 $('#party').addEventListener('click',e=>{if(e.target.closest('#awB')&&B&&B.pick){au();B.pick.aw();}});
 /* 敵をタップして狙いを変える */
 cv.addEventListener('pointerdown',ev=>{if(scene!=='battle'||!B||B.over)return;const r=cv.getBoundingClientRect(),x=(ev.clientX-r.left)/SC,y=(ev.clientY-r.top)/SC;let best=null,bd=1e9;
- aliveE().forEach(e=>{const s=16*e.sc,d=Math.hypot(e.x+s/2-x,e.y+s/2-y);if(d<s*.75&&d<bd){bd=d;best=e;}});
+ aliveE().forEach(e=>{let cx,cy,rr;try{const[fx,fy]=V19.foot(e),D=V19.dims(e),A=e.A||{};cx=fx+(A.wx||0);cy=fy-D.h/2;rr=Math.max(14,Math.max(D.w,D.h)*.62);}catch(x){const s=16*e.sc;cx=e.x+s/2;cy=e.y+s/2;rr=s*.75;}
+  /* ver0.24：当たり判定を実際の絵の大きさで（縮小・拡大した敵もタップで狙える） */const d=Math.hypot(cx-x,cy-y);if(d<rr&&d<bd){bd=d;best=e;}});
  if(best&&best!==B.tgt){B.tgt=best;SFX.sel();refresh();if(B.pick)B.pick.retarget();}});
 {const _du=drawUnit;drawUnit=function(u){_du(u);if(B&&B.tgt===u&&u.alive&&u.side===1&&aliveE().length>1){const s=16*u.sc,x=u.x+Math.round(u.ox)-2,y=u.y-2,w=s+4,p=(tick>>4)%2,L=5;ctx.fillStyle='#ffd65a';
   for(const[cx,cy,dx,dy]of[[x-p,y-p,1,1],[x+w+p,y-p,-1,1],[x-p,y+w+p,1,-1],[x+w+p,y+w+p,-1,-1]]){ctx.fillRect(dx>0?cx:cx-L,cy-(dy>0?0:1),L,1);ctx.fillRect(cx-(dx>0?0:1),dy>0?cy:cy-L,1,L);}}};}
 refresh=function(){if(!B||scene!=='battle')return;if(!B.tgt||!B.tgt.alive||!B.enemies.includes(B.tgt))B.tgt=aliveE()[0]||null;const L=$('#labels');
- [...L.children].forEach(el=>{if(el._e&&(!B.enemies.includes(el._e)||!el._e.alive))el.remove();if(el._h&&!B.heroes.includes(el._h))el.remove();});
- /* 敵：足元に名前・HP・シールド・判明した弱点 */
- aliveE().forEach(e=>{let el=e._el;if(!el||!el.isConnected){el=document.createElement('div');el.className='lab';el.innerHTML='<div class="n"></div><div class="hp"><b></b><i></i></div><div class="cs"></div>';el._e=e;e._el=el;L.appendChild(el);}
-  const s=16*e.sc;el.style.left=Math.max(0,Math.min(W*SC-96,(e.x+s/2)*SC-47))+'px';el.style.top=Math.min(H*SC-38,(e.y+s)*SC-3)+'px';el.classList.toggle('tgt',B.tgt===e&&aliveE().length>1);
-  el.querySelector('.n').innerHTML=`${e.name} <small>Lv${e.lv}</small>`;const pc=e.hp/e.mhp*100;el.querySelector('.hp i').style.width=pc+'%';el.querySelector('.hp b').style.width=pc+'%';const unk=e.weak.length-e.known.size;
-  el.querySelector('.cs').innerHTML=(e.broken?'':`<span class="ch sh">◆${e.brk}</span>`)+[...e.known].map(k=>`<span class="ch el" style="background:${ELC[k]};border-color:${ELC[k]}">${k}</span>`).join('')+'<span class="ch">?</span>'.repeat(unk)+tagH(e);});
- /* 狙っている敵の弱点一覧 */
- let tp=L.querySelector('.tgp');if(!tp){tp=document.createElement('div');tp.className='tgp';L.appendChild(tp);}const t=B.tgt;tp.style.display=t?'':'none';
- if(t){const unk=t.weak.length-t.known.size;tp.innerHTML=`<div class="tn"><em>TARGET</em><b>${t.name}</b>${t.broken?'<span class="tg bk">BREAK</span>':`<span class="sd">◆${t.brk}</span>`}</div><div class="els">${ELS10.map(e=>`<i${t.known.has(e)?` class="w" style="background:${ELC[e]}"`:''}>${e}</i>`).join('')}${unk?`<u>?×${unk}</u>`:''}</div>`;}
- /* 味方：キャラの横にHP・SP・星臨ゲージ */
- B.heroes.forEach(h=>{let el=h._pl;if(!el||!el.isConnected){el=document.createElement('div');el.className='hpl';el.innerHTML='<b class="hv"></b><div class="hb"><u></u><i></i></div><div class="ab"><i></i></div><div class="hs"><span></span><em></em></div>';el._h=h;h._pl=el;L.appendChild(el);}
-  const pc=Math.max(0,h.hp/h.mhp*100);el.style.left=(h.x+33)*SC+'px';el.style.top=(h.y+6)*SC+'px';el.className='hpl'+(B.cur===h?' cur':'')+(h.alive?'':' down')+(pc<30&&h.alive?' low':'')+(h.aw?' awk':'');
-  el.querySelector('.hv').textContent=h.alive?h.hp:'戦闘不能';el.querySelector('.hb i').style.width=pc+'%';el.querySelector('.hb u').style.width=pc+'%';
-  const ab=el.querySelector('.ab');ab.querySelector('i').style.width=Math.min(100,h.ag)+'%';ab.classList.toggle('full',h.ag>=100&&!h.aw);
-  el.querySelector('.hs span').textContent='SP'+h.sp;el.querySelector('.hs em').textContent=h.aw?'星臨':h.ag>=100?'星臨OK':h.taunt>0?'挑発':h.guard?'防御':'';});
- /* 行動中のキャラ */
- const P=$('#party'),a=B.cur&&B.cur.side===0?B.cur:(B.lastH&&B.heroes.includes(B.lastH)?B.lastH:B.heroes[0]);B.lastH=a;
- const my=B.cur===a,rdy=my&&!!B.pick&&a.ag>=100&&!a.aw&&B.heroes.filter(h=>h.aw).length<2,low=a.hp<a.mhp*.3;
- const ht=`<div class="ap1"><div class="apl"><div class="apn"><b>${a.name}</b><small>Lv${G.h[a.id].lv}　${clsOf(a.id)}</small></div><div class="tgs">${tagH(a)}</div>
-  <div class="apg${a.ag>=100&&!a.aw?' full':''}${a.aw?' on':''}"><em>${a.aw?AW[a.id].name:'ASTRAL GAUGE'}</em><div class="g"><i style="width:${Math.min(100,a.ag)}%"></i></div><span>${a.aw?(GAUGE.includes(a.id)?Math.round(a.ag):'残'+Math.max(0,awN(a)-a.awT)):Math.floor(a.ag)+'%'}</span></div></div>
-  <button id="awB" class="${rdy?'rdy':''}${a.aw?' on':''}" ${rdy?'':'disabled'}>${a.aw?'星臨中':'星臨'}<small>${a.aw?'':rdy?'行動を消費しない':'ゲージ100%で'}</small></button><img class="apf" src="${art(a.id,a.aw)}"></div>
-  <div class="ap2"><div class="bx hp${low?' low':''}"><em>HP</em><b>${a.hp}</b><small>/${a.mhp}</small></div><div class="bx sp"><em>SP</em><b>${a.sp}</b><small>/100</small></div><div class="bx tn"><em>TURN</em><b>${B.turns}</b></div></div>`;
- P.className='act'+(my?'':' off')+(a.aw?' awk':'');if(P._h!==ht||!P.querySelector('.ap1')){P._h=ht;P.innerHTML=ht;}
- /* 行動順 */
- const o=$('#order');o.innerHTML='';preview().slice(0,7).forEach((u,i)=>{const d=document.createElement('div');d.className='o'+(u.side?' e':'')+(u.aw?' aw':'');const c=document.createElement('canvas');c.width=c.height=18;
-  const b=bbox(u.spr);c.getContext('2d').drawImage(IMG[sprKey(u)],b.x,b.y,b.w,b.h,(18-b.w)>>1,(18-b.h)>>1,b.w,b.h);d.appendChild(c);
-  const hb=document.createElement('i');hb.className='ob';hb.style.width=`calc(${Math.max(0,u.hp/u.mhp*100)}% - 4px)`;d.appendChild(hb);
-  const sf=u.side&&/[ABC]$/.test(u.name)?u.name.slice(-1):'';if(sf){const tx=document.createElement('b');tx.textContent=sf;d.appendChild(tx);}if(!i){const n=document.createElement('em');n.textContent='NEXT';d.appendChild(n);}o.appendChild(d);});
+ /* ver0.24：敵・味方の足元ラベル、#party の行動中パネル、行動順は後の版で別の表示に置き換わり、すべて非表示になっていたため生成しない
+  （毎回の再描画で隠れたDOMを3層ぶん作り直していた）。行動中キャラの記録だけ残す */
+ [...L.children].forEach(el=>{if(el._e||el._h||el.classList.contains('tgp'))el.remove();});
+ B.lastH=B.cur&&B.cur.side===0?B.cur:(B.lastH&&B.heroes.includes(B.lastH)?B.lastH:B.heroes[0]);
  /* 入力待ち以外のときのコマンド欄 */
  const c=$('#cmd');if(!B.pick&&!B.over&&(c.classList.contains('bcmd')||!c.children.length||c.querySelector('.wait'))){const k=auto?'a'+AM:'w';if(c.dataset.w!==k||!c.querySelector('.bwait')){c.className='bcmd';c.dataset.w=k;c.innerHTML=`<div class="bwait${auto?' au':''}">${auto?`<b>${AM==='f'?'全力AUTO':'通常AUTO'}</b> で戦闘中…<small>下のボタンをもう一度押すと手動に戻る</small>`:'…'}</div>`;}}
  bbar();};

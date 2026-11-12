@@ -51,31 +51,18 @@ const isBadge=n=>n?`<i class="bd22">${n===true?'!':n>99?'99+':n}</i>`:'';
 /* ==================== 1. 戦闘画面 ==================== */
 const BL={dy:0,starting:false,th:undefined,boss:false,act:0};
 const HM={on:false,ty:48,sky:null,ext:null,extH:0,walk:[],news:''};
-const CMDMIN=()=>innerHeight<760?168:176;
 {const _mb=makeBg;makeBg=function(th,boss){if(scene==='battle'){BL.th=th;BL.boss=boss;}return _mb(th,boss);};}
 const appW=()=>{const a=$('#app');return Math.max(240,Math.min(a.clientWidth||innerWidth,480));};
 const isHome=()=>scene==='town'&&typeof TSC!=='undefined'&&TSC==='home'&&HM.on;
-/* 戦場の高さ：画面の高さから、下のUI（メッセージ・キャラ帯・技リスト・ボタン）の分を引いて決める */
-function battleH(){const sc=appW()/W,ch=V21.contentH(),oh=el=>{if(!el||el.style.display==='none')return 0;const s=getComputedStyle(el);return el.offsetHeight+px(s.marginTop)+px(s.marginBottom);};
- const used=oh($('#msg'))+Math.max(oh($('#party')),104)+Math.max(oh($('#bbar')),44)+CMDMIN();
- return clamp(Math.floor((ch-used)/sc),128,236);}
-const dyFor=h=>Math.round((h-128)*(h<180?1:.72));
-/* 味方：右側に弓なりに並べる（上下の端が右、中ほどが敵に近い） */
-const HX={1:[122],2:[124,114],3:[128,114,126],4:[130,116,118,132]};
-function placeHeroes(){if(!B)return;const n=B.heroes.length;if(!n)return;const avail=H-30-14-18,top0=H<170?24:36;
- let sp=n>1?clamp((avail-top0)/(n-1),22,46):0,top=top0+Math.max(0,((avail-top0)-sp*(n-1))/2);if(top+sp*(n-1)>avail)top=Math.max(0,avail-sp*(n-1));
- B.heroes.forEach((h,i)=>{h.x=(HX[n]||HX[4])[i]??118;h.y=Math.round(top+i*sp);});}
-function relayout(){if(scene!=='battle'||!B)return;const nh=battleH();if(nh!==H){const d=dyFor(nh)-BL.dy;B.enemies.forEach(e=>{e.y+=d;});BL.dy+=d;setH(nh);try{BG=makeBg(BL.th,BL.boss);}catch(e){}}
- placeHeroes();fit();}
+/* ver0.24：戦場の高さ・味方の配置は ver0.23 の layout（V23）に一本化。ここにあった旧配置（relayout）は戦闘開始・画面回転のたびに
+ 背景の作り直しと配置を二重に行い、一瞬だけ旧配置が見えることがあったため削除 */
 {const _fit=fit;fit=function(){const st=$('#stage');
  if(scene==='battle'||isHome()){const aw=appW();SC=aw/W;const h=Math.round(H*SC);cv.style.width=aw+'px';cv.style.height=h+'px';st.style.width=aw+'px';st.style.height=h+'px';
   app.classList.toggle('home22',isHome());if(scene==='battle'&&B)refresh();return;}
  app.classList.remove('home22');_fit();};}
 {const _sb=startBattle;startBattle=function(list,opts){BL.dy=0;BL.act=0;BL.starting=true;let r;try{r=_sb(list,opts);}finally{BL.starting=false;}
- try{B.rt22=1;ensureHud();relayout();if(DEV())devRefill();}catch(e){console.error(e);}return r;};}
-/* 召喚・形態変化で後から出る敵も、広げた戦場の位置に合わせる */
-{const _en=enemy;enemy=function(...a){const e=_en(...a);try{if(!BL.starting&&scene==='battle'&&B&&BL.dy)e.y+=BL.dy;}catch(x){}return e;};}
-addEventListener('resize',()=>{if(scene==='battle')requestAnimationFrame(()=>{try{relayout();}catch(e){}});if(isHome())requestAnimationFrame(()=>{try{homeLayout();}catch(e){}});});
+ try{B.rt22=1;ensureHud();if(DEV())devRefill();}catch(e){console.error(e);}return r;};}
+addEventListener('resize',()=>{if(isHome())requestAnimationFrame(()=>{try{homeLayout();}catch(e){}});});
 {const _sh=show;show=function(m){_sh(m);app.classList.add('v22');if(m!=='battle'){const h=$('#bt22');if(h)h.style.display='none';}else{const h=$('#bt22');if(h)h.style.display='';}
  if(m!=='town'){HM.on=false;app.classList.remove('home22');}};}
 /* 行動数（ACTIONS）を数える */
@@ -86,10 +73,9 @@ function ensureHud(){let h=$('#bt22');if(h&&h.isConnected){h.style.display='';re
  h=document.createElement('div');h.id='bt22';
  h.innerHTML=`<div class="b22hd"><div class="b22rt"><span><small>TURN</small><b class="tn">1</b></span><span><small>ACTIONS</small><b class="ac">0</b></span><span class="dv">DEV ∞</span></div><div class="b22tg"></div></div>
   <div class="b22btn"><button class="rb sp" data-b22="spd">${ic('fast')}<b>×1</b></button><button class="rb mn" data-b22="cfg">${ic('menu')}</button></div>
-  <div class="b22ord"><em>NEXT</em></div>
   <button class="b22aw" data-b22="aw" disabled><span class="g"><i></i></span><b>${SEIRIN.n}</b><small>${SEIRIN.en}</small></button>
-  <div id="rt22"><i class="r1"></i><i class="r2"></i><b>WEAK</b></div>`;
- $('#stage').appendChild(h);const o=$('#order');if(o)h.querySelector('.b22ord').appendChild(o);return h;}
+  <div id="rt22"><i class="r1"></i><i class="r2"></i><i class="r3"><s></s><s></s><s></s><s></s></i><b>Weak</b></div>`;
+ $('#stage').appendChild(h);return h;}
 document.addEventListener('click',e=>{const t=e.target.closest('[data-b22]');if(!t||t.disabled)return;const k=t.dataset.b22;
  if(k==='spd'){SFX.sel();$('#spd').click();bbar(true);updHud();}
  else if(k==='cfg'){SFX.sel();try{cfgOpen();}catch(x){}}
@@ -122,8 +108,9 @@ function hpBar(t,tg){const bs=V21.barState(t),bar=tg.querySelector('.bar');if(!b
  const cnt=tg.querySelector('.cnt'),ct=bs.n>1?'×'+bs.rem:'';if(cnt.textContent!==ct){cnt.textContent=ct;cnt.style.color=cur;}}
 /* 狙いの輪（弱点を突く技を選んでいるときは WEAK） */
 function reticle(){const r=$('#rt22');if(!r)return;if(!B||scene!=='battle'||B.over){r.style.display='none';return;}const t=B.tgt&&B.tgt.alive?B.tgt:null;
- if(!t||(!B.pick&&aliveE().length<2)){r.style.display='none';return;}let mx,my,w=24;try{[mx,my]=V19.mid(t);w=Math.max(18,Math.min(56,V19.dims(t).w*.9));}catch(e){mx=t.x+8*t.sc;my=t.y+8*t.sc;}
- const A=t.A||{},x=(mx+(A.wx||0)+(A.kb||0))*SC,y=(my+(A.wy||0))*SC,s=Math.round(w*SC),sk=B.sel22,wk=!!(sk&&sk.el&&t.weak.includes(sk.el)&&(t.known.has(sk.el)||(t.sts||[]).some(q=>q.k==='weak'&&q.el===sk.el)));
+ if(!t||(!B.pick&&aliveE().length<2)){r.style.display='none';return;}let mx,my;try{[mx,my]=V19.mid(t);}catch(e){mx=t.x+8*t.sc;my=t.y+8*t.sc;}
+ /* ver0.24：照準の大きさは敵の大きさに依らず画面幅の約13%（参考資料の比率）。大型ボスでも輪が体を覆い尽くさない */
+ const A=t.A||{},x=(mx+(A.wx||0)+(A.kb||0))*SC,y=(my+(A.wy||0))*SC,s=Math.round(Math.max(44,Math.min(66,appW()*.132))),sk=B.sel22,wk=!!(sk&&sk.el&&t.weak.includes(sk.el)&&(t.known.has(sk.el)||(t.sts||[]).some(q=>q.k==='weak'&&q.el===sk.el)));
  const tf=`translate(${Math.round(x-s/2)}px,${Math.round(y-s/2)}px)`;if(r._tf!==tf){r._tf=tf;r.style.transform=tf;}if(r._s!==s){r._s=s;r.style.width=r.style.height=s+'px';}
  r.classList.toggle('wk',wk);r.style.display='block';}
 {const _d=draw;draw=function(){_d();try{if(scene==='battle'&&B){reticle();const t=B.tgt&&B.tgt.alive?B.tgt:aliveE()[0],tg=$('#bt22 .b22tg');if(t&&tg)hpBar(t,tg);}}catch(e){if(!draw._e22){draw._e22=1;console.error(e);}}};}
@@ -144,7 +131,7 @@ function panel22(){const P=$('#party');if(!B||!P)return;const a=B.cur&&B.cur.sid
 function heroLabs(){B.heroes.forEach(h=>{const el=h._pl;if(!el)return;let fx,fy;try{[fx,fy]=V19.foot(h);}catch(e){fx=h.x+16;fy=h.y+30;}
  el.style.left=Math.round((fx+4)*SC)+'px';el.style.top=Math.round((fy-15)*SC)+'px';el.classList.add('v22');
  const hs=el.querySelector('.hs span');if(hs)hs.textContent=DEV()?'SP∞':'SP'+h.sp;const em=el.querySelector('.hs em');if(em&&h.ag>=100&&!h.aw)em.textContent=SEIRIN.n+'OK';});}
-{const _rf=refresh;refresh=function(){_rf();if(!B||scene!=='battle')return;try{panel22();heroLabs();updHud();}catch(e){console.error(e);}};}
+{const _rf=refresh;refresh=function(){_rf();if(!B||scene!=='battle')return;try{updHud();}catch(e){console.error(e);}};}
 
 /* ---------- 技リスト（ver0.17 の入力処理を引き継ぎ、見た目と開発者モードを追加） ---------- */
 const KINDN=s=>s.k==='phys'||s.k==='rhythm'||s.basic?['物理','ph']:s.k==='mag'?['魔法','mg']:(/heal|revive/i.test(s.k||'')||s.role==='heal'||s.heal20)?['回復','hl']:s.k==='item'?['道具','it']:['補助','sp'];
@@ -423,4 +410,4 @@ try{TIPS.battle=['戦闘のしかた',['自分の番が来たら、下の一覧�
 /* ==================== 版表示 ==================== */
 {const _t=title;title=function(){_t();const v=$('#verL');if(v)v.textContent=VER22;};const v=$('#verL');if(v)v.textContent=VER22;}
 try{document.title='アストラル・ブレイカー '+VER22;}catch(e){}
-return{relayout,battleH,updHud,panel22,missionScreen,claimQuests,partyInfo,devUnlockAll,homeLayout,HM,BL,skInfo,dev22};})();
+return{updHud,panel22,missionScreen,claimQuests,partyInfo,devUnlockAll,homeLayout,HM,BL,skInfo,dev22};})();

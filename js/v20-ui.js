@@ -48,7 +48,7 @@ function targetPanel(){const tp=$('#labels .tgp'),t=B.tgt;if(!tp||!t)return;cons
 /* 味方の横の小さな表示に状態アイコンを足す */
 function heroLabels(){B.heroes.forEach(h=>{const el=h._pl;if(!el)return;let s=el.querySelector('.s20');if(!s){s=document.createElement('div');s.className='s20';el.appendChild(s);}
  const v=(h.sts||[]).slice(0,4).map(x=>`<i class="${V20.isBuff(x)?'bu':'de'}">${x.k==='weak'?x.el:(V20.STN[x.k]||['',''])[1]}</i>`).join('');if(s._v!==v){s._v=v;s.innerHTML=v;}});}
-{const _rf=refresh;refresh=function(){_rf();if(!B||scene!=='battle')return;try{partyPanel();targetPanel();heroLabels();const r=$('#rnd20');if(r)r.innerHTML=`<small>TURN</small><b>${B.turns}</b>`;}catch(e){console.error(e);}};}
+{const _rf=refresh;refresh=function(){_rf();if(!B||scene!=='battle')return;try{/* ver0.24：隠れたパネル・ラベルは作らない */const r=$('#rnd20');if(r)r.innerHTML=`<small>TURN</small><b>${B.turns}</b>`;}catch(e){console.error(e);}};}
 /* 技リストの装飾：種類アイコン・説明ボタン */
 const GLY={'守':'shield','替':'swap','逃':'run','道':'potion','共':'star','解':'star','癒':'heart','補':'up','味':'heart'};
 const SVG={shield:'<path d="M8 1l6 2v5c0 3.5-2.6 6-6 7-3.4-1-6-3.5-6-7V3z"/>',swap:'<path d="M2 5h9l-3-3M14 11H5l3 3" fill="none" stroke-width="2"/>',run:'<path d="M9 2a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM6 7l3-1 2 3 3 1-1 1-3-1-1 2 2 3-1 1-3-3-2 3-2-1 3-4z"/>',

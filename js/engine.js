@@ -98,9 +98,9 @@ const gald=()=>B.heroes.find(h=>h.id==='gald'),rio=()=>B.heroes.find(h=>h.id==='
 
 const SLOTS={1:[[34,40]],2:[[12,26],[54,52]],3:[[6,22],[52,46],[6,74]]};
 function startBattle(list,opts={}){show('battle');setH(128);
- const sl=SLOTS[list.length],cnt={},idx={};list.forEach(e=>cnt[e.kind]=(cnt[e.kind]||0)+1);
- const enemies=list.map((e,i)=>{let suf='';if(cnt[e.kind]>1){idx[e.kind]=(idx[e.kind]||0)+1;suf='ABC'[idx[e.kind]-1];}
-  return ED[e.kind].boss?enemy(e.kind,e.lv,18,34):enemy(e.kind,e.lv,sl[i][0],sl[i][1],suf);});
+ const sl=SLOTS[Math.min(3,list.length)]||SLOTS[1],cnt={},idx={};list.forEach(e=>cnt[e.kind]=(cnt[e.kind]||0)+1);
+ const enemies=list.map((e,i)=>{let suf='';if(cnt[e.kind]>1){idx[e.kind]=(idx[e.kind]||0)+1;suf='ABCDE'[idx[e.kind]-1]||'';}
+  return ED[e.kind].boss?enemy(e.kind,e.lv,18,34):enemy(e.kind,e.lv,sl[i%sl.length][0],sl[i%sl.length][1],suf);});
  const hs=G.party.map(hero);hs.forEach((h,i)=>{[h.x,h.y]=HPOS[hs.length][i];});
  B={opts,heroes:hs,enemies,reso:false,awUsed:new Set(),turns:0,shake:0,flashBg:0,parts:[],fx:[],cur:null,over:false};
  BG=makeBg(opts.theme||battleTheme(!!opts.boss),!!opts.boss);
