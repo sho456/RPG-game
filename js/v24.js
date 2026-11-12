@@ -98,20 +98,39 @@ const fsOf=k=>clamp(SC*FS24[k][0],FS24[k][1],FS24[k][2]);
 const numFs=u=>Math.round(fsOf(u.side===0?'h':'e')*fitK());
 const TIER=[1,1.12,1.28,1.45];
 const tierOf=(u,d)=>{const r=d/Math.max(1,u.mhp||1);return r>=.35?3:r>=.15?2:r>=.05?1:0;};
-const fmt=n=>{n=Math.abs(n|0);return n>=100000?Math.floor(n/10000)+'万':String(n);};
+/* ver0.25：桁は 9,999,999 までそのまま表示（それ以上は「万」）。桁が多いときは表示幅に収まるよう文字を縮める */
+const fmt=n=>{n=Math.abs(n|0);return n>=10000000?Math.floor(n/10000)+'万':String(n);};
 function lbRow(cls,...cs){const d=document.createElement('div');d.className='lb '+cls;cs.forEach(c=>d.appendChild(c));return d;}
-
+/* 文字幅を測る（Canvas の measureText。書体は TX24 の数字用） */
+const MCX=document.createElement('canvas').getContext('2d');
+function txtW(text,sk,size){try{const S=TX24.STYLE[sk]||TX24.STYLE.dmg,F=TX24.FONT[S.font]||TX24.FONT.num;MCX.font=`${F.it} ${F.w} ${size}px ${F.f}`;return MCX.measureText(text).width+size*.02*text.length;}catch(e){return text.length*size*.56;}}
+/* 表示できる最大幅：画面幅の 34%（最大 150px）。超えるなら比例して縮める（最小 11px） */
+function fitFs(text,sk,fs){const st=stage(),mw=Math.min(150,(st?st.offsetWidth:390)*.34),w=txtW(text,sk,fs);return w>mw?Math.max(11,Math.floor(fs*mw/w)):fs;}
+/* ダメージ表示：同じ相手への連続ヒット（多段攻撃・連続行動）は1つのまとまりにする。
+ 見出し（Critical／Weak／Guard）はまとまりの上に1回だけ、数字は下へ1行ずつ追加（最大3行。古い行から消える）。
+ 以前は1ヒットごとに見出し付きの表示を作っていたため、連続ヒットで「Critical」が2つ重なって見えていた */
+const GRP_MS=900;
+function addLabels(p,u,crit,weak,grd,el,fs){const has=c=>!!p.in.querySelector(':scope>.lb.'+c),first=p.in.querySelector(':scope>.nm');
+ const lf=Math.round(fs*(FS24.lb||.56)),put=r=>p.in.insertBefore(r,first);
+ if(crit&&!has('cr'))p.in.insertBefore(lbRow('cr',TX24.el('Critical','crit',Math.round(fs*.64))),p.in.firstChild);
+ if(weak&&!has('wk')){const r=lbRow('wk',TX24.el('Weak','weak',lf));if(el&&ELC[el])r.appendChild(TX24.el(el,'elm',Math.round(lf*1.08)));put(r);}
+ if(grd&&!has('gd'))put(lbRow('gd',TX24.el('Guard','guard',Math.round(fs*.64))));}
 function dmgPop(u,s,kind,el){const v=parseInt(s,10),heal=s[0]==='+',crit=/crit/.test(kind),weak=/weak/.test(kind),psn=/psn/.test(kind),grd=u.side===0&&!heal&&!!u.guard;
- const t=heal?0:tierOf(u,Math.abs(v)),fs=Math.round(numFs(u)*TIER[t]*(crit?(FS24.cr||1.15):1)*(heal?.92:1));
+ const t=heal?0:tierOf(u,Math.abs(v));
  const sk=heal?'heal':psn?'psn':weak?(t>=3?'dmgWT':'dmgW'):grd?'dmgG':u.side===0?'dmgH':t>=3?'dmgT':'dmg';
+ const txt=(heal?'+':'')+fmt(v),fs0=Math.round(numFs(u)*TIER[t]*(crit?(FS24.cr||1.15):1)*(heal?.92:1)),fs=fitFs(txt,sk,fs0);
+ const nm=document.createElement('div');nm.className='nm';nm.appendChild(TX24.row(txt,sk,fs,/万/));
+ /* 直前のまとまりに追加 */
+ const G=u._dg25,tn=now();
+ if(!heal&&!psn&&G&&!G.gone&&G.el.isConnected&&tn-G.t1<GRP_MS){
+  addLabels(G,u,crit,weak,grd,el,fs0);G.in.appendChild(nm);
+  const rows=[...G.in.querySelectorAll(':scope>.nm')];if(rows.length>3)rows.slice(0,rows.length-3).forEach(r=>r.remove());
+  if(crit&&!G.el.classList.contains('crit')){G.el.classList.add('crit');G.pri=Math.max(G.pri,PRI.crit);}
+  G.t1=tn;G.end=Math.max(G.end,tn+Math.round((crit?1400:1150)*spdK()));arm(G);reflow(G);u._dm24=G;return G;}
  const pri=crit?PRI.crit:heal?PRI.heal:PRI.dmg;capUnit(u);
  const p=make(u,`dmg t${t}${crit?' crit':''}${weak?' weak':''}${heal?' heal':''}${grd?' grd':''}`,pri,(crit||t>=2?1400:1150));
- const lf=Math.round(fs*(FS24.lb||.56));
- if(crit)p.in.appendChild(lbRow('cr',TX24.el('Critical','crit',Math.round(fs*.62))));
- if(weak){const r=lbRow('wk',TX24.el('Weak','weak',lf));if(el&&ELC[el])r.appendChild(TX24.el(el,'elm',Math.round(lf*1.06)));p.in.appendChild(r);}
- if(grd)p.in.appendChild(lbRow('gd',TX24.el('Guard','guard',Math.round(fs*.66))));
- const nm=document.createElement('div');nm.className='nm';nm.appendChild(TX24.row((heal?'+':'')+fmt(v),sk,fs,/万/));p.in.appendChild(nm);
- p.num=1;place(p);u._dm24=p;return p;}
+ p.in.appendChild(nm);addLabels(p,u,crit,weak,grd,el,fs0);
+ p.num=1;p.t1=tn;place(p);u._dm24=p;if(!heal&&!psn)u._dg25=p;return p;}
 function wordPop(u,s,kind){const miss=s==='MISS',fs=numFs(u);
  const p=make(u,'word miss',PRI.word,950);
  p.in.appendChild(TX24.el('Miss','miss',Math.round(fs*.82)));place(p);return p;}

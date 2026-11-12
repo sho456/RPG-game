@@ -184,17 +184,37 @@ V24.HK24.choose=(u,w,h,pri,self)=>{if(!inB())return null;const bd=V24.bounds(),b
  /* 別の相手の数字と重なるなら、体の範囲内で上下にずらして最も重ならない位置へ */
  const others=V24.PM.live.filter(p=>p!==self&&!p.gone&&p.R&&p.u!==u),cost=(X,Y)=>others.reduce((c,p)=>c+ovA({l:X,t:Y,r:X+w,b:Y+h},p.R),0);
  if(cost(x,y)>0){let best=[x,y,cost(x,y)];for(const dy of[-.35,.35,-.7,.7])for(const dx of[0,-.3,.3]){const[X,Y]=fit(x+dx*w,y+dy*Math.max(h,b.h*.5));const c=cost(X,Y);if(c<best[2])best=[X,Y,c];}[x,y]=best;}
+ /* 数字と重なるキャラ横のHP表示は、数字が出ている間だけ薄くする */
+ try{const L=$('#hl24'),R0={l:x,t:y,r:x+w,b:y+h};(V24.HL.rects||[]).forEach((r,i)=>{const c=L&&L.children[i];if(!c||ovA(R0,r)<=0)return;c.classList.add('dim');clearTimeout(c._dt);c._dt=setTimeout(()=>c.classList.remove('dim'),1300);});}catch(e){}
  return{x,y,R:{l:x+3,t:y+3,r:x+w-3,b:y+h-3},c:0,hard:0};};
 /* 他の相手の数字は消さない（重なりは上の位置選びで避ける） */
 V24.HK24.bump=()=>{};
 /* Critical：数字は通常と同じ色・大きさ。見出しの「Critical」だけ金色で目立たせる */
 V24.FS24.cr=1;
-/* 「Critical」の文字だけ金色（数字は通常ダメージと同じ白） */
-try{Object.assign(TX24.STYLE.crit,{fill:[[0,'#fffbe6'],[.38,'#ffeb8a'],[.56,'#ffc828'],[1,'#d88a00']],ow:.15,oc:'#2a1400',rw:.045,rc:'#fff8d8',sh:[.04,.07,'rgba(0,0,0,.6)'],gl:.35,glow:null});TX24.clear();}catch(e){}
+
 {const _p=V17F.pop;V17F.pop=function(u,t,c,sm,kind,el){
   /* 開幕の表示ゲート中は、ダメージ以外の表示を預かる */
   if(OP.on&&opening()&&!/^-?\d+$/.test(String(t))){const f=()=>V17F.pop(u,t,c,sm,kind,el);f.u=u;OP.q.push(f);return;}
   return _p.apply(this,arguments);};}
+
+/* ==================== 8. ダメージ数字の書体・大きさ・配色（参考資料準拠） ====================
+ ・書体：数字と欧文の見出しは Jost（幾何学的なサンセリフの斜体。参考資料と同じ系統の、細身でシャープな形）
+ ・大きさ：味方・敵とも同じ基本サイズ（iPhone 17e で約18px）。大ダメージでも拡大しない。桁が多いときは表示幅に収まるよう自動で縮める
+ ・配色：数字は味方・敵・弱点・防御とも同じ白（細い濃紺の縁＋小さな落ち影）。回復は緑、毒は紫
+ ・「Critical」：金属のような金（明るい金→影→ハイライトの帯→深い金）＋焦げ茶の細い縁＋白い内縁 */
+try{
+ Object.assign(TX24.FONT.num,{f:'"Jost","Futura","Avenir Next","Century Gothic","Helvetica Neue",Arial,sans-serif',w:600,it:'italic',cap:.7,skew:0});
+ Object.assign(TX24.FONT.lat,{f:'"Jost","Futura","Avenir Next","Century Gothic","Helvetica Neue",Arial,sans-serif',w:700,it:'italic',cap:.7,skew:0});
+ const W25={font:'num',fill:[[0,'#ffffff'],[.52,'#ffffff'],[.6,'#eef1f7'],[1,'#c4ccdc']],ow:.11,oc:'#070a14',sh:[.035,.065,'rgba(0,0,0,.6)']};
+ for(const k of['dmg','dmgH','dmgG','dmgW','dmgT','dmgWT'])TX24.STYLE[k]=Object.assign({},W25);
+ TX24.STYLE.heal=Object.assign({},TX24.STYLE.heal,{ow:.11,oc:'#03200c'});
+ TX24.STYLE.psn=Object.assign({},TX24.STYLE.psn,{ow:.11});
+ TX24.STYLE.crit={font:'lat',fill:[[0,'#fffbe8'],[.22,'#f6dc8c'],[.42,'#b98322'],[.5,'#fff0b8'],[.62,'#e8b545'],[.82,'#a8701a'],[1,'#6a4006']],ow:.12,oc:'#1e1000',rw:.035,rc:'#fff6d6',sh:[.035,.065,'rgba(0,0,0,.6)'],gl:.25};
+ TX24.STYLE.weak={font:'lat',fill:[[0,'#ffe2e8'],[.4,'#ff5a74'],[.6,'#e3183c'],[1,'#a00422']],ow:.12,oc:'#240006',rw:.04,rc:'#ffffff',sh:[.035,.065,'rgba(0,0,0,.6)']};
+ TX24.STYLE.guard=Object.assign({},TX24.STYLE.guard,{ow:.12});TX24.STYLE.miss=Object.assign({},TX24.STYLE.miss,{ow:.12});
+ Object.assign(V24.FS24,{e:[8.2,16,19],h:[8.2,16,19],cr:1,lb:.62,cb:[10,19,24]});V24.TIER.splice(0,4,1,1,1,1);
+ TX24.clear();TX24.preload();
+}catch(e){console.error(e);}
 
 /* ==================== 組み込み ==================== */
 {const _rf=refresh;refresh=function(){_rf();if(!inB())return;try{ensureGauge();gaugeState();}catch(e){console.error(e);}};}
@@ -205,7 +225,7 @@ try{Object.assign(TX24.STYLE.crit,{fill:[[0,'#fffbe6'],[.38,'#ffeb8a'],[.56,'#ff
 try{document.fonts&&document.fonts.ready.then(()=>{if(inB()){try{V23.layout(false);}catch(e){}}});}catch(e){}
 
 /* ==================== お知らせ・開発者メニュー・版表示 ==================== */
-const NEWS25=`<div class="nt"><b>${VER25}</b>　戦闘画面を全面的に作り直しました。<br><small>・戦場を画面いっぱいに広げ、「○○の番」などの説明文を廃止。<br>・行動中キャラのパネル・技リスト・HP表示は、自分の番のときだけ表示。<br>・味方は画面右に縦一列（参考資料の配置）。<br>・「${SEIRIN.n}」ボタンを廃止。満タンで光るゲージをタップすると発動します。<br>・文字の書体・縁取り・配色を一新しました。<br>・<b>ブレイクを廃止</b>しました。弱点ダメージは1.7倍に強化、敵のHP・溜め攻撃を調整し、ブレイク前提の技・装備・パッシブは新しい効果に置き換えています。<br>・AUTOボタンを小型化し、Criticalの数字は通常と同じ表示に（「Critical」の文字だけ金色）。</small></div>`;
+const NEWS25=`<div class="nt"><b>${VER25}</b>　戦闘画面を全面的に作り直しました。<br><small>・戦場を画面いっぱいに広げ、「○○の番」などの説明文を廃止。<br>・行動中キャラのパネル・技リスト・HP表示は、自分の番のときだけ表示。<br>・味方は画面右に縦一列（参考資料の配置）。<br>・「${SEIRIN.n}」ボタンを廃止。満タンで光るゲージをタップすると発動します。<br>・文字の書体・縁取り・配色を一新しました。<br>・<b>ブレイクを廃止</b>しました。弱点ダメージは1.7倍に強化、敵のHP・溜め攻撃を調整し、ブレイク前提の技・装備・パッシブは新しい効果に置き換えています。<br>・AUTOボタンを小型化しました。<br>・ダメージ数字を新しい書体（細身の斜体）に変更し、味方・敵で同じ大きさ・同じ白に統一。桁が多いときは自動で縮めて収めます。<br>・連続ヒットは1つのまとまりで表示し、「Critical」が重なって2回見える不具合を修正。「Critical」は金属調の金色に。</small></div>`;
 document.addEventListener('click',e=>{const t=e.target.closest('[data-h22="news"]');if(!t||scene!=='town')return;e.stopPropagation();e.preventDefault();SFX.sel();
  const vn=V22.HM.news||'';ovOpen(`<div class="nw22"><div class="nh"><b>お知らせ</b></div>${vn||''}${NEWS25}${V23.NEWS23||''}</div><button class="tbtn back wide" data-a="close">閉じる</button>`,{close:ovClose});},true);
 function dev25(m){log(m||`<b>${VER25}</b>　戦闘画面の確認`);
