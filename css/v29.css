@@ -1,0 +1,36 @@
+/* ===== ver0.29 図鑑の回転ビューア・呼称チップ ===== */
+/* 呼称・分類のチップ（TERMS） */
+.tm29{display:inline-block;font-style:normal;font-size:10px;line-height:15px;padding:0 6px;border-radius:8px;margin:0 4px;white-space:nowrap;vertical-align:middle;border:1px solid rgba(255,255,255,.25);background:rgba(20,26,70,.8);color:#cfd6ff}
+.tm29.c-playable{background:#123a5a;border-color:#5ab8e8;color:#bfe8ff}
+.tm29.c-normal{background:#2a2a3e;border-color:#6a6a8a;color:#d0d0e4}
+.tm29.c-mid{background:#4a2a10;border-color:#e0a040;color:#ffd9a0}
+.tm29.c-big{background:#5a0c1e;border-color:#ff5a74;color:#ffd0da;font-weight:700}
+.tm29.s-phys{background:#3a2010;border-color:#d08a4a;color:#ffd8b0}
+.tm29.s-mag{background:#201a4a;border-color:#8a7aff;color:#d8d0ff}
+.tm29.s-seirin{background:#3a3010;border-color:#f3d27a;color:#ffe9a0}
+.tm29.s-passive{background:#2a1a3a;border-color:#b08ad8;color:#e8d8ff}
+.tm29.e-weapon{border-color:#ff9a6a;color:#ffd0b8}.tm29.e-armor{border-color:#6ab8ff;color:#cfe8ff}.tm29.e-cloth{border-color:#7ad8a0;color:#d0ffe0}.tm29.e-acc{border-color:#f3d27a;color:#ffe9a0}
+.zdn .tm29{margin-left:6px}
+.zsk .tm29{grid-area:auto;justify-self:start;font-size:9px;line-height:13px;margin:0 0 0 4px}
+.zsh{font-size:11px;color:#f3d27a;margin:8px 2px 3px;letter-spacing:.08em;border-left:3px solid #c9a24a;padding-left:6px}
+.z29n{color:#9aa4d8;font-size:10px;margin-left:4px}
+/* 一覧：中ボス・大ボスの枠色 */
+.ztile.zc-mid{border-color:#e0a040}.ztile.zc-big{border-color:#ff5a74}
+/* 回転ビューア */
+.zv.z29v{height:clamp(200px,34vh,290px);cursor:grab}
+.zv.z29v:active{cursor:grabbing}
+.zvd{position:absolute;right:8px;top:6px;display:flex;gap:4px;align-items:center;font-size:11px}
+.zvd b{font-weight:400;padding:1px 8px;border-radius:9px;background:rgba(0,0,0,.55);border:1px solid rgba(243,210,122,.5);color:#ffe9a0}
+.zvd i{font-style:normal;padding:1px 6px;border-radius:9px;background:rgba(10,60,40,.75);border:1px solid #5ad8a0;color:#c8ffe4;font-size:10px}
+.zvd i.auto{background:rgba(70,40,10,.75);border-color:#e0a040;color:#ffe0b0}
+.zfl{position:absolute;right:6px;bottom:6px;height:24px;padding:0 8px;border-radius:12px;border:1.5px solid #2a8a80;background:linear-gradient(180deg,#1d6b74,#0a3040);color:#fff;font-family:inherit;font-size:10px}
+.zfl b{font-weight:400;color:#ffe9a0}.zfl.on23d{border-color:#ffe27a}
+.zm.z29m button{height:36px;font-size:13px}
+.zm.z29m .skl29{font-size:12px;border-color:#6a5a9a;background:linear-gradient(180deg,#3a2a6e,#160c40)}
+.zm.z29m .skl29.on{border-color:#7dffa8;color:#0a2a14;background:linear-gradient(180deg,#b8ffd0,#4ac080)}
+.zrot{display:grid;grid-template-columns:34px 1fr 1fr 1fr 34px 1.3fr;gap:4px}
+.zrot button{height:32px;padding:0 2px;border-radius:7px;border:1.5px solid #4a5490;background:linear-gradient(180deg,#16205a,#0a1036);color:#dfe4ff;font-family:inherit;font-size:12px;white-space:nowrap}
+.zrot button.on{border-color:#fff1c2;color:#2a1600;background:linear-gradient(180deg,#f6dc8a,#c9962e)}
+.zrot .au{border-color:#2a8a80}.zrot .au.on{border-color:#7dfff0;color:#002a28;background:linear-gradient(180deg,#a8fff4,#2ab8a8)}
+.zskb{height:28px;border-radius:7px;border:1.5px dashed #7dffa8;background:#0a2018;color:#c8ffe0;font-family:inherit;font-size:11px}
+.zskx textarea{width:100%;box-sizing:border-box;font:11px/1.3 monospace;background:#05081a;color:#c8ffe0;border:1px solid #2a5a40;border-radius:6px}

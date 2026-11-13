@@ -138,7 +138,7 @@ function pop(u,txt,col='#fff',small,kind=''){const d=document.createElement('div
 
 async function hit(a,t,sk){
  const r=calc(a,t,sk);const d=hurt(t,r.d);t.flash=8;if(a.side===0&&a.legs&&a.legs.includes('meikai')&&d>0){a.hp=Math.min(a.mhp,a.hp+Math.round(d*.2));}B.fx.push({x:t.x+8*t.sc,y:t.y+8*t.sc,t:0,m:sk.k==='mag',c:ELC[sk.el]||'#ffffff'});
- pop(t,d,r.crit?'#ffe14a':r.weak?'#ffb030':(t.side===0?'#ff8a8a':'#ffffff'),false,(r.crit?'crit ':'')+(r.weak?'weak ':'')+(t.side===0?'hurt':''),sk.el);comboAdd(d);
+ pop(t,d,r.crit?'#ffe14a':r.weak?'#ffb030':(t.side===0?'#ff8a8a':'#ffffff'),false,(r.crit?'crit ':'')+(r.weak?'weak ':'')+(r.resist?'resist ':'')+(t.side===0?'hurt':''),sk.el);comboAdd(d);
  if(r.weak)SFX.weak();else SFX.hit();if(r.crit)B.fx.push({x:t.x+8*t.sc,y:t.y+8*t.sc,t:0,m:true,c:'#ffe14a'});
  if(r.crit)B.shake=6;
  if(a.side===0){if(!a.aw)a.ag=Math.min(100,a.ag+6+(r.weak?10:0)+(r.crit?4:0));

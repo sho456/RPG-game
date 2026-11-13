@@ -110,12 +110,14 @@ function fitFs(text,sk,fs){const st=stage(),mw=Math.min(150,(st?st.offsetWidth:3
  見出し（Critical／Weak／Guard）はまとまりの上に1回だけ、数字は下へ1行ずつ追加（最大3行。古い行から消える）。
  以前は1ヒットごとに見出し付きの表示を作っていたため、連続ヒットで「Critical」が2つ重なって見えていた */
 const GRP_MS=900;
-function addLabels(p,u,crit,weak,grd,el,fs){const has=c=>!!p.in.querySelector(':scope>.lb.'+c),first=p.in.querySelector(':scope>.nm');
+function addLabels(p,u,crit,weak,grd,el,fs,res){const has=c=>!!p.in.querySelector(':scope>.lb.'+c),first=p.in.querySelector(':scope>.nm');
  const lf=Math.round(fs*(FS24.lb||.56)),put=r=>p.in.insertBefore(r,first);
  if(crit&&!has('cr'))p.in.insertBefore(lbRow('cr',TX24.el('Critical','crit',Math.round(fs*.64))),p.in.firstChild);
  if(weak&&!has('wk')){const r=lbRow('wk',TX24.el('Weak','weak',lf));if(el&&ELC[el])r.appendChild(TX24.el(el,'elm',Math.round(lf*1.08)));put(r);}
- if(grd&&!has('gd'))put(lbRow('gd',TX24.el('Guard','guard',Math.round(fs*.64))));}
-function dmgPop(u,s,kind,el){const v=parseInt(s,10),heal=s[0]==='+',crit=/crit/.test(kind),weak=/weak/.test(kind),psn=/psn/.test(kind),grd=u.side===0&&!heal&&!!u.guard;
+ if(grd&&!has('gd'))put(lbRow('gd',TX24.el('Guard','guard',Math.round(fs*.64))));
+ /* ver0.29：Resist（耐性で軽減）。弱点・会心と同じ並びに、灰青の見出しで出す */
+ if(res&&!weak&&!has('rs')){const r=lbRow('rs',TX24.el('Resist','resist',lf));if(el&&ELC[el])r.appendChild(TX24.el(el,'elm',Math.round(lf*1.08)));put(r);}}
+function dmgPop(u,s,kind,el){const v=parseInt(s,10),heal=s[0]==='+',crit=/crit/.test(kind),weak=/weak/.test(kind),res=/resist/.test(kind),psn=/psn/.test(kind),grd=u.side===0&&!heal&&!!u.guard;
  const t=heal?0:tierOf(u,Math.abs(v));
  const sk=heal?'heal':psn?'psn':weak?(t>=3?'dmgWT':'dmgW'):grd?'dmgG':u.side===0?'dmgH':t>=3?'dmgT':'dmg';
  const txt=(heal?'+':'')+fmt(v),fs0=Math.round(numFs(u)*TIER[t]*(crit?(FS24.cr||1.15):1)*(heal?.92:1)),fs=fitFs(txt,sk,fs0);
@@ -123,13 +125,13 @@ function dmgPop(u,s,kind,el){const v=parseInt(s,10),heal=s[0]==='+',crit=/crit/.
  /* 直前のまとまりに追加 */
  const G=u._dg25,tn=now();
  if(!heal&&!psn&&G&&!G.gone&&G.el.isConnected&&tn-G.t1<GRP_MS){
-  addLabels(G,u,crit,weak,grd,el,fs0);G.in.appendChild(nm);
+  addLabels(G,u,crit,weak,grd,el,fs0,res);G.in.appendChild(nm);
   const rows=[...G.in.querySelectorAll(':scope>.nm')];if(rows.length>3)rows.slice(0,rows.length-3).forEach(r=>r.remove());
   if(crit&&!G.el.classList.contains('crit')){G.el.classList.add('crit');G.pri=Math.max(G.pri,PRI.crit);}
   G.t1=tn;G.end=Math.max(G.end,tn+Math.round((crit?1400:1150)*spdK()));arm(G);reflow(G);u._dm24=G;return G;}
  const pri=crit?PRI.crit:heal?PRI.heal:PRI.dmg;capUnit(u);
  const p=make(u,`dmg t${t}${crit?' crit':''}${weak?' weak':''}${heal?' heal':''}${grd?' grd':''}`,pri,(crit||t>=2?1400:1150));
- p.in.appendChild(nm);addLabels(p,u,crit,weak,grd,el,fs0);
+ p.in.appendChild(nm);addLabels(p,u,crit,weak,grd,el,fs0,res);
  p.num=1;p.t1=tn;place(p);u._dm24=p;if(!heal&&!psn)u._dg25=p;return p;}
 function wordPop(u,s,kind){const miss=s==='MISS',fs=numFs(u);
  const p=make(u,'word miss',PRI.word,950);

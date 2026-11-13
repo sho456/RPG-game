@@ -4,7 +4,7 @@
 ・rio：ラベル付きシート（rio_sheet.png）。ラベル（文字）とポーズは別の連結成分なので、枠ごとに最大の成分を拾う
 ・valk：ラベルなしシート（valk_sheet.jpg）。左上から順に 待機/正面/背面/攻撃/防御/歩き/走り/詠唱/被弾/瀕死/勝利/戦闘不能/(戦闘不能2)/覚醒
 ・jin：1 枚絵（jin.jpg）。待機・正面に使い、他のポーズは spx.js が 1 枚絵を動かして表す。戦闘不能は体を寝かせ、柴犬は座らせたまま
-・noah_K：既存データの修正。右を向いていたので左右反転し、枠で切れていた翼を反対側の翼から補う
+・noah_K：既存データ（assets_src/legacy/spx-legacy.json）の修正。右を向いていたので左右反転し、枠で切れていた翼を反対側の翼から補う
 ・jin_K：既存データの調整。原画（柴犬の相棒）に合わせ、相棒の獣の毛並みを橙と白に
 ・rio の色違い last3（虚神ノクス）も作る
 大きさは「正面」の背丈を各サイズのドット数にそろえ、全ポーズを同じ倍率で縮める。
@@ -21,10 +21,10 @@ from spx_common import shrink, kmeans, lum, to_pal_idx, png_of  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ORIG = lambda n: os.path.join(ROOT, 'assets_src', 'originals', n)
-OUT = os.path.join(ROOT, 'js', 'spx-data-heroes.js')
+OUT = os.path.join(ROOT, 'js', 'sprite', 'data', 'spx-data-heroes.js')
 PREVIEW = sys.argv[1] if len(sys.argv) > 1 else None
 
-BATTLE = ['front', 'stance', 'ready', 'lunge', 'dash', 'down', 'cast', 'hit', 'weak', 'guard', 'win']
+BATTLE = ['front', 'stance', 'ready', 'lunge', 'dash', 'down', 'cast', 'hit', 'weak', 'guard', 'win', 'back']   # back：ver0.29 図鑑の回転表示用
 FIELD = ['stand', 'walk_a', 'front', 'win', 'stance', 'lunge', 'cast', 'hit', 'weak', 'guard', 'dash', 'down', 'back']
 ALIASF = {'stand': 'stance'}
 SIZES = [('b42', 42), ('b48', 48), ('b54', 54), ('b60', 60), ('b66', 66), ('B84', 84), ('B104', 104), ('f34', 34), ('u36', 36)]
@@ -247,9 +247,8 @@ def build_hero(hid, F, head_from='front', head_k=.37, ref_k=1.0, single=False):
     return out, prev
 
 
-# ---------- 既存データ（spx-data.js）の修正 ----------
-S0 = open(os.path.join(ROOT, 'js', 'spx-data.js')).read()
-D0 = json.loads(S0[S0.index('{'):S0.rindex('}') + 1])
+# ---------- 既存データの修正（noah_K・jin_K の元データは assets_src/legacy/spx-legacy.json に保管。tools/spx_normalize.py 参照） ----------
+D0 = json.load(open(os.path.join(ROOT, 'assets_src', 'legacy', 'spx-legacy.json')))
 
 
 def decode(c, sk):
@@ -464,7 +463,7 @@ data['jin_K'] = K
 prev += p
 
 with open(OUT, 'w') as f:
-    f.write('/* 自動生成：tools/build_spx_heroes.py（提供原画 assets_src/originals と spx-data.js の修正）。手で編集しない */\n')
+    f.write('/* 自動生成：tools/build_spx_heroes.py（提供原画 assets_src/originals と assets_src/legacy の修正）。手で編集しない */\n')
     f.write('Object.assign(SPX_DATA,' + json.dumps(data, separators=(',', ':'), ensure_ascii=False) + ');\n')
 print('wrote', OUT, os.path.getsize(OUT), list(data))
 

@@ -142,8 +142,8 @@ function skInfo(sk,u){const s=sk.basic?Object.assign({},sk,{n:sk.n==='攻撃'?'�
  const pw=s.fixed?'固定':s.pow?`${s.pow}${s.hits>1?' ×'+s.hits+'回':''}`:'―',cost=s.sp?'SP '+s.sp:s.gauge?'ゲージ '+s.gauge:s.gaugeAll?'ゲージ全部':'なし';
  ovOpen(`<div class="inf22" style="--ec:${ec}"><div class="ih">${hx(el,ec)}<b>${esc(s.n||(ITEMS[s.id]&&ITEMS[s.id].n)||'')}</b><span class="tg ${kc}">${kn}</span></div>
   <div class="id">${esc(s.d||(ITEMS[s.id]&&ITEMS[s.id].d)||'')}</div>
-  <dl class="dl22"><dt>属性</dt><dd>${s.el||'なし'}</dd><dt>対象</dt><dd>${TGTN(s)}</dd><dt>威力</dt><dd>${pw}</dd><dt>消費</dt><dd>${cost}</dd>${s.req?`<dt>条件</dt><dd>${reqTxt(s.req)}</dd>`:''}${s.delay?`<dt>追加</dt><dd>敵の行動を遅らせる</dd>`:''}${s.hpCost?`<dt>代償</dt><dd>HP${Math.round(s.hpCost*100)}%</dd>`:''}</dl>
-  ${u&&B&&B.tgt&&s.el?`<div class="iw">${B.tgt.name}に対して：${B.tgt.weak.includes(s.el)&&B.tgt.known.has(s.el)?'<b class="w">弱点を突ける ▲</b>':B.tgt.known.size>=B.tgt.weak.length?'弱点ではない':'まだ分からない'}</div>`:''}</div>
+  <dl class="dl22">${s.k!=='item'&&typeof TERMS!=='undefined'?`<dt>区分</dt><dd>${TERMS.skillName(s,u&&u.side===0?u.id:null)}</dd>`:''}<dt>属性</dt><dd>${s.el||'なし'}</dd><dt>対象</dt><dd>${TGTN(s)}</dd><dt>威力</dt><dd>${pw}</dd><dt>消費</dt><dd>${cost}</dd>${s.req?`<dt>条件</dt><dd>${reqTxt(s.req)}</dd>`:''}${s.delay?`<dt>追加</dt><dd>敵の行動を遅らせる</dd>`:''}${s.hpCost?`<dt>代償</dt><dd>HP${Math.round(s.hpCost*100)}%</dd>`:''}</dl>
+  ${u&&B&&B.tgt&&s.el?`<div class="iw">${B.tgt.name}に対して：${B.tgt.weak.includes(s.el)&&B.tgt.known.has(s.el)?'<b class="w">弱点を突ける ▲</b>':B.tgt.known.size>=B.tgt.weak.length?(typeof TERMS!=='undefined'&&TERMS.resists(B.tgt,s.el)?'<b>耐性がある（Resist）</b>':'弱点ではない'):'まだ分からない'}</div>`:''}</div>
   <button class="tbtn back wide" data-a="close">閉じる</button>`,{close:ovClose});}
 chooseRoot=function(u){
  if(u.id==='valk'&&u.aw&&!DEV())return(async()=>{log('竜血が暴れる――<b>ヴァルクは止まらない！</b>');await wait(450);return autoPick(u);})();

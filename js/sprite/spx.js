@@ -1,5 +1,7 @@
 /* ===== ドット絵刷新：提供原画から作ったスプライト（SPX）を、既存の描画の入口で差し替える =====
- データ：js/spx-data.js（tools/build_spx.py が自動生成。キャラ×サイズごとのパレット付き PNG アトラス）
+ データ：js/sprite/data/spx-data*.js（tools/ の各ビルドが自動生成。キャラ×サイズごとのパレット付き PNG アトラス）
+ ・向き：素材の向きは SPX_DATA[id].face に統一済み（tools/spx_normalize.py）。表示の向きは FACING（js/sprite/facing.js）が決める
+ ・呼吸の切れ目（上半身を沈める高さ）は骨格（SKEL・js/motion/skeleton.js）の腰の位置
  ・SPRX.info：対象キー（rio / wolf / boss9 とその派生）を新しいリグ「spx_○○」へ向ける
  ・SPRX.frame：新リグはアトラスから絵を選ぶ。味方はポーズの値から「構え・踏み込み・被弾…」の絵を選び、
    敵は 1 枚絵を、ポーズの値に合わせて整数ドットでずらす・傾ける（呼吸・踏み込み・のけぞり）
@@ -62,16 +64,15 @@ function atlasCanvas(id,sk,v){const key=id+'|'+sk+'|'+v;let c=RECOL.get(key);if(
  RECOL.set(key,c);return c;}
 /* ---------- 1 フレームの切り出し（反転・ずらし・傾け・呼吸を整数ドットで） ---------- */
 const FC=new Map();let fcN=0;
-/* 原画で右を向いているポーズ（ver0.26）：左右反転して、味方の立ち絵はすべて左（敵の側）を向かせる */
-const FLIPF={gald:['stance','front','ready','hit','cast','weak','win','stand','walk_a','walk_b'],mire:['stance','guard','weak','hit','stand','walk_a','walk_b'],hakua:['weak'],shion:['weak']};/* valk は ver0.28 で原画シートから作り直し、向きはデータ側でそろえた */
-const flipOf=(id,name)=>{const l=FLIPF[id.replace(/_K$/,'')];return!!(l&&l.includes(name));};
-function cut(id,sk,v,name,mirror,shear,breath,sq=0){const S=D[id].sizes[sk]||D[id].heads,fr=S.frames[name];if(!fr)return null;const mir0=mirror;
- if(sk!=='heads'&&flipOf(id,name))mirror=!mirror;
+/* ver0.29：原画で逆を向いていたポーズ（旧 FLIPF）はデータ側で反転済み。ここでは素材の向き（face）だけを見る */
+/* 呼吸で沈める上半身の下端（骨格の腰）。骨格が無いときは足元の高さの半分 */
+const breathLine=(id,sk,name,fr)=>{try{if(typeof SKEL!=='undefined'){const y=SKEL.breathLine(id,sk,name,fr);if(y>0)return y;}}catch(e){}return Math.round(fr[5]*.5);};
+function cut(id,sk,v,name,mirror,shear,breath,sq=0){const S=sk==='heads'?D[id].heads:D[id].sizes[sk],fr=S&&S.frames[name];if(!fr)return null;const mir0=mirror;
  const key=[id,sk,v,name,mirror?1:0,shear,breath,sq].join('|');let f=FC.get(key);if(f){f.use=++fcN;return f;}
  const src=sk==='heads'?atlasCanvas(id,'heads',v):atlasCanvas(id,sk,v);if(!src)return null;const[sx,sy,w,h,ax,ay]=fr;
  const ex=Math.abs(shear),cw=w+ex,c=document.createElement('canvas');c.width=cw;c.height=h+(breath?0:0);const g=c.getContext('2d');g.imageSmoothingEnabled=false;
  if(!shear&&!breath)g.drawImage(src,sx,sy,w,h,0,0,w,h);
- else{const split=Math.round(ay*.5);/* 呼吸：上半身（足元の高さの半分より上）を 1 ドット沈める */
+ else{const split=breath?breathLine(id,sk,name,fr):0;/* 呼吸：上半身（骨格の腰より上）を 1 ドット沈める */
   for(let y=0;y<h;y++){const off=shear?Math.round(shear*Math.max(0,ay-y)/Math.max(1,ay)):0,dx=(shear<0?ex:0)+off;
    if(breath&&y<split){if(y===0)continue;g.drawImage(src,sx,sy+y-1,w,1,dx,y,w,1);}else g.drawImage(src,sx,sy+y,w,1,dx,y,w,1);}}
  let out=c,oax=ax+(shear<0?ex:0),oay=ay;
@@ -91,8 +92,6 @@ function pickSize(id,target,kind,ui){const S=D[id].sizes;let best=null,bd=1e9;
 /* ---------- 味方：ポーズの値 → 絵 ---------- */
 const A2=a=>Array.isArray(a)?a:[0,0];
 /* 星臨の 1 枚絵の動き（ポーズ名 → f＝前へ出る／l＝前傾（負はのけぞり）／y＝上下、ドット） */
-/* 図鑑の「正面」表示中か（ver0.28） */
-const ZF={on:false};
 const AWS={stance:{br:1,f:0,l:0,y:0},front:{f:0,l:0,y:0},back:{f:0,l:0,y:0},ready:{f:3,l:2,y:0},lunge:{f:5,l:4,y:0},dash:{f:3,l:5,y:0},
  cast:{f:0,l:-1,y:-2},win:{f:0,l:-1,y:-3},hit:{f:-3,l:-4,y:0},guard:{f:-1,l:-2,y:1},weak:{f:1,l:3,y:2}};
 /* 原画に無いポーズの代わり（発動の構え→踏み込み、歩き 2 コマ目→1 コマ目） */
@@ -144,25 +143,20 @@ const _info=SPRX.info,_frame=SPRX.frame,_white=SPRX.white;
 /* 白抜き（被弾の点滅）：新しい絵は元の絵ごとに控え、ドット幅の印も引き継ぐ */
 SPRX.white=function(f){if(!f||!f.spx)return _white(f);const c=f.cv;if(!c._wh)c._wh=PX.whiteOf(c);if(c._spx)c._wh._spx=c._spx;return c._wh;};
 SPRX.info=function(key){const r=ready&&parse(key);if(r&&RIGS['spx_'+r.id])return{rig:'spx_'+r.id,pal:null};return _info(key);};
-/* 戦闘時の向き（図鑑で設定。ver0.26）：G.zdir[キー]＝'L'|'R'。未設定なら味方は左・敵は右（flip＝右向き）。全モーションの絵を左右反転するだけで、動く方向は変えない */
-function dirKey(pk){let k=String(pk||'').split('|')[0];const m=/^[A-Za-z0-9_]+/.exec(k);k=(m?m[0]:k).replace(/_aw$/,'');
- const has=x=>(typeof ED!=='undefined'&&ED[x])||(typeof HB!=='undefined'&&HB[x]);if(/k$/.test(k)&&!has(k)&&has(k.slice(0,-1)))k=k.slice(0,-1);return k;}
-function wantRight(pk,flip){const d=typeof G!=='undefined'&&G&&G.zdir;if(!d)return!!flip;const k=dirKey(pk),v=d[k]||d[k.replace(/^vo_/,'')];return v==='R'?true:v==='L'?false:!!flip;}
-SPRX.frame=function(name,pose,palKey,pal,flip,sc=1,extra=''){const R=RIG[name],fr=wantRight(palKey,flip),xm=fr!==!!flip;
+/* 表示の向き：FACING.of（図鑑で設定した向き → 列の既定：味方は左・敵は右）。flip＝敵の列（動く方向）で、絵の向きとは別 */
+SPRX.frame=function(name,pose,palKey,pal,flip,sc=1,extra=''){const R=RIG[name],fr=FACING.isRight(palKey,flip?1:0);
  if(R&&R.spx){const id=R.spx,c=D[id],pk=parse(palKey)||{id,v:''},hum=c.kind==='hum';
   const k=BAT?P()/Q():1,target=(hum?R.hgt:R.wid)*sc*k,sk=pickSize(id,target,'b',!BAT);if(!sk)return null;
-  const mirror=((c.face==='R')!==!!flip)!==xm;let name2,sh=0,br=0,dx=0,dy=0,sq=0;
+  const mirror=FACING.mirror(c.face,fr?'R':'L');let name2,sh=0,br=0,dx=0,dy=0,sq=0;
   /* 星臨：原画の「覚醒した姿」（別データ <id>_K）を、ポーズに合わせて整数ドットで動かす。倒れだけは通常の絵（星臨の配色） */
   if(hum&&pk.v==='aw'&&D[id+'_K']&&D[id+'_K'].sizes[sk]){const n0=heroFrame(pose||{});
    if(n0!=='down'){const a=AWS[n0]||AWS.stance,kid=id+'_K';br=(a.br&&(pose.br||0)>.5)?1:0;
     const f=cut(kid,sk,'','awk',mirror,-a.l,br);if(f){const dX=(pose.x||0)*(flip?-1:1)+(flip?1:-1)*a.f;
      const o=Object.create(f);o.ax=f.ax-Math.round(dX);o.ay=f.ay-Math.round(a.y);if(BAT)f.cv._spx={ax:o.ax,ay:o.ay};f.cv._o={ax:o.ax,ay:o.ay,fax:f.ax,fay:f.ay};return o;}}}
   if(hum){const fs=c.sizes[sk].frames,n0=heroFrame(pose||{});name2=n0;
-   if(ZF.on&&!BAT&&fs.front)name2='front';/* 図鑑の「正面」 */
-   else if(!fs[name2]&&c.single&&fs.stance){/* 1 枚絵の味方（ジン）：星臨と同じく 1 枚の絵を整数ドットで動かす */
+   if(!fs[name2]&&c.single&&fs.stance){/* 1 枚絵の味方（ジン）：星臨と同じく 1 枚の絵を整数ドットで動かす */
     const a=AWS[n0]||AWS.stance;name2='stance';sh=-a.l;br=(a.br&&(pose.br||0)>.5)?1:0;dx=(pose.x||0)*(flip?-1:1)+(flip?1:-1)*a.f;dy=-a.y;}
    else{if(!fs[name2])name2=(FB[name2]||[]).find(n=>fs[n])||'stance';br=(name2==='stance'&&(pose.br||0)>.5)?1:0;dx=(pose.x||0)*(flip?-1:1);}}
-  else if(ZF.on&&!BAT&&c.sizes[sk].frames.front)name2='front';
   else{name2='idle';const m=monShape(pose||{},R.type==='hum');sh=Math.max(-6,Math.min(6,m.shear))*(c.face==='R'?1:-1);br=m.breath;dx=m.dx*(flip?1:-1);dy=m.dy;sq=m.sq;}
   const f=cut(id,sk,pk.v,name2,mirror,sh,br,sq);if(!f)return null;
   const o=Object.create(f);o.ax=f.ax-Math.round(dx);o.ay=f.ay-Math.round(dy);if(BAT)f.cv._spx={ax:o.ax,ay:o.ay};f.cv._o={ax:o.ax,ay:o.ay,fax:f.ax,fay:f.ay};return o;}
@@ -172,15 +166,8 @@ SPRX.frame=function(name,pose,palKey,pal,flip,sc=1,extra=''){const R=RIG[name],f
 /* 戦闘キャンバスへの描画：印の付いた絵は、足元を基準に 1 ドット＝round(dpr) 画素で置き直す。
    1:1 の写し（白抜き・消滅演出）には印を引き継ぐ */
 {const _di=CanvasRenderingContext2D.prototype.drawImage;
- /* 図鑑の再生画面：小さい絵を整数倍で拡大している場合は、同じポーズの大きいサイズ（原画からの縮小）に描き替える。
-    倍率は 1〜4 の整数のまま（ドットの大きさをそろえ、歪ませない） */
- const zoomCut=(img,p)=>{const[id,sk,v,name,mir,sh,br,sq]=img._m,S=D[id]&&D[id].sizes;if(!S||!S[sk])return null;const d1=S[sk].dots,hum=D[id].kind==='hum';
-  for(let k=1;k<=4;k++){const want=d1*p/k;let best=null,bd=1e9;for(const s2 in S){if(!'bBu'.includes(s2[0]))continue;const e=Math.abs(S[s2].dots-want)/want;if(e<bd){bd=e;best=s2;}}
-   if(best&&bd<.09&&best!==sk){const r=S[best].dots/d1,f2=cut(id,best,v,name,mir,Math.round(sh*r),br,sq);if(f2)return{f2,r,k};}}return null;};
+ /* （ver0.29：図鑑の拡大表示の描き替えは廃止。図鑑の回転ビューア js/zukan/viewer.js がサイズを直接選ぶ） */
  CanvasRenderingContext2D.prototype.drawImage=function(img){const m=img&&img._spx,n=arguments.length;
-  if(n===5&&img&&img._m&&img._o&&typeof V23!=='undefined'&&V23.ZV&&V23.ZV.cv&&this.canvas===V23.ZV.cv){const p=arguments[3]/img.width;
-   if(p>=1.5){const z=zoomCut(img,p);if(z){const o=img._o,X0=arguments[1]+o.ax*p,Y0=arguments[2]+o.ay*p,ax2=z.f2.ax-(o.fax-o.ax)*z.r,ay2=z.f2.ay-(o.fay-o.ay)*z.r;
-     return _di.call(this,z.f2.cv,Math.round(X0-ax2*z.k),Math.round(Y0-ay2*z.k),z.f2.w*z.k,z.f2.h*z.k);}}}
   if(m){if(n===5&&this===ctx&&scene==='battle'){const a=arguments[1],b=arguments[2],p=arguments[3]/img.width,q=Q();
     if(p>0&&Math.abs(p-q)>.01){const X0=a+m.ax*p,Y0=b+m.ay*p;return _di.call(this,img,Math.round(X0-m.ax*q),Math.round(Y0-m.ay*q),img.width*q,img.height*q);}}
    else if(n===3&&arguments[1]===0&&arguments[2]===0&&this.canvas&&this.canvas.width===img.width&&this.canvas.height===img.height)this.canvas._spx=m;}
@@ -202,8 +189,7 @@ function fieldFrame(key,anim,i,opt){const r=parse(key);if(!r)return null;const c
 const UIC={};
 function headCv(id,v,n){if(v==='aw'&&D[id+'_K']&&D[id+'_K'].heads)return cut(id+'_K','heads','',String(n),false,0,0);return cut(id,'heads',v,String(n),false,0,0);}
 /* 表示の向き（図鑑・編成・一覧の絵）：味方は左・敵は右が既定。図鑑で設定した向き（G.zdir）があればそれに合わせる */
-function isFoe(key){const k=String(key).replace(/_aw$/,'');return typeof ED!=='undefined'&&!!ED[k]&&!(typeof HB!=='undefined'&&HB[k]);}
-function wantR(key,hum){const d=typeof G!=='undefined'&&G&&G.zdir,v=d&&(d[key]||d[String(key).replace(/^vo_/,'')]);return v==='R'?true:v==='L'?false:(!hum||isFoe(key));}
+const wantR=key=>FACING.isRight(key);
 /* 立ち絵：味方は「正面」、敵は 1 枚絵。target＝背丈（味方）／横幅（敵）のドット数 */
 function artCv(id,v,mir,target=84){if(v==='aw'&&D[id+'_K']){const kid=id+'_K',sk=pickSize(kid,target,'b',false);if(sk)return cut(kid,sk,'','awk',mir,0,0);}
  const c=D[id],sk=pickSize(id,target,'b',false)||Object.keys(c.sizes)[0];return cut(id,sk,v,c.kind==='hum'?'front':'idle',mir,0,0);}
@@ -211,7 +197,7 @@ function artCv(id,v,mir,target=84){if(v==='aw'&&D[id+'_K']){const kid=id+'_K',sk
 function zReg(k){if(typeof ZIMG==='undefined')return;const r=parse(k);if(!r)return;const c=D[r.id],hum=c.kind==='hum',nm=hum?'front':'idle';
  const N=Math.max(48,Math.min(120,40*Q()));
  const mkz=sil=>{let best=null,ba=0;for(const sk in c.sizes){if(!'bBuz'.includes(sk[0]))continue;const fr=c.sizes[sk].frames[nm];if(!fr)continue;const mx=Math.max(fr[2],fr[3]);if(mx<=N-2&&mx>ba){ba=mx;best=sk;}}
-  if(!best)return'';const mir=(c.face==='R')!==wantR(k,hum),f=cut(r.id,best,r.v,nm,mir,0,0);if(!f)return'';
+  if(!best)return'';const mir=FACING.mirror(c.face,wantR(k)?'R':'L'),f=cut(r.id,best,r.v,nm,mir,0,0);if(!f)return'';
   const cv=document.createElement('canvas');cv.width=cv.height=N;const g=cv.getContext('2d');g.imageSmoothingEnabled=false;
   g.drawImage(f.cv,Math.round(N/2-f.w/2),N-1-f.h);return(sil?PX.whiteOf(cv):cv).toDataURL();};
  for(const sil of[0,1]){const zz=k+(sil?'_w':'');try{delete ZIMG[zz];}catch(e){}let val=null;
@@ -220,9 +206,9 @@ function onReady(){
  regRigs();
  {const _fo=frameOf;frameOf=function(key,anim='idle',i=0,opt=''){try{const f=fieldFrame(key,anim,i,opt);if(f)return f;}catch(e){console.error(e);}return _fo(key,anim,i,opt);};}
  {const _f=face;face=function(id,aw){const r=parse(id);if(!r||D[r.id].kind!=='hum')return _f(id,aw);const k='f|'+id+(aw?'_aw':'');if(UIC[k])return UIC[k];const h=headCv(r.id,aw?'aw':r.v,20);return UIC[k]=h?h.cv.toDataURL():_f(id,aw);};}
- {const _a=art;art=function(id,aw){const r=parse(id);if(!r)return _a(id,aw);const hum=D[r.id].kind==='hum',wr=wantR(id,hum),k='a|'+id+(aw?'_aw':'')+(wr?'R':'L');if(UIC[k])return UIC[k];
+ {const _a=art;art=function(id,aw){const r=parse(id);if(!r)return _a(id,aw);const hum=D[r.id].kind==='hum',wr=wantR(id),k='a|'+id+(aw?'_aw':'')+(wr?'R':'L');if(UIC[k])return UIC[k];
    /* 編成カードの立ち絵の高さ（約 84 CSS px）に合わせた大きさ：端末の画素密度の整数倍で表示され、ドットがそろう */
-   const kc=aw&&D[r.id+'_K']?D[r.id+'_K']:D[r.id],f=artCv(r.id,aw?'aw':r.v,(kc.face==='R')!==wr,hum?84:72);if(!f)return _a(id,aw);
+   const kc=aw&&D[r.id+'_K']?D[r.id+'_K']:D[r.id],f=artCv(r.id,aw?'aw':r.v,FACING.mirror(kc.face,wr?'R':'L'),hum?84:72);if(!f)return _a(id,aw);
    /* 正方形・下揃え（ver0.26 修正）：立ち絵の枠は縦横比 1:1 で表示されるため、縦長の絵のままだと横に引き伸ばされ、下が切れていた */
    const S=Math.max(f.w,f.h)+2,c=document.createElement('canvas');c.width=c.height=S;const g=c.getContext('2d');g.imageSmoothingEnabled=false;
    g.drawImage(f.cv,Math.floor((S-f.w)/2),S-1-f.h);return UIC[k]=c.toDataURL();};}
@@ -247,30 +233,8 @@ function onReady(){
  /* すでに設定済みのユニットは作り直す（読み込み前に作られた旧リグの設定を捨てる） */
  try{if(typeof B!=='undefined'&&B)[...B.heroes,...B.enemies].forEach(u=>{if(parse(sprKey(u))||parse(u.spr))u.A=null;});}catch(e){}
 }
-return{get ready(){return ready;},parse,heroFrame,pickSize,D,cut,palOf,ZF,zReg,artCv};})();
-/* ver0.26：敵のドット絵を提供原画へ（スライム・騎士・ゴーレム・番人の系統）、味方の立ち絵を左向きにそろえる
-   ver0.27：氷の精・毒茸・大海月・影法師・金の狼・緑の騎士・火竜の系統とリオを提供原画へ。立ち絵の歪み・途切れを修正。図鑑で戦闘時の向きを設定
-   ver0.28：ヴァルク・ジン・氷の女王・忍を提供原画へ。ノア星臨の向きと翼、立ち絵・一覧の解像度、図鑑の再生項目（待機・正面・星臨・向き）を整理 */
-const VER28='ver0.28';
-{const _t=title;title=function(){_t();const v=$('#verL');if(v)v.textContent=VER28;};const v=$('#verL');if(v)v.textContent=VER28;}
-try{document.title='アストラル・ブレイカー '+VER28;}catch(e){}
-/* 図鑑の再生画面（ver0.28）：確認できるのは「待機」「正面」「星臨」（味方のみ）「向き」だけ。攻撃・防御などの動きは戦闘画面で見る。
-   「⇄ 向き」は表示中のキャラの戦闘時の向きを切り替えて保存する（味方は左・敵は右が既定）。図鑑・編成・戦闘の全モーションに反映 */
-{const lab=()=>{const b=document.querySelector('#cmd [data-a="flip"]'),u=typeof V23!=='undefined'&&V23.ZV&&V23.ZV.u;if(!b||!u)return;
-  const def=u.side===0?'L':'R',v=(G.zdir&&G.zdir[u.spr])||def;b.innerHTML=`⇄ 向き：<b>${v==='L'?'左':'右'}</b>`;b.classList.toggle('on23d',v!==def);b.title='戦闘でもこの向きで表示する';};
- const mark=k=>{document.querySelectorAll('#cmd .zm [data-a="mo"]').forEach(b=>b.classList.toggle('on',b.dataset.v===k));const l=document.querySelector('#cmd .zvl');if(l)l.textContent={idle:'待機',front:'正面',aw:'星臨中'}[k]||'';};
- const _pn=panel;panel=function(html,acts){if(acts&&acts.flip&&typeof html==='string'&&html.includes('data-a="flip"')){
-   SPX.ZF.on=false;
-   const hasAw=/data-a="mo" data-v="aw"/.test(html);
-   html=html.replace(/<div class="zm">[\s\S]*?<\/div>/,`<div class="zm z28"><button data-a="mo" data-v="idle" class="on">待機</button><button data-a="mo" data-v="front">正面</button>${hasAw?'<button data-a="mo" data-v="aw">星臨</button>':''}<button class="fl" data-a="flip">⇄ 向き</button></div>`);
-   const mo0=acts.mo;
-   acts=Object.assign({},acts,{
-    mo:v=>{const u=V23.ZV.u;if(!u)return;try{SFX.sel();}catch(e){}
-     if(v==='front'){if(u.aw){u.aw=false;try{ANIM.setup(u);}catch(e){}}SPX.ZF.on=true;try{mo0('idle');}catch(e){}mark('front');return;}
-     SPX.ZF.on=false;if(v==='idle'&&u.aw){u.aw=false;try{ANIM.setup(u);}catch(e){}}
-     if(v==='aw'&&u.aw){u.aw=false;try{ANIM.setup(u);}catch(e){}mo0('idle');mark('idle');return;}
-     mo0(v);setTimeout(()=>mark(v),0);},
-    flip:()=>{const u=V23.ZV.u;if(!u)return;const k=u.spr,def=u.side===0?'L':'R';G.zdir=G.zdir||{};const nx=((G.zdir[k]||def)==='L')?'R':'L';
-     if(nx===def)delete G.zdir[k];else G.zdir[k]=nx;try{save();}catch(e){}try{SFX.sel();}catch(e){}try{SPX.zReg(k);}catch(e){}lab();}});
-   const r=_pn.call(this,html,acts);setTimeout(lab,0);setTimeout(lab,120);return r;}
-  if(SPX.ZF)SPX.ZF.on=false;return _pn.apply(this,arguments);};}
+/* 向きを変えたら、一覧・立ち絵の控えを作り直す */
+FACING.onChange(k=>{try{zReg(k);for(const x in UIC)if(x.startsWith('a|'+k))delete UIC[x];}catch(e){}});
+return{get ready(){return ready;},parse,heroFrame,monShape,pickSize,D,cut,palOf,zReg,artCv,AWS,FB,DEF};})();
+/* 履歴：ver0.26 敵のドット絵を提供原画へ／ver0.27 第2弾とリオ／ver0.28 ヴァルク・ジン・氷の女王・忍
+   ver0.29 向きの窓口を FACING に一本化、原画の反転をデータへ焼き込み、図鑑の再生画面は js/zukan/ へ移した */

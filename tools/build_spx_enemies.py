@@ -17,7 +17,7 @@ from PIL import Image
 from scipy import ndimage as nd
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(ROOT, 'js', 'spx-data-enemy.js')
+OUT = os.path.join(ROOT, 'js', 'sprite', 'data', 'spx-data-enemy.js')
 PREVIEW = sys.argv[1] if len(sys.argv) > 1 else None
 ORIG = lambda n: os.path.join(ROOT, 'assets_src', 'originals', n)
 

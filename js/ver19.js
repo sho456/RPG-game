@@ -100,6 +100,9 @@ async function pre(u,sk,t){const A=setup(u);if(A.none||!u.alive)return;const c=u
   c.ready=(async()=>{await T(big?430:270);await to(u,cp.b,90,'in');})();}}
 /* 1撃ぶんの攻撃動作。戻り値を待ってから命中処理に入る */
 async function strike(a,t,sk){const c=a._act,A=a.A;if(!c||!A||A.none||!a.alive)return;c.n++;const first=c.n===1,R=A.rig,hum=R.type==='hum';c.fx=null;
+ /* ver0.29：モーション台帳（js/motion/registry.js）に専用モーションがあれば、それで 1 撃ぶんを動かす */
+ {const ov=typeof MOTION!=='undefined'?MOTION.custom(a,sk):null;if(ov){if(c.ready){await c.ready;c.ready=null;}else if(ov.approach&&(first||c.last!==t))await dash(a,t,first?200:110);c.last=t;
+  await MOTION.play(a,ov,c.n);c.fx=Object.assign({type:sk.k==='mag'?'elem':'slash'},ov.fx||{});return;}}
  if(c.style==null){c.style=styleOf(a,sk);if(c.style==='cast'){c.big=(sk.pow||0)>=2;}}
  if(hum&&c.style==='melee'){if(c.ready){await c.ready;c.ready=null;}else if(first||c.last!==t)await dash(a,t,first?200:110);c.last=t;
   const S=WP[R.wp]||WP.sword,heavy=first&&!sk.hits&&sk.t==='one'&&((sk.pow||0)>=2||(sk.fixed!=null))&&S.H,v=heavy?S.H:S.seq[(c.n-1)%S.seq.length],m=(S.slow||1)*(c.n>1?.62:1);

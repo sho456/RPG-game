@@ -126,121 +126,8 @@ new MutationObserver(()=>{if(scene!=='field'||!msgHidden())return;const m=$('#ms
 {const _ef=enterField;enterField=function(...a){const r=_ef(...a);try{applyFieldMsg(false);}catch(e){console.error(e);}return r;};}
 {const _sh=show;show=function(m){_sh(m);if(m!=='field')app.classList.remove('fmh23');else requestAnimationFrame(()=>{try{applyFieldMsg(false);}catch(e){}});};}
 
-/* ==================== 4. 図鑑：専用の詳細画面とモーション再生 ====================
- 一覧（敵・仲間・装備）→ タップで詳細。詳細では戦闘と同じリグ・同じポーズ定義でドット絵を動かす。
- 敵：待機／攻撃／魔法／溜め／被弾／撃破　仲間：待機／ダッシュ／攻撃／大技／魔法／防御／被弾／瀕死／勝利／戦闘不能／星臨 */
-const ZK={t:'e',from:'home',cur:null,dt:'info'};
-const ZV={u:null,cv:null,raf:0,busy:0,alpha:1,white:0,label:'待機',parts:[],flip:false,shake:0,run:0};
-const RUN23={ta:.3,cr:2,fF:[-6,2.5],fN:[6.5,0],hF:[2,4],hN:[4,4],sw:2.5};
-const zkList=()=>({e:zkEnemies(),h:Object.keys(PROF),i:zkEquip()});
-const seenE=k=>!!(G.zk&&G.zk.e[k]),seenI=x=>!!(G.zk&&G.zk.i[x.k]),joined=id=>G.members.includes(id);
-function zkBack(){zvStop();if(ZK.from==='bar')tavern();else townMenu();}
-const ELCH=(e,on=true)=>`<i class="zel${on?'':' off'}" style="--c:${ELC[e]||'#8890c0'}">${e}</i>`;
-zkMenu=function(m){if(typeof TSC!=='undefined'&&(TSC==='home'||TSC==='bar'))ZK.from=TSC==='home'?'home':'bar';zvStop();G.zk=G.zk||{e:{},i:{}};G.inv.forEach(zkItem);
- const Lst=zkList(),ne=Lst.e.filter(seenE).length,nh=Lst.h.filter(joined).length,ni=Lst.i.filter(seenI).length,t=ZK.t;
- log((m||'<b>図鑑</b>　タップすると専用の詳細画面を開く')+`<br><small>敵 ${ne}/${Lst.e.length}　仲間 ${nh}/${Lst.h.length}　装備 ${ni}/${Lst.i.length}</small>`);
- let body='';
- if(t==='e')body='<div class="zgrid z23">'+Lst.e.map((k,i)=>{const s=seenE(k);return`<button class="ztile${s?'':' un'}${ED[k].boss?' bs':''}" data-a="e" data-v="${k}"><em>${String(i+1).padStart(2,'0')}</em><img src="${zimg(k,!s)}" alt=""><span>${s?esc(ED[k].name):'？？？'}</span></button>`;}).join('')+'</div>';
- if(t==='h')body='<div class="zhg">'+Lst.h.map(id=>{const j=joined(id);return`<button class="zhc${j?'':' un'}" data-a="h" data-v="${id}" style="--ec:${elCol(id)}"><img src="${j?art(id):zimg(id,1)}" alt=""><b>${j?esc(HB[id].name):'？？？'}</b><small>${j?esc(clsOf(id)):'未加入'}</small></button>`;}).join('')+'</div>';
- if(t==='i')body='<div class="zig">'+Lst.i.map((x,i)=>{const s=seenI(x),ik=icKey(x);return`<button class="zic${s?'':' un'}" data-a="i" data-v="${i}">${ik?`<img src="${s?IC21.render(ik,4):IC21.shadow(ik)}" alt="">`:''}<b>${s?esc(x.n):'？？？'}</b><small>${esc(x.t)}</small></button>`;}).join('')+'</div>';
- panel(`<div class="ftabs zt23" style="grid-template-columns:repeat(3,1fr)">${[['e','敵'],['h','仲間'],['i','装備']].map(([k,n])=>`<button class="${t===k?'on':''}" data-a="tab" data-v="${k}">${n}</button>`).join('')}</div>${body}<button class="tbtn back wide" data-a="back">戻る</button>`,
-  {tab:k=>{ZK.t=k;zkMenu();},e:k=>zkDetail('e',k,'info'),h:id=>zkDetail('h',id,'prof'),i:i=>zkDetail('i',+i),back:zkBack});};
-const icKey=x=>typeof IC21==='undefined'?null:x.k.startsWith('set:')?'S_'+x.k.split(':')[1]+'_'+x.k.split(':')[2]:'L_'+x.k;
-zkEnemy=k=>zkDetail('e',k);zkHero=id=>zkDetail('h',id);
-/* ---------- 詳細画面 ---------- */
-function zkDetail(type,key,dt){const L=zkList()[type],idx=type==='i'?key:L.indexOf(key);if(idx<0)return;ZK.cur={type,key,idx};if(dt)ZK.dt=dt;
- const n=L.length,prev=(idx-1+n)%n,next=(idx+1)%n,pv=type==='i'?prev:L[prev],nx=type==='i'?next:L[next];let h='';
- if(type==='e')h=enemyHTML(key);else if(type==='h')h=heroHTML(key);else h=equipHTML(L[idx]);
- panel(`<div class="zd23"><div class="zdh"><button class="zb" data-a="list">◀ 一覧</button><b>No.${String(idx+1).padStart(2,'0')}</b><span class="nv"><button data-a="go" data-v="${pv}" aria-label="前へ">◀</button><button data-a="go" data-v="${nx}" aria-label="次へ">▶</button></span></div>${h}</div>
-  <button class="tbtn back wide" data-a="list">図鑑の一覧へ</button>`,
-  {list:()=>{zvStop();zkMenu();},go:v=>{zvStop();zkDetail(type,type==='i'?+v:v);},dt:v=>{ZK.dt=v;zkDetail(type,key);},mo:v=>zvPlay(v),flip:()=>{ZV.flip=!ZV.flip;},
-   ex:v=>{const im=$('#cmd .zex img');if(im)im.src=exprFace(key,v);$('#cmd').querySelectorAll('.zex [data-a="ex"]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));},
-   sk:v=>{const s=SK[v];if(s)try{V22.skInfo(s);}catch(e){}}});
- const c=$('#cmd .zv canvas');if(c)zvStart(c,type,key);else zvStop();}
-const tabsH=(L)=>`<div class="zdt">${L.map(([k,n])=>`<button class="${ZK.dt===k?'on':''}" data-a="dt" data-v="${k}">${n}</button>`).join('')}</div>`;
-const motH=(L)=>`<div class="zm">${L.map(([k,n])=>`<button data-a="mo" data-v="${k}">${n}</button>`).join('')}<button class="fl" data-a="flip">⇄ 向き</button></div>`;
-const viewH=(bg)=>`<div class="zv" style="--bg:${bg}"><canvas></canvas><span class="zvl">待機</span></div>`;
-function habitat(k){const o=[];try{for(const id in AREAS){const A=AREAS[id];if(!A||!A.name)continue;const g=[...(A.groups||[]),...(A.libGroups||[])];if(g.some(x=>x.includes(k))||(A.boss&&A.boss.kind===k))o.push(A.name);}}catch(e){}
- if(typeof TMOBS!=='undefined'&&TMOBS.includes(k))o.push('天への塔');return[...new Set(o)];}
-const TGT={one:'単体',all:'全体'};
-function enemyHTML(k){const d=ED[k],s=seenE(k)||DEV(),n=(G.zk.e[k]|0);if(!['info','sk','dot'].includes(ZK.dt))ZK.dt='info';
- const head=`<div class="zdn"><b>${s?esc(d.name):'？？？'}</b>${d.boss?'<em class="bs">BOSS</em>':''}<small>${s?'撃破 '+n+'体':'未撃破'}</small></div>`;
- if(!s)return head+`<div class="zv un"><img src="${zimg(k,1)}" alt=""></div><div class="zno">まだ倒したことがない敵。倒すとドット絵・能力・技が記録される。${habitat(k).length?`<br>出現：${habitat(k).map(esc).join('・')}`:''}</div>`;
- let body='';
- if(ZK.dt==='info'){const st=[['HP',d.mhp],['攻撃',d.atk],['防御',d.def],['魔力',d.mag],['精神',d.res],['速さ',d.spd]];
-  body=`<div class="zst">${st.map(([a,v])=>`<div><small>${a}</small><b>${v}</b></div>`).join('')}</div>
-  <dl class="dl22"><dt>弱点</dt><dd>${d.weak.map(e=>ELCH(e)).join('')}</dd><dt>落とす物</dt><dd>${[...new Set((d.drop||[]).map(([m])=>MATS[m]?MATS[m].n:m))].map(esc).join('・')||'なし'}</dd>
-  <dt>出現</dt><dd>${habitat(k).map(esc).join('・')||'特別な戦い'}</dd>${d.xp?`<dt>報酬</dt><dd>経験値 ${d.xp}・${d.gold}G</dd>`:''}</dl>`;}
- if(ZK.dt==='sk'){const ai=d.ai,acts=(ai?ai.acts:d.acts)||[],rows=acts.map(([a,w])=>[a,Math.round(w*100)+'%']);if(ai&&ai.charge)rows.push([ai.charge,`${ai.every}ターンごとに溜めて放つ`]);
-  body=`<div class="zsl">${rows.map(([a,w])=>{const e=EA[a];if(!e)return'';return`<div class="zsk"><span class="el">${e.el?ELCH(e.el):'<i class="zel" style="--c:#c8c8d8">無</i>'}</span><b>${esc(e.n)}</b><small>${e.k==='mag'?'魔法':'物理'}・${TGT[e.t]||'―'}・威力${e.pow||'―'}</small><em>${esc(w)}</em></div>`;}).join('')}</div>
-  ${ai&&ai.summon&&ED[ai.summon]?`<div class="zno">HPが半分を切ると「${esc(ED[ai.summon].name)}」を呼び出す</div>`:''}<div class="zno">弱点を突くと大きなダメージ（1.7倍）。溜めの次の手番は大技が来るので、防御で備えよう。</div>`;}
- if(ZK.dt==='dot')body=`<div class="zdots"><figure><img src="${zimg(k)}" alt=""><figcaption>図鑑用（48×48）</figcaption></figure><figure><img src="${zimg(k,1)}" alt=""><figcaption>未発見のシルエット</figcaption></figure></div><div class="zno">上の再生ボタンで、戦闘中と同じ動き（同じ骨格・同じポーズ）を確認できる。</div>`;
- const mv=[['idle','待機'],['atk','攻撃'],['cast','魔法'],['chg','溜め'],['hit','被弾'],['die','撃破']];
- return head+viewH('#3a1a3a')+motH(mv)+tabsH([['info','能力'],['sk','技'],['dot','ドット絵']])+`<div class="zbody">${body}</div>`;}
-function heroHTML(id){const j=joined(id)||DEV(),P=PROF[id],hb=HB[id];if(!['prof','art','dot','sk','aw'].includes(ZK.dt))ZK.dt='prof';
- const head=`<div class="zdn" style="--ec:${elCol(id)}">${elOf(id)?ELCH(elOf(id)):''}<b>${j?esc(hb.name):'？？？'}</b><small>${j&&G.h[id]?'Lv'+G.h[id].lv+'　'+esc(clsOf(id)):'未加入'}</small></div>`;
- if(!j)return head+`<div class="zv un"><img src="${zimg(id,1)}" alt=""></div><div class="zno">加入条件：${esc(P[3])}</div>`;
- let body='';
- if(ZK.dt==='prof'){let s=null;try{s=stats(id);}catch(e){}const gr=hb.g||{};const st=[['HP','mhp'],['攻撃','atk'],['防御','def'],['魔力','mag'],['精神','res'],['速さ','spd']];
-  body=`<div class="zpf"><img src="${art(id)}" alt=""><div><div class="zq">「${esc(P[2])}」</div><dl class="dl22"><dt>年齢・身分</dt><dd>${esc(P[0])}</dd><dt>職・武器・属性</dt><dd>${esc(P[1])}</dd><dt>加入</dt><dd>${esc(P[3])}</dd></dl></div></div>
-  <div class="zst">${st.map(([a,k])=>`<div><small>${a}<i>${gr[k]||''}</i></small><b>${s?Math.round(s[k]):hb[k]}</b></div>`).join('')}</div>`;}
- if(ZK.dt==='art')body=`<div class="zart"><figure><img src="${art(id)}" alt=""><figcaption>通常</figcaption></figure><figure class="aw"><img src="${art(id,true)}" alt=""><figcaption>${SEIRIN.n}「${esc(AW[id].name)}」</figcaption></figure></div>
-  <div class="zex"><img src="${exprFace(id,'n')}" alt=""><div>${Object.entries(EXN).map(([k,n],i)=>`<button class="${i?'':'on'}" data-a="ex" data-v="${k}">${n}</button>`).join('')}</div></div>`;
- if(ZK.dt==='dot')body=`<div class="zdots"><figure><img src="${face(id)}" alt=""><figcaption>顔（行動順・欄）</figcaption></figure><figure><img src="${face(id,true)}" alt=""><figcaption>顔（${SEIRIN.n}）</figcaption></figure><figure><img src="${zimg(id)}" alt=""><figcaption>図鑑用</figcaption></figure></div><div class="zno">上の再生ボタンで、戦闘中と同じ動きを確認できる。「${SEIRIN.n}」で姿が切り替わる。</div>`;
- if(ZK.dt==='sk'){const have=new Set(skillList(id)),src={};(hb.skills||[]).forEach(k=>src[k]='初期');(typeof LSK!=='undefined'&&LSK[id]||[]).forEach(([l,k])=>src[k]=src[k]||'Lv'+l);
-  try{for(const p in BOARD[id]){const nd=BOARD[id][p];if(nd&&nd.t==='skill')src[nd.v]=src[nd.v]||'星盤';}}catch(e){}
-  body=`<div class="zsl">${Object.keys(src).filter(k=>SK[k]).map(k=>{const s=SK[k],[el,ec]=skBadge(s),ok=have.has(k);return`<button class="zsk${ok?'':' off'}" data-a="sk" data-v="${k}"><span class="el"><i class="zel" style="--c:${ec}">${el}</i></span><b>${esc(s.n)}</b><small>${esc(s.d||'')}</small><em>${ok?(s.sp?'SP'+s.sp:'習得'):esc(src[k])}</em></button>`;}).join('')}</div>`;}
- if(ZK.dt==='aw'){const A=AW[id],lv=(G.h[id]&&G.h[id].awLv)||1,cm=[...(A.cmds||[]),'goku'+id].filter(k=>SK[k]);
-  body=`<div class="zaw"><b>「${esc(A.name)}」</b><small>${esc(A.type||'')}　位階${ROMAN[lv]}　${'★'.repeat(lv)}${'☆'.repeat(3-lv)}</small><p>${esc(SEIRIN.lore)}</p></div><div class="zsl">${cm.map(k=>{const s=SK[k],[el,ec]=skBadge(s);return`<button class="zsk" data-a="sk" data-v="${k}"><span class="el"><i class="zel" style="--c:${ec}">${el}</i></span><b>${esc(s.n)}</b><small>${esc(s.d||'')}</small><em>${/^goku/.test(k)?'位階Ⅲ':s.gauge?'ゲージ'+s.gauge:''}</em></button>`;}).join('')}</div>`;}
- const mv=[['idle','待機'],['run','ダッシュ'],['atk','攻撃'],['big','大技'],['cast','魔法'],['guard','防御'],['hit','被弾'],['low','瀕死'],['win','勝利'],['down','戦闘不能'],['aw',SEIRIN.n]];
- return head+viewH(elCol(id))+motH(mv)+tabsH([['prof','人物'],['art','立ち絵'],['dot','ドット絵'],['sk','技'],['aw',SEIRIN.n]])+`<div class="zbody">${body}</div>`;}
-function equipHTML(x){const s=seenI(x)||DEV(),ik=icKey(x),L0=x.k.startsWith('set:')?null:LEG[x.k],who=L0&&L0.who&&HB[L0.who]?HB[L0.who].name:'';
- const sl={w:'武器',sub:'盾・副装備',head:'頭',body:'体',acc:'装飾品'};
- return`<div class="zdn"><b>${s?esc(x.n):'？？？'}</b><em class="it">${esc(x.t)}</em></div><div class="zeq">${ik?`<img src="${s?IC21.render(ik,8):IC21.shadow(ik)}" alt="">`:''}</div>
-  ${s?`<dl class="dl22"><dt>種別</dt><dd>${esc(x.t)}${L0&&L0.slot?'・'+(sl[L0.slot]||L0.slot):''}</dd>${who?`<dt>専用</dt><dd>${esc(who)}</dd>`:''}<dt>効果</dt><dd>${esc(x.d)}</dd></dl>`:'<div class="zno">まだ手に入れていない。強敵や宝箱、絆の物語から手に入ることがある。</div>'}`;}
-/* ---------- モーション再生（戦闘と同じリグ・ポーズ） ---------- */
-function zvStop(){cancelAnimationFrame(ZV.raf);ZV.raf=0;ZV.cv=null;ZV.u=null;ZV.busy=0;}
-function zvStart(c,type,key){cancelAnimationFrame(ZV.raf);const u=type==='h'?{id:key,side:0,spr:key,name:HB[key].name,x:0,y:0,sc:2,alive:true,hp:100,mhp:100,aw:false,awLv:(G.h[key]&&G.h[key].awLv)||1,guard:false,sts:[]}
-  :{kind:key,side:1,spr:key,name:ED[key].name,x:0,y:0,sc:ED[key].sc||2,alive:true,hp:100,mhp:100,boss:!!ED[key].boss,charging:false,sts:[]};
- let A;try{A=ANIM.setup(u);}catch(e){A={none:1};}if(A.none){const im=document.createElement('img');im.src=zimg(key);c.replaceWith(im);return;}
- Object.assign(ZV,{u,cv:c,busy:0,alpha:1,white:0,parts:[],flip:false,shake:0,label:'待機'});const loop=()=>{if(!ZV.cv||!ZV.cv.isConnected){zvStop();return;}try{zvDraw();}catch(e){console.error(e);zvStop();return;}ZV.raf=requestAnimationFrame(loop);};ZV.raf=requestAnimationFrame(loop);}
-function zvDraw(){const c=ZV.cv,u=ZV.u,dpr=Math.min(3,devicePixelRatio||1),cw=c.clientWidth,ch=c.clientHeight;if(!cw||!ch)return;const Wd=Math.round(cw*dpr),Hd=Math.round(ch*dpr);if(c.width!==Wd||c.height!==Hd){c.width=Wd;c.height=Hd;}
- const g=c.getContext('2d');g.imageSmoothingEnabled=false;g.clearRect(0,0,Wd,Hd);ANIM.tick();const A=ANIM.setup(u),R=A.rig,pose=ANIM.poseOf(u),[wx,wy,hop]=ANIM.world(u);
- const f=SPRX.frame(A.name,pose,A.palKey,A.pal,ZV.flip?!A.flip:A.flip,1,A.extra);if(!f)return;
- const z=Math.max(1,Math.floor(Math.min(Hd*.7/(R.hgt||36),Wd*.46/(R.wid||22)))),gy=Math.round(Hd*.86),sx=ZV.shake>0?((ZV.shake--)%2?z:-z):0,cx=Math.round(Wd/2)+sx;
- /* 床：格子と影 */
- g.fillStyle='rgba(255,255,255,.06)';for(let x=(cx%(z*8));x<Wd;x+=z*8)g.fillRect(x,gy,z,Hd-gy);g.fillRect(0,gy,Wd,z);
- const sw=Math.round((R.wid||22)*.46)*z;g.fillStyle='rgba(0,0,0,.35)';g.fillRect(cx+wx*1.5*z-sw,gy-z,sw*2,z*2);g.fillRect(cx+wx*1.5*z-sw+2*z,gy+z,sw*2-4*z,z);
- let img=f.cv;if(ZV.white>0){ZV.white--;if(ZV.white>1)img=SPRX.white(f);}
- g.globalAlpha=ZV.alpha*(u.side===0&&!u.alive?.78:1);g.drawImage(img,Math.round(cx+wx*1.5*z-f.ax*z),Math.round(gy+wy*1.5*z+hop*1.5*z-f.ay*z),f.w*z,f.h*z);g.globalAlpha=1;
- /* 星臨のオーラ・粒子 */
- if(u.aw&&Math.random()<.5)ZV.parts.push({x:(Math.random()-.5)*14,y:0,vx:0,vy:-.35-Math.random()*.5,l:34,c:Math.random()<.3?'#ffffff':'#ffe27a',s:1});
- if(u.charging&&Math.random()<.6)ZV.parts.push({x:(Math.random()-.5)*(R.wid||22),y:0,vx:0,vy:-.8-Math.random(),l:22,c:Math.random()<.5?'#ffb030':'#ffe27a',s:1});
- ZV.parts=ZV.parts.filter(p=>p.l-->0);for(const p of ZV.parts){p.x+=p.vx;p.y+=p.vy;p.vy+=p.gr||0;g.globalAlpha=Math.min(1,p.l/12);g.fillStyle=p.c;g.fillRect(Math.round(cx+p.x*z),Math.round(gy-((R.hgt||36)*(p.my||0))*z+p.y*z),p.s*z,p.s*z);}g.globalAlpha=1;}
-function burst(n,col,my=.5,sp=1.6){for(let i=0;i<n;i++){const a=Math.random()*6.283,v=.4+Math.random()*sp;ZV.parts.push({x:(ZV.flip?1:-1)*(ZV.u.side===0?1:-1)*6,y:0,my,vx:Math.cos(a)*v,vy:Math.sin(a)*v,l:16+Math.random()*12|0,c:col[i%col.length],s:i%3?1:2});}}
-const T=ms=>ANIM.T(ms);
-async function zvPlay(k){const u=ZV.u;if(!u||ZV.busy)return;ZV.busy=1;const A=ANIM.setup(u),R=A.rig,hum=R.type==='hum',dir=(u.side===0?-1:1)*(ZV.flip?-1:1);
- const lab=t=>{ZV.label=t;const e=$('#cmd .zvl');if(e)e.textContent=t;};const btn=$('#cmd').querySelector(`.zm [data-v="${k}"]`);$('#cmd').querySelectorAll('.zm button').forEach(b=>b.classList.toggle('on',b===btn));
- const reset=()=>{u.guard=false;u.hp=100;u.alive=true;u.charging=false;ZV.alpha=1;};
- try{const nm=btn?btn.textContent:k;lab(nm);
-  if(k==='idle'){reset();ANIM.idle(u,200);}
-  else if(k==='low'){reset();u.hp=10;}else if(k==='down'){reset();u.alive=false;}else if(k==='guard'){reset();u.guard=true;}
-  else if(k==='chg'){reset();u.charging=true;}
-  else if(k==='aw'){reset();u.aw=!u.aw;ANIM.setup(u);if(u.aw){await ANIM.to(u,V19.AWK,220,'back');burst(26,['#ffe27a','#ffffff','#7fd6ff'],.5,2);ZV.white=4;await T(500);}ANIM.idle(u,260);lab(u.aw?SEIRIN.n+'中':'待機');}
-  else if(k==='hit'){reset();const M=ANIM.MST[A.name];await ANIM.to(u,hum?ANIM.HST.hit:(M&&M.hit)||{},60);A.kbv=-dir*5;ZV.white=4;burst(8,['#ffffff','#ffd0a0']);await T(320);ANIM.idle(u,200);}
-  else if(k==='die'){reset();ZV.white=6;burst(20,['#ffffff','#c8b0ff'],.5,1);for(let i=0;i<=14;i++){ZV.alpha=1-i/14;await sleep(45);}await sleep(500);ZV.alpha=1;ANIM.idle(u,1);}
-  else if(k==='run'){reset();ANIM.to(u,RUN23,140);await ANIM.move(u,dir*14,0,420,'io',3);await T(120);ANIM.to(u,RUN23,120);await ANIM.move(u,0,0,380,'io',3);ANIM.idle(u,200);}
-  else if(k==='win'){reset();ANIM.move(u,0,0,380,'lin',7);await ANIM.to(u,V19.VIC.a,180,'out');await ANIM.to(u,V19.VIC.b,200,'in');burst(10,['#ffe27a','#ffffff']);await T(800);ANIM.idle(u,260);}
-  else if(k==='cast'){reset();if(hum){const cp=V19.CAST[R.wp]||V19.CAST._;await ANIM.to(u,cp.a,380);for(let i=0;i<3;i++){burst(5,['#9fd8ff','#ffffff'],.6,.8);await T(90);}await ANIM.to(u,cp.b,120,'in');burst(16,['#9fd8ff','#ffffff','#c8b0ff'],.5,2.2);await T(420);}
-   else{const M=V19.MA[A.name]||{},c=M.cast||{};await ANIM.to(u,c.w||{},380);burst(10,['#c8b0ff','#ffffff'],.6,.8);await ANIM.to(u,c.h||{},160,'in');burst(16,['#ff9ad6','#ffffff'],.5,2.2);await T(420);}ANIM.idle(u,220);}
-  else if(k==='atk'||k==='big'){reset();
-   if(hum){const wp=V19.WP[R.wp]||V19.WP.sword;ANIM.to(u,RUN23,120);await ANIM.move(u,dir*10,0,260,'io',3);
-    if(R.wp==='bow'&&V19.BOW){await ANIM.to(u,V19.BOW.aim,160);await ANIM.to(u,V19.BOW.draw,260);await ANIM.to(u,V19.BOW.loose,60,'in');burst(8,['#ffffff','#ffe14a']);await T(260);}
-    else{const seq=k==='big'?[wp.H]:wp.seq.slice(0,2);for(const s of seq){await ANIM.to(u,s.w,s.wt);await ANIM.to(u,s.h,s.ht,'in');burst(k==='big'?22:10,k==='big'?['#ffe27a','#ffffff','#ff9a40']:['#ffffff','#ffe27a'],.55,k==='big'?2.4:1.6);if(k==='big'){ZV.shake=10;ZV.white=0;}await T(k==='big'?260:120);}}
-    await T(160);ANIM.to(u,RUN23,100);await ANIM.move(u,0,0,300,'io',2);}
-   else{const M=V19.MA[A.name]||{},ap=M.ap||{ms:260,hop:4},a=M.atk||{};await ANIM.move(u,dir*8,0,ap.ms,'io',ap.hop);await ANIM.to(u,a.w||{},a.wt||150);if(a.m)await ANIM.to(u,a.m,a.mt||100);await ANIM.to(u,a.h||{},a.ht||70,'in');burst(a.big?20:10,['#ffffff','#ffb070']);if(a.big)ZV.shake=8;await T(320);await ANIM.move(u,0,0,ap.ms,'io',ap.hop);}
-   ANIM.idle(u,220);}
- }catch(e){console.error(e);}finally{ZV.busy=0;}}
+/* ==================== 4. 図鑑 ====================
+ ver0.29 で js/zukan/zukan.js（一覧・詳細）と js/zukan/viewer.js（回転ビューア）へ移した */
 
 /* ==================== 3. ホーム画面：実際の大きさから配置を決める ====================
  これまでは各要素を固定の座標で置いていたため、画面が低い・狭いと右メニューと「NEXT」、
@@ -284,4 +171,4 @@ function sample(){if(!B)return;const e=B.enemies[0],s=B.enemies[1],h=B.heroes;le
 /* 版表示 */
 {const _t=title;title=function(){_t();const v=$('#verL');if(v)v.textContent=VER23;};const v=$('#verL');if(v)v.textContent=VER23;}
 try{document.title='アストラル・ブレイカー '+VER23;}catch(e){}
-return{HK23,NEWS23,zkDetail,zvPlay,ZV,homeFix,applyFieldMsg,layout,LY,seirinText,fadeIn,placeEnemies,placeHeroes,battleH,esc,clamp,appW,oh,sleep,DEV};})();
+return{HK23,NEWS23,homeFix,applyFieldMsg,layout,LY,seirinText,fadeIn,placeEnemies,placeHeroes,battleH,esc,clamp,appW,oh,sleep,DEV};})();
