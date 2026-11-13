@@ -18,17 +18,33 @@ const toHex=([r,g,b])=>'#'+[r,g,b].map(v=>Math.max(0,Math.min(255,Math.round(v))
 /* ---------- キー → キャラ・色替え ---------- */
 /* rio / rio_aw / tr_rio2 / tr_rio3 / wolf / vo_wolf / boss9 / ernaE・valkE（決闘の敵＝仲間と同じ絵） */
 const ALIAS={ernaE:'erna',valkE:'valk'};
+/* 敵（ver0.26）：同じ形の色違いは、原画 1 体＋パレットの写像（データの vars）で描く。[原画のid, 色替え] */
+const FAM={slime:['slime',''],moss:['slime','moss'],cursedslime:['slime','cursedslime'],ironslime:['slime','ironslime'],iceslime:['slime','iceslime'],
+ waterslime:['slime','waterslime'],lavaslime:['slime','lavaslime'],
+ darkknight:['knight','darkknight'],drowned:['knight','drowned'],
+ golemkin:['golem',''],boss2:['golem','boss2'],golemboss:['golem','golemboss'],tower10:['golem','tower10'],boss7:['golem','boss7'],last1:['golem','last1'],
+ boss:['banjin',''],boss3:['banjin','boss3']};
+/* 虚の回廊の番人（kb10, kb20…）：30層は刻喰らいの番人（専用色）、それ以外は元のボスの虚ろ化（灰色） */
+function kbFam(key){const m=/^kb(\d+)$/.exec(key);if(!m)return null;const f=+m[1];if(f===30)return['golem','kb30'];
+ const bk=[['golemboss'],['boss5'],['boss3'],['boss6']][(f/10-1)%4];const r=bk&&FAM[bk[0]];return r?[r[0],'void']:null;}
 function parse(key){if(!key)return null;key=String(key).split('|')[0];let v='';if(ALIAS[key])key=ALIAS[key];
  if(key.startsWith('vo_')){v='void';key=key.slice(3);}
+ {const kb=kbFam(key);if(kb)return D[kb[0]]?{id:kb[0],v:kb[1]}:null;}
+ if(key.endsWith('k')&&FAM[key.slice(0,-1)])key=key.slice(0,-1);
+ if(FAM[key]&&D[FAM[key][0]]){const[id,fv]=FAM[key];return{id,v:v||fv};}
  const tr=/^tr_([a-z]+?)(\d)$/.exec(key);if(tr){v='trial'+tr[2];key=tr[1];}
  if(key.endsWith('_aw')){v=v||'aw';key=key.slice(0,-3);}
  if(key.endsWith('k')&&!D[key]&&D[key.slice(0,-1)])key=key.slice(0,-1);
  return D[key]?{id:key,v}:null;}
 /* 色替え（パレットの各色を写像）。星臨はビルド時に作った専用パレット、試練の幻影・虚蝕化は既存と同じ式 */
 const mixHex2=(a,b,t)=>{const x=hex(a),y=hex(b);return toHex(x.map((v,i)=>v+(y[i]-v)*t));};
+const ENEW=new Set(['slime','knight','golem','banjin']);
 function palOf(id,v){const c=D[id],base=c.pal;
  if(v==='aw'&&c.palAw)return c.palAw;
+ if(c.vars&&c.vars[v])return c.vars[v];
  if(v.startsWith('trial')){const f=v==='trial2'?.7:.55;return base.map((h,i)=>i===base.length-1?h:toHex(hex(mixHex2(h,'#5a2aa0',.55)).map(x=>x*f)));}
+ if(v==='void'&&ENEW.has(id))return base.map((h,i)=>{if(i===base.length-1)return h;const[r,g,b]=hex(h),mx=Math.max(r,g,b),mn=Math.min(r,g,b),s=mx?(mx-mn)/mx:0,l=r*.3+g*.59+b*.11;
+  if(s>.55&&mx>200)return'#e080ff';return toHex([l*.8+14,l*.74+8,Math.min(255,l*.95+30)]);});/* 新しい敵：灰色に沈め、目・核など強く光る色だけ紫に灯す */
  if(v==='void')return base.map((h,i)=>{if(i===base.length-1)return h;const[r,g,b]=hex(h),mx=Math.max(r,g,b),mn=Math.min(r,g,b),s=mx?(mx-mn)/mx:0,l=r*.3+g*.59+b*.11;
   if(s>.6&&r>g*1.6&&l>60&&l<200)return'#e080ff';return toHex([l*.8+14,l*.74+8,Math.min(255,l*.95+30)]);});
  return base;}
@@ -40,17 +56,24 @@ function atlasCanvas(id,sk,v){const key=id+'|'+sk+'|'+v;let c=RECOL.get(key);if(
  RECOL.set(key,c);return c;}
 /* ---------- 1 フレームの切り出し（反転・ずらし・傾け・呼吸を整数ドットで） ---------- */
 const FC=new Map();let fcN=0;
-function cut(id,sk,v,name,mirror,shear,breath){const S=D[id].sizes[sk]||D[id].heads,fr=S.frames[name];if(!fr)return null;
- const key=[id,sk,v,name,mirror?1:0,shear,breath].join('|');let f=FC.get(key);if(f){f.use=++fcN;return f;}
+/* 原画で右を向いているポーズ（ver0.26）：左右反転して、味方の立ち絵はすべて左（敵の側）を向かせる */
+const FLIPF={gald:['stance','front','ready','hit','cast','weak','win','stand','walk_a','walk_b'],mire:['stance','guard','weak','hit','stand','walk_a','walk_b'],hakua:['weak'],shion:['weak'],valk:['hit']};
+const flipOf=(id,name)=>{const l=FLIPF[id.replace(/_K$/,'')];return!!(l&&l.includes(name));};
+function cut(id,sk,v,name,mirror,shear,breath,sq=0){const S=D[id].sizes[sk]||D[id].heads,fr=S.frames[name];if(!fr)return null;
+ if(sk!=='heads'&&flipOf(id,name))mirror=!mirror;
+ const key=[id,sk,v,name,mirror?1:0,shear,breath,sq].join('|');let f=FC.get(key);if(f){f.use=++fcN;return f;}
  const src=sk==='heads'?atlasCanvas(id,'heads',v):atlasCanvas(id,sk,v);if(!src)return null;const[sx,sy,w,h,ax,ay]=fr;
  const ex=Math.abs(shear),cw=w+ex,c=document.createElement('canvas');c.width=cw;c.height=h+(breath?0:0);const g=c.getContext('2d');g.imageSmoothingEnabled=false;
  if(!shear&&!breath)g.drawImage(src,sx,sy,w,h,0,0,w,h);
  else{const split=Math.round(ay*.5);/* 呼吸：上半身（足元の高さの半分より上）を 1 ドット沈める */
   for(let y=0;y<h;y++){const off=shear?Math.round(shear*Math.max(0,ay-y)/Math.max(1,ay)):0,dx=(shear<0?ex:0)+off;
    if(breath&&y<split){if(y===0)continue;g.drawImage(src,sx,sy+y-1,w,1,dx,y,w,1);}else g.drawImage(src,sx,sy+y,w,1,dx,y,w,1);}}
- let out=c,oax=ax+(shear<0?ex:0);
- if(mirror){const m=document.createElement('canvas');m.width=cw;m.height=c.height;const mg=m.getContext('2d');mg.translate(cw,0);mg.scale(-1,1);mg.drawImage(c,0,0);out=m;oax=cw-1-oax;}
- f={cv:out,w:out.width,h:out.height,ax:oax,ay,use:++fcN,spx:1};FC.set(key,f);
+ let out=c,oax=ax+(shear<0?ex:0),oay=ay;
+ /* つぶれ・伸び（スライム）：足元を固定し、高さを 5% 刻み・幅を 3.5% 刻みで最近傍に拡縮 */
+ if(sq){const w2=Math.max(1,Math.round(cw*(1+.035*sq))),h2=Math.max(1,Math.round(c.height*(1-.05*sq))),s2=document.createElement('canvas');s2.width=w2;s2.height=h2;
+  const g2=s2.getContext('2d');g2.imageSmoothingEnabled=false;g2.drawImage(c,0,0,w2,h2);oax=Math.round(oax*w2/cw);oay=Math.round(ay*h2/c.height);out=s2;}
+ if(mirror){const cw=out.width,c=out;const m=document.createElement('canvas');m.width=cw;m.height=c.height;const mg=m.getContext('2d');mg.translate(cw,0);mg.scale(-1,1);mg.drawImage(c,0,0);out=m;oax=cw-1-oax;}
+ f={cv:out,w:out.width,h:out.height,ax:oax,ay:oay,use:++fcN,spx:1};FC.set(key,f);
  if(FC.size>900){const arr=[...FC.entries()].sort((a,b)=>a[1].use-b[1].use);for(let i=0;i<300;i++)FC.delete(arr[i][0]);}
  return f;}
 /* ---------- サイズの選択 ---------- */
@@ -76,15 +99,19 @@ function heroFrame(p){if(p.f)return p.f;const ta=p.ta||0,cr=p.cr||0,hF=A2(p.hF),
  if(y<=-4)return'dash';
  return'stance';}
 /* ---------- 敵：ポーズの値 → ずらし・傾け ---------- */
-function monShape(p){const pt=p.pt||0,ln=p.ln||0;return{dx:-(p.x||0)*1.6,dy:(p.y||0)*1.4+(p.by||0),shear:Math.round((pt*1.6+ln*1.2)),breath:(p.br||0)>.5?1:0};}
+function monShape(p,hum){const pt=p.pt||0,ln=p.ln||0,lx=p.lx||0,ta=hum?(p.ta||0):0;
+ return{dx:-(p.x||0)*1.6,dy:(p.y||0)*1.4+(p.by||0),shear:Math.round(pt*1.6+ln*1.2+lx*1.1+Math.max(-1,Math.min(1,ta))*7),breath:(p.br||0)>.5?1:0,sq:Math.max(-4,Math.min(4,Math.round((p.sq||0)*4)))};}
 /* ---------- リグ登録 ---------- */
 const RIGS={};
-const DEF={rio:{base:'rio',wid:25,hgt:36},wolf:{base:'wolf',wid:72.5,hgt:43},boss9:{base:'wolf',wid:55,hgt:37}};
+const DEF={rio:{base:'rio',wid:25,hgt:36},wolf:{base:'wolf',wid:72.5,hgt:43},boss9:{base:'wolf',wid:55,hgt:37},
+ /* 敵（ver0.26）：wid＝原画の横幅（倍率 1 のドット数）。旧リグより 1.3 倍ほど大きく、提供原画の描き込みが見える大きさ。
+    騎士は人型の骨格（踏み込み・斬りつけの振り付け）を流用し、絵は 1 枚絵を傾けて動かす */
+ slime:{base:'slime',wid:42,hgt:45},knight:{base:'gald',wid:36,hgt:54},golem:{base:'golem',wid:62,hgt:79,nsc:.86},banjin:{base:'boss',wid:33,hgt:63}};
 /* 仲間：元のリグを土台にし、背丈は元のリグの比（データ側のサイズも同じ比で作ってある） */
 const HEROES=['gald','mire','shion','noah','erna','balza','crow','hakua','jin','celes','valk'];
 function regRigs(){for(const id of HEROES)if(D[id]&&RIG[id]&&!DEF[id])DEF[id]={base:id,wid:25,hgt:RIG[id].hgt*36/37};
  for(const id in D){const d=DEF[id];if(!d||!RIG[d.base])continue;const name='spx_'+id;
-  const R=Object.assign(Object.create(RIG[d.base]),{spx:id,wid:d.wid,hgt:d.hgt,step:D[id].kind==='hum'?100:120,nsc:1});
+  const R=Object.assign(Object.create(RIG[d.base]),{spx:id,wid:d.wid,hgt:d.hgt,step:D[id].kind==='hum'?100:120,nsc:d.nsc||1});
   RIGS[name]=R;RIG[name]=R;}
  /* 動き：味方は元のキャラの待機・構えを引き継ぐ。敵は 1 枚絵用の待機（呼吸）と、狼の攻撃の型を使う */
  for(const id of['rio',...HEROES])if(ANIM.IDLE[id]&&RIGS['spx_'+id])ANIM.IDLE['spx_'+id]=ANIM.IDLE[id];
@@ -92,6 +119,9 @@ function regRigs(){for(const id of HEROES)if(D[id]&&RIG[id]&&!DEF[id])DEF[id]={b
  ANIM.IDLE.spx_wolf=(t)=>{const b=mk(560)(t),g=(t%5200)<700;return{br:b>.5?1:0,pt:g?.6:0,x:g?-.6:0};};/* 荒い息。ときどき身を低くうなる */
  ANIM.IDLE.spx_boss9=(t)=>{const b=mk(1500)(t),g=(t%6100)<900;return{br:b>.55?1:0,pt:g?.8:0,y:0};};/* 深い呼吸。ときどき首を突き出す */
  for(const n of['spx_wolf','spx_boss9']){if(V19.MA.wolf)V19.MA[n]=V19.MA.wolf;if(ANIM.MST.wolf)ANIM.MST[n]=ANIM.MST.wolf;}
+ /* 敵（ver0.26）：元の種族の待機（ぷるぷる・沈み込み・浮遊）と攻撃の型をそのまま使う */
+ for(const id of['slime','knight','golem','banjin']){const n='spx_'+id,b=DEF[id].base;if(!RIGS[n])continue;
+  if(ANIM.IDLE[b])ANIM.IDLE[n]=ANIM.IDLE[b];if(V19.MA[b])V19.MA[n]=V19.MA[b];if(ANIM.MST[b])ANIM.MST[n]=ANIM.MST[b];}
  /* 黒炎竜：旧リグ（狼の骨格＋竜の派生形）への振り分けを外す。大きさの倍率はそのまま */
  if(ANIM.KIND.boss9)ANIM.KIND.boss9={sc:ANIM.KIND.boss9.sc||2.3};}
 /* ---------- 入口の差し替え ---------- */
@@ -105,15 +135,15 @@ SPRX.info=function(key){const r=ready&&parse(key);if(r&&RIGS['spx_'+r.id])return
 SPRX.frame=function(name,pose,palKey,pal,flip,sc=1,extra=''){const R=RIG[name];
  if(R&&R.spx){const id=R.spx,c=D[id],pk=parse(palKey)||{id,v:''},hum=c.kind==='hum';
   const k=BAT?P()/Q():1,target=(hum?R.hgt:R.wid)*sc*k,sk=pickSize(id,target,'b',!BAT);if(!sk)return null;
-  const mirror=(c.face==='R')!==!!flip;let name2,sh=0,br=0,dx=0,dy=0;
+  const mirror=(c.face==='R')!==!!flip;let name2,sh=0,br=0,dx=0,dy=0,sq=0;
   /* 星臨：原画の「覚醒した姿」（別データ <id>_K）を、ポーズに合わせて整数ドットで動かす。倒れだけは通常の絵（星臨の配色） */
   if(hum&&pk.v==='aw'&&D[id+'_K']&&D[id+'_K'].sizes[sk]){const n0=heroFrame(pose||{});
    if(n0!=='down'){const a=AWS[n0]||AWS.stance,kid=id+'_K';br=(a.br&&(pose.br||0)>.5)?1:0;
     const f=cut(kid,sk,'','awk',mirror,-a.l,br);if(f){const dX=(pose.x||0)*(flip?-1:1)+(flip?1:-1)*a.f;
      const o=Object.create(f);o.ax=f.ax-Math.round(dX);o.ay=f.ay-Math.round(a.y);if(BAT)f.cv._spx={ax:o.ax,ay:o.ay};return o;}}}
   if(hum){name2=heroFrame(pose||{});const fs=c.sizes[sk].frames;if(!fs[name2])name2=(FB[name2]||[]).find(n=>fs[n])||'stance';br=(name2==='stance'&&(pose.br||0)>.5)?1:0;dx=(pose.x||0)*(flip?-1:1);}
-  else{name2='idle';const m=monShape(pose||{});sh=Math.max(-6,Math.min(6,m.shear))*(c.face==='R'?1:-1);br=m.breath;dx=m.dx*(flip?1:-1);dy=m.dy;}
-  const f=cut(id,sk,pk.v,name2,mirror,sh,br);if(!f)return null;
+  else{name2='idle';const m=monShape(pose||{},R.type==='hum');sh=Math.max(-6,Math.min(6,m.shear))*(c.face==='R'?1:-1);br=m.breath;dx=m.dx*(flip?1:-1);dy=m.dy;sq=m.sq;}
+  const f=cut(id,sk,pk.v,name2,mirror,sh,br,sq);if(!f)return null;
   const o=Object.create(f);o.ax=f.ax-Math.round(dx);o.ay=f.ay-Math.round(dy);if(BAT)f.cv._spx={ax:o.ax,ay:o.ay};return o;}
  if(BAT){/* 旧リグ：同じ見た目の大きさのまま、1 ドット＝round(dpr) 画素で描き直す */
   const k=P()/Q();if(k>1.01){const f=_frame.call(this,name,pose,palKey,pal,flip,sc*k,extra);if(f)f.cv._spx={ax:f.ax,ay:f.ay};return f;}}
@@ -144,6 +174,12 @@ const UIC={};
 function headCv(id,v,n){if(v==='aw'&&D[id+'_K']&&D[id+'_K'].heads)return cut(id+'_K','heads','',String(n),false,0,0);return cut(id,'heads',v,String(n),false,0,0);}
 function artCv(id,v){if(v==='aw'&&D[id+'_K']){const kid=id+'_K',sk=pickSize(kid,54,'b',false);if(sk)return cut(kid,sk,'','awk',false,0,0);}
  const c=D[id],sk=pickSize(id,54,'b',false)||Object.keys(c.sizes)[0];return cut(id,sk,v,c.kind==='hum'?'front':'idle',false,0,0);}
+/* 図鑑の絵（48×48、下揃え）を新しい原画から。読むときに作る */
+function zReg(k){if(typeof ZIMG==='undefined')return;const r=parse(k);if(!r||D[r.id].kind==='hum')return;const zk=Object.keys(D[r.id].sizes).find(s=>s[0]==='z');if(!zk)return;
+ const mkz=sil=>{const f=cut(r.id,zk,r.v,'idle',false,0,0);if(!f)return'';const cv=document.createElement('canvas');cv.width=cv.height=48;const g=cv.getContext('2d');g.imageSmoothingEnabled=false;
+  g.drawImage(f.cv,Math.round(24-f.w/2),Math.round(47-f.h));return(sil?PX.whiteOf(cv):cv).toDataURL();};
+ for(const sil of[0,1]){const zz=k+(sil?'_w':'');try{delete ZIMG[zz];}catch(e){}let v=null;
+  Object.defineProperty(ZIMG,zz,{configurable:true,enumerable:true,get(){return v===null?(v=mkz(sil)):v;},set(x){v=x;}});}}
 function onReady(){
  regRigs();
  {const _fo=frameOf;frameOf=function(key,anim='idle',i=0,opt=''){try{const f=fieldFrame(key,anim,i,opt);if(f)return f;}catch(e){console.error(e);}return _fo(key,anim,i,opt);};}
@@ -169,7 +205,15 @@ function onReady(){
     const s=Math.min(1,46/Math.max(f.w,f.h));if(s<1){/* 大きすぎる場合は 48 用の顔を使う */const h=headCv(id,'',48);if(h){g.drawImage(h.cv,0,0);return(sil?PX.whiteOf(cv):cv).toDataURL();}}
     g.drawImage(f.cv,Math.round(24-f.w/2),Math.round(47-f.h));return(sil?PX.whiteOf(cv):cv).toDataURL();};
    ZIMG[id]=mk(0);ZIMG[id+'_w']=mk(1);}}catch(e){console.error(e);}
+ /* 敵の色違い（苔スライム・亡霊騎士・黒鉄の巨像…）と虚ろ化：図鑑の絵も新しい原画から。後から作られる虚ろ化・回廊の番人も同じ */
+ try{const keys=new Set(Object.keys(FAM));if(typeof ED!=='undefined')for(const k in ED)keys.add(k);for(const k of keys)zReg(k);}catch(e){console.error(e);}
+ if(typeof voidKind==='function'){const _vk=voidKind;voidKind=function(k){const vk=_vk.apply(this,arguments);try{zReg(vk);}catch(e){}return vk;};}
+ if(typeof kBoss==='function'){const _kb=kBoss;kBoss=function(f){const k=_kb.apply(this,arguments);try{zReg(k);}catch(e){}return k;};}
  /* すでに設定済みのユニットは作り直す（読み込み前に作られた旧リグの設定を捨てる） */
  try{if(typeof B!=='undefined'&&B)[...B.heroes,...B.enemies].forEach(u=>{if(parse(sprKey(u))||parse(u.spr))u.A=null;});}catch(e){}
 }
 return{get ready(){return ready;},parse,heroFrame,pickSize,D,cut,palOf};})();
+/* ver0.26：敵のドット絵を提供原画へ（スライム・騎士・ゴーレム・番人の系統）、味方の立ち絵を左向きにそろえる */
+const VER26='ver0.26';
+{const _t=title;title=function(){_t();const v=$('#verL');if(v)v.textContent=VER26;};const v=$('#verL');if(v)v.textContent=VER26;}
+try{document.title='アストラル・ブレイカー '+VER26;}catch(e){}
