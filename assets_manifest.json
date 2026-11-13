@@ -76,10 +76,10 @@
     63
    ],
    "colors": 32,
-   "frames": "原画のポーズ11種＋探索用（stand・walk_a・front・win・stance・ready・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
+   "frames": "星臨1枚絵×サイズ8（構え・踏み込み・詠唱・被弾などはずらし・傾け・上下で表現）＋顔20/22/48",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "高：提供原画",
-   "status": "検証済み（星臨はパレット置換）",
+   "status": "検証済み（原画の「覚醒した姿」1枚絵を整数ドットで動かす。倒れのみ通常の絵を星臨の配色で）",
    "source": "assets_src/originals/hero_gald_poses.png"
   },
   {
@@ -116,10 +116,10 @@
     56
    ],
    "colors": 32,
-   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
+   "frames": "星臨1枚絵×サイズ8（構え・踏み込み・詠唱・被弾などはずらし・傾け・上下で表現）＋顔20/22/48",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "高：提供原画",
-   "status": "検証済み（星臨はパレット置換）",
+   "status": "検証済み（原画の「覚醒した姿」1枚絵を整数ドットで動かす。倒れのみ通常の絵を星臨の配色で）",
    "source": "assets_src/originals/hero_mire_poses.png"
   },
   {
@@ -156,10 +156,10 @@
     56
    ],
    "colors": 32,
-   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
+   "frames": "星臨1枚絵×サイズ8（構え・踏み込み・詠唱・被弾などはずらし・傾け・上下で表現）＋顔20/22/48",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "高：提供原画",
-   "status": "検証済み（星臨はパレット置換）",
+   "status": "検証済み（原画の「覚醒した姿」1枚絵を整数ドットで動かす。倒れのみ通常の絵を星臨の配色で）",
    "source": "assets_src/originals/hero_shion_poses.png"
   },
   {
@@ -196,10 +196,10 @@
     63
    ],
    "colors": 32,
-   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
+   "frames": "星臨1枚絵×サイズ8（構え・踏み込み・詠唱・被弾などはずらし・傾け・上下で表現）＋顔20/22/48",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "高：提供原画",
-   "status": "検証済み（星臨はパレット置換）",
+   "status": "検証済み（原画の「覚醒した姿」1枚絵を整数ドットで動かす。倒れのみ通常の絵を星臨の配色で）",
    "source": "assets_src/originals/hero_noah_poses.png"
   },
   {
@@ -236,10 +236,10 @@
     56
    ],
    "colors": 32,
-   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
+   "frames": "星臨1枚絵×サイズ8（構え・踏み込み・詠唱・被弾などはずらし・傾け・上下で表現）＋顔20/22/48",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "高：提供原画",
-   "status": "検証済み（星臨はパレット置換）",
+   "status": "検証済み（原画の「覚醒した姿」1枚絵を整数ドットで動かす。倒れのみ通常の絵を星臨の配色で）",
    "source": "assets_src/originals/hero_erna_poses.png"
   },
   {
@@ -276,10 +276,10 @@
     49
    ],
    "colors": 32,
-   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
+   "frames": "星臨1枚絵×サイズ8（構え・踏み込み・詠唱・被弾などはずらし・傾け・上下で表現）＋顔20/22/48",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "高：提供原画",
-   "status": "検証済み（星臨はパレット置換）",
+   "status": "検証済み（原画の「覚醒した姿」1枚絵を整数ドットで動かす。倒れのみ通常の絵を星臨の配色で）",
    "source": "assets_src/originals/hero_balza_poses.png"
   },
   {
@@ -316,10 +316,10 @@
     70
    ],
    "colors": 32,
-   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
+   "frames": "星臨1枚絵×サイズ8（構え・踏み込み・詠唱・被弾などはずらし・傾け・上下で表現）＋顔20/22/48",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "高：提供原画",
-   "status": "検証済み（星臨はパレット置換）",
+   "status": "検証済み（原画の「覚醒した姿」1枚絵を整数ドットで動かす。倒れのみ通常の絵を星臨の配色で）",
    "source": "assets_src/originals/hero_crow_poses.png"
   },
   {
@@ -356,10 +356,10 @@
     54
    ],
    "colors": 32,
-   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
+   "frames": "星臨1枚絵×サイズ8（構え・踏み込み・詠唱・被弾などはずらし・傾け・上下で表現）＋顔20/22/48",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "高：提供原画",
-   "status": "検証済み（星臨はパレット置換）",
+   "status": "検証済み（原画の「覚醒した姿」1枚絵を整数ドットで動かす。倒れのみ通常の絵を星臨の配色で）",
    "source": "assets_src/originals/hero_hakua_poses.png"
   },
   {
@@ -396,10 +396,10 @@
     63
    ],
    "colors": 32,
-   "frames": "原画のポーズ10種＋探索用（stand・walk_a・walk_b・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
+   "frames": "星臨1枚絵×サイズ8（構え・踏み込み・詠唱・被弾などはずらし・傾け・上下で表現）＋顔20/22/48",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "高：提供原画",
-   "status": "検証済み（星臨はパレット置換）",
+   "status": "検証済み（原画の「覚醒した姿」1枚絵を整数ドットで動かす。倒れのみ通常の絵を星臨の配色で）",
    "source": "assets_src/originals/hero_jin_poses.png"
   },
   {
@@ -436,10 +436,10 @@
     63
    ],
    "colors": 32,
-   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
+   "frames": "星臨1枚絵×サイズ8（構え・踏み込み・詠唱・被弾などはずらし・傾け・上下で表現）＋顔20/22/48",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "高：提供原画",
-   "status": "検証済み（星臨はパレット置換）",
+   "status": "検証済み（原画の「覚醒した姿」1枚絵を整数ドットで動かす。倒れのみ通常の絵を星臨の配色で）",
    "source": "assets_src/originals/hero_celes_poses.png"
   },
   {
@@ -476,10 +476,10 @@
     62
    ],
    "colors": 32,
-   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
+   "frames": "星臨1枚絵×サイズ8（構え・踏み込み・詠唱・被弾などはずらし・傾け・上下で表現）＋顔20/22/48",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
    "quality": "高：提供原画",
-   "status": "検証済み（星臨はパレット置換）",
+   "status": "検証済み（原画の「覚醒した姿」1枚絵を整数ドットで動かす。倒れのみ通常の絵を星臨の配色で）",
    "source": "assets_src/originals/hero_valk_poses.png"
   },
   {

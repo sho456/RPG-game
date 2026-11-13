@@ -328,6 +328,58 @@ def hero(cid):
     return dict(id=cid, face='L', kind='hum', frames=F, ref=ref, ref_axis='h', colors=31, sizes=sizes, anchors=AX,
                 field_frames=[n for n in order if n in F], head=head, aw=H['aw'], field_only=('stand', 'walk_a', 'walk_b', 'back'))
 
+# ------------------------------------------------------------------ 星臨（覚醒）の原画：シートの「覚醒した姿」1 枚
+# method：'wall'＝通常ポーズと同じ（輪郭の内側だけ）／'flood'＝背景色だけを抜く（輪郭の無い光の翼・光輪・炎を残す）
+# box：シート上の範囲（flood のとき）。idx：segment の番号（wall のとき）。erase：原画座標（反転前）の多角形
+AWK = {
+ 'gald': dict(method='flood', box=(936, 574, 1228, 805)),
+ 'celes': dict(method='wall', idx=12),
+ 'mire': dict(method='flood', box=(940, 461, 1250, 820)),
+ 'noah': dict(method='flood', box=(1000, 590, 1254, 821)),
+ 'erna': dict(method='wall', idx=12, erase=[[(0, 0), (170, 0), (170, 52), (0, 52)]]),
+ 'hakua': dict(method='wall', idx=12, erase=[[(0, 0), (78, 0), (78, 260), (0, 260)], [(0, 0), (320, 0), (320, 48), (0, 48)],
+                                        [(78, 48), (125, 48), (125, 105), (78, 105)], [(118, 48), (162, 48), (162, 63), (118, 63)], [(205, 48), (320, 48), (320, 110), (250, 110), (205, 80)]]),
+ 'balza': dict(method='wall', idx=13),
+ 'crow': dict(method='wall', idx=12),
+ 'shion': dict(method='wall', idx=12),
+ 'jin': dict(method='wall', idx=17, m=True),
+ 'valk': dict(method='flood', box=(958, 617, 1230, 832)),
+}
+
+AWK_HEAD = {'gald': (165, 58, 0), 'celes': (95, 115, 62), 'mire': (160, 180, 0), 'noah': (108, 95, 0), 'erna': (65, 52, 56), 'hakua': (62, 56, 56),
+            'balza': (125, 85, 62), 'crow': (155, 226, 72), 'shion': (145, 78, 0), 'jin': (196, 62, 72), 'valk': (150, 75, 0)}   # 顔の中心 x, y, 切り出す大きさ（0＝通常の顔と同じ）
+
+def hero_awk(base):
+    """星臨の姿（原画の 1 枚絵）を、通常の姿と同じ縮尺で別キャラ「<id>_K」として作る（専用パレット）。
+    戦闘では 1 枚絵をポーズの値に合わせて整数ドットで動かす（敵と同じ方式）。オーラが大きすぎる絵は高さを抑える。"""
+    cid = base['id']; im = awk_image(cid); fr = base['frames']['front']
+    cap = fr.height * 1.3
+    if im.height > cap: im = im.resize((round(im.width * cap / im.height), round(cap)), Image.LANCZOS); hs_k = cap / awk_image(cid).height
+    else: hs_k = 1
+    hx, hy, hs = AWK_HEAD[cid]; hs = hs or base['head'][2]
+    sizes = {k: v for k, v in base['sizes'].items() if not k.startswith('f')}
+    return dict(id=cid + '_K', face='L', kind='hum', frames={'awk': im}, ref=base['ref'], ref_axis='h', colors=31, sizes=sizes,
+                field_frames=[], head=(hx * hs_k, hy * hs_k, hs * hs_k), head_src='awk', aw=None, field_only=())
+
+def awk_image(cid):
+    A = AWK[cid]; H = HEROES[cid]; path = os.path.join(SRC, f'hero_{cid}_poses.png')
+    if A['method'] == 'wall':
+        parts, rgba = segment(path, **H['seg']); im, _ = pose_image(parts, rgba, [A['idx']])
+    else:
+        from scipy import ndimage as ndi
+        x0, y0, x1, y1 = A['box']; src = Image.open(path).convert('RGBA'); p = 20
+        crop = src.crop((x0 - p, y0 - p, min(src.width, x1 + p), min(src.height, y1 + p)))
+        a = cutout(crop, tol=40, hole_area=150, hole_tol=30)
+        m = a[..., 3] > 127; lab, n = ndi.label(m); ar = ndi.sum(m, lab, range(1, n + 1))
+        a[..., 3] = np.where(lab == int(np.argmax(ar)) + 1, 255, 0)   # 一番大きな塊だけ（離れた星・隣のポーズは落とす）
+        im = Image.fromarray(a.clip(0, 255).astype(np.uint8), 'RGBA')
+    im = crop_alpha(im, 128)
+    if A.get('erase'):
+        for poly in A['erase']: im = erase_poly(im, poly)
+        im = crop_alpha(im, 128)
+    if A.get('m'): im = im.transpose(Image.FLIP_LEFT_RIGHT)
+    return im
+
 def mon(id_, path, ref_w, sizes, colors, **cut):
     im = load_cutout(os.path.join(SRC, path), **cut)
     return dict(id=id_, face='R', kind='mon', frames={'idle': im}, ref=im.width, ref_axis='w', colors=colors, sizes=sizes, field_frames=['idle'],
@@ -335,7 +387,8 @@ def mon(id_, path, ref_w, sizes, colors, **cut):
 
 def chars(only=None):
     want = lambda i: not only or i in only
-    return ([hero_rio()] if want('rio') else []) + [hero(c) for c in HEROES if want(c)] + [
+    hs = [hero(c) for c in HEROES if want(c) or want(c + '_K')]
+    return ([hero_rio()] if want('rio') else []) + [h for h in hs if want(h['id'])] + [hero_awk(h) for h in hs if h['id'] in AWK] + [
             mon('wolf', 'wolf.png', 116, {'b84': 84, 'b100': 100, 'b116': 116, 'b130': 130, 'b146': 146, 'B176': 176, 'f36': 36, 'z46': 46, 'u72': 72}, 26, tol=70),
             mon('boss9', 'boss9_volganon.png', 202, {'b146': 146, 'b174': 174, 'b202': 202, 'b226': 226, 'b252': 252, 'f68': 68, 'z46': 46, 'u56': 56}, 34, tol=40, hole_area=150, hole_tol=40)]
 
@@ -358,7 +411,7 @@ def build(c):
         url, pos = atlas_png([v[0] for v in fs.values()], pal)
         data['sizes'][sk] = {'k': round(k, 5), 'dots': dots, 'png': url, 'frames': {n: [p[0], p[1], int(v[0].shape[1]), int(v[0].shape[0]), v[1], v[2]] for (n, v), p in zip(fs.items(), pos)}}
     if c['head']:   # 顔グラ用：正面の頭部を四角く切り出して変換
-        hx, hy, hs = c['head']; fr = frames['front']
+        hx, hy, hs = c['head']; fr = frames[c.get('head_src', 'front')]
         box = (int(hx - hs / 2), int(hy - hs / 2), int(hx + hs / 2), int(hy + hs / 2))
         head = Image.new('RGBA', (box[2] - box[0], box[3] - box[1]), (0, 0, 0, 0)); head.alpha_composite(fr.crop((max(0, box[0]), max(0, box[1]), box[2], box[3])), (max(0, -box[0]), max(0, -box[1])))
         hs_ = {}
@@ -388,7 +441,7 @@ if __name__ == '__main__':
     if only and os.path.exists(prev_path):
         txt = open(prev_path, encoding='utf8').read(); ALL = json.loads(txt[txt.index('{'):txt.rindex('}') + 1])
     for c in chars(only):
-        if only and c['id'] not in only: continue
+        if only and c['id'] not in only and c['id'][:-2] not in only: continue
         data, pal, prev = build(c); ALL[c['id']] = data
         sheet(c['id'], prev, pal, os.path.join(ROOT, 'docs', 'sheets', f"spx_{c['id']}.png"))
         main = [s for s in data['sizes'] if s.startswith('b')]; main = main[len(main) // 2]

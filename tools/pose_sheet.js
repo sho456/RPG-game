@@ -1,10 +1,11 @@
 // 戦闘の振り付けで使うキーポーズを新スプライトで描かせて一覧にする（フレームの選ばれ方・ずれ・傾きの確認）
-// node tools/pose_sheet.js <out.png> [仲間のID,カンマ区切り（省略時はリオ＋狼＋竜）]
+// node tools/pose_sheet.js <out.png> [仲間のID,カンマ区切り（省略時はリオ＋狼＋竜）]　AW=1 で星臨の姿
 const { chromium } = require('playwright');
 (async () => {
   const out = process.argv[2];
   const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
   const errs = []; p.on('pageerror', e => errs.push(e.message));
+  if (process.env.AW) await p.addInitScript('window.__AW=1');
   if (process.argv[3]) await p.addInitScript(`window.__HEROES=${JSON.stringify(process.argv[3])}`);
   await p.goto(process.env.GAME_URL || 'http://localhost:8765/index.html'); await p.waitForTimeout(1500);
   const res = await p.evaluate(() => {
@@ -23,7 +24,7 @@ const { chromium } = require('playwright');
       if (f) g.drawImage(f.cv, 130 - f.ax, 150 - f.ay); g.fillStyle = '#fff'; g.font = '12px sans-serif'; g.fillText(tag + ' ' + n + (A.rig.spx && A.rig.type === 'hum' ? ' → ' + SPX.heroFrame(pose) : ''), 4, 14);
       out.push(c.toDataURL()); } };
     const HS = (window.__HEROES || 'rio').split(',');
-    for (const h of HS) draw({ id: h, side: 0, spr: h, sc: 2, x: 0, y: 0, alive: true }, heroPoses, h);
+    for (const h of HS) draw({ id: h, side: 0, spr: h, sc: 2, x: 0, y: 0, alive: true, aw: !!window.__AW }, heroPoses, h + (window.__AW ? '(星臨)' : ''));
     if (window.__HEROES) return out;
     draw({ kind: 'wolf', side: 1, spr: 'wolf', sc: 2, x: 0, y: 0, alive: true }, monPoses, '狼');
     draw({ kind: 'boss9', side: 1, spr: 'boss9', sc: 3, boss: true, x: 0, y: 0, alive: true }, monPoses.slice(0, 4).concat(monPoses.slice(8)), '竜');

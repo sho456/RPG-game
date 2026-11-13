@@ -60,6 +60,9 @@ function pickSize(id,target,kind,ui){const S=D[id].sizes;let best=null,bd=1e9;
  return best;}
 /* ---------- 味方：ポーズの値 → 絵 ---------- */
 const A2=a=>Array.isArray(a)?a:[0,0];
+/* 星臨の 1 枚絵の動き（ポーズ名 → f＝前へ出る／l＝前傾（負はのけぞり）／y＝上下、ドット） */
+const AWS={stance:{br:1,f:0,l:0,y:0},front:{f:0,l:0,y:0},back:{f:0,l:0,y:0},ready:{f:3,l:2,y:0},lunge:{f:5,l:4,y:0},dash:{f:3,l:5,y:0},
+ cast:{f:0,l:-1,y:-2},win:{f:0,l:-1,y:-3},hit:{f:-3,l:-4,y:0},guard:{f:-1,l:-2,y:1},weak:{f:1,l:3,y:2}};
 /* 原画に無いポーズの代わり（発動の構え→踏み込み、歩き 2 コマ目→1 コマ目） */
 const FB={ready:['lunge','cast'],walk_b:['walk_a','stand'],walk_a:['stand'],guard:['stance'],weak:['hit'],win:['cast','front']};
 function heroFrame(p){if(p.f)return p.f;const ta=p.ta||0,cr=p.cr||0,hF=A2(p.hF),hN=A2(p.hN),fF=A2(p.fF),y=p.y||0;
@@ -103,6 +106,11 @@ SPRX.frame=function(name,pose,palKey,pal,flip,sc=1,extra=''){const R=RIG[name];
  if(R&&R.spx){const id=R.spx,c=D[id],pk=parse(palKey)||{id,v:''},hum=c.kind==='hum';
   const k=BAT?P()/Q():1,target=(hum?R.hgt:R.wid)*sc*k,sk=pickSize(id,target,'b',!BAT);if(!sk)return null;
   const mirror=(c.face==='R')!==!!flip;let name2,sh=0,br=0,dx=0,dy=0;
+  /* 星臨：原画の「覚醒した姿」（別データ <id>_K）を、ポーズに合わせて整数ドットで動かす。倒れだけは通常の絵（星臨の配色） */
+  if(hum&&pk.v==='aw'&&D[id+'_K']&&D[id+'_K'].sizes[sk]){const n0=heroFrame(pose||{});
+   if(n0!=='down'){const a=AWS[n0]||AWS.stance,kid=id+'_K';br=(a.br&&(pose.br||0)>.5)?1:0;
+    const f=cut(kid,sk,'','awk',mirror,-a.l,br);if(f){const dX=(pose.x||0)*(flip?-1:1)+(flip?1:-1)*a.f;
+     const o=Object.create(f);o.ax=f.ax-Math.round(dX);o.ay=f.ay-Math.round(a.y);if(BAT)f.cv._spx={ax:o.ax,ay:o.ay};return o;}}}
   if(hum){name2=heroFrame(pose||{});const fs=c.sizes[sk].frames;if(!fs[name2])name2=(FB[name2]||[]).find(n=>fs[n])||'stance';br=(name2==='stance'&&(pose.br||0)>.5)?1:0;dx=(pose.x||0)*(flip?-1:1);}
   else{name2='idle';const m=monShape(pose||{});sh=Math.max(-6,Math.min(6,m.shear))*(c.face==='R'?1:-1);br=m.breath;dx=m.dx*(flip?1:-1);dy=m.dy;}
   const f=cut(id,sk,pk.v,name2,mirror,sh,br);if(!f)return null;
@@ -133,8 +141,9 @@ function fieldFrame(key,anim,i,opt){const r=parse(key);if(!r)return null;const c
  const f=cut(r.id,sk,v,name,false,0,br);return f?{c:f.cv,W:f.w,H:f.h,ax:f.ax,ay:f.ay}:null;}
 /* ---------- 顔グラ・立ち絵 ---------- */
 const UIC={};
-function headCv(id,v,n){return cut(id,'heads',v,String(n),false,0,0);}
-function artCv(id,v){const c=D[id],sk=pickSize(id,54,'b',false)||Object.keys(c.sizes)[0];return cut(id,sk,v,c.kind==='hum'?'front':'idle',false,0,0);}
+function headCv(id,v,n){if(v==='aw'&&D[id+'_K']&&D[id+'_K'].heads)return cut(id+'_K','heads','',String(n),false,0,0);return cut(id,'heads',v,String(n),false,0,0);}
+function artCv(id,v){if(v==='aw'&&D[id+'_K']){const kid=id+'_K',sk=pickSize(kid,54,'b',false);if(sk)return cut(kid,sk,'','awk',false,0,0);}
+ const c=D[id],sk=pickSize(id,54,'b',false)||Object.keys(c.sizes)[0];return cut(id,sk,v,c.kind==='hum'?'front':'idle',false,0,0);}
 function onReady(){
  regRigs();
  {const _fo=frameOf;frameOf=function(key,anim='idle',i=0,opt=''){try{const f=fieldFrame(key,anim,i,opt);if(f)return f;}catch(e){console.error(e);}return _fo(key,anim,i,opt);};}
@@ -155,7 +164,7 @@ function onReady(){
    return UIC[key]=c.toDataURL();};}
  /* 古い絵で作られた立ち絵・顔の控えを捨て、図鑑の絵も作り直す */
  try{for(const id in D){for(const k of[id,id+'_aw'])if(typeof ZIMG!=='undefined'){delete ZIMG[k];delete ZIMG[k+'_w'];}}}catch(e){}
- try{if(typeof ZIMG!=='undefined')for(const id in D){const c=D[id],zk=Object.keys(c.sizes).find(s=>s[0]==='z');
+ try{if(typeof ZIMG!=='undefined')for(const id in D){if(id.endsWith('_K'))continue;const c=D[id],zk=Object.keys(c.sizes).find(s=>s[0]==='z');
    const mk=sil=>{const f=c.kind==='hum'?artCv(id,''):(zk?cut(id,zk,'','idle',false,0,0):artCv(id,''));if(!f)return'';const cv=document.createElement('canvas');cv.width=cv.height=48;const g=cv.getContext('2d');g.imageSmoothingEnabled=false;
     const s=Math.min(1,46/Math.max(f.w,f.h));if(s<1){/* 大きすぎる場合は 48 用の顔を使う */const h=headCv(id,'',48);if(h){g.drawImage(h.cv,0,0);return(sil?PX.whiteOf(cv):cv).toDataURL();}}
     g.drawImage(f.cv,Math.round(24-f.w/2),Math.round(47-f.h));return(sil?PX.whiteOf(cv):cv).toDataURL();};
