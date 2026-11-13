@@ -17,124 +17,70 @@ from PIL import Image
 from scipy import ndimage as nd
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SRC = os.path.join(ROOT, 'assets_src', 'originals', 'enemies_set1.jpg')
 OUT = os.path.join(ROOT, 'js', 'spx-data-enemy.js')
 PREVIEW = sys.argv[1] if len(sys.argv) > 1 else None
+ORIG = lambda n: os.path.join(ROOT, 'assets_src', 'originals', n)
 
 # ---------- キャラ定義 ----------
-# order：原画の左から。face：原画の向き（L＝左向き／正面）。sizes：横幅のドット数
-CHARS = [
-    dict(id='slime',  face='L', ncol=34,
-         b=[40, 46, 52, 58, 66, 74, 84, 96], f=24, z=46, u=56),
-    dict(id='knight', face='L', ncol=38,
-         b=[34, 38, 42, 48, 54, 60, 68, 78, 90], f=22, z=46, u=48),
-    dict(id='golem',  face='L', ncol=38,
-         b=[46, 52, 58, 66, 74, 84, 96, 110, 126, 144, 164], f=40, z=46, u=56),
-    dict(id='banjin', face='L', ncol=36,
-         b=[36, 42, 48, 56, 64, 72, 82, 94, 108], f=28, z=46, u=48),
+# 原画ごとに、左から順にキャラを並べる。face：原画の向き（L＝左向き／正面、R＝右向き）。b/f/z/u：横幅のドット数
+SOURCES = [
+    ('enemies_set1.jpg', [
+        dict(id='slime',  face='L', ncol=34, b=[40, 46, 52, 58, 66, 74, 84, 96], f=24, z=46, u=56),
+        dict(id='knight', face='L', ncol=38, b=[34, 38, 42, 48, 54, 60, 68, 78, 90], f=22, z=46, u=48),
+        dict(id='golem',  face='L', ncol=38, b=[46, 52, 58, 66, 74, 84, 96, 110, 126, 144, 164], f=40, z=46, u=56),
+        dict(id='banjin', face='L', ncol=36, b=[36, 42, 48, 56, 64, 72, 82, 94, 108], f=28, z=46, u=48),
+    ]),
+    ('enemies_set2.jpg', [
+        dict(id='icespirit', face='L', ncol=30, b=[30, 34, 38, 44, 50, 56, 64, 72, 82], f=20, z=46, u=44),
+        dict(id='shroom',    face='L', ncol=34, b=[34, 38, 44, 50, 56, 64, 72, 82, 94], f=24, z=46, u=52),
+        dict(id='goldwolf',  face='R', ncol=32, b=[56, 64, 72, 82, 92, 104, 118, 134, 150], f=36, z=46, u=64),
+        dict(id='gknight',   face='L', ncol=36, b=[28, 32, 36, 40, 46, 52, 58, 66, 76], f=20, z=46, u=44),
+    ]),
+    ('enemies_set3.jpg', [
+        dict(id='jelly', face='L', ncol=34, b=[28, 32, 36, 42, 48, 54, 62, 70, 80], f=20, z=46, u=44),
+        dict(id='shade', face='L', ncol=30, b=[34, 38, 44, 50, 56, 64, 72, 82, 94], f=24, z=46, u=52),
+        dict(id='drake', face='R', ncol=36, b=[56, 64, 72, 82, 92, 104, 118, 134, 150, 170, 192, 216], f=44, z=46, u=64),
+    ]),
 ]
 
-# ---------- 読み込み・背景抜き ----------
-img = np.asarray(Image.open(SRC).convert('RGB')).astype(np.float64)
-H0, W0, _ = img.shape
-dist = (255 - img).max(2)
-lab, n = nd.label(dist <= 28)
-border = set(np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))) - {0}
-fg = ~np.isin(lab, list(border))
-# 体に囲まれた背景（腕と胴のすき間など）：広い、または真っ白な白の島も背景にする。小さいハイライトは残す
-for i, (s_, o_) in enumerate(zip(nd.sum(np.ones_like(dist), lab, range(1, n + 1)), nd.find_objects(lab))):
-    if i + 1 in border:
-        continue
-    mdist = dist[o_][lab[o_] == i + 1].mean()
-    if s_ >= 300 or (s_ >= 80 and mdist < 6):
-        fg[lab == i + 1] = False
-fg = nd.binary_opening(fg, iterations=1)          # JPEG の縁のにじみ（1 画素の白っぽい輪）を落とす
-fg = nd.binary_erosion(fg, iterations=1) | (fg & (dist > 120))
-lab2, n2 = nd.label(fg)
-sizes = nd.sum(fg, lab2, range(1, n2 + 1))
-objs = nd.find_objects(lab2)
-comps = [(i + 1, s, o) for i, (s, o) in enumerate(zip(sizes, objs)) if s >= 25]
-bodies = sorted([c for c in comps if c[1] > 20000], key=lambda c: c[2][1].start)
-assert len(bodies) == len(CHARS), f'本体の数が合わない: {len(bodies)}'
-owner = {}
-for li, s, o in comps:
-    cx = (o[1].start + o[1].stop) / 2
-    best = min(range(len(bodies)), key=lambda k: abs(cx - (bodies[k][2][1].start + bodies[k][2][1].stop) / 2)
-               if not (bodies[k][2][1].start <= cx < bodies[k][2][1].stop) else -1)
-    owner[li] = best
+
+# ---------- 読み込み・背景抜き・切り出し ----------
+def load_source(fname, n_chars):
+    img = np.asarray(Image.open(ORIG(fname)).convert('RGB')).astype(np.float64)
+    dist = (255 - img).max(2)
+    lab, n = nd.label(dist <= 28)
+    border = set(np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))) - {0}
+    fg = ~np.isin(lab, list(border))
+    # 体に囲まれた背景（腕と胴のすき間など）：広い、または真っ白な白の島も背景にする。小さいハイライトは残す
+    for i, (s_, o_) in enumerate(zip(nd.sum(np.ones_like(dist), lab, range(1, n + 1)), nd.find_objects(lab))):
+        if i + 1 in border:
+            continue
+        mdist = dist[o_][lab[o_] == i + 1].mean()
+        if s_ >= 300 or (s_ >= 80 and mdist < 6):
+            fg[lab == i + 1] = False
+    fg = nd.binary_opening(fg, iterations=1)          # JPEG の縁のにじみ（1 画素の白っぽい輪）を落とす
+    fg = nd.binary_erosion(fg, iterations=1) | (fg & (dist > 120))
+    lab2, n2 = nd.label(fg)
+    sizes = nd.sum(fg, lab2, range(1, n2 + 1))
+    objs = nd.find_objects(lab2)
+    comps = [(i + 1, s, o) for i, (s, o) in enumerate(zip(sizes, objs)) if s >= 25]
+    bodies = sorted(sorted(comps, key=lambda c: -c[1])[:n_chars], key=lambda c: c[2][1].start)
+    owner = {}
+    for li, s, o in comps:
+        cx = (o[1].start + o[1].stop) / 2
+        owner[li] = min(range(len(bodies)), key=lambda k: abs(cx - (bodies[k][2][1].start + bodies[k][2][1].stop) / 2)
+                        if not (bodies[k][2][1].start <= cx < bodies[k][2][1].stop) else -1)
+    crops = []
+    for k in range(n_chars):
+        ids = [li for li, b in owner.items() if b == k]
+        m = np.isin(lab2, ids)
+        ys, xs = np.where(m)
+        y0, y1, x0, x1 = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
+        crops.append((img[y0:y1, x0:x1], m[y0:y1, x0:x1].astype(np.float64)))
+    return crops
 
 
-def crop(k):
-    ids = [li for li, b in owner.items() if b == k]
-    m = np.isin(lab2, ids)
-    ys, xs = np.where(m)
-    y0, y1, x0, x1 = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
-    return img[y0:y1, x0:x1], m[y0:y1, x0:x1].astype(np.float64)
-
-
-# ---------- 縮小（不透明度で重み付けした面積平均） ----------
-def shrink(rgb, a, w):
-    h0, w0 = a.shape
-    h = max(1, round(h0 * w / w0))
-    A = Image.fromarray(a.astype(np.float32), 'F').resize((w, h), Image.BOX)
-    al = np.asarray(A)
-    ch = []
-    for c in range(3):
-        P = Image.fromarray((rgb[:, :, c] * a).astype(np.float32), 'F').resize((w, h), Image.BOX)
-        ch.append(np.asarray(P))
-    col = np.stack(ch, 2) / np.maximum(al, 1e-6)[:, :, None]
-    if w < w0 / 3.2:   # 原画のドットより細かく縮めるときは、輪郭と陰影が眠くならないよう少しだけ締める
-        blur = nd.uniform_filter(col, size=(3, 3, 1))
-        col = np.clip(col + (col - blur) * .35, 0, 255)
-    return col, al >= .5
-
-
-# ---------- パレット（k-means） ----------
-def kmeans(px, k, it=30, seed=1):
-    rng = np.random.default_rng(seed)
-    # k-means++ 初期化
-    c = [px[rng.integers(len(px))]]
-    for _ in range(k - 1):
-        d = np.min(((px[:, None, :] - np.array(c)[None]) ** 2).sum(2), 1)
-        c.append(px[rng.choice(len(px), p=d / d.sum())])
-    c = np.array(c)
-    for _ in range(it):
-        lbl = np.argmin(((px[:, None, :] - c[None]) ** 2).sum(2), 1)
-        for j in range(k):
-            s = px[lbl == j]
-            if len(s):
-                c[j] = s.mean(0)
-    return c
-
-
-def lum(c):
-    return c[0] * .3 + c[1] * .59 + c[2] * .11
-
-
-def to_pal_idx(col, m, pal):
-    px = col[m]
-    lbl = np.argmin(((px[:, None, :] - pal[None]) ** 2).sum(2), 1)
-    idx = np.zeros(m.shape, np.int32)
-    idx[m] = lbl + 1           # 0 = 透明
-    return idx
-
-
-def png_of(idx, pal):
-    h, w = idx.shape
-    im = Image.new('P', (w, h))
-    flat = [0, 0, 0] + [int(round(v)) for c in pal for v in c]
-    im.putpalette(flat + [0] * (768 - len(flat)))
-    im.putdata(idx.flatten().tolist())
-    b = io.BytesIO()
-    im.save(b, 'PNG', optimize=True, transparency=0)
-    return 'data:image/png;base64,' + base64.b64encode(b.getvalue()).decode()
-
-
-def anchor(m):
-    ys, xs = np.where(m)
-    ay = ys.max()
-    low = xs[ys >= ay - max(2, m.shape[0] // 10)]
-    return int(round((low.min() + low.max()) / 2)), int(ay)
+from spx_common import shrink, kmeans, lum, to_pal_idx, png_of, anchor  # noqa: E402
 
 
 # ---------- 色替え（パレットの各色を写像） ----------
@@ -222,6 +168,28 @@ VARS = {
                       (HUE(70, 140, .12), tint(260, smul=.45, val=1.1)), (HUE(15, 70, .0), tint(258, smul=.5, val=1.15)),
                       (ANY, grey(1.1, 258, .15))],
     },
+    # 氷の精（原画：水色の氷・白い光）→ 残り火（炎の精）
+    'icespirit': {
+        'ember': [(HUE(160, 260, .08), lambda h, s, v: (((22 + (1 - v) * 40) / 360), min(1, s * 1.6 + .25), v * 1.02)),
+                  (ANY, lambda h, s, v: (40 / 360, .25, v))],
+    },
+    # 金の狼（原画：黄色の毛・茶色の背の棘・青い目）→ 翠狼・雪狼
+    'goldwolf': {
+        'jadewolf':  [(HUE(185, 250, .3), tint(355, smul=1, val=1.05)), (HUE(20, 75, .1), tint(150, smul=.45, val=.86))],
+        'snowwolf':  [(HUE(185, 250, .3), tint(205, smul=1, val=1.1)), (HUE(40, 75, .1), tint(210, smul=.1, val=1.18)),
+                      (HUE(15, 40, .1), tint(212, smul=.25, val=1.05))],
+    },
+    # 緑の騎士（原画：緑の鎧・赤い羽根飾りと外套・金の縁）→ 竜兵（そのまま）・鬼武者・坑道の亡者
+    'gknight': {
+        'onimusha':   [(HUE(70, 175, .1), tint(356, sat=.72, val=.98)), (HUE(330, 25, .25), grey(.42, 0, .15))],
+        'minerghost': [(HUE(70, 175, .1), tint(32, smul=.38, val=.85)), (HUE(330, 25, .25), tint(22, smul=.55, val=.7)),
+                       (HUE(25, 65, .3), tint(42, smul=.75, val=1.0))],
+    },
+    # 火竜（原画：赤茶の鱗・金の角と爪・小さな炎）→ 虚獣ノクス
+    'drake': {
+        'last2': [(HUE(30, 70, .3), tint(300, smul=.9, val=1.1)), (HUE(330, 40, .1), tint(272, smul=.75, val=.6)),
+                  (ANY, grey(.6, 270, .2))],
+    },
     # 番人（原画：紫の外套・金の冠と縁・黄色の目・青白い霊の手）
     'banjin': {
         'boss3': [(HUE(40, 70, .45), tint(2, smul=1, val=1.0)),
@@ -232,8 +200,13 @@ VARS = {
 # ---------- 作成 ----------
 data = {}
 prev = []
-for k, C in enumerate(CHARS):
-    rgb0, a0 = crop(k)
+CHARS = []
+for fname, chars in SOURCES:
+    for C, cr in zip(chars, load_source(fname, len(chars))):
+        C['crop'] = cr
+        CHARS.append(C)
+for C in CHARS:
+    rgb0, a0 = C['crop']
     hh, ww = a0.shape
     # パレット：原画の 1 ドット相当（1/3）に縮めた絵から
     nat = max(8, round(ww / 3))
@@ -244,7 +217,7 @@ for k, C in enumerate(CHARS):
     order = sorted(range(len(pal)), key=lambda i: -lum(pal[i]))
     pal = np.vstack([pal[order], [[min(px[:, 0].min(), 14), min(px[:, 1].min(), 10), min(px[:, 2].min(), 18)]]])
     sizes = {}
-    zw = max(8, round(C['z'] * min(1, ww / hh)))  # 図鑑：縦横とも 46 に収める（キー名は z46 のまま）
+    zw = max(8, int(C['z'] * min(1, ww / hh)) - 1)  # 図鑑：縦横とも 46 に収める（キー名は z46 のまま）
     plist = [('b%d' % w, w) for w in C['b']] + [('f%d' % C['f'], C['f']), ('z%d' % C['z'], zw), ('u%d' % C['u'], C['u'])]
     for sk, w in plist:
         col, m = shrink(rgb0, a0, w)
