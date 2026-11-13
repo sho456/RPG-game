@@ -16,8 +16,9 @@ const toHex=([r,g,b])=>'#'+[r,g,b].map(v=>Math.max(0,Math.min(255,Math.round(v))
  let left=jobs.length;if(!left)ready=false;
  for(const[k,src]of jobs){const im=new Image();im.onload=()=>{atlas[k]=im;if(--left===0){ready=true;onReady();}};im.onerror=()=>{console.error('SPX: 読み込み失敗',k);if(--left===0){ready=true;onReady();}};im.src=src;}}
 /* ---------- キー → キャラ・色替え ---------- */
-/* rio / rio_aw / tr_rio2 / tr_rio3 / wolf / vo_wolf / boss9 */
-function parse(key){if(!key)return null;key=String(key).split('|')[0];let v='';
+/* rio / rio_aw / tr_rio2 / tr_rio3 / wolf / vo_wolf / boss9 / ernaE・valkE（決闘の敵＝仲間と同じ絵） */
+const ALIAS={ernaE:'erna',valkE:'valk'};
+function parse(key){if(!key)return null;key=String(key).split('|')[0];let v='';if(ALIAS[key])key=ALIAS[key];
  if(key.startsWith('vo_')){v='void';key=key.slice(3);}
  const tr=/^tr_([a-z]+?)(\d)$/.exec(key);if(tr){v='trial'+tr[2];key=tr[1];}
  if(key.endsWith('_aw')){v=v||'aw';key=key.slice(0,-3);}
@@ -59,10 +60,12 @@ function pickSize(id,target,kind,ui){const S=D[id].sizes;let best=null,bd=1e9;
  return best;}
 /* ---------- 味方：ポーズの値 → 絵 ---------- */
 const A2=a=>Array.isArray(a)?a:[0,0];
+/* 原画に無いポーズの代わり（発動の構え→踏み込み、歩き 2 コマ目→1 コマ目） */
+const FB={ready:['lunge','cast'],walk_b:['walk_a','stand'],walk_a:['stand'],guard:['stance'],weak:['hit'],win:['cast','front']};
 function heroFrame(p){if(p.f)return p.f;const ta=p.ta||0,cr=p.cr||0,hF=A2(p.hF),hN=A2(p.hN),fF=A2(p.fF),y=p.y||0;
  if(ta>1)return'down';if(p.ex===1)return'hit';
  if(cr>=4.5&&ta>=.3&&p.ex!==2)return'weak';
- if((p.wa||0)>=1.7&&hN[0]<=-4&&cr>=1.5)return'guard';
+ if(p.ex!==2&&(p.wa||0)>=1.7&&hN[0]<=-4&&cr>=1.5)return'guard';
  if(p.ex===2&&ta<0)return hF[1]<=-5?'win':'cast';
  if(hF[1]<=-4||hN[1]<=-4)return'cast';
  if(hN[0]<=-8)return'ready';
@@ -74,11 +77,14 @@ function monShape(p){const pt=p.pt||0,ln=p.ln||0;return{dx:-(p.x||0)*1.6,dy:(p.y
 /* ---------- リグ登録 ---------- */
 const RIGS={};
 const DEF={rio:{base:'rio',wid:25,hgt:36},wolf:{base:'wolf',wid:72.5,hgt:43},boss9:{base:'wolf',wid:55,hgt:37}};
-function regRigs(){for(const id in D){const d=DEF[id];if(!d||!RIG[d.base])continue;const name='spx_'+id;
+/* 仲間：元のリグを土台にし、背丈は元のリグの比（データ側のサイズも同じ比で作ってある） */
+const HEROES=['gald','mire','shion','noah','erna','balza','crow','hakua','jin','celes','valk'];
+function regRigs(){for(const id of HEROES)if(D[id]&&RIG[id]&&!DEF[id])DEF[id]={base:id,wid:25,hgt:RIG[id].hgt*36/37};
+ for(const id in D){const d=DEF[id];if(!d||!RIG[d.base])continue;const name='spx_'+id;
   const R=Object.assign(Object.create(RIG[d.base]),{spx:id,wid:d.wid,hgt:d.hgt,step:D[id].kind==='hum'?100:120,nsc:1});
   RIGS[name]=R;RIG[name]=R;}
  /* 動き：味方は元のキャラの待機・構えを引き継ぐ。敵は 1 枚絵用の待機（呼吸）と、狼の攻撃の型を使う */
- if(ANIM.IDLE.rio)ANIM.IDLE.spx_rio=ANIM.IDLE.rio;
+ for(const id of['rio',...HEROES])if(ANIM.IDLE[id]&&RIGS['spx_'+id])ANIM.IDLE['spx_'+id]=ANIM.IDLE[id];
  const mk=(per,ph=0)=>t=>(Math.sin((t/per+ph)*6.2832)+1)/2;
  ANIM.IDLE.spx_wolf=(t)=>{const b=mk(560)(t),g=(t%5200)<700;return{br:b>.5?1:0,pt:g?.6:0,x:g?-.6:0};};/* 荒い息。ときどき身を低くうなる */
  ANIM.IDLE.spx_boss9=(t)=>{const b=mk(1500)(t),g=(t%6100)<900;return{br:b>.55?1:0,pt:g?.8:0,y:0};};/* 深い呼吸。ときどき首を突き出す */
@@ -97,7 +103,7 @@ SPRX.frame=function(name,pose,palKey,pal,flip,sc=1,extra=''){const R=RIG[name];
  if(R&&R.spx){const id=R.spx,c=D[id],pk=parse(palKey)||{id,v:''},hum=c.kind==='hum';
   const k=BAT?P()/Q():1,target=(hum?R.hgt:R.wid)*sc*k,sk=pickSize(id,target,'b',!BAT);if(!sk)return null;
   const mirror=(c.face==='R')!==!!flip;let name2,sh=0,br=0,dx=0,dy=0;
-  if(hum){name2=heroFrame(pose||{});if(!c.sizes[sk].frames[name2])name2='stance';br=(name2==='stance'&&(pose.br||0)>.5)?1:0;dx=(pose.x||0)*(flip?-1:1);}
+  if(hum){name2=heroFrame(pose||{});const fs=c.sizes[sk].frames;if(!fs[name2])name2=(FB[name2]||[]).find(n=>fs[n])||'stance';br=(name2==='stance'&&(pose.br||0)>.5)?1:0;dx=(pose.x||0)*(flip?-1:1);}
   else{name2='idle';const m=monShape(pose||{});sh=Math.max(-6,Math.min(6,m.shear))*(c.face==='R'?1:-1);br=m.breath;dx=m.dx*(flip?1:-1);dy=m.dy;}
   const f=cut(id,sk,pk.v,name2,mirror,sh,br);if(!f)return null;
   const o=Object.create(f);o.ax=f.ax-Math.round(dx);o.ay=f.ay-Math.round(dy);if(BAT)f.cv._spx={ax:o.ax,ay:o.ay};return o;}
@@ -122,7 +128,7 @@ function fieldFrame(key,anim,i,opt){const r=parse(key);if(!r)return null;const c
   if(anim==='walk')name=['walk_a','stand','walk_b','stand'][((i%4)+4)%4];
   else if(anim==='win')name='win';else if(anim==='atk')name='lunge';else if(anim==='hurt')name='hit';else if(anim==='charge'||anim==='awaken')name='cast';
   else{name=o.noW?'stand':'front';br=(i&1)&&!o.noW?0:(i&1);}
-  if(!fr[name])name='stand';}
+  if(!fr[name])name=(FB[name]||[]).find(n=>fr[n])||'stand';}
  else br=i&1;
  const f=cut(r.id,sk,v,name,false,0,br);return f?{c:f.cv,W:f.w,H:f.h,ax:f.ax,ay:f.ay}:null;}
 /* ---------- 顔グラ・立ち絵 ---------- */

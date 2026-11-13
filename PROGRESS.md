@@ -1,4 +1,4 @@
-# ドット絵全面刷新：進捗（最終更新：提供原画3点を実装・検証済み／残りは原画待ち）
+# ドット絵全面刷新：進捗（最終更新：仲間12人＋灰狼＋黒炎竜を実装・検証済み／残りの敵は原画待ち）
 
 ## いまの状態
 | フェーズ | 状態 |
@@ -6,19 +6,24 @@
 | Phase 0 現状調査 | 完了（`assets_manifest.json`：76キャラ。改修前の描画は `assets_backup/old_sprites/`） |
 | Phase 1 参考分析・アートバイブル | 完了（`docs/art_bible.md`。RS一覧サイトは画像配信元が環境の通信制限で取得不可） |
 | Phase 2 パイロット | 完了。第1〜4版（自作）は不採用 → **提供原画方式で確定**（ユーザー承認） |
-| Phase 3 本制作 | **リオ・灰狼・黒炎竜の3体を実装**。残り（敵38・味方11・街の住人4）は**原画待ち**（`docs/art_request.md`） |
+| Phase 3 本制作 | **仲間12人全員**（リオ＋提供シート11人）と**灰狼・黒炎竜**を実装。残り（敵38・街の住人4）は**原画待ち**（`docs/art_request.md`） |
 | Phase 4 実装 | 完了（`js/spx-data.js`＋`js/spx.js`。既存コードは無変更で入口だけ差し替え） |
-| Phase 5 総合検証 | 3体について完了（dpr 2／3、戦闘・ボス戦・試練の幻影・虚蝕化・探索・街・図鑑・編成・顔グラ） |
+| Phase 5 総合検証 | 実装分について完了（dpr 2／3、戦闘3組・自動戦闘・決闘・ボス戦・試練の幻影・虚蝕化・探索・街・図鑑・編成・顔グラ・表情・星臨の配色） |
 
 ## 各アセットの状態
-- 検証済み：`rio`（＋`rio_aw` 星臨・`tr_rio2/3` 試練の幻影）、`wolf`（＋`vo_wolf` 虚蝕化）、`boss9`
+- 検証済み：仲間12人 `rio gald mire shion noah erna balza crow hakua jin celes valk`（各 `_aw` 星臨・`tr_○○` 試練の幻影）、
+  決闘の `ernaE`・`valkE`（仲間と同じ絵を右向きで表示）、`wolf`（＋`vo_wolf` 虚蝕化）、`boss9`
 - 原画待ち（旧リグで表示）：上記以外の全キャラ。一覧は `assets_manifest.json`／依頼は `docs/art_request.md`
 
 ## 原画が届いたときの手順
 1. 原画を `assets_src/originals/` に保存（敵：`<ID>.png`、味方：`hero_<ID>_poses.png`）
-2. `tools/build_spx.py` の `chars()` に 1 行追加（敵は `mon(...)`。味方は `hero_rio()` を写して切り出し位置を調整）
+2. `tools/build_spx.py` に追加。敵は `chars()` に `mon(...)` を 1 行。味方（ポーズ一覧シート）は `HEROES` に 1 項目：
+   シート上の番号→ポーズ名、右向きのポーズは `'m'`（左右反転）、残ったエフェクトは `erase`（原画座標の多角形）、
+   目と足元の高さ（`eye`/`feet`：キャラ間の頭身をそろえる）、顔の中心 `cx`、星臨の配色 `aw_rules(...)`
 3. `js/spx.js` の `DEF` に新しいリグの寸法を 1 行追加（味方は元のキャラのリグ、敵は種族の近いリグを `base` に）
-4. `python3 tools/build_spx.py <ID>` → `node tools/verify_spx.js <dir>`／`node tools/verify_ui.js <dir>`／`node tools/pose_sheet.js <png>` で確認
+4. `python3 tools/build_spx.py <ID>` → `python3 tools/review_heroes.py <png> <ID>`（ポーズ一覧）→
+   `node tools/verify_heroes.js <dir> 3`（戦闘3組・決闘・試練）／`node tools/verify_faces.js <png>`（顔・立ち絵・星臨）／
+   `node tools/pose_sheet.js <png> <ID,...>`（全キーポーズの選ばれ方と接地）／`node tools/verify_ui.js <dir>`
 
 ## 仕組み（要点）
 - ビルド：原画 → 背景抜き → 原画の解像度で派生ポーズ → 共有パレット → 複数サイズへ縮小 → 輪郭 → PNG アトラス（data URL）
@@ -26,11 +31,21 @@
 - ドット幅：戦闘中は全キャラ 1 ドット＝`round(dpr)` 画素（旧リグも同じ幅で描き直す）。探索・街は 1 ドット＝論理 1px
 - 味方の背丈：画面幅の約 13.8%（`V23.HK23.placeHeroes` を包んで調整）
 
+## 味方シートの取り込み（`tools/hero_sheet.py`）
+- 1 枚に十数ポーズ・文字ラベル・エフェクトが描かれたシートを、**キャラの暗い輪郭線を壁にして**切り抜く：
+  縁から壁を越えずに届く所（背景・光・炎・魔法陣・文字・砂ぼこり）を除き、輪郭の内側だけを残す
+- 輪郭に重なって残ったもの（斬撃の帯・煙・炎の線・岩）はキャラごとに多角形で消した（`HEROES[..]['erase']`）
+- 向き：味方は左向き。右を向いて描かれたポーズは 1 枚ずつ判定して左右反転（ガルドの走り・防御・攻撃、ノア／クロウ／シオン／ヴァルク／ミレイユのほぼ全ポーズ、ハクア・ジン・エルナ・バルザの一部）
+- 大きさ：正面の「目→足元」の長さでキャラ間の縮尺をそろえ、元のリグの背丈の比（バルザ 0.85〜ヴァルク 1.08）を掛ける
+- 原画に無いポーズ：防御（ミレイユ・エルナ・バルザ＝構えから作成）、発動の構え（踏み込みで代用）、歩きの2コマ目（ジン以外は1コマ目で代用）
+
 ## 既知の制限
 - 新しい味方スプライトでは、装備の素材による刃の色替え（銅・鉄・鋼・星鋼）が効かない（原画の色のまま）
+- 星臨は配色の置き換え（全ポーズに効かせるため）。原画シートの「覚醒した姿」1 枚絵は、エフェクトが大きく全ポーズを作れないため未使用
+- エフェクトが体に重なっていたポーズ（エルナの攻撃・防御、ミレイユ・バルザの防御）は別のポーズで代用。ジンの攻撃・クロウの攻撃には斬撃の名残が少し残る
 - 会話の表情5種は同じ顔グラに記号を重ねる方式（原画に表情差分が無いため）
 - エフェクト・粒子のドット幅は従来のまま（≒1.5 CSS px）で、キャラ（≒1 CSS px）より少し粗い
 
 ## ツール
-`tools/build_spx.py`（変換）／`tools/import_art.py`（背景抜き・縮小）／`tools/verify_spx.js`・`tools/verify_ui.js`（ゲーム内撮影）／
+`tools/build_spx.py`（変換）／`tools/hero_sheet.py`（味方シートの切り抜き）／`tools/review_heroes.py`・`tools/verify_heroes.js`・`tools/verify_faces.js`（味方の確認）／`tools/import_art.py`（背景抜き・縮小）／`tools/verify_spx.js`・`tools/verify_ui.js`（ゲーム内撮影）／
 `tools/pose_sheet.js`（全キーポーズ）／`tools/dump_current.js`（全キャラ書き出し）／`tools/contact.py`（一覧）／`tools/pxl/`（不採用の自作方式の記録）

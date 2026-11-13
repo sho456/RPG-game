@@ -18,7 +18,7 @@ const { chromium } = require('playwright'); const fs = require('fs');
   await ev(`devBattle([{kind:'boss9',lv:68}],'ryuu',{theme:'lava'});1`); await shot('boss_idle', 3200);
   await ev(`document.querySelectorAll('button').forEach(b=>{if(/通常AUTO/.test(b.textContent))b.click();});1`);
   for (let i = 0; i < 12; i++) await shot('boss_auto' + String(i).padStart(2, '0'), 300);
-  await ev(`devBattle([{kind:trialEnemy('rio',2),lv:30}],'tower',{theme:'tower'});1`); await shot('trial', 3200);
+  await ev(`devBattle([{kind:trialEnemy('rio',2),lv:30}],'haido',{});1`); await shot('trial', 3200);
   await ev(`enterField('haido');1`); await shot('field', 2200);
   await ev(`enterTown('x');1`); await shot('town', 2200);
   await ev(`try{zkMenu();}catch(e){}1`); await shot('zukan', 1200);

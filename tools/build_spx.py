@@ -213,13 +213,129 @@ def hero_rio():
                 field_frames=['stand', 'walk_a', 'walk_b', 'front', 'win', 'stance', 'ready', 'lunge', 'cast', 'hit', 'weak', 'guard', 'dash', 'down', 'back'],
                 head=(W0 * .517, H0 * .228, H0 * .40), aw=aw_palette_rio, field_only=('stand', 'walk_a', 'walk_b', 'back'))
 
+
+# ------------------------------------------------------------------ 味方（ポーズ一覧シート）
+from hero_sheet import segment, pose_image
+
+def aw_rules(rules, glow=0.0):
+    """星臨の配色：色相の範囲ごとに、目標の色相・彩度倍率・明るさの式で置き換える。肌・輪郭はそのまま。
+    rules: [(h0, h1, smin, lmax, 目標の色相 or None, 彩度倍率, (明るさ = a + b*l))]"""
+    def f(pal):
+        out = []
+        for c in pal:
+            h, s, l = hsl(c); done = False
+            skin = 12 <= h <= 42 and .18 <= s <= .75 and l >= .55
+            if not skin:
+                for h0, h1, smin, lmax, th, sm, (la, lb) in rules:
+                    inside = (h0 <= h <= h1) if h0 <= h1 else (h >= h0 or h <= h1)
+                    if inside and s >= smin and l <= lmax:
+                        out.append(from_hsl(h if th is None else th, min(1, s * sm), min(.95, la + lb * l))); done = True; break
+            if not done: out.append(mixc(c, (255, 250, 230), glow) if glow and not skin else c)
+        return out
+    return f
+
+GOLD = (35, 60, .3, 1, 45, 1.05, (.08, 1.12))   # 金具・金糸：白金寄りに明るく
+
+# 各キャラ：シート上の番号（hero_sheet.segment の並び順）→ ゲームのポーズ名。
+#   'm'：左右反転（右を向いて描かれたポーズを、味方の向き＝左向きにそろえる）
+#   'add'：同じポーズに含める別の塊（離れて描かれた相棒など）
+#   'erase'：原画の座標（反転前）で消す多角形（輪郭に重なって残ったエフェクト）
+#   eye/feet：正面の目と足元の高さ（原画 px）。キャラ間の頭身・大きさをそろえる基準
+#   cx：正面の顔の中心 x（顔グラの切り出し）。hgt：元のリグの背丈（ゲーム内の大きさの比）
+HEROES = {
+ 'gald': dict(erase={'lunge': [[(172, 118), (222, 118), (222, 172), (176, 174), (168, 160)]]}, hgt=38.5, eye=90, feet=248, cx=128, seg={},
+   poses={'stance': 0, 'front': 1, 'back': 2, 'walk_a': 3, 'dash': (4, 'm'), 'guard': (5, 'm'), 'lunge': (6, 'm'), 'ready': 7,
+          'hit': 8, 'cast': 9, 'weak': 10, 'win': 11, 'down': 12},
+   aw=aw_rules([(340, 15, .35, .8, 222, .9, (.12, 1.05)), GOLD, (0, 360, 0, 1, 215, .25, (.06, 1.08))])),
+ 'celes': dict(erase={'dash': [[(150, 135), (202, 135), (202, 206), (140, 206), (140, 190)]]}, hgt=36.1, eye=88, feet=216, cx=72, hy=96, seg={},
+   poses={'stance': 0, 'front': 1, 'back': 2, 'lunge': 3, 'guard': 4, 'walk_a': 5, 'dash': 6, 'cast': 7, 'hit': 8, 'weak': 9, 'win': 10, 'down': 11},
+   aw=aw_rules([(250, 320, .15, .9, 238, 1.1, (.1, 1.15)), GOLD], glow=.06)),
+ 'mire': dict(erase={'lunge': [[(212, 66), (266, 66), (266, 116), (212, 116)]]}, hgt=36.5, eye=72, feet=230, cx=70, seg={},
+   poses={'stance': (0, 'm'), 'front': 1, 'back': 2, 'lunge': (3, 'm'), 'walk_a': (5, 'm'), 'dash': (6, 'm'), 'cast': (7, 'm'), 'hit': (8, 'm'),
+          'weak': 9, 'win': (10, 'm'), 'down': 11, 'guard': ('derive', 'guard', 'stance')},
+   aw=aw_rules([(340, 12, .4, .7, 218, .95, (.1, 1.1)), GOLD])),
+ 'noah': dict(erase={'guard': [[(125, 0), (220, 0), (220, 70), (158, 70), (150, 50), (125, 30)]]}, hgt=35, eye=100, feet=241, cx=100, seg={},
+   poses={'stance': (0, 'm'), 'front': 1, 'back': 2, 'walk_a': (3, 'm'), 'dash': (4, 'm'), 'lunge': (5, 'm'), 'guard': (6, 'm'), 'cast': (7, 'm'),
+          'hit': (8, 'm'), 'weak': (9, 'm'), 'win': (10, 'm'), 'down': 11},
+   aw=aw_rules([GOLD, (0, 360, 0, .45, 230, .6, (.08, 1.1))], glow=.1)),
+ 'erna': dict(erase={'dash': [[(108, 98), (147, 98), (147, 148), (110, 148), (108, 130)]]}, hgt=38.7, eye=45, feet=158, cx=85, seg={'pre_fill': [(876, 282, 1010, 316)]},
+   poses={'stance': 0, 'front': 1, 'back': 2, 'walk_a': 5, 'dash': 6, 'lunge': (7, 'm'), 'cast': (7, 'm'), 'hit': (8, 'm'), 'weak': 9, 'win': 10, 'down': 11,
+          'guard': ('derive', 'guard', 'stance')},
+   aw=aw_rules([(200, 250, .25, .8, 212, .45, (.3, .85)), GOLD])),
+ 'hakua': dict(erase={'dash': [[(108, 96), (154, 96), (154, 148), (95, 148), (100, 135)]], 'down': [[(112, 0), (170, 0), (170, 62), (140, 62), (138, 80), (118, 80)]]}, hgt=35.5, eye=47, feet=157, cx=42, seg={},
+   poses={'stance': (0, 'm'), 'front': 1, 'back': 2, 'lunge': (3, 'm'), 'guard': 4, 'walk_a': (5, 'm'), 'dash': 6, 'cast': 7, 'hit': 8, 'weak': 9, 'win': 10, 'down': 11},
+   aw=aw_rules([(340, 15, .35, .75, 318, .8, (.08, 1.05)), (0, 360, 0, 1, 205, .3, (.05, 1.02))])),
+ 'balza': dict(erase={'lunge': [[(48, 126), (92, 126), (92, 168), (48, 168)], [(146, 138), (168, 138), (168, 168), (146, 168)]], 'dash': [[(118, 98), (182, 98), (182, 146), (115, 146)]], 'cast': [[(0, 104), (48, 104), (48, 182), (0, 182)], [(140, 80), (155, 80), (155, 182), (140, 182)]]}, hgt=31.5, eye=48, feet=148, cx=100, seg={},
+   poses={'stance': 0, 'front': 1, 'back': 2, 'lunge': 3, 'walk_a': 6, 'dash': 7, 'cast': 8, 'hit': (9, 'm'), 'weak': 10, 'win': 11, 'down': 12,
+          'guard': ('derive', 'guard', 'stance')},
+   aw=aw_rules([(345, 20, .35, .7, 22, 1.1, (.12, 1.15)), GOLD])),
+ 'crow': dict(erase={'lunge': [[(190, 68), (355, 68), (355, 280), (200, 280), (205, 245), (240, 225), (250, 195), (238, 180), (205, 160), (195, 120)], [(0, 240), (50, 240), (50, 280), (0, 280)], [(80, 262), (160, 262), (160, 280), (80, 280)]], 'cast': [[(0, 95), (62, 95), (65, 150), (70, 210), (0, 210)], [(170, 100), (247, 100), (247, 210), (160, 210), (165, 150)], [(60, 196), (170, 196), (170, 210), (60, 210)]]}, hgt=38.8, eye=108, feet=260, cx=78, seg={'hole_tol': 60, 'hole_area': 100},
+   poses={'stance': (0, 'm'), 'front': 1, 'back': 2, 'lunge': (3, 'm'), 'guard': (4, 'm'), 'walk_a': (5, 'm'), 'dash': (6, 'm'), 'cast': (7, 'm'),
+          'hit': (8, 'm'), 'weak': (9, 'm'), 'win': (10, 'm'), 'down': 11},
+   aw=aw_rules([(240, 320, .12, .9, 232, 1.4, (.06, 1.2))])),
+ 'shion': dict(hgt=34.3, eye=80, feet=222, cx=108, seg={'hole_tol': 60, 'hole_area': 100},
+   poses={'stance': (0, 'm'), 'front': 1, 'back': 2, 'lunge': (3, 'm'), 'guard': (4, 'm'), 'cast': (5, 'm'), 'walk_a': (6, 'm'), 'dash': (7, 'm'),
+          'hit': 8, 'weak': 9, 'win': (10, 'm'), 'down': 11},
+   aw=aw_rules([(90, 170, .2, .9, 182, 1.1, (.12, 1.15)), GOLD])),
+ 'jin': dict(erase={'lunge': [[(150, 0), (255, 0), (255, 190), (110, 190), (110, 165), (150, 140)]], 'guard': [[(0, 75), (58, 75), (68, 120), (68, 180), (0, 180)], [(162, 0), (236, 0), (236, 180), (160, 180), (158, 110)], [(0, 172), (236, 172), (236, 180), (0, 180)]], 'win': [[(0, 140), (35, 140), (35, 215), (0, 215)], [(150, 195), (232, 195), (232, 242), (145, 242)]]}, hgt=38.5, eye=72, feet=199, cx=68, seg={}, popo=True,
+   poses={'stance': 0, 'front': 1, 'back': 2, 'lunge': 3, 'guard': 4, 'walk_a': ([5, 6], 'm'), 'walk_b': 7, 'dash': ([8, 9], 'm'), 'cast': 10, 'hit': 11,
+          'weak': [12, 13], 'win': 15, 'down': 16},
+   aw=aw_rules([(70, 170, .15, .8, 42, .9, (.06, 1.0)), GOLD])),
+ 'valk': dict(hgt=39.8, eye=70, feet=214, cx=135, seg={'hole_tol': 60, 'hole_area': 100},
+   poses={'stance': (0, 'm'), 'front': 1, 'back': 2, 'lunge': (3, 'm'), 'guard': (4, 'm'), 'walk_a': (5, 'm'), 'dash': (6, 'm'), 'cast': (7, 'm'),
+          'hit': 8, 'weak': (9, 'm'), 'win': (10, 'm'), 'down': 11},
+   aw=aw_rules([(340, 15, .3, .7, 236, .9, (.04, .9)), GOLD])),
+}
+
+def popo_mask(a):
+    """ジンの相棒ポポ（橙と白の毛）の画素：足元の基準点を求めるときに除く"""
+    r, g, b = a[..., 0].astype(int), a[..., 1].astype(int), a[..., 2].astype(int)
+    return ((r > 170) & (g > 80) & (g < 190) & (b < 120) & (r - b > 90)) | ((r > 225) & (g > 215) & (b > 200))
+
+def derive(kind, st):
+    sw, sh = st.size
+    if kind == 'guard': return crop_alpha(rotate_about(squash_lower(st, int(sh * .62), .9), -6, sw * .6, sh))
+    if kind == 'hit': return crop_alpha(rotate_about(st, -11, sw * .62, sh))
+    raise ValueError(kind)
+
+def hero(cid):
+    H = HEROES[cid]; path = os.path.join(SRC, f'hero_{cid}_poses.png')
+    parts, rgba = segment(path, **H['seg'])
+    F = {}; AX = {}
+    for name, spec in H['poses'].items():
+        if isinstance(spec, tuple) and spec[0] == 'derive': continue
+        ids, flags = (spec, ()) if not isinstance(spec, tuple) else (spec[0], spec[1:])
+        ids = ids if isinstance(ids, list) else [ids]
+        im, _ = pose_image(parts, rgba, ids)
+        for poly in H.get('erase', {}).get(name, []): im = erase_poly(im, poly)
+        im = crop_alpha(im, 128)
+        if 'm' in flags: im = im.transpose(Image.FLIP_LEFT_RIGHT)
+        F[name] = im
+    for name, spec in H['poses'].items():
+        if isinstance(spec, tuple) and spec[0] == 'derive': F[name] = derive(spec[1], F[spec[2]])
+    if H.get('popo'):   # 足元の基準点はジン本人の足（ポポを除く）
+        for n, im in F.items():
+            a = np.array(im); m = (a[..., 3] > 128) & ~popo_mask(a); ys, xs = np.where(m)
+            if len(ys): y1 = ys.max(); band = ys >= y1 - max(2, int((y1 - ys.min()) * .08)); AX[n] = float(xs[band].mean())
+    F.setdefault('stand', F['stance'])
+    f = H['hgt'] / 37.0; ef = H['feet'] - H['eye']
+    ref = ef / 201 * 289 / H.get('scale', 1)   # リオの正面（目→足 201px／全高 289px）に換算した全高。scale：帽子などで目の位置が低いキャラの補正
+    base = {'b42': 42, 'b48': 48, 'b54': 54, 'b60': 60, 'b66': 66, 'B84': 84, 'B104': 104}
+    sizes = {k: max(8, round(v * f)) for k, v in base.items()}; sizes['f34'] = round(34 * f); sizes['u36'] = round(36 * f)
+    fr = F['front']
+    head = (H['cx'], H.get('hy', H['eye'] - .11 * ef), .577 * ef)   # hy：帽子のつばが大きいキャラは顔の中心を下げる
+    order = ['stand', 'walk_a', 'walk_b', 'front', 'win', 'stance', 'ready', 'lunge', 'cast', 'hit', 'weak', 'guard', 'dash', 'down', 'back']
+    return dict(id=cid, face='L', kind='hum', frames=F, ref=ref, ref_axis='h', colors=31, sizes=sizes, anchors=AX,
+                field_frames=[n for n in order if n in F], head=head, aw=H['aw'], field_only=('stand', 'walk_a', 'walk_b', 'back'))
+
 def mon(id_, path, ref_w, sizes, colors, **cut):
     im = load_cutout(os.path.join(SRC, path), **cut)
     return dict(id=id_, face='R', kind='mon', frames={'idle': im}, ref=im.width, ref_axis='w', colors=colors, sizes=sizes, field_frames=['idle'],
                 head=None, aw=None)
 
-def chars():
-    return [hero_rio(),
+def chars(only=None):
+    want = lambda i: not only or i in only
+    return ([hero_rio()] if want('rio') else []) + [hero(c) for c in HEROES if want(c)] + [
             mon('wolf', 'wolf.png', 116, {'b84': 84, 'b100': 100, 'b116': 116, 'b130': 130, 'b146': 146, 'B176': 176, 'f36': 36, 'z46': 46, 'u72': 72}, 26, tol=70),
             mon('boss9', 'boss9_volganon.png', 202, {'b146': 146, 'b174': 174, 'b202': 202, 'b226': 226, 'b252': 252, 'f68': 68, 'z46': 46, 'u56': 56}, 34, tol=40, hole_area=150, hole_tol=40)]
 
@@ -236,6 +352,7 @@ def build(c):
         for n in names:
             idx = convert_frame(frames[n], k, pal, sharpen=.45 if dots >= 60 else .3)
             ax, ay = anchor_of(idx, 'center' if n == 'down' else 'feet')
+            if n in c.get('anchors', {}) and n != 'down': ax = int(round(c['anchors'][n] * (idx.shape[1] - 2) / frames[n].width)) + 1
             idx, ax, ay = trim(idx, ax, ay)
             fs[n] = (idx, int(ax), int(ay)); previews[(sk, n)] = (idx, ax, ay)
         url, pos = atlas_png([v[0] for v in fs.values()], pal)
@@ -270,7 +387,7 @@ if __name__ == '__main__':
     prev_path = os.path.join(ROOT, 'js', 'spx-data.js')
     if only and os.path.exists(prev_path):
         txt = open(prev_path, encoding='utf8').read(); ALL = json.loads(txt[txt.index('{'):txt.rindex('}') + 1])
-    for c in chars():
+    for c in chars(only):
         if only and c['id'] not in only: continue
         data, pal, prev = build(c); ALL[c['id']] = data
         sheet(c['id'], prev, pal, os.path.join(ROOT, 'docs', 'sheets', f"spx_{c['id']}.png"))

@@ -47,418 +47,440 @@
    "name": "ガルド",
    "type": "hero",
    "tier": "ally",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "gald",
    "variant": "",
    "scale": 1.2,
    "bbox_dots": [
-    45,
-    48
+    56,
+    63
    ],
-   "colors": 30,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "colors": 32,
+   "frames": "原画のポーズ11種＋探索用（stand・walk_a・front・win・stance・ready・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み",
+   "source": "assets_src/originals/hero_gald_poses.png"
   },
   {
    "id": "gald_aw",
    "name": "gald_aw",
    "type": "hero_aw",
    "tier": "ally",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "gald",
    "variant": "",
    "scale": 1.2,
    "bbox_dots": [
-    45,
-    48
+    56,
+    63
    ],
-   "colors": 29,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "colors": 32,
+   "frames": "原画のポーズ11種＋探索用（stand・walk_a・front・win・stance・ready・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み（星臨はパレット置換）",
+   "source": "assets_src/originals/hero_gald_poses.png"
   },
   {
    "id": "mire",
    "name": "ミレイユ",
    "type": "hero",
    "tier": "ally",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "mire",
    "variant": "",
    "scale": 1.2,
    "bbox_dots": [
-    25,
-    41
+    34,
+    56
    ],
-   "colors": 33,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "colors": 32,
+   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み",
+   "source": "assets_src/originals/hero_mire_poses.png"
   },
   {
    "id": "mire_aw",
    "name": "mire_aw",
    "type": "hero_aw",
    "tier": "ally",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "mire",
    "variant": "",
    "scale": 1.2,
    "bbox_dots": [
-    25,
-    41
+    34,
+    56
    ],
-   "colors": 33,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "colors": 32,
+   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み（星臨はパレット置換）",
+   "source": "assets_src/originals/hero_mire_poses.png"
   },
   {
    "id": "shion",
    "name": "シオン",
    "type": "hero",
    "tier": "ally",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "shion",
    "variant": "",
    "scale": 1.2,
    "bbox_dots": [
-    35,
-    37
+    48,
+    56
    ],
-   "colors": 35,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "colors": 32,
+   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み",
+   "source": "assets_src/originals/hero_shion_poses.png"
   },
   {
    "id": "shion_aw",
    "name": "shion_aw",
    "type": "hero_aw",
    "tier": "ally",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "shion",
    "variant": "",
    "scale": 1.2,
    "bbox_dots": [
-    35,
-    37
+    48,
+    56
    ],
-   "colors": 35,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "colors": 32,
+   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み（星臨はパレット置換）",
+   "source": "assets_src/originals/hero_shion_poses.png"
   },
   {
    "id": "noah",
    "name": "ノア",
    "type": "hero",
    "tier": "ally",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "noah",
    "variant": "",
    "scale": 1.2,
    "bbox_dots": [
-    24,
-    43
+    45,
+    63
    ],
-   "colors": 26,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "colors": 32,
+   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み",
+   "source": "assets_src/originals/hero_noah_poses.png"
   },
   {
    "id": "noah_aw",
    "name": "noah_aw",
    "type": "hero_aw",
    "tier": "ally",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "noah",
    "variant": "",
    "scale": 1.2,
    "bbox_dots": [
-    24,
-    43
+    45,
+    63
    ],
-   "colors": 26,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "colors": 32,
+   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み（星臨はパレット置換）",
+   "source": "assets_src/originals/hero_noah_poses.png"
   },
   {
    "id": "erna",
    "name": "エルナ",
    "type": "hero",
    "tier": "ally",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "erna",
    "variant": "",
    "scale": 1.2,
    "bbox_dots": [
-    31,
-    43
+    60,
+    56
    ],
-   "colors": 38,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "colors": 32,
+   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み",
+   "source": "assets_src/originals/hero_erna_poses.png"
   },
   {
    "id": "erna_aw",
    "name": "erna_aw",
    "type": "hero_aw",
    "tier": "ally",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "erna",
    "variant": "",
    "scale": 1.2,
    "bbox_dots": [
-    31,
-    43
+    60,
+    56
    ],
-   "colors": 38,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "colors": 32,
+   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み（星臨はパレット置換）",
+   "source": "assets_src/originals/hero_erna_poses.png"
   },
   {
    "id": "balza",
    "name": "バルザ",
    "type": "hero",
    "tier": "ally",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "balza",
    "variant": "",
    "scale": 1.2,
    "bbox_dots": [
-    29,
-    37
+    51,
+    49
    ],
-   "colors": 42,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "colors": 32,
+   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み",
+   "source": "assets_src/originals/hero_balza_poses.png"
   },
   {
    "id": "balza_aw",
    "name": "balza_aw",
    "type": "hero_aw",
    "tier": "ally",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "balza",
    "variant": "",
    "scale": 1.2,
    "bbox_dots": [
-    29,
-    37
+    51,
+    49
    ],
-   "colors": 42,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "colors": 32,
+   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み（星臨はパレット置換）",
+   "source": "assets_src/originals/hero_balza_poses.png"
   },
   {
    "id": "crow",
    "name": "クロウ",
    "type": "hero",
    "tier": "ally",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "crow",
    "variant": "",
    "scale": 1.2,
    "bbox_dots": [
-    23,
-    42
+    44,
+    70
    ],
    "colors": 32,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み",
+   "source": "assets_src/originals/hero_crow_poses.png"
   },
   {
    "id": "crow_aw",
    "name": "crow_aw",
    "type": "hero_aw",
    "tier": "ally",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "crow",
    "variant": "",
    "scale": 1.2,
    "bbox_dots": [
-    23,
-    42
+    44,
+    70
    ],
    "colors": 32,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み（星臨はパレット置換）",
+   "source": "assets_src/originals/hero_crow_poses.png"
   },
   {
    "id": "hakua",
    "name": "ハクア",
    "type": "hero",
    "tier": "ally",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "hakua",
    "variant": "",
    "scale": 1.2,
    "bbox_dots": [
-    26,
-    37
+    31,
+    54
    ],
-   "colors": 30,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "colors": 32,
+   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み",
+   "source": "assets_src/originals/hero_hakua_poses.png"
   },
   {
    "id": "hakua_aw",
    "name": "hakua_aw",
    "type": "hero_aw",
    "tier": "ally",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "hakua",
    "variant": "",
    "scale": 1.2,
    "bbox_dots": [
-    26,
-    37
+    31,
+    54
    ],
-   "colors": 30,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "colors": 32,
+   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み（星臨はパレット置換）",
+   "source": "assets_src/originals/hero_hakua_poses.png"
   },
   {
    "id": "jin",
    "name": "ジン",
    "type": "hero",
    "tier": "ally",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "jin",
    "variant": "",
    "scale": 1.2,
    "bbox_dots": [
-    38,
-    45
+    60,
+    63
    ],
-   "colors": 42,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "colors": 32,
+   "frames": "原画のポーズ10種＋探索用（stand・walk_a・walk_b・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み",
+   "source": "assets_src/originals/hero_jin_poses.png"
   },
   {
    "id": "jin_aw",
    "name": "jin_aw",
    "type": "hero_aw",
    "tier": "ally",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "jin",
    "variant": "",
    "scale": 1.2,
    "bbox_dots": [
-    38,
-    45
+    60,
+    63
    ],
-   "colors": 42,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "colors": 32,
+   "frames": "原画のポーズ10種＋探索用（stand・walk_a・walk_b・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み（星臨はパレット置換）",
+   "source": "assets_src/originals/hero_jin_poses.png"
   },
   {
    "id": "celes",
    "name": "セレス",
    "type": "hero",
    "tier": "ally",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "celes",
    "variant": "",
    "scale": 1.2,
    "bbox_dots": [
-    27,
-    54
+    46,
+    63
    ],
-   "colors": 33,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "colors": 32,
+   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み",
+   "source": "assets_src/originals/hero_celes_poses.png"
   },
   {
    "id": "celes_aw",
    "name": "celes_aw",
    "type": "hero_aw",
    "tier": "ally",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "celes",
    "variant": "",
    "scale": 1.2,
    "bbox_dots": [
-    27,
-    54
+    46,
+    63
    ],
-   "colors": 31,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "colors": 32,
+   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み（星臨はパレット置換）",
+   "source": "assets_src/originals/hero_celes_poses.png"
   },
   {
    "id": "valk",
    "name": "ヴァルク",
    "type": "hero",
    "tier": "ally",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "valk",
    "variant": "",
    "scale": 1.2,
    "bbox_dots": [
-    55,
-    50
+    68,
+    62
    ],
-   "colors": 42,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "colors": 32,
+   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み",
+   "source": "assets_src/originals/hero_valk_poses.png"
   },
   {
    "id": "valk_aw",
    "name": "valk_aw",
    "type": "hero_aw",
    "tier": "ally",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "valk",
    "variant": "",
    "scale": 1.2,
    "bbox_dots": [
-    55,
-    50
+    68,
+    62
    ],
-   "colors": 42,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "colors": 32,
+   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "中",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み（星臨はパレット置換）",
+   "source": "assets_src/originals/hero_valk_poses.png"
   },
   {
    "id": "slime",
@@ -808,19 +830,20 @@
    "name": "弓手エルナ",
    "type": "enemy",
    "tier": "mid",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "erna",
    "variant": "",
    "scale": 1.2,
    "bbox_dots": [
-    31,
-    43
+    60,
+    56
    ],
-   "colors": 38,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "colors": 32,
+   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "低：色替え・拡大流用",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み（決闘：仲間と同じ絵を右向きで表示）",
+   "source": "assets_src/originals/hero_erna_poses.png"
   },
   {
    "id": "boss4b",
@@ -1227,19 +1250,20 @@
    "name": "竜人ヴァルク",
    "type": "enemy",
    "tier": "mid",
-   "store": "Canvas手続き生成（js/dot-rig.js・dot-heroes.js・dot-mon.js のリグ）",
+   "store": "提供原画→PNGアトラス（js/spx-data.js）＋実行時差し替え（js/spx.js）",
    "rig": "valk",
    "variant": "",
    "scale": 1.2,
    "bbox_dots": [
-    55,
-    50
+    68,
+    62
    ],
-   "colors": 39,
-   "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
+   "colors": 32,
+   "frames": "原画のポーズ10種＋探索用（stand・walk_a・front・win・stance・lunge・cast・hit・weak・guard・dash・down・back）×サイズ9",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "低：色替え・拡大流用",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み（決闘：仲間と同じ絵を右向きで表示）",
+   "source": "assets_src/originals/hero_valk_poses.png"
   },
   {
    "id": "tr_rio2",
@@ -1277,8 +1301,9 @@
    "colors": 30,
    "frames": "ポーズ補間（待機/走り/攻撃/詠唱/被弾/防御/瀕死/戦闘不能/勝利/星臨）",
    "bind": "ED[id]／HB[id] → SPRX.frame()",
-   "quality": "低：色替え・拡大流用",
-   "status": "原画待ち（docs/art_request.md で依頼中。旧リグで表示）"
+   "quality": "高：提供原画",
+   "status": "検証済み（仲間の新スプライトから自動で色替え・大型サイズ）",
+   "source": "assets_src/originals/hero_gald_poses.png"
   },
   {
    "id": "kb10",
