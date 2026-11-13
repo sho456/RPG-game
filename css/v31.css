@@ -1,0 +1,104 @@
+/* ===== ver0.31 クエスト・限界突破・天星盤・宝箱 ===== */
+/* --- キャラ詳細 --- */
+.cap31{font-size:10px;color:#9aa4d8;margin-left:2px;font-weight:400}
+.sr.x31 b{color:#ffb8e0}
+/* --- 限界突破 --- */
+.lbh31{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px}
+.lbh31>div{border:2px solid #8a7330;border-radius:9px;background:linear-gradient(90deg,#2e2006,#0b1340);padding:4px 10px}
+.lbh31 small{display:block;font-size:10px;color:#ffe9a8}.lbh31 b{font-weight:400;font-size:14px;display:flex;align-items:center;gap:4px}.lbh31 img{width:20px;height:20px;image-rendering:pixelated}
+.lbnote{font-size:11px;color:#aab0d8;line-height:1.5;margin:0 2px 6px}.lbnote b{color:#ffe27a;font-weight:400}
+.lbl31{display:flex;flex-direction:column;gap:6px;max-height:56vh;overflow-y:auto;padding:2px}
+.lb31{display:grid;grid-template-columns:36px 1fr auto 62px;grid-template-areas:"f n c b" "w w w w";gap:2px 8px;align-items:center;padding:6px 8px;border-radius:9px;border:2px solid #4a5490;background:linear-gradient(90deg,#1d2c70,#0b1340)}
+.lb31.ok{border-color:#ffd65a;box-shadow:0 0 10px rgba(255,214,90,.35)}
+.lb31>img{grid-area:f;width:34px;height:34px;image-rendering:pixelated}
+.lbn{grid-area:n;min-width:0}.lbn b{font-weight:400;font-size:14px;display:block}.lbn small{font-size:10px;color:#aab0d8}
+.lbs{display:flex;gap:2px;font-size:11px}.lbs i{font-style:normal;color:#4a5490}.lbs i.on{color:#ffe27a}
+.lbc{grid-area:c;text-align:right;font-size:11px;line-height:1.3}.lbc small{display:block;color:#ffe9a8;font-size:10px}.lbc span{display:flex;align-items:center;gap:2px;justify-content:flex-end;white-space:nowrap}.lbc img{width:16px;height:16px;image-rendering:pixelated}
+.lb31 .tbtn{grid-area:b;height:38px}
+.lb31 em{grid-area:w;font-style:normal;font-size:10px;color:#ff9a9a;text-align:right}
+/* --- 天星盤 --- */
+.bdh.up31{background:linear-gradient(90deg,rgba(90,52,14,.92),rgba(40,16,60,.85))!important;border-color:#ffb86b!important}
+.bdh.up31 .bdn small{color:#ffcf8a}
+.lk31{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);padding:10px 18px;border-radius:12px;border:2px solid #ffb86b;background:rgba(20,10,30,.88);color:#ffe0b0;font-size:16px;text-align:center;text-shadow:1px 1px 0 #000}
+.lk31 small{display:block;font-size:11px;color:#cfd3f5}
+.bdb.b31{grid-template-columns:1fr 1fr}
+.bdb.b31 .tbtn.back{grid-column:auto}
+.bdb.b31:has(.back){grid-template-columns:1.2fr 1fr 1fr}
+/* --- クエスト一覧 --- */
+.wmr .s31{display:flex;align-items:center;justify-content:flex-end;gap:3px;color:#fff0c0;flex:.7}.wmr .s31 img{width:14px;height:14px;image-rendering:pixelated}
+.wtabs.t31{grid-template-columns:repeat(3,1fr)}
+.qchs31{display:flex;gap:5px;overflow-x:auto;overflow-y:hidden;padding:6px 2px 4px;flex:none;scrollbar-width:none;touch-action:pan-x pan-y;overscroll-behavior-x:contain}
+.qchs31::-webkit-scrollbar{display:none}
+.qch31{position:relative;flex:none;min-width:96px;max-width:150px;height:52px;padding:3px 8px;border-radius:9px;border:2px solid #4a5490;background:linear-gradient(180deg,#1d2c70,#0b1340);color:#cfd3f5;font-family:inherit;text-align:left;display:flex;flex-direction:column;justify-content:center;gap:0}
+.qch31 small{font-size:9px;color:#ffe9a8;letter-spacing:1px}.qch31 b{font-weight:400;font-size:12px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.qch31 i{font-style:normal;font-size:10px;color:#9aa4d8}
+.qch31.on{border-color:var(--gold);background:linear-gradient(180deg,#6a4c12,#2e2006);box-shadow:0 0 8px rgba(255,214,90,.45)}
+.qch31.done::after{content:'CLEAR';position:absolute;right:4px;top:3px;font-size:8px;letter-spacing:1px;color:#2a1a00;background:linear-gradient(180deg,#ffe9a0,#e0a030);border-radius:3px;padding:0 3px}
+.qch31.lock{opacity:.45}
+.qch31.vd{border-color:#c8a0ff}.qch31 em{position:absolute;right:4px;bottom:3px;font-style:normal;font-size:8px;color:#e0d0ff;background:#3a1a6a;border-radius:3px;padding:0 3px}
+.qrow31 .wnm{display:flex;align-items:center;gap:5px}
+.rk31{flex:none;font-style:normal;font-size:9px;line-height:15px;padding:0 5px;border-radius:7px;border:1px solid}
+.rk31.mid{background:#4a2a10;border-color:#e0a040;color:#ffd9a0}.rk31.big{background:#5a0c1e;border-color:#ff5a74;color:#ffd0da}
+.qrow31.r-big{border-color:#c85a74}.qrow31.r-mid{border-color:#b08040}
+.qrow31.sel{border-color:var(--gold)}
+.qrow31 .bn{color:#9fd8ff}
+.qp31{gap:2px!important;align-items:center;flex-wrap:nowrap}.qp31 i.mid,.qp31 i.big{all:unset}
+.qp31 i{all:unset;font-style:normal;font-size:11px;line-height:1;color:#8a94c8}.qp31 i.mid{color:#ffb860;font-size:13px}.qp31 i.big{color:#ff6a84;font-size:14px}
+.qd31{font-size:12px;color:#e8ecff;line-height:1.5}
+.qe31{margin-top:4px;font-size:11px;color:#cfd6ff;line-height:1.6}.qe31 span{display:inline-block;min-width:34px;font-size:9px;color:#ffe9a8;border:1px solid #8a7330;border-radius:4px;padding:0 3px;margin-right:4px;text-align:center}
+.qr31x{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;font-size:10px}.qr31x span{border:1px solid #4a5490;border-radius:6px;padding:1px 6px;background:#0b1340;color:#cfd6ff}
+.qr31x .fr{border-color:#8a7330;color:#ffe9a8;background:#2e2006}
+.ss31{border-color:#ffb86b!important;color:#ffe0b0!important}
+.qkr31{font-size:11px;color:#d0c0ff;margin:0 2px 6px}
+.qm31 .wfoot .tbtn{width:auto;flex:none;padding:0 12px}
+/* --- 戦闘中 --- */
+.b22rt .qw31 b{color:#ffe27a}
+.qb31{position:absolute;left:0;right:0;top:20%;z-index:8;pointer-events:none;text-align:center;animation:qb31 2.2s ease forwards;text-shadow:0 0 10px #000,2px 2px 0 #000}
+.qb31 small{display:block;font-size:12px;color:#ffe9a8;letter-spacing:2px}
+.qb31 b{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:40px;color:#fff;letter-spacing:2px;padding:0 24px;background:linear-gradient(90deg,rgba(10,16,50,0),rgba(10,16,50,.85) 20%,rgba(10,16,50,.85) 80%,rgba(10,16,50,0));border-top:1px solid #ffd65a;border-bottom:1px solid #ffd65a}
+.qb31 b i{font-size:24px;color:#cfd6ff}
+.qb31 em{display:block;font-style:normal;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:4px;color:#ff8aa0;margin-top:2px}
+.qb31.boss b{border-color:#ff5a74}
+@keyframes qb31{0%{opacity:0;transform:scaleX(1.6)}12%{opacity:1;transform:scaleX(1)}80%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
+/* --- 報酬画面 --- */
+.qh31{display:flex;align-items:baseline;justify-content:center;gap:8px;margin:-2px 0 2px;text-shadow:1px 1px 0 #000}
+.qh31 small{font-size:12px;color:#ffe9a8}.qh31 b{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-size:20px;color:#fff}.qh31 b i{font-size:14px;color:#aab0d8}
+.qh31 em{font-style:normal;font-size:11px;color:#2a1a00;background:linear-gradient(180deg,#ffe9a0,#e0a030);border-radius:3px;padding:0 5px}
+.rwX31{display:flex;flex-direction:column;gap:4px}
+.cx31{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:9px;border:2px solid #7a4a22;background:linear-gradient(90deg,#2a1608,#0b1340);opacity:0;animation:cx31 .5s ease forwards;animation-delay:var(--d,.3s);text-align:left}
+.cx31.silver{border-color:#9fb0cf;background:linear-gradient(90deg,#26304a,#0b1340)}.cx31.gold{border-color:#ffd65a;background:linear-gradient(90deg,#4a3410,#0b1340);box-shadow:0 0 12px rgba(255,214,90,.4)}
+.cx31 img{width:34px;height:34px;image-rendering:pixelated;flex:none}.cx31 b{display:block;font-weight:400;font-size:13px}.cx31 small{font-size:11px;color:#e8ecff;line-height:1.4}
+@keyframes cx31{0%{opacity:0;transform:translateY(8px) scale(.9)}60%{opacity:1;transform:translateY(-2px) scale(1.03)}100%{opacity:1;transform:none}}
+.rw20.skip .cx31{animation-delay:0s!important;animation-duration:.01s!important}
+/* --- クエストの合間・結果・仲間の加入 --- */
+#app #ov.qi31ov,#app #ov.qc31ov,#app #ov.qr31ov{justify-content:flex-start;overflow-y:auto;padding:calc(var(--sat) + 14px) 12px calc(var(--sab) + 14px);background:radial-gradient(ellipse at 50% 0%,rgba(26,38,96,.97),rgba(6,8,18,.98) 60%)}
+#app #ov.qc31ov{background:radial-gradient(ellipse at 50% 0%,rgba(70,52,10,.97),rgba(6,8,18,.98) 60%)}
+.qi31,.qc31,.qr31{width:100%;max-width:400px;margin:auto;display:flex;flex-direction:column;align-items:stretch;gap:8px;flex:none}
+.qi31 .qt31{font-size:13px;color:#ffe9a8;letter-spacing:2px}
+.qi31 .qbn31{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:44px;color:#fff;line-height:1;text-shadow:0 0 12px #6a7aff,3px 3px 0 #070c28}
+.qi31 .qbn31 small{display:block;font-size:14px;letter-spacing:4px;color:#9fd8ff}.qi31 .qbn31 b{color:#ffe27a}.qi31 .qbn31 i{font-size:26px;color:#aab0d8}
+.qnx31{font-size:12px;color:#e8ecff}.qnx31 em{font-style:normal;font-size:10px;padding:0 6px;border-radius:7px;margin-right:6px;border:1px solid}.qnx31 em.mid{background:#4a2a10;border-color:#e0a040;color:#ffd9a0}.qnx31 em.big{background:#5a0c1e;border-color:#ff5a74;color:#ffd0da}
+.qst31{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;font-size:11px}.qst31 span{color:#aab0d8;margin-right:2px}.qst31 b{font-weight:400;border:1px solid #4a5490;border-radius:6px;padding:1px 6px;background:#0b1340}
+.qhp31{display:flex;flex-direction:column;gap:4px}
+.qhp31>div{display:flex;align-items:center;gap:8px;padding:4px 8px;border-radius:8px;border:1px solid #4a5490;background:rgba(11,19,64,.85);text-align:left}
+.qhp31 img{width:28px;height:28px;image-rendering:pixelated}.qhp31 span{flex:1;display:grid;grid-template-columns:auto 1fr;grid-template-areas:"n s" "b b";gap:1px 6px;align-items:center}
+.qhp31 span b{grid-area:n;font-weight:400;font-size:12px}.qhp31 span small{grid-area:s;font-size:10px;color:#cfd6ff;text-align:right}
+.qhp31 span i{grid-area:b;height:6px;border-radius:3px;background:#1a1028;overflow:hidden;display:block}.qhp31 span i u{display:block;height:100%}
+.qno31{font-size:10px;color:#9aa4d8}
+.qi31 .big,.qc31 .big,.qr31 .big{max-width:none;height:48px;margin:0}.qi31 .big small,.qc31 .big small{display:block;font-size:10px;letter-spacing:0;color:#cfd6ff}
+.qcT{display:flex;justify-content:center;gap:12px;font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:700;font-size:40px;line-height:1;color:#ffe27a;text-shadow:0 0 14px #ffb020,3px 3px 0 #2a1a00}
+.qcT span{animation:qcT .6s ease both}.qcT span+span{animation-delay:.15s}
+.qc31.fail .qcT{color:#cfd6ff;text-shadow:0 0 12px #6a7aff,3px 3px 0 #070c28;font-size:34px}
+@keyframes qcT{0%{opacity:0;transform:translateY(-14px) scale(1.3)}100%{opacity:1;transform:none}}
+.qcn small{display:block;font-size:11px;color:#ffe9a8}.qcn b{display:block;font-weight:400;font-size:18px;color:#fff}.qcn em{font-style:normal;font-size:11px;color:#aab0d8}
+.qcg{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}.qcg>div{border:1px solid #8a7330;border-radius:8px;background:linear-gradient(180deg,#2e2006,#0b1340);padding:3px 4px}
+.qcg em{display:block;font-style:normal;font-size:9px;color:#ffe9a8;letter-spacing:1px}.qcg b{font-family:'Barlow Condensed',sans-serif;font-size:18px;color:#fff}
+.qcb,.qcf,.qcu{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;font-size:12px;border-radius:9px;padding:6px;border:1px solid #4a5490;background:rgba(11,19,64,.8)}
+.qcb .rwh,.qcf .rwh,.qcu .rwh{flex-basis:100%}
+.qcb span,.qcf span,.qcu span{border:1px solid #3a4275;border-radius:6px;padding:1px 7px;background:#101a4c;display:inline-flex;align-items:center;gap:2px}.qcb img{width:20px;height:20px;image-rendering:pixelated}
+.qcf{border-color:#8a7330}.qcu b{color:#ffe27a;font-weight:400}
+.qr31{align-items:center}.qr31 img{width:120px;height:120px;image-rendering:pixelated}.qr31 b{font-weight:400;font-size:20px}.qr31 small{color:#aab0d8;margin-bottom:6px}
+.qr31 .big{width:100%}
+/* お知らせ */
+.n31{margin-bottom:6px}
+
+.qp31 i.mid{color:#ffb860;font-size:13px;line-height:1}.qp31 i.big{color:#ff6a84;font-size:14px;line-height:1}
