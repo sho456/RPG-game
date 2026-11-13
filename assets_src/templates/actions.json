@@ -1,0 +1,19 @@
+{
+  "_doc": "アクションの台帳（制作テンプレート）。forge＝Agent Sprite Forge の sprite_set.py --actions の名前、pose＝ゲームの素材のポーズ名（js/motion/registry.js MOTION.CATALOG の f）、anim＝character.json の anims に書く名前。loop：ループ（状態）か一回（行動）。ms：ゲームでの長さの目安。hit：命中の瞬間（全体に対する割合）。一回の行動は anims ではなく、コマ名（<anim>@<番号>）を MOTION.add の keys に並べて振り付ける（docs/PIPELINE.md の 5 章）",
+  "actions": [
+    {"id": "idle",    "forge": "idle",    "pose": "stance", "anim": "stance", "loop": true,  "frames": "6〜8", "fps": 8,  "note": "待機。呼吸・髪・外套の揺れ。足元は動かさない。最優先で作る"},
+    {"id": "seirin",  "forge": "idle",    "pose": "awk",    "anim": "awk",    "loop": true,  "frames": "6〜8", "fps": 8,  "note": "星臨の待機。星臨のマスター（seirin.png）から作り、seirinAnims に書く"},
+    {"id": "walk",    "forge": "walk",    "pose": "dash",   "anim": "dash",   "loop": true,  "frames": "8",    "fps": 12, "note": "移動。戦闘では前へ出る・戻るときに使う。歩幅は gait_loop.py measure-stride"},
+    {"id": "attack",  "forge": "attack",  "pose": "lunge",  "anim": "attack", "loop": false, "ms": 700, "hit": 0.4, "frames": "6〜10", "fps": 12, "note": "通常攻撃（物理）。命中で hit 0.4。終わりは構えに戻る（最終コマ＝マスター）"},
+    {"id": "cast",    "forge": "cast",    "pose": "cast",   "anim": "cast",   "loop": false, "ms": 900, "hit": 0.6, "frames": "6〜10", "fps": 12, "note": "魔法・スキルの詠唱"},
+    {"id": "guard",   "forge": "guard",   "pose": "guard",  "anim": "guard",  "loop": true,  "frames": "4",    "fps": 6,  "note": "防御の構え（保持はループ）"},
+    {"id": "hurt",    "forge": "hurt",    "pose": "hit",    "anim": "hurt",   "loop": false, "ms": 500, "frames": "4〜6", "fps": 12, "note": "被弾。のけぞって構えに戻る"},
+    {"id": "weak",    "forge": "idle",    "pose": "weak",   "anim": "weak",   "loop": true,  "frames": "4〜6", "fps": 6,  "note": "瀕死の待機（息が荒い）。forge の idle を『膝をついて荒く息をする』指示で作る"},
+    {"id": "victory", "forge": "victory", "pose": "win",    "anim": "win",    "loop": true,  "frames": "6〜8", "fps": 8,  "note": "勝利"},
+    {"id": "defeat",  "forge": "defeat",  "pose": "down",   "anim": "down",   "loop": false, "ms": 800, "frames": "6", "fps": 10, "note": "戦闘不能。最後のコマで止める"}
+  ],
+  "enemy": [
+    {"id": "idle",    "forge": "idle",    "pose": "idle",   "anim": "idle",   "loop": true,  "frames": "6〜8", "fps": 8,  "note": "敵の待機。呼吸・浮遊・ぷるぷる"},
+    {"id": "attack",  "forge": "attack",  "pose": "idle",   "anim": "attack", "loop": false, "ms": 700, "hit": 0.4, "frames": "6〜10", "fps": 12, "note": "敵の攻撃（MOTION.add('<敵id>', 'cat:…') で振り付ける）"}
+  ]
+}

@@ -9,6 +9,12 @@
 3. 背面（back）：戦闘サイズ（b/B/u）に背面が無い味方は、探索用（f34）の背面の原画を
    Scale2x で 4 倍に起こし、正面と同じ比率の背丈へ面積平均で縮めてキャラのパレットに戻す。
    自動で作った絵は c.derived に名前を記録する（手描きの背面に差し替えたら外す）
+4. 星臨の縮尺（ver0.30）：旧データの星臨（<id>_K）は通常の姿より 1.1〜1.3 倍大きく作られていた。
+   assets_src/character_scale.json の seirin の倍率で、最大サイズ（B104）から各サイズを作り直し、
+   通常の姿と同じ体格にそろえる。元の絵は spx-legacy.json に 'orig:<id>_K' として保管し、毎回そこから作る
+5. 一覧（図鑑のサムネイル）用のサイズ（ver0.30）：一覧の枠は端末の画素密度で 48／80／120 px。
+   枠に収まる最大の絵が枠の 9 割に満たない敵（黒炎竜ヴォルガノンなど大型の旧データ）には、
+   最大サイズから面積平均で縮めた u<長辺> サイズを足す（枠いっぱいに表示され、他の敵と大きさがそろう）
 
 使い方：python3 tools/spx_normalize.py
 """
@@ -23,6 +29,7 @@ from spx_common import shrink, to_pal_idx, png_of, lum  # noqa: E402
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE = os.path.join(ROOT, 'js', 'sprite', 'data', 'spx-data.js')
 LEGACY = os.path.join(ROOT, 'assets_src', 'legacy', 'spx-legacy.json')
+SCALE = os.path.join(ROOT, 'assets_src', 'character_scale.json')
 HEADER = '/* 自動生成：旧 tools/build_spx.py の出力を tools/spx_normalize.py が整えたもの（提供原画 → パレット番号 PNG）。手で編集しない */\n'
 
 OVERRIDDEN = ['rio', 'jin', 'valk', 'noah_K', 'jin_K', 'valk_K']      # spx-data-heroes.js が上書きする
@@ -131,6 +138,73 @@ def derive_back(c, sk):
     return idx, ax, ay
 
 
+def rescale_K(c, f):
+    """星臨の絵（'awk' 1 枚）を倍率 f で作り直す。素材は最大サイズ（B104）、各サイズの倍率は元の k の比"""
+    import copy
+    c = copy.deepcopy(c)
+    pal = pal_rgb(c)
+    src_sk = max(c['sizes'], key=lambda s: c['sizes'][s]['k'])
+    S0 = c['sizes'][src_sk]
+    at = dec(S0)
+    x, y, w, h, _, _ = S0['frames']['awk']
+    src = unoutline(at[y:y + h, x:x + w], pal)
+    rgb = np.zeros(src.shape + (3,))
+    m = src > 0
+    rgb[m] = pal[src[m] - 1]
+    for sk, S in c['sizes'].items():
+        r = f * S['k'] / S0['k']
+        col, mm = shrink(rgb, m.astype(np.float64), max(4, round(w * r)))
+        idx = to_pal_idx(col, mm, pal)
+        if S['dots'] <= 36:
+            edge = mm & ~nd.binary_erosion(mm)
+            dk = np.array([lum(p) for p in pal])
+            e = edge & (idx > 0)
+            idx[e] = np.where(dk[idx[e] - 1] < 70, idx[e], len(pal))
+        ys, xs = np.where(idx > 0)
+        idx = idx[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
+        ax, ay = foot(idx > 0)
+        repack(S, [('awk', idx, ax, ay)], pal)
+        S['k'] = round(S['k'] * f, 5)
+    c['scaleFix'] = f
+    return c
+
+
+UI_TARGETS = (46, 78, 118)   # 一覧の枠（48／80／120 px）から余白 2 px を引いた長辺
+
+
+def ensure_ui_sizes(c):
+    """敵（1 枚絵 'idle'）の一覧用サイズを足す。足したサイズ名を返す"""
+    if c.get('kind') != 'mon':
+        return []
+    pal = pal_rgb(c)
+    nm = 'idle'
+    src_sk = max((s for s in c['sizes'] if nm in c['sizes'][s]['frames']), key=lambda s: c['sizes'][s]['k'])
+    S0 = c['sizes'][src_sk]
+    x, y, w, h, _, _ = S0['frames'][nm]
+    added = []
+    for T in UI_TARGETS:
+        have = [max(S['frames'][nm][2:4]) for sk, S in c['sizes'].items() if sk[0] in 'bBuz' and nm in S['frames']]
+        fit = [m for m in have if m <= T]
+        if fit and max(fit) >= T * .9:
+            continue
+        at = dec(S0)
+        src = at[y:y + h, x:x + w]
+        rgb = np.zeros(src.shape + (3,))
+        m = src > 0
+        rgb[m] = pal[src[m] - 1]
+        r = T / max(w, h)
+        col, mm = shrink(rgb, m.astype(np.float64), max(4, round(w * r)))
+        idx = to_pal_idx(col, mm, pal)
+        ys, xs = np.where(idx > 0)
+        idx = idx[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
+        ax, ay = foot(idx > 0)
+        S = {'k': round(S0['k'] * r, 5), 'dots': int(idx.shape[1])}
+        repack(S, [(nm, idx, ax, ay)], pal)
+        c['sizes']['u%d' % T] = S
+        added.append('u%d' % T)
+    return added
+
+
 def main():
     D = load()
     # 1. 重複の除去（素材として必要なものは保管）
@@ -139,6 +213,13 @@ def main():
     for k in KEEP_LEGACY:
         if k in D and k not in leg:
             leg[k] = D[k]
+    seirin = json.load(open(SCALE)).get('seirin', {}) if os.path.exists(SCALE) else {}
+    for hid in seirin:
+        k = hid + '_K'
+        if k in D and 'orig:' + k not in leg:
+            if D[k].get('scaleFix'):
+                sys.exit('error: %s は補正済みで元データが無い（spx-legacy.json を確認）' % k)
+            leg['orig:' + k] = D[k]
     with open(LEGACY, 'w') as f:
         json.dump(leg, f, separators=(',', ':'))
     for k in OVERRIDDEN:
@@ -169,6 +250,17 @@ def main():
             der.add('back')
         if der:
             c['derived'] = sorted(der)
+    # 5. 一覧用サイズ
+    for id_, c in D.items():
+        a = ensure_ui_sizes(c)
+        if a:
+            print('ui sizes', id_, a)
+    # 4. 星臨の縮尺
+    for hid, f in seirin.items():
+        k = hid + '_K'
+        if 'orig:' + k not in leg or k in OVERRIDDEN:
+            continue
+        D[k] = leg['orig:' + k] if abs(f - 1) < 1e-6 else rescale_K(leg['orig:' + k], f)
     with open(BASE, 'w') as f:
         f.write(HEADER)
         f.write('const SPX_DATA=' + json.dumps(D, separators=(',', ':'), ensure_ascii=False) + ';\n')

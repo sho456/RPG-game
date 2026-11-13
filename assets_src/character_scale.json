@@ -1,0 +1,14 @@
+{
+  "_doc": "キャラクターの縮尺の正本。seirin＝星臨（<id>_K）の絵を、通常の姿と同じ体格に戻す倍率（1.0＝補正なし）。値は B104 サイズで『目の高さ（足元から）』を通常と星臨で実測した比の逆数。tools/spx_normalize.py と tools/spx_import.py が読む。補正後は tools/spx_qa.py の lineup で確認する",
+  "seirin": {
+    "celes": 0.78,
+    "shion": 0.80,
+    "balza": 0.87,
+    "hakua": 0.88,
+    "erna": 0.87,
+    "mire": 1.0,
+    "noah": 1.0,
+    "gald": 1.0,
+    "crow": 1.0
+  }
+}

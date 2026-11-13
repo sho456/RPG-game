@@ -18,6 +18,7 @@
 const MOTION=(()=>{
 /* 標準モーション：g＝区分（TERMS.SKILL / 状態）、f＝既定の絵（側面）、loop＝待機系 */
 const CATALOG={
+ front:{n:'正面',g:'view',f:'front',fm:'front',loop:0,d:'正面の基準画像（動かない）'},
  base:{n:'通常',g:'view',f:'stance',fm:'idle',loop:0,d:'基本姿勢（動かない）'},
  idle:{n:'待機',g:'view',f:'stance',fm:'idle',loop:1,d:'呼吸・しぐさ'},
  seirin:{n:'星臨',g:'seirin',f:'awk',loop:1,d:'星臨の姿'},
@@ -35,12 +36,8 @@ const CATALOG={
  low:{n:'瀕死',g:'state',f:'weak'},
  down:{n:'戦闘不能',g:'state',f:'down'},
  win:{n:'勝利',g:'state',f:'win'}};
-/* 図鑑で確認できるモーション（ver0.29：通常・待機・星臨の 3 種に統一） */
-const ZUKAN=['base','idle','seirin'];
-/* 図鑑の回転表示で、向き（正面・側面・背面）ごとに使う素材のポーズ名。無い向きは自動補完（viewer.js） */
-const VIEWS={
- hum:{base:{front:'front',side:'stance',back:'back'},idle:{front:'front',side:'stance',back:'back'},seirin:{front:'awk',side:'awk',back:null,K:1}},
- mon:{base:{front:'front',side:'idle',back:null},idle:{front:'front',side:'idle',back:null}}};
+/* 図鑑に載せる基準画像（ver0.30：正面・待機・星臨の 3 種。同じ縮尺・同じ足元で描く。js/zukan/viewer.js） */
+const ZUKAN=['front','idle','seirin'];
 
 /* ---------- キャラ・技ごとの登録 ---------- */
 const REG={};/* REG[キャラid or '*'][対象]＝定義 */
@@ -58,4 +55,4 @@ async function play(u,def,hitN=1){const keys=typeof def.keys==='function'?def.ke
  for(const k of keys){if(k.move)ANIM.move(u,k.move[0],k.move[1],k.ms,k.ease||'out',k.hop||0);await ANIM.to(u,k.pose||{},k.ms||100,k.ease||'out');if(k.wait)await ANIM.T(k.wait);}}
 /* 一覧（開発・図鑑用） */
 function list(who){return Object.assign({},REG['*'],REG[who]);}
-return{CATALOG,ZUKAN,VIEWS,add,remove,custom,play,list,skKey,REG};})();
+return{CATALOG,ZUKAN,add,remove,custom,play,list,skKey,REG};})();

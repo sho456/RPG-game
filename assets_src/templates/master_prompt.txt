@@ -1,0 +1,15 @@
+（マスター原画の依頼文のひな形。{ } を埋め、Agent Sprite Forge の master_still.py の --spec か、画像生成の依頼文に使う）
+
+The same {identity}.
+Full body, standing in a ready battle stance, facing {left|right}, three-quarter side view, whole figure visible with margin on every side, feet on one flat ground line.
+Chibi proportions about {2.5} heads tall, matching the style reference exactly (outline weight, shading steps, colour count, lighting from the upper left).
+Flat {#FF00FF} background, no floor, no shadow, no text, no frame, no effects that touch the edges.
+
+参照画像（この順に添付する）
+ 1. identity-ref：このキャラクターの既存の原画（assets_src/originals/ の該当シート）か、承認済みの正面
+ 2. style-ref：同じ作品の承認済みの仲間（例：リオの正面）。画風と枠取りだけを合わせる
+
+星臨（seirin.png）の依頼
+ The same {identity}, transformed into the star-descended form: {星臨の変化（鎧・光輪・翼・配色）}.
+ Same body proportions, same head size and same height as the normal form; effects stay close to the body
+ and never make the figure larger. （体格をそろえるため、通常の正面を identity-ref として必ず添付する）

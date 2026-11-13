@@ -1,11 +1,10 @@
-/* ===== ver0.29 図鑑（一覧・詳細） =====
+/* ===== 図鑑（一覧・詳細） ver0.30 =====
  一覧：敵・仲間・装備 → タップで詳細。
- 詳細：回転ビューア（js/zukan/viewer.js）でキャラクターを全方向から確認する。
-  ・モーション：通常・待機・星臨 の 3 種（敵は 星臨 なし）
-  ・向き：ドラッグで回す／◀ ▶ で 90° ずつ／正面・側面・背面へ直接／自動回転
-  ・下部タブ：人物・技・星臨 の 3 種（敵は 人物・技）。旧「立ち絵」「ドット絵」タブは廃止し、表情は「人物」へまとめた
-  ・呼称・分類は TERMS（js/data/terms.js）に従う（プレイアブルキャラ／通常敵・中ボス・大ボス、技の区分、装備の区分）
- 旧実装（v23.js の 4 章）はこのファイルへ移した。 */
+ 詳細：キャラクタービューア（js/zukan/viewer.js）に「正面」「待機」「星臨」の 3 種だけを載せる（敵は 星臨 なし）。
+  3 種は同じ縮尺・同じ足元・同じキャンバスで描き、デザイン・配色・体格・シルエットの公式な基準画像として扱う。
+  （ver0.29 の 回転・正面/側面/背面の切り替え・自動回転・骨格表示・表情差分 は廃止）
+  ・下部タブ：人物・技・星臨 の 3 種（敵は 人物・技）
+  ・呼称・分類は TERMS（js/data/terms.js）に従う */
 const ZUKAN=(()=>{
 const ZK={t:'e',from:'home',dt:'prof'};
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -20,7 +19,7 @@ function back(){ZVIEW.stop();if(ZK.from==='bar')tavern();else townMenu();}
 /* ---------- 一覧 ---------- */
 function list(m){if(typeof TSC!=='undefined'&&(TSC==='home'||TSC==='bar'))ZK.from=TSC==='home'?'home':'bar';ZVIEW.stop();G.zk=G.zk||{e:{},i:{}};G.inv.forEach(zkItem);
  const L=zkList(),ne=L.e.filter(seenE).length,nh=L.h.filter(joined).length,ni=L.i.filter(seenI).length,t=ZK.t;
- log((m||'<b>図鑑</b>　タップで詳細（キャラクターは回して見られる）')+`<br><small>敵 ${ne}/${L.e.length}　${TERMS.CHAR.playable} ${nh}/${L.h.length}　装備 ${ni}/${L.i.length}</small>`);
+ log((m||'<b>図鑑</b>　タップで詳細（正面・待機・星臨の基準画像）')+`<br><small>敵 ${ne}/${L.e.length}　${TERMS.CHAR.playable} ${nh}/${L.h.length}　装備 ${ni}/${L.i.length}</small>`);
  let body='';
  if(t==='e')body='<div class="zgrid z23">'+L.e.map((k,i)=>{const s=seenE(k),c=TERMS.charCat(k);return`<button class="ztile${s?'':' un'}${c!=='normal'?' bs':''} zc-${c}" data-a="e" data-v="${k}"><em>${String(i+1).padStart(2,'0')}</em><img src="${zimg(k,!s)}" alt=""><span>${s?esc(ED[k].name):'？？？'}</span></button>`;}).join('')+'</div>';
  if(t==='h')body='<div class="zhg">'+L.h.map(id=>{const j=joined(id);return`<button class="zhc${j?'':' un'}" data-a="h" data-v="${id}" style="--ec:${elCol(id)}"><img src="${j?art(id):zimg(id,1)}" alt=""><b>${j?esc(HB[id].name):'？？？'}</b><small>${j?esc(clsOf(id)):'未加入'}</small></button>`;}).join('')+'</div>';
@@ -35,33 +34,27 @@ function detail(type,key,dt){const L=zkList()[type],idx=type==='i'?key:L.indexOf
  panel(`<div class="zd23 z29"><div class="zdh"><button class="zb" data-a="list">◀ 一覧</button><b>No.${String(idx+1).padStart(2,'0')}</b><span class="nv"><button data-a="go" data-v="${pv}" aria-label="前へ">◀</button><button data-a="go" data-v="${nx}" aria-label="次へ">▶</button></span></div>${h}</div>
   <button class="tbtn back wide" data-a="list">図鑑の一覧へ</button>`,
   {list:()=>{ZVIEW.stop();list();},go:v=>{ZVIEW.stop();detail(type,type==='i'?+v:v);},dt:v=>{ZK.dt=v;refreshBody(type,key);},
-   mo:v=>{ZVIEW.setMotion(v);mark();},vw:v=>{ZVIEW.face(v);},turn:v=>ZVIEW.turn(+v),auto:()=>{ZVIEW.toggleAuto();mark();},
-   skel:()=>{ZVIEW.toggleSkel();mark();},flip:()=>{ZVIEW.flipBattle();mark();},
-   skx:()=>{const t=$('#cmd .zskx');if(t){t.hidden=!t.hidden;if(!t.hidden){const V=ZVIEW.S.last;t.querySelector('textarea').value=SKEL.exportOvr(V&&V.cid);}}},
-   ex:v=>{const im=$('#cmd .zex img');if(im)im.src=exprFace(key,v);$('#cmd').querySelectorAll('.zex [data-a="ex"]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));},
+   mo:v=>{ZVIEW.setMotion(v);mark();},flip:()=>{ZVIEW.flipBattle();mark();},
    sk:v=>{const s=SK[v];if(s)try{V22.skInfo(s);}catch(e){}}});
  const c=$('#cmd .zv canvas');
- if(c){const ok=ZVIEW.start(c,type,key,{view:$('#cmd .zvd b'),src:$('#cmd .zvd i')});if(!ok){const im=document.createElement('img');im.src=zimg(key);c.replaceWith(im);}ZVIEW.onInfo=()=>mark();ZVIEW.onSkel=()=>mark();mark();}
+ if(c){const ok=ZVIEW.start(c,type,key);if(!ok){const im=document.createElement('img');im.src=zimg(key);c.replaceWith(im);const zm=$('#cmd .zm');if(zm)zm.remove();}else{modeButtons();ZVIEW.onInfo=()=>mark();mark();}}
  else ZVIEW.stop();}
 /* タブの中身だけ差し替える（回転ビューアは止めない） */
 function refreshBody(type,key){const b=$('#cmd .zbody'),t=$('#cmd .zdt');if(!b||!t)return detail(type,key);
  const tmp=document.createElement('div');tmp.innerHTML=type==='e'?enemyHTML(key):heroHTML(key);
  const nb=tmp.querySelector('.zbody'),nt=tmp.querySelector('.zdt');if(nb)b.replaceWith(nb);if(nt)t.replaceWith(nt);}
-/* ボタンの状態（選択中のモーション・自動回転・骨格・戦闘の向き） */
+/* 形態のボタン：素材にある形態だけ（敵は正面の原画がある場合だけ「正面」、星臨はプレイアブルキャラだけ） */
+function modeButtons(){const zm=$('#cmd .zm');if(!zm)return;const ms=ZVIEW.modes();zm.style.gridTemplateColumns=`repeat(${ms.length},1fr)`;
+ zm.innerHTML=ms.map(m=>`<button data-a="mo" data-v="${m}">${ZVIEW.NAMES[m]}</button>`).join('');}
+/* ボタンの状態（選択中の形態・戦闘の向き） */
 function mark(){const S=ZVIEW.S,cmd=$('#cmd');if(!cmd||!S.u)return;
  cmd.querySelectorAll('.zm [data-a="mo"]').forEach(b=>b.classList.toggle('on',b.dataset.v===S.motion));
- const ml=cmd.querySelector('.zvl');if(ml)ml.textContent=(MOTION.CATALOG[S.motion]||{}).n||'';
- const a=cmd.querySelector('[data-a="auto"]');if(a)a.classList.toggle('on',!!S.auto);
- const s=cmd.querySelector('[data-a="skel"]');if(s)s.classList.toggle('on',!!S.skel);
- const x=cmd.querySelector('[data-a="skx"]');if(x)x.hidden=!(S.skel&&DEV());
- const f=cmd.querySelector('[data-a="flip"]');if(f){const d=FACING.of(S.key,S.u.side),def=FACING.base(S.key,S.u.side);f.innerHTML=`戦闘の向き：<b>${d==='L'?'左':'右'}</b>`;f.classList.toggle('on23d',d!==def);}
- const yw=Math.round(ZVIEW.S.target!=null?ZVIEW.S.target:ZVIEW.S.yaw)%360;cmd.querySelectorAll('.zrot [data-a="vw"]').forEach(b=>b.classList.toggle('on',!S.auto&&((b.dataset.v==='front'&&yw===0)||(b.dataset.v==='back'&&yw===180)||(b.dataset.v==='side'&&(yw===90||yw===270)))));}
+ const ml=cmd.querySelector('.zvl');if(ml)ml.textContent=ZVIEW.NAMES[S.motion]||'';
+ const f=cmd.querySelector('[data-a="flip"]');if(f){const d=FACING.of(S.key,S.u.side),def=FACING.base(S.key,S.u.side);f.innerHTML=`戦闘の向き：<b>${d==='L'?'左':'右'}</b>`;f.classList.toggle('on23d',d!==def);}}
 const tabsH=L=>`<div class="zdt">${L.map(([k,n])=>`<button class="${ZK.dt===k?'on':''}" data-a="dt" data-v="${k}">${n}</button>`).join('')}</div>`;
 function viewH(bg,aw){const mo=MOTION.ZUKAN.filter(m=>m!=='seirin'||aw);
- return`<div class="zv z29v" style="--bg:${bg}"><canvas></canvas><span class="zvl">待機</span><span class="zvd"><b>―</b><i>原画</i></span><button class="zfl fl" data-a="flip" title="戦闘でもこの向きで表示する">戦闘の向き</button></div>
- <div class="zm z29m" style="grid-template-columns:repeat(${mo.length+1},1fr)">${mo.map(m=>`<button data-a="mo" data-v="${m}">${MOTION.CATALOG[m].n}</button>`).join('')}<button class="skl29" data-a="skel">骨格</button></div>
- <div class="zrot"><button data-a="turn" data-v="-1" aria-label="左へ回す">◀</button><button data-a="vw" data-v="front">正面</button><button data-a="vw" data-v="side">側面</button><button data-a="vw" data-v="back">背面</button><button data-a="turn" data-v="1" aria-label="右へ回す">▶</button><button class="au" data-a="auto">自動回転</button></div>
- <button class="zskb" data-a="skx" hidden>骨格を書き出す（js/data/skeleton-overrides.js へ貼る）</button><div class="zskx" hidden><textarea readonly rows="5"></textarea></div>`;}
+ return`<div class="zv z29v z30v" style="--bg:${bg}"><canvas></canvas><span class="zvl">待機</span><button class="zfl fl" data-a="flip" title="戦闘でもこの向きで表示する">戦闘の向き</button></div>
+ <div class="zm z29m" style="grid-template-columns:repeat(${mo.length},1fr)">${mo.map(m=>`<button data-a="mo" data-v="${m}">${ZVIEW.NAMES[m]}</button>`).join('')}</div>`;}
 function habitat(k){const o=[];try{for(const id in AREAS){const A=AREAS[id];if(!A||!A.name)continue;const g=[...(A.groups||[]),...(A.libGroups||[])];if(g.some(x=>x.includes(k))||(A.boss&&A.boss.kind===k))o.push(A.name);}}catch(e){}
  if(typeof TMOBS!=='undefined'&&TMOBS.includes(k))o.push('天への塔');return[...new Set(o)];}
 const TGT={one:'単体',all:'全体',ally:'味方単体',self:'自分'};
@@ -88,8 +81,7 @@ function heroHTML(id){const j=joined(id)||DEV(),P=PROF[id],hb=HB[id];if(!['prof'
  let body='';
  if(ZK.dt==='prof'){let s=null;try{s=stats(id);}catch(e){}const gr=hb.g||{};const st=[['HP','mhp'],['攻撃','atk'],['防御','def'],['魔力','mag'],['精神','res'],['速さ','spd']];
   body=`<div class="zpf"><img src="${art(id)}" alt=""><div><div class="zq">「${esc(P[2])}」</div><dl class="dl22"><dt>年齢・身分</dt><dd>${esc(P[0])}</dd><dt>職・武器・属性</dt><dd>${esc(P[1])}</dd><dt>加入</dt><dd>${esc(P[3])}</dd></dl></div></div>
-  <div class="zst">${st.map(([a,k])=>`<div><small>${a}<i>${gr[k]||''}</i></small><b>${s?Math.round(s[k]):hb[k]}</b></div>`).join('')}</div>
-  <div class="zex"><img src="${exprFace(id,'n')}" alt=""><div>${Object.entries(EXN).map(([k,n],i)=>`<button class="${i?'':'on'}" data-a="ex" data-v="${k}">${n}</button>`).join('')}</div></div>`;}
+  <div class="zst">${st.map(([a,k])=>`<div><small>${a}<i>${gr[k]||''}</i></small><b>${s?Math.round(s[k]):hb[k]}</b></div>`).join('')}</div>`;}
  if(ZK.dt==='sk'){const have=new Set(skillList(id)),src={};(hb.skills||[]).forEach(k=>src[k]='初期');((typeof V20!=='undefined'&&V20.LSK[id])||[]).forEach(([l,k])=>src[k]=src[k]||'Lv'+l);
   try{for(const p in BOARD[id]){const nd=BOARD[id][p];if(nd&&nd.t==='skill')src[nd.v]=src[nd.v]||'星盤';}}catch(e){}
   const ks=Object.keys(src).filter(k=>SK[k]&&TERMS.skillCat(k,id)!=='seirin'),grp=g=>ks.filter(k=>TERMS.SKILL[TERMS.skillCat(k,id)].g===g);
@@ -107,7 +99,7 @@ function heroHTML(id){const j=joined(id)||DEV(),P=PROF[id],hb=HB[id];if(!['prof'
  return head+viewH(elCol(id),!!AW[id])+tabsH([['prof','人物'],['sk','技'],['aw',SEIRIN.n]])+`<div class="zbody">${body}</div>`;}
 
 function equipHTML(x){const s=seenI(x)||DEV(),ik=icKey(x),L0=x.k.startsWith('set:')?null:LEG[x.k],who=L0&&L0.who&&HB[L0.who]?HB[L0.who].name:'',sl=eqSlot(x);
- return`<div class="zdn"><b>${s?esc(x.n):'？？？'}</b>${TERMS.equipChip(sl)}<em class="it">${esc(x.t)}</em></div><div class="zeq">${ik?`<img src="${s?IC21.render(ik,8):IC21.shadow(ik)}" alt="">`:''}</div>
+ return`<div class="zdn"><b>${s?esc(x.n):'？？？'}</b>${TERMS.equipChip(sl)}<em class="it">${esc(x.t)}</em></div><div class="zeq">${ik?`<img src="${s?IC21.render(ik,4):IC21.shadow(ik)}" alt="">`:''}</div>
   ${s?`<dl class="dl22"><dt>分類</dt><dd>${esc(TERMS.equipName(sl))}${SLOTN[sl==='acc'?'acc1':sl]?'（'+esc(SLOTN[sl==='acc'?'acc1':sl].replace(/^.*・/,'').replace(/\d$/,''))+'）':''}</dd><dt>種別</dt><dd>${esc(x.t)}</dd>${who?`<dt>専用</dt><dd>${esc(who)}</dd>`:''}<dt>効果</dt><dd>${esc(x.d)}</dd></dl>`:'<div class="zno">まだ手に入れていない。強敵や宝箱、絆の物語から手に入ることがある。</div>'}`;}
 
 /* 入口（ホーム・酒場・開発者メニューから呼ばれる関数を差し替える） */

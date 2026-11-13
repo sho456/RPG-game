@@ -84,6 +84,14 @@ function cut(id,sk,v,name,mirror,shear,breath,sq=0){const S=sk==='heads'?D[id].h
  f={cv:out,w:out.width,h:out.height,ax:oax,ay:oay,use:++fcN,spx:1};FC.set(key,f);
  if(FC.size>900){const arr=[...FC.entries()].sort((a,b)=>a[1].use-b[1].use);for(let i=0;i<300;i++)FC.delete(arr[i][0]);}
  return f;}
+/* ---------- 連続フレーム（ver0.30：tools/spx_import.py の anims） ----------
+ anims[ポーズ名]={f:[コマ名...],ms:[表示時間...],loop:1}。ポーズ名に anims があれば、時間でコマを切り替える。
+ 素材に呼吸が描かれているので、呼吸の 1 ドット沈め（breath）は行わない。そのサイズに無いコマはポーズ名のまま */
+function animFrame(id,sk,name,ph=0){const a=D[id]&&D[id].anims&&D[id].anims[name];if(!a||!a.f||!a.f.length)return null;
+ const fs=D[id].sizes[sk]&&D[id].sizes[sk].frames;if(!fs)return null;const tot=a.tot||(a.tot=a.ms.reduce((x,y)=>x+y,0)||1);
+ const t=((typeof ANIM!=='undefined'?ANIM.now:performance.now())+ph)%tot;let acc=0;
+ for(let i=0;i<a.f.length;i++){acc+=a.ms[i]||0;if(t<acc)return fs[a.f[i]]?a.f[i]:null;}return fs[a.f[a.f.length-1]]?a.f[a.f.length-1]:null;}
+const phase=k=>{let h=0;for(const ch of String(k||''))h=(h*31+ch.charCodeAt(0))|0;return Math.abs(h)%997;};
 /* ---------- サイズの選択 ---------- */
 function pickSize(id,target,kind,ui){const S=D[id].sizes;let best=null,bd=1e9;
  for(const sk in S){const t=sk[0];if(ui?!'bBu'.includes(t):(t!=='b'&&t!=='B'))continue;const d=S[sk].dots;
@@ -121,6 +129,10 @@ const DEF={rio:{base:'rio',wid:25,hgt:36},wolf:{base:'wolf',wid:72.5,hgt:43},bos
 /* 仲間：元のリグを土台にし、背丈は元のリグの比（データ側のサイズも同じ比で作ってある） */
 const HEROES=['gald','mire','shion','noah','erna','balza','crow','hakua','jin','celes','valk'];
 function regRigs(){for(const id of HEROES)if(D[id]&&RIG[id]&&!DEF[id])DEF[id]={base:id,wid:25,hgt:RIG[id].hgt*36/37};
+ /* ver0.30：素材パック（tools/spx_import.py）で足したキャラ。味方は同じ id の旧リグ、敵はデータの rig（{base,wid,hgt,nsc}）を土台にする */
+ for(const id in D){if(DEF[id]||id.endsWith('_K'))continue;const c=D[id];
+  if(c.kind==='hum'&&RIG[id]){DEF[id]={base:id,wid:25,hgt:RIG[id].hgt*36/37};if(!HEROES.includes(id))HEROES.push(id);}
+  else if(c.kind==='mon'&&c.rig&&RIG[c.rig.base]){DEF[id]=Object.assign({wid:40,hgt:48},c.rig);ENEW.add(id);}}
  for(const id in D){const d=DEF[id];if(!d||!RIG[d.base])continue;const name='spx_'+id;
   const R=Object.assign(Object.create(RIG[d.base]),{spx:id,wid:d.wid,hgt:d.hgt,step:D[id].kind==='hum'?100:120,nsc:d.nsc||1});
   RIGS[name]=R;RIG[name]=R;}
@@ -151,13 +163,16 @@ SPRX.frame=function(name,pose,palKey,pal,flip,sc=1,extra=''){const R=RIG[name],f
   /* 星臨：原画の「覚醒した姿」（別データ <id>_K）を、ポーズに合わせて整数ドットで動かす。倒れだけは通常の絵（星臨の配色） */
   if(hum&&pk.v==='aw'&&D[id+'_K']&&D[id+'_K'].sizes[sk]){const n0=heroFrame(pose||{});
    if(n0!=='down'){const a=AWS[n0]||AWS.stance,kid=id+'_K';br=(a.br&&(pose.br||0)>.5)?1:0;
-    const f=cut(kid,sk,'','awk',mirror,-a.l,br);if(f){const dX=(pose.x||0)*(flip?-1:1)+(flip?1:-1)*a.f;
+    const an=n0==='stance'?animFrame(kid,sk,'awk',phase(palKey)):null;
+    const f=an?cut(kid,sk,'',an,mirror,-a.l,0):cut(kid,sk,'','awk',mirror,-a.l,br);if(f){const dX=(pose.x||0)*(flip?-1:1)+(flip?1:-1)*a.f;
      const o=Object.create(f);o.ax=f.ax-Math.round(dX);o.ay=f.ay-Math.round(a.y);if(BAT)f.cv._spx={ax:o.ax,ay:o.ay};f.cv._o={ax:o.ax,ay:o.ay,fax:f.ax,fay:f.ay};return o;}}}
   if(hum){const fs=c.sizes[sk].frames,n0=heroFrame(pose||{});name2=n0;
    if(!fs[name2]&&c.single&&fs.stance){/* 1 枚絵の味方（ジン）：星臨と同じく 1 枚の絵を整数ドットで動かす */
     const a=AWS[n0]||AWS.stance;name2='stance';sh=-a.l;br=(a.br&&(pose.br||0)>.5)?1:0;dx=(pose.x||0)*(flip?-1:1)+(flip?1:-1)*a.f;dy=-a.y;}
-   else{if(!fs[name2])name2=(FB[name2]||[]).find(n=>fs[n])||'stance';br=(name2==='stance'&&(pose.br||0)>.5)?1:0;dx=(pose.x||0)*(flip?-1:1);}}
-  else{name2='idle';const m=monShape(pose||{},R.type==='hum');sh=Math.max(-6,Math.min(6,m.shear))*(c.face==='R'?1:-1);br=m.breath;dx=m.dx*(flip?1:-1);dy=m.dy;sq=m.sq;}
+   else{if(!fs[name2])name2=(FB[name2]||[]).find(n=>fs[n])||'stance';br=(name2==='stance'&&(pose.br||0)>.5)?1:0;dx=(pose.x||0)*(flip?-1:1);
+    const an=animFrame(id,sk,name2,phase(palKey));if(an){name2=an;br=0;}}}
+  else{name2='idle';const m=monShape(pose||{},R.type==='hum');sh=Math.max(-6,Math.min(6,m.shear))*(c.face==='R'?1:-1);br=m.breath;dx=m.dx*(flip?1:-1);dy=m.dy;sq=m.sq;
+   const an=animFrame(id,sk,'idle',phase(palKey));if(an){name2=an;br=0;sq=0;}}
   const f=cut(id,sk,pk.v,name2,mirror,sh,br,sq);if(!f)return null;
   const o=Object.create(f);o.ax=f.ax-Math.round(dx);o.ay=f.ay-Math.round(dy);if(BAT)f.cv._spx={ax:o.ax,ay:o.ay};f.cv._o={ax:o.ax,ay:o.ay,fax:f.ax,fay:f.ay};return o;}
  if(BAT){/* 旧リグ：同じ見た目の大きさのまま、1 ドット＝round(dpr) 画素で描き直す */
@@ -235,6 +250,6 @@ function onReady(){
 }
 /* 向きを変えたら、一覧・立ち絵の控えを作り直す */
 FACING.onChange(k=>{try{zReg(k);for(const x in UIC)if(x.startsWith('a|'+k))delete UIC[x];}catch(e){}});
-return{get ready(){return ready;},parse,heroFrame,monShape,pickSize,D,cut,palOf,zReg,artCv,AWS,FB,DEF};})();
+return{get ready(){return ready;},parse,heroFrame,monShape,pickSize,D,cut,palOf,zReg,artCv,AWS,FB,DEF,animFrame,phase};})();
 /* 履歴：ver0.26 敵のドット絵を提供原画へ／ver0.27 第2弾とリオ／ver0.28 ヴァルク・ジン・氷の女王・忍
    ver0.29 向きの窓口を FACING に一本化、原画の反転をデータへ焼き込み、図鑑の再生画面は js/zukan/ へ移した */
