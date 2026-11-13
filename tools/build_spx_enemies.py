@@ -41,6 +41,15 @@ SOURCES = [
         dict(id='shade', face='L', ncol=30, b=[34, 38, 44, 50, 56, 64, 72, 82, 94], f=24, z=46, u=52),
         dict(id='drake', face='R', ncol=36, b=[56, 64, 72, 82, 92, 104, 118, 134, 150, 170, 192, 216], f=44, z=46, u=64),
     ]),
+    # 3 方向の絵：views に原画の左からの並び（idle＝戦闘で使う斜めの絵。right 向き）。shadow：足元の影を抜く
+    ('enemies_queen.jpg', [
+        dict(id='queen', face='R', ncol=36, views=['front', 'idle', 'skip'], shadow=True,
+             b=[36, 42, 48, 56, 64, 72, 82, 94, 108, 124], f=24, z=46, u=48),
+    ]),
+    ('enemies_ninja.jpg', [
+        dict(id='ninja', face='R', ncol=36, views=['front', 'skip', 'idle'], shadow=True,
+             b=[40, 46, 52, 60, 68, 78, 90, 104, 120, 138], f=26, z=46, u=52),
+    ]),
 ]
 
 
@@ -190,6 +199,11 @@ VARS = {
         'last2': [(HUE(30, 70, .3), tint(300, smul=.9, val=1.1)), (HUE(330, 40, .1), tint(272, smul=.75, val=.6)),
                   (ANY, grey(.6, 270, .2))],
     },
+    # 忍（原画：紫の鎧と髪・灰色の面・桃色に光る目と刃）→ 虚蝕の残影（青灰の鎧・水色の光）
+    'ninja': {
+        'boss4b': [(lambda h, s, v: s >= .3 and v > .75 and hue_in(h, 285, 345), tint(186, smul=1.1, val=1.05)),
+                   (HUE(250, 345, .1), tint(205, smul=.55, val=.9))],
+    },
     # 番人（原画：紫の外套・金の冠と縁・黄色の目・青白い霊の手）
     'banjin': {
         'boss3': [(HUE(40, 70, .45), tint(2, smul=1, val=1.0)),
@@ -197,22 +211,65 @@ VARS = {
     },
 }
 
+# ---------- 影抜き（足元の灰色の楕円） ----------
+def drop_shadow(rgb, a):
+    h = a.shape[0]
+    mx, mn = rgb.max(2), rgb.min(2)
+    sat = (mx - mn) / np.maximum(mx, 1)
+    rows = np.arange(h)[:, None]
+    sh = (rows >= h * .86) & (sat < .25) & (mx > 110)
+    a = a * ~sh
+    l3, n3 = nd.label(a > 0)
+    if n3 > 1:
+        s3 = nd.sum(a > 0, l3, range(1, n3 + 1))
+        a = a * np.isin(l3, [k + 1 for k, v in enumerate(s3) if v >= s3.max() * .003])
+    ys, xs = np.where(a > 0)
+    y0, y1, x0, x1 = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
+    return rgb[y0:y1, x0:x1], a[y0:y1, x0:x1]
+
+
+def pack_frames(tiles, pal):
+    Wt = sum(t[1].shape[1] + 1 for t in tiles)
+    Ht = max(t[1].shape[0] for t in tiles)
+    big = np.zeros((Ht, Wt), np.int32)
+    fr, x = {}, 0
+    for nm, idx, ax, ay in tiles:
+        h, w = idx.shape
+        big[:h, x:x + w] = idx
+        fr[nm] = [x, 0, w, h, ax, ay]
+        x += w + 1
+    return png_of(big, pal), fr
+
+
 # ---------- 作成 ----------
 data = {}
 prev = []
 CHARS = []
 for fname, chars in SOURCES:
-    for C, cr in zip(chars, load_source(fname, len(chars))):
-        C['crop'] = cr
+    n_fig = sum(len(C.get('views', ['idle'])) for C in chars)
+    crops = load_source(fname, n_fig)
+    k = 0
+    for C in chars:
+        C['frames'] = {}
+        for vn in C.get('views', ['idle']):
+            cr = crops[k]
+            k += 1
+            if C.get('shadow'):
+                cr = drop_shadow(*cr)
+            if vn != 'skip':
+                C['frames'][vn] = cr
         CHARS.append(C)
 for C in CHARS:
-    rgb0, a0 = C['crop']
+    rgb0, a0 = C['frames']['idle']
     hh, ww = a0.shape
-    # パレット：原画の 1 ドット相当（1/3）に縮めた絵から
-    nat = max(8, round(ww / 3))
-    col, m = shrink(rgb0, a0, nat)
-    px = col[m]
-    pal = kmeans(px, C['ncol'] - 1)
+    # パレット：原画の 1 ドット相当（1/3）に縮めた絵から（全ての向きの絵をまとめて）
+    px = []
+    for r_, a_ in C['frames'].values():
+        col, m = shrink(r_, a_, max(8, round(a_.shape[1] / 3)))
+        px.append(col[m])
+    px = np.vstack(px)
+    sub = px if len(px) <= 12000 else px[np.random.default_rng(2).choice(len(px), 12000, replace=False)]
+    pal = kmeans(sub, C['ncol'] - 1)
     # 最も暗い色を最後に（輪郭。試練・虚蝕化の色替えで変えない色）
     order = sorted(range(len(pal)), key=lambda i: -lum(pal[i]))
     pal = np.vstack([pal[order], [[min(px[:, 0].min(), 14), min(px[:, 1].min(), 10), min(px[:, 2].min(), 18)]]])
@@ -220,18 +277,28 @@ for C in CHARS:
     zw = max(8, int(C['z'] * min(1, ww / hh)) - 1)  # 図鑑：縦横とも 46 に収める（キー名は z46 のまま）
     plist = [('b%d' % w, w) for w in C['b']] + [('f%d' % C['f'], C['f']), ('z%d' % C['z'], zw), ('u%d' % C['u'], C['u'])]
     for sk, w in plist:
-        col, m = shrink(rgb0, a0, w)
-        # 小さいサイズは輪郭を最暗色でなぞる（背景に溶けないように）
-        idx = to_pal_idx(col, m, pal)
-        if w <= 48:
-            edge = m & ~nd.binary_erosion(m)
-            idx[edge & (idx > 0)] = np.where(
-                np.array([lum(pal[i - 1]) for i in idx[edge & (idx > 0)]]) < 70, idx[edge & (idx > 0)], len(pal))
-        ax, ay = anchor(m)
-        h, wd = idx.shape
-        sizes[sk] = {'k': round(w / ww, 5), 'dots': w, 'png': png_of(idx, pal), 'frames': {'idle': [0, 0, wd, h, ax, ay]}}
+        ks = w / ww
+        tiles = []
+        for vn, (r_, a_) in C['frames'].items():
+            if sk[0] in 'fz' and vn != 'idle':
+                continue
+            col, m = shrink(r_, a_, max(4, round(a_.shape[1] * ks)))
+            if w <= 48:   # 小さいサイズ：本体から離れた小さな粒（泡・火の粉）は 1〜2 ドットの点になって汚れるので落とす
+                l3, n3 = nd.label(m)
+                if n3 > 1:
+                    s3 = nd.sum(m, l3, range(1, n3 + 1))
+                    m = np.isin(l3, [q + 1 for q, v in enumerate(s3) if v >= max(5, s3.max() * .01)])
+            idx = to_pal_idx(col, m, pal)
+            if w <= 48:   # 小さいサイズは輪郭を最暗色でなぞる（背景に溶けないように）
+                edge = m & ~nd.binary_erosion(m)
+                idx[edge & (idx > 0)] = np.where(
+                    np.array([lum(pal[i - 1]) for i in idx[edge & (idx > 0)]]) < 70, idx[edge & (idx > 0)], len(pal))
+            ax, ay = anchor(m)
+            tiles.append((vn, idx, ax, ay))
+        png, fr = pack_frames(tiles, pal)
+        sizes[sk] = {'k': round(ks, 5), 'dots': w, 'png': png, 'frames': fr}
         if sk.startswith('b') and w in (C['b'][len(C['b']) // 2], C['b'][-1]):
-            prev.append((C['id'], sk, idx, pal))
+            prev.append((C['id'], sk, tiles[0][1], pal))
     vars_ = {}
     for vn, rules in VARS.get(C['id'], {}).items():
         mp = rule_map(pal[:-1], rules)
@@ -239,10 +306,10 @@ for C in CHARS:
     data[C['id']] = {'face': C['face'], 'kind': 'mon', 'pal': [hexs(c) for c in pal], 'sizes': sizes}
     if vars_:
         data[C['id']]['vars'] = vars_
-    print(C['id'], 'crop', ww, hh, 'sizes', list(sizes), 'vars', list(vars_))
+    print(C['id'], 'crop', ww, hh, 'sizes', list(sizes), 'views', list(C['frames']), 'vars', list(vars_))
 
 with open(OUT, 'w') as f:
-    f.write('/* 自動生成：tools/build_spx_enemies.py（提供原画 assets_src/originals/enemies_set1.jpg）。手で編集しない */\n')
+    f.write('/* 自動生成：tools/build_spx_enemies.py（提供原画 assets_src/originals/enemies_*.jpg）。手で編集しない */\n')
     f.write('Object.assign(SPX_DATA,' + json.dumps(data, separators=(',', ':'), ensure_ascii=False) + ');\n')
 print('wrote', OUT, os.path.getsize(OUT))
 

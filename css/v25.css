@@ -344,3 +344,4 @@
 
 /* ver0.26 図鑑：戦闘時の向き */
 .zm .fl{font-size:11px}.zm .fl b{font-weight:400;color:#ffe9a0}.zm .fl small{font-size:9px;color:#9fe;margin-left:1px}.zm .fl.on23d{border-color:#ffe27a}
+.zm.z28{grid-template-columns:repeat(4,1fr)}.zm.z28 button{height:36px;font-size:13px}
