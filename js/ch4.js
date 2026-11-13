@@ -7,11 +7,11 @@ for(const[k,b,pal]of[['snowwolf','wolf',{g:'#e8eef8',G:'#8a9ab0',w:'#ffffff',x:'
 IIS.fist=["","...MMMMM....","..MmmmmmM...","..MmMmMmM...","..MmmmmmMM..","..MmmmmmmM..","...MmmmmM...","...MbbbbM...","...bbbbbb...","...bbbbbb..."];ITYPE.unshift(['手甲','fist']);
 Object.assign(EA,{blizzard:{n:'絶対氷河',el:'氷',k:'mag',pow:2.5,t:'all'},icewave:{n:'氷華の息',el:'氷',k:'mag',pow:1.2,t:'all'},slash2:{n:'鬼斬り',el:'斬',k:'phys',pow:1.5,t:'one'}});
 Object.assign(ED,{
- snowwolf:{name:'雪狼',mhp:170,atk:62,def:18,mag:20,res:14,spd:16,weak:['炎','雷'],brk:3,xp:30,gold:20,drop:[['kiba',.5]],acts:[['claw',.6],['bite',.4]]},
- iceslime:{name:'氷スライム',mhp:180,atk:54,def:24,mag:40,res:20,spd:8,weak:['炎','打'],brk:3,xp:28,gold:20,drop:[['haiseki',.5]],acts:[['claw',.5],['icewave',.5]]},
- yukirei:{name:'雪霊',mhp:160,atk:30,def:16,mag:70,res:12,spd:14,weak:['炎','光'],brk:3,xp:32,gold:22,drop:[['kakera',.25]],acts:[['curse',.5],['icewave',.5]]},
- onimusha:{name:'鬼武者',mhp:240,atk:72,def:26,mag:20,res:16,spd:11,weak:['光','氷'],brk:5,xp:36,gold:26,drop:[['kiba',.3],['kakera',.2]],acts:[['slash2',.6],['claw',.4]],flip:1},
- boss5:{name:'氷華の妖狐',mhp:10000,atk:250,def:72,mag:285,res:70,spd:16,weak:['炎','雷'],brk:14,sc:3,boss:true,xp:3600,gold:4000,drop:[['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1]],
+ snowwolf:{name:'雪狼',mhp:170,atk:62,def:18,mag:20,res:14,spd:16,weak:['炎','雷'],xp:30,gold:20,drop:[['kiba',.5]],acts:[['claw',.6],['bite',.4]]},
+ iceslime:{name:'氷スライム',mhp:180,atk:54,def:24,mag:40,res:20,spd:8,weak:['炎','打'],xp:28,gold:20,drop:[['haiseki',.5]],acts:[['claw',.5],['icewave',.5]]},
+ yukirei:{name:'雪霊',mhp:160,atk:30,def:16,mag:70,res:12,spd:14,weak:['炎','光'],xp:32,gold:22,drop:[['kakera',.25]],acts:[['curse',.5],['icewave',.5]]},
+ onimusha:{name:'鬼武者',mhp:240,atk:72,def:26,mag:20,res:16,spd:11,weak:['光','氷'],xp:36,gold:26,drop:[['kiba',.3],['kakera',.2]],acts:[['slash2',.6],['claw',.4]],flip:1},
+ boss5:{name:'氷華の妖狐',mhp:10000,atk:250,def:72,mag:285,res:70,spd:16,weak:['炎','雷'],sc:3,boss:true,xp:3600,gold:4000,drop:[['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1]],
   ai:{every:3,charge:'blizzard',acts:[['claw',.4],['bite',.3],['icewave',.3]],summon:'yukirei',sumLv:29},ilv:30}});
 HB.hakua={name:'ハクア',mhp:260,atk:46,def:22,mag:24,res:26,spd:15,g:{mhp:'B',atk:'S',def:'C',mag:'C',res:'B',spd:'A'},skills:['shouken','hyouken','renken']};
 Object.assign(SK,{shouken:{n:'掌拳',sp:15,el:'打',k:'phys',pow:1.3,t:'one',d:'打撃・単体'},hyouken:{n:'氷拳',sp:20,el:'氷',k:'phys',pow:1.5,t:'one',d:'氷属性の拳'},renken:{n:'連拳',sp:25,el:'打',k:'phys',pow:.6,hits:3,t:'one',d:'打撃3連打'},

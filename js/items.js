@@ -3,8 +3,8 @@ const RAR=[{n:'コモン',c:'#d8d8d8',m:1},{n:'アンコモン',c:'#6fdc7f',m:2}
 const SLOTN={w:'武器',sub:'副装備',head:'頭',body:'体',acc1:'装飾1',acc2:'装飾2'};
 const SLOTS6=['w','sub','head','body','acc1','acc2'];
 const OPS={atkP:['攻撃','%',3,10],defP:['防御','%',3,10],magP:['魔力','%',3,10],resP:['精神','%',3,10],mhpP:['最大HP','%',4,12],spd:['素早さ','+',.3,1.2],
- crit:['会心率','%',2,8],weakDmg:['弱点ダメ','%',8,25],startAG:['開始時AG','+',8,25],awDmg:['覚醒中与ダメ','%',8,30],spGain:['攻撃時SP','+',3,10],drop:['ドロップ率','%',3,10]};
-const LEG={koukagari:{n:'流星の後篝',slot:'acc',d:'覚醒が解けるときAG50を残す'},shokei:{n:'処刑人の刃',slot:'w',who:'rio',d:'ブレイク中の敵への与ダメ×2.0'},futago:{n:'双子星の首飾り',slot:'acc',d:'共鳴技の威力2倍'}};
+ crit:['会心率','%',2,8],weakDmg:['弱点ダメ','%',8,25],startAG:['開始時AG','+',8,25],awDmg:['星臨中与ダメ','%',8,30],spGain:['攻撃時SP','+',3,10],drop:['ドロップ率','%',3,10]};
+const LEG={koukagari:{n:'流星の後篝',slot:'acc',d:'星臨が解けるときAG50を残す'},shokei:{n:'処刑人の刃',slot:'w',who:'rio',d:'弱点を突いたときの与ダメ×1.3'},futago:{n:'双子星の首飾り',slot:'acc',d:'共鳴技の威力2倍'}};
 const BN={atk:'攻',def:'防',res:'精',mag:'魔',mhp:'HP',spd:'速'};
 const MATL=l=>l<=2?'銅':l<=5?'鉄':l<=9?'鋼':'星鋼';
 const grp=s=>s.startsWith('acc')?'acc':s;
@@ -14,7 +14,7 @@ function genItem(ilv,minR=0,bonus=0,slot=null,rarFix=null){
  const rar=rarFix!=null?rarFix:rollRar(minR,bonus);
  if(!slot){const r=Math.random();slot=r<.28?'w':r<.4?'sub':r<.58?'head':r<.78?'body':'acc';}
  const it={uid:++G.uid,slot,ilv,rar,plus:0,ops:[],unid:rar>=3,lock:false,base:{}};
- if(rar===4){const ks=Object.keys(LEG).filter(k=>LEG[k].slot===slot);it.leg=ks.length?ks[Math.random()*ks.length|0]:Object.keys(LEG)[Math.random()*Object.keys(LEG).length|0];it.slot=slot=LEG[it.leg].slot;}
+ if(rar===4){const al=Object.keys(LEG).filter(k=>!LEG[k].uq),ks=al.filter(k=>LEG[k].slot===slot);it.leg=ks.length?ks[Math.random()*ks.length|0]:al[Math.random()*al.length|0];it.slot=slot=LEG[it.leg].slot;}
  const m=MATL(ilv);
  if(slot==='w'){it.who=(it.leg&&LEG[it.leg].who)||G.members[Math.random()*G.members.length|0];wbase(it,ilv,m);}
  else if(slot==='sub'){if(Math.random()<.5){it.base.def=Math.round(3+ilv*1.1);it.name=m+'の小盾';}else{it.base.res=Math.round(3+ilv*1.2);it.name='灯の護符';}}
@@ -75,17 +75,17 @@ Object.assign(SK,{
 const JOBS={kenshi:{n:'剣士',d:'物理で押し切る',sk:[[1,'nidan'],[4,'reppu']],ps:[[7,{atkP:8},'攻撃+8%'],[10,{crit:5},'会心率+5%']]},
  juukishi:{n:'重騎士',d:'仲間を守る',sk:[[1,'kabau'],[4,'teppeki']],ps:[[7,{defP:10},'防御+10%'],[10,{mhpP:10},'最大HP+10%']]},
  iyashi:{n:'癒し手',d:'回復と支援',sk:[[1,'cure'],[4,'recover']],ps:[[7,{resP:10},'精神+10%'],[10,{spGain:5},'攻撃時SP+5']]},
- kariudo:{n:'狩人',d:'弱点を射抜く',sk:[[1,'hikariya'],[3,'tsuchiya']],ps:[[7,{weakDmg:15},'弱点ダメ+15%'],[10,{brkPlus:1},'ブレイク削り+1']]}};
+ kariudo:{n:'狩人',d:'弱点を射抜く',sk:[[1,'hikariya'],[3,'tsuchiya']],ps:[[7,{weakDmg:15},'弱点ダメ+15%'],[10,{weakDmg:10},'弱点ダメ+10%']]}};
 const jobNext=l=>4+l*3;
 const HEXD=[[1,0],[1,-1],[0,-1],[-1,0],[-1,1],[0,1]];
 const SBASE={atkP:4,defP:4,mhpP:5,resP:4,magP:5,spd:.3,crit:3,weakDmg:8,startAG:8,awDmg:10,spGain:3};
 const BDEF={
  rio:{star:'灯火座',sec:[['atkP'],['spd','crit'],['weakDmg','startAG'],['defP'],['mhpP'],['resP','magP']],mask:['2,-3','-1,-2','-3,2','1,2'],
-  sp:{'2,-2':{t:'skill',v:'shiden'},'-2,2':{t:'skill',v:'kibou'},'0,-3':{t:'aw',v:{awTurn:1},d:'覚醒の行動回数+1'},'3,-3':{t:'aw',v:{noRecoil:1},d:'覚醒の反動を無効'},
+  sp:{'2,-2':{t:'skill',v:'shiden'},'-2,2':{t:'skill',v:'kibou'},'0,-3':{t:'aw',v:{awTurn:1},d:'星臨の行動回数+1'},'3,-3':{t:'aw',v:{noRecoil:1},d:'星臨の反動を無効'},
    '3,0':{t:'fork',g:1,v:{atkP:12},d:'剛星：攻撃+12%'},'0,3':{t:'fork',g:1,v:{mhpP:15},d:'柔星：最大HP+15%'},
-   '-3,0':{t:'fork',g:2,v:{awDmg:20},d:'烈星：覚醒中与ダメ+20%'},'-3,3':{t:'fork',g:2,v:{weakDmg:20},d:'狙星：弱点ダメ+20%'}}},
+   '-3,0':{t:'fork',g:2,v:{awDmg:20},d:'烈星：星臨中与ダメ+20%'},'-3,3':{t:'fork',g:2,v:{weakDmg:20},d:'狙星：弱点ダメ+20%'}}},
  gald:{star:'城塞座',sec:[['atkP'],['defP'],['mhpP'],['resP'],['startAG','spGain'],['crit']],mask:['3,-1','-2,-1','-2,3','2,1'],
-  sp:{'2,-2':{t:'skill',v:'gansai'},'-2,2':{t:'skill',v:'ikari'},'0,-3':{t:'aw',v:{awTurn:1},d:'覚醒の行動回数+1'},'3,-3':{t:'aw',v:{storeUp:30},d:'蓄積効率+30%'},
+  sp:{'2,-2':{t:'skill',v:'gansai'},'-2,2':{t:'skill',v:'ikari'},'0,-3':{t:'aw',v:{awTurn:1},d:'星臨の行動回数+1'},'3,-3':{t:'aw',v:{storeUp:30},d:'蓄積効率+30%'},
    '3,0':{t:'fork',g:1,v:{atkP:12},d:'攻城：攻撃+12%'},'0,3':{t:'fork',g:1,v:{defP:15},d:'堅城：防御+15%'},
    '-3,0':{t:'fork',g:2,v:{startAG:25},d:'先陣：開始時AG+25'},'-3,3':{t:'fork',g:2,v:{spGain:8},d:'闘志：攻撃時SP+8'}}}};
 const hexDist=(q,r)=>(Math.abs(q)+Math.abs(r)+Math.abs(q+r))/2;
@@ -123,11 +123,13 @@ const npos=n=>[90+13*Math.sqrt(3)*(n.q+n.r/2),H/2+13*1.5*n.r];
 const bcv=$('#bcv'),bctx=bcv.getContext('2d');
 const SHORT={atkP:'攻',defP:'防',mhpP:'HP',resP:'精',magP:'魔',spd:'速',crit:'会',weakDmg:'弱',startAG:'AG',awDmg:'覚',spGain:'SP'};
 const BGS=Array.from({length:90},(_,i)=>{const f=v=>v-Math.floor(v);return[f(Math.sin(i*99.7)*1e4),f(Math.sin(i*31.3)*1e4),f(Math.sin(i*7.1)*1e4)];});
-function sizeBoard(){const d=window.devicePixelRatio||1;bcv.width=W*SC*d;bcv.height=224*SC*d;bcv.style.width=W*SC+'px';bcv.style.height=224*SC+'px';bctx.setTransform(d,0,0,d,0,0);}
-function bpos(n){const cw=W*SC,s=cw/(Math.sqrt(3)*7.4);return[cw/2+s*Math.sqrt(3)*(n.q+n.r/2),224*SC/2+18+s*1.5*n.r,s];}
+/* 星盤の表示の高さ（CSS px）。ver0.21 で画面の高さに合わせて変える */
+function BCH(){return 224*SC;}
+function sizeBoard(){const d=window.devicePixelRatio||1;bcv.width=W*SC*d;bcv.height=Math.round(BCH()*d);bcv.style.width=W*SC+'px';bcv.style.height=BCH()+'px';bctx.setTransform(d,0,0,d,0,0);}
+function bpos(n){const cw=W*SC,s=cw/(Math.sqrt(3)*7.4);return[cw/2+s*Math.sqrt(3)*(n.q+n.r/2),BCH()/2+18+s*1.5*n.r,s];}
 function hexPath(c,x,y,r){c.beginPath();for(let i=0;i<6;i++){const a=Math.PI/180*(60*i-30);c.lineTo(x+r*Math.cos(a),y+r*Math.sin(a));}c.closePath();}
 const shade=h=>{const n=parseInt(h.slice(1),16);return`rgb(${(n>>16)*.4|0},${(n>>8&255)*.4|0},${(n&255)*.4|0})`;};
-function drawBoard(){const c=bctx,cw=W*SC,ch=224*SC,id=BS.id,N=BOARD[id],U=G.h[id].board;
+function drawBoard(){const c=bctx,cw=W*SC,ch=BCH(),id=BS.id,N=BOARD[id],U=G.h[id].board;
  const bg=c.createRadialGradient(cw/2,ch/2,20,cw/2,ch/2,ch*.75);bg.addColorStop(0,'#1c2150');bg.addColorStop(1,'#05060f');c.fillStyle=bg;c.fillRect(0,0,cw,ch);
  BGS.forEach(([x,y,b],i)=>{c.fillStyle=`rgba(200,210,255,${.2+.5*b*(.6+.4*Math.sin(tick/30+i))})`;c.fillRect(x*cw,y*ch,1.5,1.5);});
  c.lineCap='round';
@@ -147,13 +149,13 @@ function drawBoard(){const c=bctx,cw=W*SC,ch=224*SC,id=BS.id,N=BOARD[id],U=G.h[i
  c.fillStyle='#cfd3f5';c.font='13px -apple-system,"Hiragino Sans",sans-serif';c.fillText(`星ポイント 残り ${ptsLeft(id)}　Lv${G.h[id].lv}`,12,44);}
 function openBoard(id,m){show('board');setH(224);sizeBoard();BS.id=id;if(!BOARD[id][BS.sel])BS.sel=null;boardMenu(m);}
 function boardMenu(m){const id=BS.id,n=BS.sel&&BOARD[id][BS.sel],U=G.h[id].board;
- const info=n?`<b style="color:${NCOL[n.t]}">${{core:'星片',stat:'能力',skill:'技',aw:'覚醒',fork:'分岐（どちらか1つ）'}[n.t]}</b>　${n.d}　<small>必要ポイント${n.cost}・${U.includes(n.k)?'解放済み':canUnlock(id,n.k)?'解放できる':'未接続'}</small>`:'星をタップで詳細。光る輪の星が解放できる。<br><small>青：能力　緑：技　赤：覚醒強化　紫：分岐（どちらか一方）</small>';
+ const info=n?`<b style="color:${NCOL[n.t]}">${{core:'星片',stat:'能力',skill:'技',aw:'星臨',fork:'分岐（どちらか1つ）'}[n.t]}</b>　${n.d}　<small>必要ポイント${n.cost}・${U.includes(n.k)?'解放済み':canUnlock(id,n.k)?'解放できる':'未接続'}</small>`:'星をタップで詳細。光る輪の星が解放できる。<br><small>青：能力　緑：技　赤：星臨強化　紫：分岐（どちらか一方）</small>';
  log((m?m+'<br>':'')+info);
  menu([{l:'解放',s:n?`ポイント${n.cost}`:'星を選ぶ',cls:'ready',dis:!n||!canUnlock(id,n.k)||n.cost>ptsLeft(id),f:()=>{U.push(n.k);SFX.aw();save();boardMenu(`<b>${n.d}</b> を解放した！`);}},
   {l:'おまかせ解放',s:'自動で振り分け',f:()=>{const c=autoUnlock(id);if(c)SFX.aw();save();boardMenu(c?`${c}個の星を解放した`:'解放できる星がない（ポイント不足）');}},
   {l:'リセット',s:'無料でやり直し',f:()=>{G.h[id].board=['0,0'];save();boardMenu('星盤をリセットした');}},
   {l:`${HB[nextM(id)].name}の星盤`,f:()=>{BS.sel=null;openBoard(nextM(id));}},
-  {l:'ジョブ',s:G.h[id].job?JOBS[G.h[id].job].n:'未設定',f:()=>jobMenu(id)},{l:'覚醒の試練',s:'段階'+ROMAN[G.h[id].awLv||1],cls:'ready',f:()=>{enterTown();trialMenu();}},{l:'戻る',cls:'back',f:()=>enterTown()}]);}
+  {l:'ジョブ',s:G.h[id].job?JOBS[G.h[id].job].n:'未設定',f:()=>jobMenu(id)},{l:'星臨の試練',s:'位階'+ROMAN[G.h[id].awLv||1],cls:'ready',f:()=>{enterTown();trialMenu();}},{l:'戻る',cls:'back',f:()=>enterTown()}]);}
 function boardTap(x,y){const N=BOARD[BS.id];let best=null,bd=1e9;for(const k in N){const[nx,ny,s]=bpos(N[k]),d=Math.hypot(nx-x,ny-y);if(d<s*.8&&d<bd){bd=d;best=k;}}if(best){BS.sel=best;SFX.sel();boardMenu();}}
 /* --- ジョブ画面 --- */
 function jobMenu(id,m){const h=G.h[id];
