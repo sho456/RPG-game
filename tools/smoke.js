@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /* ゲーム全体の自動点検（ブラウザで画面を巡回し、JavaScript のエラーを集める）
-   使い方：python3 -m http.server 8765 &   →   node tools/smoke.js [--url http://localhost:8765/index.html] [--shots <dir>] [--quick]
+   使い方：python3 -m http.server 8765 &   →   node tools/smoke.js [--url http://localhost:8765/index.html] [--shots <dir>] [--quick] [--fx] [--no-battle]
    ・巡回：タイトル → 街 → クエスト（全章・全クエストの情報タブ）→ 編成 → 図鑑（敵・仲間・装備の一覧と全員の詳細・3 形態）
            → 戦闘（全種類の敵を 3 体ずつ。AUTO・速度×4 で決着まで。星臨も使う）
+   ・--fx：演出ビューアで、味方全員の全技・星臨（通常／短縮／省略）・敵の全行動を 1 回ずつ再生（演出が終わらない・エラーを検出）
    ・結果：エラーの一覧（場面・メッセージ）。1 件でもあれば終了コード 1
    Playwright は環境に入っているものを使う（require('playwright')） */
 'use strict';
@@ -12,6 +13,8 @@ const opt = k => {const i = args.indexOf(k);return i >= 0 ? args[i + 1] : null;}
 const URL = opt('--url') || 'http://localhost:8765/index.html';
 const SHOTS = opt('--shots');
 const QUICK = args.includes('--quick');
+const FX = args.includes('--fx');
+const NOBATTLE = args.includes('--no-battle');/* 全種類の敵との戦闘を飛ばす（演出だけを点検するとき） */
 const fs = require('fs');
 if (SHOTS) fs.mkdirSync(SHOTS, {recursive: true});
 
@@ -81,10 +84,10 @@ if (SHOTS) fs.mkdirSync(SHOTS, {recursive: true});
   const groups = [];
   for (let i = 0; i < enemies.length; i += 3) groups.push(enemies.slice(i, i + 3));
   const parties = [['rio', 'gald', 'celes', 'mire'], ['hakua', 'noah', 'erna', 'valk'], ['balza', 'jin', 'shion', 'crow']];
-  for (let gi = 0; gi < (QUICK ? 3 : groups.length); gi++) {
+  for (let gi = 0; gi < (NOBATTLE ? 0 : QUICK ? 3 : groups.length); gi++) {
     const g = groups[gi], party = parties[gi % parties.length];
     const name = 'battle:' + g.join(',');
-    await step(name, `(()=>{auto=true;setSpeed(4);G.party=${JSON.stringify(party)};for(const id of G.party){G.h[id].hp=null;G.h[id].awLv=3;}
+    await step(name, `(()=>{auto=true;setSpeed(2);speed=4;/* 点検だけの早回し（画面からは選べない） */G.party=${JSON.stringify(party)};for(const id of G.party){G.h[id].hp=null;G.h[id].awLv=3;}
       const L=${JSON.stringify(g)}.map(k=>({kind:k,lv:ED[k].boss?30:25}));const bs=L.filter(e=>ED[e.kind].boss);
       startBattle(bs.length?[bs[0]]:L,{boss:!!bs.length,onEnd:()=>{window.__end=1;}});window.__end=0;})()`, 300);
     /* 星臨：最初の味方を星臨にする（AG を満たす） */
@@ -100,6 +103,33 @@ if (SHOTS) fs.mkdirSync(SHOTS, {recursive: true});
     await step(name + ':close', `(()=>{if(B){B.over=true;}auto=false;setSpeed(1);try{document.querySelector('#ov').classList.add('hide');}catch(e){}})()`, 2500);
   }
   await step('town-end', () => {try {enterTown();} catch (e) {townMenu();}}, 600);await shot('09_town_end');
+
+  /* 演出の総当たり（--fx）：演出ビューアで、味方全員の全技・星臨（通常／短縮／省略）・敵の全行動を 1 回ずつ再生する。
+     エラー・時間切れ（演出が終わらない）・粒の出しっぱなしを集める */
+  if (FX) {
+    const run = async (name, r, capMs = 20000) => {scene = name;
+      const res = await Promise.race([p.evaluate(r => BXV.play(r), r).catch(e => 'evaluate: ' + String(e.message).split('\n')[0]), new Promise(z => setTimeout(() => z('no-answer'), capMs + 5000))]);
+      if (res) errs.push([name, '演出が正常に終わらない: ' + res]);};
+    const heroesAll = await p.evaluate(() => Object.keys(HB));
+    for (const id of (QUICK ? heroesAll.slice(0, 2) : heroesAll)) {
+      await step('fx-open:' + id, `(()=>{BXV.open({hero:'${id}',ek:'golemkin',n:2,loop:false});setSpeed(2);speed=4;})()`, 700);
+      const sks = await p.evaluate(id => BXV.heroSkills(id), id);
+      for (const k of sks) await run(`fx:${id}:${k}`, {t: 'sk', id: k});
+      for (const m of ['full', 'short', 'skip']) {await p.evaluate(m => {BX.set().aw = m;}, m);await run(`fx:${id}:seirin:${m}`, {t: 'aw'});await run(`fx:${id}:seirin-off`, {t: 'awoff'});}
+      await p.evaluate(() => {BX.set().aw = 'full';});
+      await run(`fx:${id}:hit`, {t: 'state', v: 'hit'});await run(`fx:${id}:down`, {t: 'state', v: 'down'});
+      if (id === heroesAll[0]) await shot('10_fx_viewer');
+    }
+    const eas = await p.evaluate(() => Object.keys(EA));
+    const foes = QUICK ? ['slime'] : ['slime', 'wolf', 'golemkin', 'bookghost', 'boss5', 'x_dragon'];
+    for (const ek of foes) {
+      await step('fx-open-e:' + ek, `(()=>{BXV.open({hero:'gald',ek:'${ek}',n:1,loop:false});setSpeed(2);speed=4;})()`, 700);
+      for (const k of eas) await run(`fx:${ek}:ea:${k}`, {t: 'ea', id: k});
+    }
+    const left = await p.evaluate(async () => {await new Promise(r => setTimeout(r, 2500));return BX.count;});
+    if (left.fx > 0 || left.parts > 40) errs.push(['fx-end', `演出が残ったまま: エフェクト ${left.fx}・粒 ${left.parts}`]);
+    await step('fx-close', () => {BXV.close();}, 900);
+  }
 
   await b.close();
   const uniq = new Map();

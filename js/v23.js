@@ -93,8 +93,8 @@ addEventListener('resize',()=>{if(scene==='battle')requestAnimationFrame(()=>req
 /* ==================== 7. 星臨：テキスト → アニメーション の順に ====================
  これまで：カットイン（文字）と、キャラのポーズ・光の柱が同時に始まり重なっていた。
  これから：①カットイン（「星」「臨」→ 名前と星座名）を出し切って消す → ②戦場に戻して光の柱・ポーズ・衝撃を再生 */
-function seirinText(u){return new Promise(res=>{const st=$('#stage');st.querySelectorAll('.bossin').forEach(e=>e.remove());let c=$('#sr23');if(!c){c=document.createElement('div');c.id='sr23';st.appendChild(c);}
- const A=AW[u.id],lv=u.awLv||1,ec=elCol(u.id),k=speed>=4?.6:speed>=2?.8:1;c.style.setProperty('--ec',ec);c.style.setProperty('--k',k);
+function seirinText(u){return new Promise(res=>{/* ver0.34：星臨演出の設定（短縮・省略）に合わせて縮める／出さない */const ts34=typeof BX!=='undefined'?BX.ts:1;if(ts34<.2){res();return;}const st=$('#stage');st.querySelectorAll('.bossin').forEach(e=>e.remove());let c=$('#sr23');if(!c){c=document.createElement('div');c.id='sr23';st.appendChild(c);}
+ const A=AW[u.id],lv=u.awLv||1,ec=elCol(u.id),k=(speed>=2?.8:1)*Math.min(1,ts34);c.style.setProperty('--ec',ec);c.style.setProperty('--k',k);
  c.innerHTML=`<div class="bg"><i></i><i></i><i></i></div><div class="kj"><b>星</b><b>臨</b></div><div class="tx"><div class="t">${esc(u.name)} ― ${SEIRIN.en}${lv>1?'　位階'+ROMAN[lv]:''}</div><div class="b">《${esc(A.name)}》</div></div><img class="pf" src="${art(u.id,true)}" alt="">`;
  c.className='on';try{tone(523,.08,'triangle',.05);setTimeout(()=>tone(784,.12,'triangle',.05),110);}catch(e){}
  setTimeout(()=>{c.className='on out';},Math.round(1350*k));setTimeout(()=>{c.className='';c.innerHTML='';res();},Math.round(1700*k));});}

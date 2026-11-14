@@ -83,6 +83,8 @@ const styleOf=(u,sk)=>{const A=u.A,k=sk.k;if(A.rig.type!=='hum')return k==='mag'
 const NOHIT=['guard','kenshu','taunt','healAll','guardRegen','item','roar','charge','haste','cheer','grace','scan','reviveAll','barrier','revive','heal','rewind','tstop'];
 /* 行動の開始：味方（技は分かっている） */
 async function pre(u,sk,t){const A=setup(u);if(A.none||!u.alive)return;const c=u._act={sk,n:0};
+ /* ver0.34：演出の台帳（js/battle/seq.js）に定義があれば、そちらで動かす */
+ if(V19.ext){c.bx=V19.ext.find(u,sk)||null;if(c.bx){await V19.ext.pre(u,sk,t,c);return;}}
  if(NOHIT.includes(sk.k)||(sk.k!=='phys'&&sk.k!=='mag'&&!['reso','zen','release','release2','pct','rhythm'].includes(sk.k)&&sk.pow==null)){c.sup=1;
   const[mx,my]=mid(u),[fx,fy]=foot(u),hs=B.heroes.filter(h=>h.alive);
   if(sk.k==='guard'||sk.k==='kenshu'){FX19.shield(mx,my,sk.k==='kenshu'?'#ffd65a':'#c8d8ff');return;}
@@ -100,6 +102,7 @@ async function pre(u,sk,t){const A=setup(u);if(A.none||!u.alive)return;const c=u
   c.ready=(async()=>{await T(big?430:270);await to(u,cp.b,90,'in');})();}}
 /* 1撃ぶんの攻撃動作。戻り値を待ってから命中処理に入る */
 async function strike(a,t,sk){const c=a._act,A=a.A;if(!c||!A||A.none||!a.alive)return;c.n++;const first=c.n===1,R=A.rig,hum=R.type==='hum';c.fx=null;
+ if(V19.ext){if(c.bx===undefined){c.bx=V19.ext.find(a,sk)||null;if(c.bx)await V19.ext.pre(a,sk,t,c);}if(c.bx){await V19.ext.strike(a,t,sk,c);return;}}
  /* ver0.29：モーション台帳（js/motion/registry.js）に専用モーションがあれば、それで 1 撃ぶんを動かす */
  {const ov=typeof MOTION!=='undefined'?MOTION.custom(a,sk):null;if(ov){if(c.ready){await c.ready;c.ready=null;}else if(ov.approach&&(first||c.last!==t))await dash(a,t,first?200:110);c.last=t;
   await MOTION.play(a,ov,c.n);c.fx=Object.assign({type:sk.k==='mag'?'elem':'slash'},ov.fx||{});return;}}
@@ -123,6 +126,7 @@ async function strike(a,t,sk){const c=a._act,A=a.A;if(!c||!A||A.none||!a.alive)r
  c.fx={type:'elem',big:c.big};}
 /* 行動の終わり：元の位置へ跳んで戻る */
 async function finish(u){const c=u._act;u._act=null;const A=u.A;if(!A||A.none)return;
+ if(c&&c.bx&&V19.ext){try{await V19.ext.after(u,c);}catch(e){console.error(e);}}
  if(A.wx||A.wy||A.mv){if(A.rig.type==='hum'&&u.alive)to(u,{ta:-.12,cr:2,fF:[-3,2],fN:[4,3],sw:-2},120);await move(u,0,0,A.rig.type==='hum'?210:280,'io',A.name==='golem'||A.name==='boss'||A.name==='bookghost'?1:6);}
  idle(u,200);}
 
@@ -140,6 +144,7 @@ function onHurt(t,d){const A=t.A;if(!A||A.none)return;const c=CUR&&CUR.a._act,sk
   case'slam':FX19.smash(x,fy0,PHYS.includes(sk.el)||!sk.el?'#d8c8a8':col,{size:fx.big?1.4:1});FX19.burst(x,y,'#ffffff',{size:1.2});if(!PHYS.includes(sk.el)&&sk.el)FX19.elem(sk.el,x,y,.7*sc);break;
   case'fist':FX19.burst(x,y,PHYS.includes(sk.el)||!sk.el?'#ffe9a0':col,{size:fx.big?1.5:1,rays:fx.kick?10:8,rot:(c?c.n:0)*.5});FX19.ring(x,y,'#ffffff',{r0:1,r1:fx.big?15:10,dur:200});if(!PHYS.includes(sk.el)&&sk.el)FX19.elem(sk.el,x,y,.6*sc);break;
   case'elem':FX19.elem(PHYS.includes(sk.el)?'':sk.el,x,y+D.h*.18,sc*(fx.big?1.3:1));if(PHYS.includes(sk.el))FX19.slash(x,y,{col:'#e8f0ff'});break;
+  case'bx':V19.ext.impact(CUR.a,t,sk,c,r,d);break;
   default:FX19.burst(x,y,col,{size:1.1});}
  if(r.crit){FX19.burst(x,y,'#ffe14a',{size:1.9,rays:12,dur:300});FX19.ring(x,y,'#ffe14a',{r1:22,dur:320});}
  if(r.weak)FX19.ring(x,y,'#ffb030',{r0:3,r1:17,dur:280,dash:1,thick:2});
@@ -166,7 +171,7 @@ function onHurt(t,d){const A=t.A;if(!A||A.none)return;const c=CUR&&CUR.a._act,sk
   try{return await pr;}finally{B.heroes.forEach(h=>{if(h!==u&&h.A&&h.A.act)idle(h,260);});}};}
 {const _end=V17F.end;end=async function(win){if(win&&B){try{B.heroes.forEach((h,i)=>{if(!h.alive||!h.A||h.A.none)return;setTimeout(async()=>{move(h,0,0,380,'lin',7);await to(h,VIC.a,180,'out');await to(h,VIC.b,200,'in');},i*90);});await T(820);}catch(e){console.error(e);}}const r=await _end(win);try{if(win&&B&&/レベルアップ/.test($('#ov').innerHTML))B.heroes.forEach(h=>{if(h.alive&&h.A&&!h.A.none)FX19.buff(...mid(h));});}catch(e){}return r;};}
 /* 回復・復活・補助などの文字ポップに合わせてエフェクトを出す（ver0.18 の仕組みを新エフェクトで引き継ぐ） */
-pop=function(u,txt,col,small,kind,el){V17F.pop(u,txt,col,small,kind,el);if(!B||!u||u.x==null||!u.A||u.A.none)return;try{const s=String(txt),[x,y]=mid(u);
+pop=function(u,txt,col,small,kind,el){V17F.pop(u,txt,col,small,kind,el);if(!B||!u||u.x==null||!u.A||u.A.none)return;try{const s=String(txt),[x,y]=mid(u);if(V19.ext&&V19.ext.popFx(u,s,kind))return;
   if(/^\+\d+$/.test(s))FX19.heal(x,y);else if(s==='REVIVE'||s==='奇跡！')FX19.pillar(...foot(u));else if(/^AG\+|^SP\+|HASTE|充填/.test(s))FX19.buff(x,y,/SP/.test(s)?'#6fb2ff':/HASTE/.test(s)?'#8ff0a8':'#ffe27a');
   else if(s==='DELAY'||s==='凍結'||s==='STOP')FX19.ring(x,y,'#7fd6ff',{r0:15,r1:3,dash:1,dur:340});else if(s==='MISS')FX19.spray(x,y,7,['#ffffff','#c8ffd8'],1.3,0,14);else if(s==='SCAN')FX19.ring(x,y,'#7fd6ff',{r1:15,dash:1});}catch(e){}};
 {const _sb=startBattle;startBattle=function(list,opts={}){FX19.clear();return _sb(list,opts);};}
@@ -236,4 +241,4 @@ function icon(u){const key=sprKey(u),A=setup(u);if(A.none)return null;let c=ICO.
 try{for(const k in IMG){if(/_(w|aw)$/.test(k)||!SPRX.info(k))continue;for(const sil of[0,1])Object.defineProperty(ZIMG,k+(sil?'_w':''),{configurable:true,enumerable:true,get(){const ed=ED[k],c=still(k,48,ed&&!ed.flip);const v=c?(sil?PX.whiteOf(c):c).toDataURL():'';Object.defineProperty(ZIMG,k+(sil?'_w':''),{value:v,writable:true,configurable:true,enumerable:true});return v;}});}}catch(e){}
 /* 版表示 */
 const VER19='ver0.19';{const _t=title;title=function(){_t();const v=$('#verL');if(v)v.textContent=VER19;};const v=$('#verL');if(v)v.textContent=VER19;}
-return{foot,mid,dims,WP,MA,CAST,BOW,VIC,AWK,still,icon,drawBattle};})();
+return{foot,mid,dims,near,dash,WP,MA,CAST,BOW,VIC,AWK,still,icon,drawBattle,ext:null};})();

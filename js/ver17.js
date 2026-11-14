@@ -256,7 +256,7 @@ function cfgOpen(back){const s=G&&G.set,seg=(k,opts,cur)=>`<div class="seg">${op
  if(!s)return;const re=()=>{save();cfgOpen(back);if(scene==='battle')bbar(true);};
  ovOpen(`<div class="cfh"><b>✦ 設定</b><button class="sx" data-a="close">✕</button></div><div class="cfb">
  <div class="cfr"><label>テキスト速度<small>会話の文字送り</small></label>${seg('txt',TXS.map((t,i)=>[i,t[0]]),s.txt)}</div>
- <div class="cfr"><label>戦闘速度</label>${seg('spd',[[1,'×1'],[2,'×2'],[4,'×4']],speed)}</div>
+ <div class="cfr"><label>戦闘速度</label>${seg('spd',[[1,'×1'],[2,'×2']],speed)}</div>${typeof CFGX!=='undefined'?CFGX.html(seg):''}
  <div class="cfr"><label>コマンド決定<small>技の選び方</small></label>${seg('tap',[[0,'2タップ（確認あり）'],[1,'1タップ']],s.tap1?1:0)}</div>
  <div class="cfr"><label>通常AUTOの星臨<small>全力AUTOは常にすぐ使う</small></label>${seg('aw',Object.entries(AWN),s.autoAw)}</div>
  <div class="cfr"><label>拾う前フィルター<small>拾った装備を自動で処理する等級</small></label>${seg('fr',FLN.map((n,i)=>[i-1,n]),s.flt.rar)}</div>
@@ -266,8 +266,8 @@ function cfgOpen(back){const s=G&&G.set,seg=(k,opts,cur)=>`<div class="seg">${op
  <div class="cfr"><label>チュートリアル<small>初めての画面で説明を出す</small></label>${seg('tut',[[1,'ON'],[0,'OFF']],s.tut?1:0)}</div>
  <div class="cfr"><label>説明をもう一度<small>次に開いた画面から再表示</small></label><div class="seg"><button data-a="trs">リセット</button><button data-a="how">遊び方</button></div></div></div>
  <button class="tbtn back wide" data-a="close">閉じる</button>`,
- {txt:v=>{s.txt=+v;re();},spd:v=>{setSpeed(+v);re();},tap:v=>{s.tap1=!!+v;re();},aw:v=>{s.autoAw=v;re();},fr:v=>{s.flt.rar=+v;re();},fm:v=>{s.flt.mode=v;re();},fk:v=>{s.flt.keepUp=!!+v;re();},
-  bgm:v=>{if(BGM.on!==!!+v)bgmToggle();re();},tut:v=>{s.tut=!!+v;re();},trs:()=>{G.tut={};s.tut=true;save();cfgOpen(back);tipShow('how');},how:()=>tipShow('how'),close:()=>{ovClose();if(typeof back==='function')back();}});}
+ Object.assign(typeof CFGX!=='undefined'?CFGX.acts(re):{},{txt:v=>{s.txt=+v;re();},spd:v=>{setSpeed(+v);re();},tap:v=>{s.tap1=!!+v;re();},aw:v=>{s.autoAw=v;re();},fr:v=>{s.flt.rar=+v;re();},fm:v=>{s.flt.mode=v;re();},fk:v=>{s.flt.keepUp=!!+v;re();},
+  bgm:v=>{if(BGM.on!==!!+v)bgmToggle();re();},tut:v=>{s.tut=!!+v;re();},trs:()=>{G.tut={};s.tut=true;save();cfgOpen(back);tipShow('how');},how:()=>tipShow('how'),close:()=>{ovClose();if(typeof back==='function')back();}}));}
 
 /* ==================== テキスト速度 ==================== */
 talk=function(lines,done){const d=document.createElement('div');d.id='talk';

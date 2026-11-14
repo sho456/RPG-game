@@ -53,8 +53,9 @@ function title(){SAVE='astral_save_v1';show('title');const ov=$('#ov');ov.classL
  $('#newg').onclick=()=>{au();SAVE='astral_save_v1';if(has&&!warn){warn=true;$('#newg').textContent='もう一度押すと上書きして開始';return;}migrate(newGame());setSpeed(1);SFX.aw();
   enterTown('<b>序章</b>――大灯が揺らぎ、虚蝕が街に迫る。灯守見習いのリオは、元騎士団長ガルドと共に灰の街道へ向かう。');};}
 
-function setSpeed(v){speed=v;$('#spd').textContent='×'+v;document.documentElement.style.setProperty('--pd',(v===1?1.4:v===2?.95:.6)+'s');if(G)G.speed=v;}
-$('#spd').onclick=()=>setSpeed(speed===1?2:speed===2?4:1);
+/* ver0.34：戦闘速度は ×1・×2 の 2 段階（以前の ×4 の保存値は ×2 として読む） */
+function setSpeed(v){v=+v===1?1:2;speed=v;$('#spd').textContent='×'+v;document.documentElement.style.setProperty('--pd',(v===1?1.4:.95)+'s');if(G)G.speed=v;}
+$('#spd').onclick=()=>setSpeed(speed===1?2:1);
 $('#autoB').onclick=()=>{auto=!auto;$('#autoB').classList.toggle('on',auto);if(auto&&B&&B.res&&!B.over)B.res();};
 /* ===== 装備系UI（パネル） ===== */
 let ACT={};

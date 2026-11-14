@@ -1,4 +1,4 @@
-# 戦闘の仕組み（ロジック・モーション・エフェクト）の見取り図（ver0.33）
+# 戦闘の仕組み（ロジック・モーション・エフェクト）の見取り図（ver0.34）
 
 戦闘モーション・エフェクトの大型アップデートの前に、今の作りを整理したもの。
 ドット絵の素材の作り方は [PIPELINE.md](PIPELINE.md)、ファイルの役割は [ASSETS.md](ASSETS.md)。
@@ -20,7 +20,8 @@ startBattle(list, opts)          敵・味方のユニットを作り（enemy() 
 ```
 
 - 戦闘中の状態は全部 `B`（グローバル）。`B.heroes` / `B.enemies` / `B.over` / `B.opts`。
-- 時間：`wait(ms)`（engine）と `ANIM.T(ms)`（演出）は、どちらも速度（`SPD[speed]`、×1・×2・×4）で縮む。
+- 時間：`wait(ms)`（engine）と `ANIM.T(ms)`（演出）は、どちらも速度（`SPD[speed]`、×1・×2）で縮む。ver0.34 から `SPD` は「基準×倍率」で、
+  `BX.scaled(倍率, fn)` の間だけまとめて縮められる（星臨演出の短縮・省略）。
 - **注意**：`run()` は `B` をその都度読むので、戦闘中に別の `startBattle` を呼ぶと古い手番が新しい `B` に触れる。
   ver0.33 で `hit` に「対象がいなければ何もしない」防御を入れた（js/ver19.js）。戦闘を打ち切るときは `B.over=true` にして、
   手番が終わるのを待ってから次を始める。
@@ -40,6 +41,7 @@ startBattle(list, opts)          敵・味方のユニットを作り（enemy() 
 | 骨格 | `js/motion/skeleton.js`（`SKEL`） | 不透明画素から関節を推定（呼吸の切れ目＝腰）。手動修正は `js/data/skeleton-overrides.js` |
 | 状態効果・新しい技 | `js/v20-battle.js` | バフ・デバフ・毒…の見せ方（`fx20`）も含む |
 | 戦闘画面の UI | `js/v22.js` `v23.js` `v24.js` `v25.js` | DOM の重ね（`#hud` `#labels` `#pops`）、文字（`TX24`）、自分の番だけのパネル |
+| **演出の台帳（ver0.34〜）** | `js/battle/`（`BX` `BXP` `BXS` `BXV`） | 技ごとの演出をデータで組む新しい層。`V19.ext` から差し込まれ、定義のある技だけ置き換わる。作り方と計画は [FX.md](FX.md) |
 
 ### 2-1. ver0.17 の「控え」（V17F）と ver0.18 の整理
 
@@ -82,18 +84,18 @@ startBattle(list, opts)          敵・味方のユニットを作り（enemy() 
 <!-- wrapmap:begin -->
 | 関数 | 読み込み順の流れ（**太字**＝定義、（控え）＝V17F に控えた時点、＊＝控えを包む） |
 |---|---|
-| `startBattle` | **engine.js** → ch8.js → ver18-battle.js → ver19.js → v20-battle.js → v21.js → v22.js → v23.js → v24.js → v25.js |
+| `startBattle` | **engine.js** → ch8.js → ver18-battle.js → ver19.js → v20-battle.js → v21.js → v22.js → v23.js → v24.js → v25.js → battle/seq.js |
 | `run` | **engine.js** |
 | `nextActor` | **engine.js** |
-| `heroTurn` | **engine.js** → v20-battle.js → v22.js → v25.js |
-| `enemyTurn` | **engine.js** → ver19-pre.js（控え） → ver19.js＊ → v20-battle.js → v20-ui.js → v25.js |
+| `heroTurn` | **engine.js** → v20-battle.js → v22.js → v25.js → battle/viewer.js |
+| `enemyTurn` | **engine.js** → ver19-pre.js（控え） → ver19.js＊ → v20-battle.js → v20-ui.js → v25.js → battle/viewer.js |
 | `doAction` | **engine.js** → ch8.js → ver19-pre.js（控え） → ver19.js＊ → v20-battle.js → v20-ui.js → v22.js |
 | `hit` | **engine.js** → ver19-pre.js（控え） → ver19.js＊ → v20-battle.js |
 | `calc` | **engine.js** → ch8.js → ch9.js → ver19.js → v20-battle.js → v20-battle.js → data/terms.js → v31/core.js |
 | `hurt` | **engine.js** → ver19.js → v20-battle.js |
 | `kill` | **engine.js** → ver19-pre.js（控え） → ver19.js＊ |
 | `pop` | **engine.js** → **ch5.js** → ver19-pre.js（控え） → ver19.js＊ → v25.js＊ |
-| `awaken` | **engine.js** → ch8.js → ver19-pre.js（控え） → ver19.js＊ → v22.js → v23.js → v25.js |
+| `awaken` | **engine.js** → ch8.js → ver19-pre.js（控え） → ver19.js＊ → v22.js → v23.js → v25.js → battle/viewer.js |
 | `endAw` | **engine.js** |
 | `reso` | **engine.js** → **awaken.js** → ver18-art.js → ver19.js → v22.js |
 | `end` | **engine.js** → ver19-pre.js（控え） → ver19.js＊ → v20-ui.js → v31/quests.js |
@@ -106,8 +108,8 @@ startBattle(list, opts)          敵・味方のユニットを作り（enemy() 
 
 戦闘以外で 4 回以上包まれている関数：
 
-- `title`（16）：**town.js** → ver16.js → ver18-town.js → ver19.js → v20-ui.js → v21.js → v22.js → v22.js → v23.js → v24.js → v25.js → v30.js → v31/core.js → v31/quests.js → v32.js → v33.js
-- `dvMenu`（14）：**dev.js** → ch9.js → ver16.js → ver17.js → ver18-town.js → v20-ui.js → v21.js → v22.js → v23.js → v24.js → v25.js → v29.js → v30.js → v31/quests.js
+- `title`（17）：**town.js** → ver16.js → ver18-town.js → ver19.js → v20-ui.js → v21.js → v22.js → v22.js → v23.js → v24.js → v25.js → v30.js → v31/core.js → v31/quests.js → v32.js → v33.js → battle/version.js
+- `dvMenu`（15）：**dev.js** → ch9.js → ver16.js → ver17.js → ver18-town.js → v20-ui.js → v21.js → v22.js → v23.js → v24.js → v25.js → v29.js → v30.js → v31/quests.js → battle/viewer.js
 - `show`（10）：**core.js** → ver17.js → ver18-town.js → v20-ui.js → v20-ui.js → v22.js → v23.js → v23.js → v24.js → v25.js
 - `migrate`（8）：**items.js** → ch8.js → ch9.js → ver17.js → ver18-field.js → v31/items.js → v31/quests.js → v32.js
 - `townMenu`（6）：**town.js** → ch9.js → ver17.js → v21.js → v23.js → v31/quests.js
