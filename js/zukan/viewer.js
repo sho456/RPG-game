@@ -56,10 +56,19 @@ function fitOf(pl,Wd,Hd){const want=FACING.of(S.key,S.u?S.u.side:0),k=Wd+'x'+Hd+
  if(!best){const sk=Object.keys(Z).filter(s=>'bB'.includes(s[0])).sort((a,b)=>Z[a].dots-Z[b].dots)[0];best={sk,z:1,off:0,T:0};}
  pl._fit=best;pl._fitK=k;return best;}
 
+/* 旧リグ（提供原画の無い敵）：最初のコマの不透明な範囲（外枠）を測り、外枠が枠に収まる倍率と、外枠の中心を枠の中央に置くずらしを決める。
+   以後のコマも同じ値を使う（待機の動きで倍率や位置が揺れない） */
+function legFit(f,R,Wd,Hd){let x0=0,x1=f.w,y0=0;try{const d=f.cv.getContext('2d').getImageData(0,0,f.cv.width,f.cv.height).data,W=f.cv.width;
+  let a=W,b=-1,t=f.cv.height;for(let y=0;y<f.cv.height;y++)for(let x=0;x<W;x++)if(d[(y*W+x)*4+3]>8){if(x<a)a=x;if(x>b)b=x;if(y<t)t=y;}if(b>=a){x0=a;x1=b+1;y0=t;}}catch(e){}
+ const L=f.ax+.5-x0,Rr=x1-f.ax-.5,T=f.ay+1-y0;
+ const z=Math.max(1,Math.floor(Math.min(Hd*.80/(T+MARGIN),Wd*.90/(L+Rr+MARGIN*2))));
+ return{k:Wd+'x'+Hd,z,off:(L-Rr)/2,T};}
+
 /* ---------- 1 コマ ---------- */
 function frameOf(Wd,Hd){const u=S.u,pl=S.plan,mo=S.motion;
  if(pl.legacy){const A=ANIM.setup(u),R=A.rig,pose=ANIM.poseOf(u);const f=SPRX.frame(A.name,pose||ANIM.base(A),A.palKey,A.pal,A.flip,1,A.extra);if(!f)return null;
-  const z=Math.max(1,Math.floor(Math.min(Hd*.70/(R.hgt||36),Wd*.50/(R.wid||22))));return{cv:f.cv,w:f.w,h:f.h,ax:f.ax,ay:f.ay,z};}
+  const L=S.leg&&S.leg.k===Wd+'x'+Hd?S.leg:(S.leg=legFit(f,R,Wd,Hd));
+  return{cv:f.cv,w:f.w,h:f.h,ax:f.ax,ay:f.ay,z:L.z,off:L.off,T:L.T};}
  const{sk,z}=fitOf(pl,Wd,Hd),c=SPX.D[pl.id],want=FACING.of(S.key,u.side),mir=cid=>FACING.mirror(SPX.D[cid].face,want);
  let f=null,dx=0,dy=0;
  if(mo==='front')f=SPX.cut(pl.id,sk,pl.v,'front',false,0,0);
@@ -91,9 +100,9 @@ function loop(){if(!S.cv||!S.cv.isConnected){stop();return;}try{draw();}catch(e)
 /* type：'h'（プレイアブルキャラ）| 'e'（敵） */
 function start(c,type,key){stop();const hero=type==='h';
  const u=hero?{id:key,side:0,spr:key,name:HB[key].name,x:0,y:0,sc:2,alive:true,hp:100,mhp:100,aw:false,awLv:(G.h[key]&&G.h[key].awLv)||1,guard:false,sts:[]}
-  :{kind:key,side:1,spr:key,name:ED[key].name,x:0,y:0,sc:ED[key].sc||2,alive:true,hp:100,mhp:100,boss:!!ED[key].boss,charging:false,sts:[]};
+  :{kind:key,side:1,spr:ED[key].spr||key,name:ED[key].name,x:0,y:0,sc:ED[key].sc||2,alive:true,hp:100,mhp:100,boss:!!ED[key].boss,charging:false,sts:[]};
  let A,pl;try{A=ANIM.setup(u);pl=A.none?null:planOf(u);}catch(e){console.error(e);pl=null;}if(!pl)return false;
- Object.assign(S,{cv:c,u,key,type,plan:pl,motion:pl.modes.includes('idle')?'idle':pl.modes[0],parts:[],last:null,shadowW:0});
+ Object.assign(S,{cv:c,u,key,type,plan:pl,motion:pl.modes.includes('idle')?'idle':pl.modes[0],parts:[],last:null,shadowW:0,leg:null});
  setMotion(S.motion);S.raf=requestAnimationFrame(loop);return true;}
 function stop(){cancelAnimationFrame(S.raf);S.raf=0;S.cv=null;S.u=null;}
 function setMotion(m){if(!S.u||!S.plan||!S.plan.modes.includes(m))return;S.motion=m;S.parts=[];S.u.aw=m==='seirin';

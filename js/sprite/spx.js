@@ -28,7 +28,7 @@ const FAM={slime:['slime',''],moss:['slime','moss'],cursedslime:['slime','cursed
  boss:['banjin',''],boss3:['banjin','boss3'],
  /* ver0.26 第2弾：氷の精・毒茸・大海月・影法師・金の狼・緑の騎士・火竜 */
  yukirei:['icespirit',''],ember:['icespirit','ember'],shroom:['shroom',''],jelly:['jelly',''],shade:['shade',''],
- raiwolf:['goldwolf',''],jadewolf:['goldwolf','jadewolf'],snowwolf:['goldwolf','snowwolf'],
+ raiwolf:['goldwolf','raiwolf'],jadewolf:['goldwolf','jadewolf'],snowwolf:['goldwolf',''],/* 狼の系統：原画（白い氷の狼）のままが雪狼 */
  dragonewt:['gknight',''],onimusha:['gknight','onimusha'],minerghost:['gknight','minerghost'],firedrake:['drake',''],last2:['drake','last2'],
  /* ver0.28：氷の女王・忍・虚神ノクス（リオの色違い） */
  boss6:['queen',''],boss4:['ninja',''],boss4b:['ninja','boss4b'],last3:['rio','last3']};
@@ -124,7 +124,7 @@ const DEF={rio:{base:'rio',wid:25,hgt:36},wolf:{base:'wolf',wid:72.5,hgt:43},bos
     騎士は人型の骨格（踏み込み・斬りつけの振り付け）を流用し、絵は 1 枚絵を傾けて動かす */
  slime:{base:'slime',wid:42,hgt:45},knight:{base:'gald',wid:36,hgt:54},golem:{base:'golem',wid:62,hgt:79,nsc:.86},banjin:{base:'boss',wid:33,hgt:63},
  icespirit:{base:'bookghost',wid:34,hgt:56},shroom:{base:'shroom',wid:40,hgt:54},jelly:{base:'shroom',wid:33,hgt:54},shade:{base:'bookghost',wid:40,hgt:61},
- goldwolf:{base:'wolf',wid:64,hgt:70},gknight:{base:'gald',wid:31,hgt:47},drake:{base:'wolf',wid:62,hgt:75},
+ goldwolf:{base:'wolf',wid:66,hgt:64},/* 狼の系統：新しい原画は尻尾のぶん横に広いので、横幅を少し広げる */gknight:{base:'gald',wid:31,hgt:47},drake:{base:'wolf',wid:62,hgt:75},
  queen:{base:'noah',wid:30,hgt:62},ninja:{base:'crow',wid:31,hgt:54}};
 /* 仲間：元のリグを土台にし、背丈は元のリグの比（データ側のサイズも同じ比で作ってある） */
 const HEROES=['gald','mire','shion','noah','erna','balza','crow','hakua','jin','celes','valk'];

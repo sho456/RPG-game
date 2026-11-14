@@ -68,6 +68,8 @@ js/
    ポーズ名は `MOTION` の素材名（`stance front back ready lunge dash cast guard hit weak win down awk`）に合わせる。
    新しいポーズ（例：`skill_koujin`）は `BATTLE` に名前を足すと全サイズで作られる。
 3. 敵：`build_spx_enemies.py` に追加し、`spx.js` の `FAM`（色違い）と `DEF`（元のリグ・大きさ）に登録する。
+   原画を差し替えるときは `SOURCES` に原画を足し、古い並びの絵は `views=['skip']` にする（例：狼の系統 `enemies_snowwolf.jpg`。
+   原画のままが雪狼、雷狼・翠狼は `VARS.goldwolf` の色替え、v31 の天狼などは `js/v31/enemies.js` の `VAR` が自動で色替えする）。
 4. `python3 tools/build_spx_heroes.py`（または enemies）→ `python3 tools/spx_normalize.py` を実行。
 5. 図鑑（正面・待機・星臨）と、開発者メニュー「基準画像の並び」で縮尺・足元を確認する。`python3 tools/spx_qa.py check` も通す。
 

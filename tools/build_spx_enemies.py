@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """提供原画（敵）→ js/spx-data-enemy.js
 
-assets_src/originals/enemies_set1.jpg（白背景に 4 体：スライム／騎士／ゴーレム／番人）から、
+assets_src/originals/enemies_*.jpg（白背景にキャラを並べた原画）から、
 spx.js が読む形式（キャラ×サイズごとのパレット付き PNG アトラス）を作る。
 
 ・背景：白に近い画素のうち、画像の縁とつながっているものだけを抜く（体の中の白いハイライトは残す）
@@ -33,7 +33,7 @@ SOURCES = [
     ('enemies_set2.jpg', [
         dict(id='icespirit', face='L', ncol=30, b=[30, 34, 38, 44, 50, 56, 64, 72, 82], f=20, z=46, u=44),
         dict(id='shroom',    face='L', ncol=34, b=[34, 38, 44, 50, 56, 64, 72, 82, 94], f=24, z=46, u=52),
-        dict(id='goldwolf',  face='R', ncol=32, b=[56, 64, 72, 82, 92, 104, 118, 134, 150], f=36, z=46, u=64),
+        dict(id='_goldwolf_old', views=['skip']),   # 旧・金の狼（enemies_snowwolf.jpg に差し替え。並びの数合わせに読むだけ）
         dict(id='gknight',   face='L', ncol=36, b=[28, 32, 36, 40, 46, 52, 58, 66, 76], f=20, z=46, u=44),
     ]),
     ('enemies_set3.jpg', [
@@ -41,6 +41,10 @@ SOURCES = [
         dict(id='shade', face='L', ncol=30, b=[34, 38, 44, 50, 56, 64, 72, 82, 94], f=24, z=46, u=52),
         dict(id='drake', face='R', ncol=36, b=[56, 64, 72, 82, 92, 104, 118, 134, 150, 170, 192, 216], f=44, z=46, u=64),
     ]),
+    # 狼の系統（雪狼・雷狼・翠狼・天狼…）：新しい原画（白い氷の狼）。1 体だけの絵。ring：白い毛の光沢を背景と見分ける。despeckle：周りの光の粒を落とす
+    ('enemies_snowwolf.jpg', [
+        dict(id='goldwolf', face='R', ncol=34, b=[64, 72, 82, 92, 104, 118, 134, 150, 170], f=40, z=46, u=64),
+    ], {'ring': 120, 'despeckle': .004}),
     # 3 方向の絵：views に原画の左からの並び（idle＝戦闘で使う斜めの絵。right 向き）。shadow：足元の影を抜く
     ('enemies_queen.jpg', [
         dict(id='queen', face='R', ncol=36, views=['front', 'idle', 'skip'], shadow=True,
@@ -54,7 +58,10 @@ SOURCES = [
 
 
 # ---------- 読み込み・背景抜き・切り出し ----------
-def load_source(fname, n_chars):
+def load_source(fname, n_chars, ring=0, despeckle=0):
+    """ring：体に囲まれた白い島を「すき間」とみなすのは、周り（3 画素の輪）の白との色差の平均が ring を超える（＝輪郭線に囲まれた）ときだけ。
+    白い毛・刃の光沢（明るい色に囲まれている）は残す。0 なら従来の判定（広い島はすべて抜く）。
+    despeckle：本体から離れた、最大の成分のこの割合より小さい粒（光の粒・飾りの星）を落とす"""
     img = np.asarray(Image.open(ORIG(fname)).convert('RGB')).astype(np.float64)
     dist = (255 - img).max(2)
     lab, n = nd.label(dist <= 28)
@@ -65,14 +72,20 @@ def load_source(fname, n_chars):
         if i + 1 in border:
             continue
         mdist = dist[o_][lab[o_] == i + 1].mean()
-        if s_ >= 300 or (s_ >= 80 and mdist < 6):
+        if ring:
+            if s_ >= 80 and mdist < 10:
+                sl = tuple(slice(max(0, q.start - 4), q.stop + 4) for q in o_)
+                me = lab[sl] == i + 1
+                if dist[sl][nd.binary_dilation(me, iterations=3) & ~me].mean() > ring:
+                    fg[lab == i + 1] = False
+        elif s_ >= 300 or (s_ >= 80 and mdist < 6):
             fg[lab == i + 1] = False
     fg = nd.binary_opening(fg, iterations=1)          # JPEG の縁のにじみ（1 画素の白っぽい輪）を落とす
     fg = nd.binary_erosion(fg, iterations=1) | (fg & (dist > 120))
     lab2, n2 = nd.label(fg)
     sizes = nd.sum(fg, lab2, range(1, n2 + 1))
     objs = nd.find_objects(lab2)
-    comps = [(i + 1, s, o) for i, (s, o) in enumerate(zip(sizes, objs)) if s >= 25]
+    comps = [(i + 1, s, o) for i, (s, o) in enumerate(zip(sizes, objs)) if s >= max(25, despeckle * sizes.max())]
     bodies = sorted(sorted(comps, key=lambda c: -c[1])[:n_chars], key=lambda c: c[2][1].start)
     owner = {}
     for li, s, o in comps:
@@ -182,11 +195,17 @@ VARS = {
         'ember': [(HUE(160, 260, .08), lambda h, s, v: (((22 + (1 - v) * 40) / 360), min(1, s * 1.6 + .25), v * 1.02)),
                   (ANY, lambda h, s, v: (40 / 360, .25, v))],
     },
-    # 金の狼（原画：黄色の毛・茶色の背の棘・青い目）→ 翠狼・雪狼
+    # 狼の系統（原画：白〜薄紫の毛・青灰の氷の棘・桃色の目・紺の輪郭）。原画のままが雪狼（snowwolf）
+    #   → 雷狼（raiwolf：金色の毛・茶の棘・青い目）・翠狼（jadewolf：翠の毛・暗い緑の棘・赤い目）
     'goldwolf': {
-        'jadewolf':  [(HUE(185, 250, .3), tint(355, smul=1, val=1.05)), (HUE(20, 75, .1), tint(150, smul=.45, val=.86))],
-        'snowwolf':  [(HUE(185, 250, .3), tint(205, smul=1, val=1.1)), (HUE(40, 75, .1), tint(210, smul=.1, val=1.18)),
-                      (HUE(15, 40, .1), tint(212, smul=.25, val=1.05))],
+        'raiwolf':  [(lambda h, s, v: s >= .3 and hue_in(h, 285, 345), tint(200, sat=.8, val=1.0)),
+                     (lambda h, s, v: v < .25, lambda h, s, v: (h, s, v)),
+                     (HUE(180, 214, .12), lambda h, s, v: (26 / 360, .55, v * .78)),
+                     (ANY, lambda h, s, v: ((50 - (1 - v) * 34) / 360, min(.92, .62 + (1 - v) * 1.1), min(1, v * .97)))],
+        'jadewolf': [(lambda h, s, v: s >= .3 and hue_in(h, 285, 345), tint(355, sat=.85, val=1.0)),
+                     (lambda h, s, v: v < .25, lambda h, s, v: (h, s, v)),
+                     (HUE(180, 214, .12), lambda h, s, v: (105 / 360, .4, v * .62)),
+                     (ANY, lambda h, s, v: ((158 + (1 - v) * 12) / 360, min(.75, .36 + (1 - v) * 1.1), v * .86))],
     },
     # 緑の騎士（原画：緑の鎧・赤い羽根飾りと外套・金の縁）→ 竜兵（そのまま）・鬼武者・坑道の亡者
     'gknight': {
@@ -245,9 +264,10 @@ def pack_frames(tiles, pal):
 data = {}
 prev = []
 CHARS = []
-for fname, chars in SOURCES:
+for src in SOURCES:
+    fname, chars, opt = src if len(src) == 3 else (*src, {})
     n_fig = sum(len(C.get('views', ['idle'])) for C in chars)
-    crops = load_source(fname, n_fig)
+    crops = load_source(fname, n_fig, **opt)
     k = 0
     for C in chars:
         C['frames'] = {}
@@ -258,7 +278,8 @@ for fname, chars in SOURCES:
                 cr = drop_shadow(*cr)
             if vn != 'skip':
                 C['frames'][vn] = cr
-        CHARS.append(C)
+        if C['frames']:
+            CHARS.append(C)
 for C in CHARS:
     rgb0, a0 = C['frames']['idle']
     hh, ww = a0.shape
