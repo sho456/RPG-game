@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 """味方の原画 → js/spx-data-heroes.js（spx-data.js の同じキャラを上書きする）
 
-・rio・celes・gald・mire（2026-11 の新原画）：正面・待機・星臨を横に 3 体並べたシート（<id>_v2.jpg）。from_trio で切り出す。
+・rio・celes・gald・mire・hakua・noah・erna・valk（2026-11 の新原画）：正面・待機・星臨を横に 3 体並べたシート（<id>_v2.jpg）。from_trio で切り出す。
   待機・星臨は原画で右を向いているので反転して左向きに。正面は原画のまま。
   戦闘不能は待機を寝かせて作り、他のポーズ（攻撃・詠唱・被弾…）は 1 枚絵（single）として spx.js が待機の絵を動かす
-・（旧）rio_sheet.png：ver0.31 までのリオのシート。ラベル（文字）とポーズは別の連結成分なので、枠ごとに最大の成分を拾う
-・valk：ラベルなしシート（valk_sheet.jpg）。左上から順に 待機/正面/背面/攻撃/防御/歩き/走り/詠唱/被弾/瀕死/勝利/戦闘不能/(戦闘不能2)/覚醒
 ・jin：1 枚絵（jin.jpg）。待機・正面に使い、他のポーズは spx.js が 1 枚絵を動かして表す。戦闘不能は体を寝かせ、柴犬は座らせたまま
-・noah_K：既存データ（assets_src/legacy/spx-legacy.json）の修正。右を向いていたので左右反転し、枠で切れていた翼を反対側の翼から補う
 ・jin_K：既存データの調整。原画（柴犬の相棒）に合わせ、相棒の獣の毛並みを橙と白に
 ・rio の色違い last3（虚神ノクス）も作る
 大きさは「正面」の背丈を各サイズのドット数にそろえ、全ポーズを同じ倍率で縮める。
@@ -164,12 +161,16 @@ def foot(m, name):
     return int(round(np.median(low))), ay
 
 
-def head_crop(rgb, a, L, skip=0.0):
-    """skip：上端から飛ばす割合（背の高い帽子・羽飾りの分。顔が枠に入るように）"""
+def head_crop(rgb, a, L, skip=0.0, at=None):
+    """skip：上端から飛ばす割合（背の高い帽子・羽飾りの分。顔が枠に入るように）。
+    at：(中心の x, 上端の y) を絵の幅・高さに対する割合で直接指定（杖・弓・光輪が頭より上や横に出ている絵）"""
     ys, xs = np.where(a > 0)
-    top = ys.min() + int(a.shape[0] * skip)
-    band = xs[(ys >= top) & (ys < top + int(L * .85))]
-    cx = int(round(np.median(band)))
+    if at:
+        cx, top = int(round(at[0] * a.shape[1])), int(round(at[1] * a.shape[0]))
+    else:
+        top = ys.min() + int(a.shape[0] * skip)
+        band = xs[(ys >= top) & (ys < top + int(L * .85))]
+        cx = int(round(np.median(band)))
     x0 = max(0, cx - L // 2)
     y0 = max(0, top - int(L * .03))
     pr, pa = np.zeros((L, L, 3)), np.zeros((L, L))
@@ -219,8 +220,8 @@ def render(src, pal, kscale, dots, name):
     return idx, ax, ay
 
 
-def heads_of(src, pal, L, skip=0.0):
-    r, a = head_crop(*src, L, skip)
+def heads_of(src, pal, L, skip=0.0, at=None):
+    r, a = head_crop(*src, L, skip, at)
     tiles = []
     for nn in (20, 22, 48):
         col, m = shrink(r, a, nn)
@@ -240,7 +241,7 @@ def aw_col(c):
     return np.array(colorsys.hsv_to_rgb(h, s, v)) * 255
 
 
-def build_hero(hid, F, head_from='front', head_k=.37, ref_k=1.0, single=False, head_skip=0.0):
+def build_hero(hid, F, head_from='front', head_k=.37, ref_k=1.0, single=False, head_skip=0.0, head_at=None, head_atK=None):
     """F：ポーズ名→(rgb, alpha)。'awk' があれば <hid>_K も作る"""
     ref_h = F['front'][1].shape[0] * ref_k
     names = [k for k in F if k != 'awk']
@@ -264,7 +265,7 @@ def build_hero(hid, F, head_from='front', head_k=.37, ref_k=1.0, single=False, h
         C['sizes'][sk] = S
         if sk in ('B84',):
             prev.append((hid + ' ' + sk, tiles, pal))
-    C['heads'] = heads_of(F[head_from], pal, int(round(F[head_from][1].shape[0] * head_k)), head_skip)
+    C['heads'] = heads_of(F[head_from], pal, int(round(F[head_from][1].shape[0] * head_k)), head_skip, head_at)
     C['palAw'] = [hexs(aw_col(c)) for c in pal[:-1]] + [hexs(pal[-1])]
     out = {hid: C}
     if 'awk' in F:
@@ -280,12 +281,12 @@ def build_hero(hid, F, head_from='front', head_k=.37, ref_k=1.0, single=False, h
             K['sizes'][sk] = S
             if sk == 'B84':
                 prev.append((hid + '_K ' + sk, [('awk', idx, ax, ay)], palK))
-        K['heads'] = heads_of(F['awk'], palK, int(round(F['awk'][1].shape[0] * head_k * .92)), head_skip)
+        K['heads'] = heads_of(F['awk'], palK, int(round(F['awk'][1].shape[0] * head_k * .92)), head_skip, head_atK)
         out[hid + '_K'] = K
     return out, prev
 
 
-# ---------- 既存データの修正（noah_K・jin_K の元データは assets_src/legacy/spx-legacy.json に保管。tools/spx_normalize.py 参照） ----------
+# ---------- 既存データの修正（jin_K の元データは assets_src/legacy/spx-legacy.json に保管。tools/spx_normalize.py 参照） ----------
 D0 = json.load(open(os.path.join(ROOT, 'assets_src', 'legacy', 'spx-legacy.json')))
 
 
@@ -311,53 +312,6 @@ def requant(entries, ncol=34):
         idx = to_pal_idx(rgba[:, :, :3], rgba[:, :, 3] > 0, pal)
         by.setdefault(sk, []).append((nm, idx, ax, ay))
     return pal, by
-
-
-def fix_noah_K():
-    """右向き→左向き。左右反転したあと、枠で切れた側（左）の翼を、無傷の右の翼を鏡に映して補う"""
-    c = D0['noah_K']
-    entries = []
-    for sk in c['sizes']:
-        S, im = decode(c, sk)
-        x, y, w, h, ax, ay = S['frames']['awk']
-        f = im[y:y + h, x:x + w][:, ::-1].copy()
-        ax = w - 1 - ax
-        a = f[:, :, 3] > 0
-        ys, xs = np.where(a)
-        top = ys.min()
-        head = xs[(ys < top + h * .3)]
-        axis = (head.min() + head.max()) / 2           # 光輪と頭の中心＝体の軸
-        body = w * .17                                  # 胴体の半幅（ここより外を翼とみなす）
-        wing = np.zeros_like(a)
-        wing[: int(h * .66), :] = True
-        cols = np.arange(w)[None, :]
-        src = a & wing & (cols > axis + body)
-        # 鏡像の位置（x' = 2*axis - x）。左へはみ出す分だけ枠を広げる
-        sy, sx = np.where(src)
-        mx = np.round(2 * axis - sx).astype(int)
-        pad = max(0, -mx.min())
-        out = np.zeros((h, w + pad, 4))
-        out[:, pad:] = f
-        for yy, xx, mm in zip(sy, sx, mx):
-            if out[yy, mm + pad, 3] == 0:
-                out[yy, mm + pad] = f[yy, xx]
-        entries.append((sk, 'awk', out, ax + pad, ay))
-    pal, by = requant(entries)
-    K = {'face': 'L', 'kind': 'hum', 'pal': [hexs(p) for p in pal], 'sizes': {}}
-    prev = []
-    for sk in c['sizes']:
-        S = pack(by[sk], pal)
-        S.update({'k': c['sizes'][sk]['k'], 'dots': c['sizes'][sk]['dots']})
-        K['sizes'][sk] = S
-        if sk == 'B84':
-            prev.append(('noah_K ' + sk, by[sk], pal))
-    # 顔：反転のみ
-    Sh, imh = decode(c, 'heads')
-    he = []
-    for nm, (x, y, w, h, _, _) in Sh['frames'].items():
-        he.append((nm, to_pal_idx(imh[y:y + h, x:x + w][:, ::-1, :3], imh[y:y + h, x:x + w][:, ::-1, 3] > 0, pal), 0, 0))
-    K['heads'] = pack(he, pal)
-    return K, prev
 
 
 def fix_jin_K(jin):
@@ -448,16 +402,7 @@ def jin_frames():
 
 
 # ---------- 作成 ----------
-RIO_CELLS = {
-    'stance': (0, 240, 55, 290), 'front': (240, 500, 55, 290), 'back': (500, 720, 55, 290),
-    'lunge': (720, 1030, 55, 290), 'guard': (1030, 1264, 55, 290),
-    'walk_a': (0, 230, 335, 575), 'dash': (230, 500, 335, 575), 'cast': (500, 760, 335, 575),
-    'hit': (760, 1000, 335, 575), 'weak': (1000, 1264, 335, 575),
-    'win': (0, 470, 590, 848), 'down': (470, 780, 590, 848), 'awk': (780, 1264, 590, 848),
-}
-VALK_NAMES = ['stance', 'front', 'back', 'lunge', 'guard', 'walk_a', 'dash', 'cast', 'hit', 'weak', 'win', 'down', 'down2', 'awk']
-# 原画で右を向いているポーズ（顔・胴体・視線・武器の構えで判定）。反転して左向きに
-VALK_FLIP = {'stance', 'lunge', 'guard', 'walk_a', 'dash', 'cast', 'hit', 'weak', 'win'}   # 翼（背中）が左・顔の見える側が右＝右向き
+# （ver0.31 までのリオ rio_sheet.png・ヴァルク valk_sheet.jpg の切り出し表は、新原画への差し替えで不要になったので外した。git の履歴に残っている）
 
 data, prev = {}, []
 # 新原画：正面・待機・星臨の 3 体シート。原画の待機・星臨は右向き → 反転して左向き（正面は原画のまま）
@@ -467,6 +412,10 @@ TRIO = {   # id: (原画, from_trio の設定, build_hero の設定)
     'celes': ('celes_v2.jpg', {'ring': 60}, {'head_skip': .26}),    # 暗い背景：すき間も輪郭も暗いので輪の判定を緩める。顔グラは帽子の分を飛ばす
     'gald': ('gald_v2.jpg', {'ring': 120, 'erase': GALD_GHOST}, {'head_skip': .12}),
     'mire': ('mire_v2.jpg', {}, {}),
+    'hakua': ('hakua_v2.jpg', {}, {'head_atK': (.33, .15)}),     # 顔グラの位置（星臨は冠の飾りが高い）
+    'noah': ('noah_v2.jpg', {}, {'head_at': (.6, .11), 'head_atK': (.49, .21)}),   # 杖・翼・光輪が頭より高い
+    'erna': ('erna_v2.jpg', {}, {'head_atK': (.54, .2)}),      # 星臨は弓が頭より高い
+    'valk': ('valk_v2.jpg', {}, {'head_skip': .1}),            # 顔グラは角の分を飛ばす
 }
 for hid, (fn, opt, hopt) in TRIO.items():
     F = from_trio(fn, **opt)
@@ -492,21 +441,10 @@ def last3(c):
     return np.array(colorsys.hsv_to_rgb(h2 / 360, s2, v2)) * 255
 data['rio']['vars'] = {'last3': [hexs(last3(np.array([int(x[1:3], 16), int(x[3:5], 16), int(x[5:7], 16)]))) for x in data['rio']['pal'][:-1]] + [data['rio']['pal'][-1]]}
 
-F = from_auto('valk_sheet.jpg', VALK_NAMES, rows=[330, 590])
-F.pop('down2')   # 戦闘不能の 2 枚目（剣なし）は使わない
-for k in VALK_FLIP:
-    F[k] = flip(F[k])
-o, p = build_hero('valk', F)
-data.update(o)
-prev += p
-
 o, p = build_hero('jin', jin_frames(), head_from='stance', head_k=.33, ref_k=1.08, single=True)
 data.update(o)
 prev += p
 
-K, p = fix_noah_K()
-data['noah_K'] = K
-prev += p
 K, p = fix_jin_K(data['jin'])
 data['jin_K'] = K
 prev += p

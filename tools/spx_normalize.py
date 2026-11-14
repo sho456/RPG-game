@@ -33,7 +33,7 @@ SCALE = os.path.join(ROOT, 'assets_src', 'character_scale.json')
 HEADER = '/* 自動生成：旧 tools/build_spx.py の出力を tools/spx_normalize.py が整えたもの（提供原画 → パレット番号 PNG）。手で編集しない */\n'
 
 OVERRIDDEN = ['rio', 'jin', 'valk', 'noah_K', 'jin_K', 'valk_K']      # spx-data-heroes.js が上書きする
-KEEP_LEGACY = ['noah_K', 'jin_K']                                      # build_spx_heroes.py の素材
+KEEP_LEGACY = ['noah_K', 'jin_K']                                      # build_spx_heroes.py の素材（noah_K は新原画への差し替えで今は使わない。保管のみ）
 FLIPF = {'gald': ['stance', 'front', 'ready', 'hit', 'cast', 'weak', 'win', 'stand', 'walk_a', 'walk_b'],
          'mire': ['stance', 'guard', 'weak', 'hit', 'stand', 'walk_a', 'walk_b'],
          'hakua': ['weak'], 'shion': ['weak']}
