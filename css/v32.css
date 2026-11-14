@@ -1,0 +1,50 @@
+/* ===== ver0.32 図鑑の絞り込み・クエスト情報 ===== */
+/* 図鑑：区分と系統の絞り込み */
+.zf32{display:flex;flex-direction:column;gap:5px;margin:2px 0 6px}
+.zfc32{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.zff32{display:flex;gap:5px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px;scrollbar-width:none}
+.zff32::-webkit-scrollbar{display:none}
+.zfc32 button,.zff32 button{flex:none;height:30px;padding:0 10px;border-radius:15px;border:1.5px solid #4a5490;background:#0b1340;color:#cfd6ff;font:inherit;font-size:12px;white-space:nowrap}
+.zfc32 button small,.zff32 button small{margin-left:4px;font-size:9px;opacity:.75}
+.zfc32 button.on,.zff32 button.on{border-color:var(--gold);color:#fff0c0;background:linear-gradient(180deg,#6a4c12,#2e2006)}
+.zn32{padding:18px 0;text-align:center;font-size:12px;color:#9aa3d8}
+
+/* クエスト一覧：行の右下に「詳細 ▶」 */
+.qrow31{position:relative}
+.qgo32{position:absolute;right:10px;bottom:7px;font-size:10px;color:#ffe9a8;letter-spacing:.05em}
+
+/* クエスト情報（専用のタブ） */
+.qi32{display:flex;flex-direction:column}
+.wtabs.qt32{grid-template-columns:1fr 1fr}
+.qinfo32{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:none;padding:10px 6px 6px;border-top:2px solid var(--gold);margin-top:-2px}
+.qh32{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;padding:8px 10px;border:2px solid #6a74b0;border-radius:10px;background:linear-gradient(180deg,#1a2a6a,#0d1540);margin-bottom:8px}
+.qh32 b{font-size:16px;color:#fff;letter-spacing:.04em}
+.qh32>span{flex-basis:100%;font-size:11px;color:#cfd6ff}
+.qh32 .bn{color:#9fd8ff}
+.qh32 .cl{color:#ffe27a}
+.qh32.r-mid{border-color:#e0a040}
+.qh32.r-big{border-color:#ff5a74}
+.qs32{margin:12px 0 5px;padding-left:8px;border-left:3px solid var(--gold);font-size:12px;color:#ffe9a8;letter-spacing:.06em}
+.qw32{border:1px solid #2a3470;border-radius:8px;background:rgba(10,16,52,.7);padding:5px 6px;margin-bottom:5px}
+.qwh32{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.qwh32 span{font-size:9px;color:#ffe9a8;border:1px solid #8a7330;border-radius:4px;padding:0 5px}
+.qwh32 small{font-size:9px;color:#9aa3d8}
+.qwl32{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:5px}
+.qf32{display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 3px 5px;border:1px solid #3a4486;border-radius:7px;background:#0b1340;text-align:center;min-width:0}
+.qf32 img{width:40px;height:40px;image-rendering:pixelated}
+.qf32 b{font-size:11px;font-weight:normal;color:#e8ecff;line-height:1.25;word-break:break-all}
+.qf32 b i{font-style:normal;color:#ffe27a;margin-left:2px}
+.qf32 em{font-size:9px}
+.qf32 small{font-size:9px;color:#9aa3d8}
+.qf32.b.mid{border-color:#e0a040;background:#2a1a08}
+.qf32.b.big{border-color:#ff5a74;background:#2e0a14}
+.qp32{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.qp32 img{width:32px;height:32px;image-rendering:pixelated;border-radius:6px;border:1px solid #4a5490;background:#0b1340}
+.qp32 small{margin-left:6px;font-size:11px;color:#cfd6ff}
+.qp32 small b{color:#ffe27a}
+.qp32 em{font-style:normal;color:#ff9a9a}
+.qm31 .wfoot.qfoot32 .tbtn.wgo{flex:1;width:auto;height:44px;font-size:15px}
+
+/* 大ボスの札（.rk31.big）が汎用のボタン .big（幅 100%・高さ 54px）とぶつかり、一覧の行で大きな箱になっていたのを戻す */
+.rk31.big{width:auto;max-width:none;height:auto;margin:0;font-family:inherit;letter-spacing:0}
+.qf32.big{width:auto;max-width:none;height:auto;margin:0;font-family:inherit;letter-spacing:0;color:inherit}

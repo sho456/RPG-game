@@ -208,6 +208,13 @@ const wantR=key=>FACING.isRight(key);
 /* 立ち絵：味方は「正面」、敵は 1 枚絵。target＝背丈（味方）／横幅（敵）のドット数 */
 function artCv(id,v,mir,target=84){if(v==='aw'&&D[id+'_K']){const kid=id+'_K',sk=pickSize(kid,target,'b',false);if(sk)return cut(kid,sk,'','awk',mir,0,0);}
  const c=D[id],sk=pickSize(id,target,'b',false)||Object.keys(c.sizes)[0];return cut(id,sk,v,c.kind==='hum'?'front':'idle',mir,0,0);}
+/* ver0.32：1 体の絵（出撃前の画面など）。spr＝描画のキー、fk＝向きを引くキー（敵は ED の id）、side＝0 味方／1 敵、target＝背丈（味方）／横幅（敵）のドット数。
+   味方は待機の構え、敵は 1 枚絵。向きは FACING（図鑑で設定した向き → 既定：味方は左・敵は右＝向かい合う） */
+function unitCv(spr,fk,side,target){const r=parse(spr);if(!r)return null;const c=D[r.id],hum=c.kind==='hum',fs0=Object.values(c.sizes)[0].frames;
+ const nm=hum?(fs0.stance?'stance':'front'):'idle';let sk=null;
+ if(target&&target.area){let bd=1e9;for(const k in c.sizes){if(!'bB'.includes(k[0]))continue;const f=c.sizes[k].frames[nm];if(!f)continue;const d=Math.abs(Math.sqrt(f[2]*f[3])-target.area);if(d<bd){bd=d;sk=k;}}}/* 見た目の大きさ（面積の平方根）で選ぶ */
+ else sk=pickSize(r.id,target,'b',false);if(!sk)return null;
+ return cut(r.id,sk,r.v,nm,FACING.mirror(c.face,FACING.of(fk||spr,side)),0,0);}
 /* 一覧の絵（ZIMG）：表示枠（40 CSS px）× 端末の画素密度の正方形に、枠に収まる最大のサイズの絵を 1:1 で置く（拡大しないのでぼやけない）。読むときに作る */
 function zReg(k){if(typeof ZIMG==='undefined')return;const r=parse(k);if(!r)return;const c=D[r.id],hum=c.kind==='hum',nm=hum?'front':'idle';
  const N=Math.max(48,Math.min(120,40*Q()));
@@ -250,6 +257,6 @@ function onReady(){
 }
 /* 向きを変えたら、一覧・立ち絵の控えを作り直す */
 FACING.onChange(k=>{try{zReg(k);for(const x in UIC)if(x.startsWith('a|'+k))delete UIC[x];}catch(e){}});
-return{get ready(){return ready;},parse,heroFrame,monShape,pickSize,D,cut,palOf,zReg,artCv,AWS,FB,DEF,animFrame,phase};})();
+return{get ready(){return ready;},parse,heroFrame,monShape,pickSize,D,cut,palOf,zReg,artCv,unitCv,AWS,FB,DEF,animFrame,phase};})();
 /* 履歴：ver0.26 敵のドット絵を提供原画へ／ver0.27 第2弾とリオ／ver0.28 ヴァルク・ジン・氷の女王・忍
    ver0.29 向きの窓口を FACING に一本化、原画の反転をデータへ焼き込み、図鑑の再生画面は js/zukan/ へ移した */

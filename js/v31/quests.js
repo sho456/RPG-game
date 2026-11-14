@@ -149,7 +149,7 @@ function runPost(p,done){const P=POST[p];
  talk(P.lines,()=>{if(!P.who)return done();if(P.auto){G.flags[P.flag]=1;newMember(P.who);SFX.aw();save();toastMsg(`<b>${HB[P.who].name}が仲間になった！</b>`+(G.party.includes(P.who)?'':'（控えに入った）'));return done();}recruitAsk(P,done);});}
 
 /* ---------- クエスト一覧の画面 ---------- */
-const QM={on:false,tab:0,ch:{},sel:null,cur:null,bgs:{},st:new Map()};
+const QM={on:false,tab:0,ch:{},sel:null,cur:null,bgs:{},st:new Map(),view:'list'};
 const TABS=[['本編',()=>true,''],['深層',()=>!!G.flags.boss8,'終章クリアで開放'],['天極',()=>!!G.flags.boss9,'竜の巣クリアで開放']];
 function defCh(tab){const L=CH.filter(c=>c.tab===tab&&chOpen(c));return(L.find(c=>!chDone(c))||L[L.length-1]||CH.find(c=>c.tab===tab)).id;}
 function defQ(c){const L=qsOf(c).filter(q=>qOpen(c,q));return(L.find(q=>!qCleared(q.id))||L[L.length-1]||qsOf(c)[0]).id;}
@@ -159,38 +159,73 @@ function render(m){try{migQ();}catch(e){}if(!TABS[QM.tab][1]())QM.tab=0;const ta
  const c=chById(cid),L=qsOf(c);if(!QM.sel||!L.some(q=>q.id===QM.sel))QM.sel=defQ(c);const q=L.find(x=>x.id===QM.sel)||L[0];const vd=isVoid(c);
  QM.cur={c,q,boss:q?bossOf(q):null,vd,th:(q&&q.th)||c.th};QM.on=true;WMS.on=false;
  const clr=L.filter(x=>qCleared(x.id)).length;
+ if(QM.view==='info'&&q&&qOpen(c,q))return renderInfo(c,q,vd,m);QM.view='list';
  $('#labels').innerHTML=`<div class="wmr"><span class="g">${fm(G.gold)} G</span><span class="t">灯力 ${fm(G.tou||0)}</span><span class="s31"><img src="${ICON.seishou}">${G.mats.seishou||0}</span></div>
   <div class="wmt${vd?' vd':''}"><small>${esc(c.ch)}${vd?'　◆虚蝕化':''}</small><b>${esc(c.n)}</b><span>${q?esc(q.n)+'　'+lvTag(q.lv):''}</span></div>`;
  log((m?m+'<br>':'')+(TOAST?TOAST+'<br>':'')+esc(c.intro)+(vd?'<br><small style="color:#d0b0ff">虚蝕化中：敵が強いぶん、ドロップと灯力・宝箱が増える</small>':''));TOAST='';
  const chip=x=>{const op=chOpen(x),dn=chDone(x),xl=qsOf(x),n=xl.filter(y=>qCleared(y.id)).length,v=isVoid(x);
   return`<button class="qch31${x.id===cid?' on':''}${op?'':' lock'}${dn?' done':''}${v?' vd':''}" data-a="ch" data-v="${x.id}"><small>${esc(x.ch)}</small><b>${op?esc(x.n):'？？？'}</b><i>${op?(x.dyn?'最深 '+((kst().max)||0)+'層':`${n}/${xl.length}`):'🔒'}</i>${v?'<em>虚蝕化</em>':''}</button>`;};
- const row=(x,i)=>{const op=qOpen(c,x),s=x.id===QM.sel&&op,cn=qCount(x.id),rk=qRank(x),n=x.w.length,nm=s?enemyNames(x):null;
+ const row=(x,i)=>{const op=qOpen(c,x),s=x.id===QM.sel&&op,cn=qCount(x.id),rk=qRank(x),n=x.w.length;
   const pips=x.w.map(w=>{const e=waveOf(w).e.map(kindOf),b=e.find(k=>ED[k]&&ED[k].boss);return`<i class="${b?rankOf(b):''}">${b?(rankOf(b)==='big'?'◆':'◇'):'●'}</i>`;}).join('');
   return`<div class="wrow qrow31${s?' sel':''}${op?'':' lock'}${vd?' vd':''}${rk?' r-'+rk:''}" data-a="sel" data-v="${x.id}">${cn?`<div class="wcl">CLEAR${cn>1?' ×'+cn:''}</div>`:''}
    <div class="wch">${c.dyn?'層':`No.${i+1}`}</div><div class="wnm">${rk?`<em class="rk31 ${rk}">${rk==='big'?'大ボス':'中ボス'}</em>`:''}${op?esc(x.n):'？？？'}</div>
    <div class="wrec">${op?`${lvTag(x.lv)}　<span class="bn">戦闘×${n}</span>${vd?'　<b>◆虚蝕化</b>':''}`:'🔒 前のクエストをクリアすると開放'}</div><div class="wdr qp31">${op?pips:''}</div>
-   ${s?`<div class="wdet"><div class="qd31">${esc(x.d||'')}</div><div class="qe31">${nm.map((L2,j)=>`<div><span>${j+1}戦目</span>${L2.map(esc).join('・')}</div>`).join('')}</div>
-    <div class="qr31x">${!cn&&x.first?`<span class="fr">初回報酬：${firstTxt(x.first)}</span>`:''}<span>宝箱：${rk==='big'?'金の宝箱（確定）':rk==='mid'?'銀の宝箱（確定）':'まれに銅の宝箱'}</span>${x.lv>=70?`<span class="ss31">${MATS.seishou.n}が出る</span>`:''}</div>
-    <button class="tbtn gold wgo" data-a="go" data-v="${x.id}">▼ 出 撃 ▼</button></div>`:''}</div>`;};
+   ${op?'<div class="qgo32">詳細 ▶</div>':''}</div>`;};
  const cmd=$('#cmd');cmd.className='panel wmap qm31';
  cmd.innerHTML=`<div class="wtabs t31">${TABS.map(([l,ok,un],i)=>`<button class="${i===tab?'on':''}${ok()?'':' lock'}" data-a="tab" data-v="${i}">${ok()?l:'🔒 ？？？'}</button>`).join('')}</div>
   <div class="qchs31">${chs.map(chip).join('')}</div>
   <div class="wlist">${c.dyn?`<div class="qkr31">最深到達 ${(kst().max)||0}層。10層ごとに番人を倒すと先へ進める</div>`:''}${L.map(row).join('')}</div>
   <div class="wfoot"><button class="tbtn back" data-a="back">◀ 戻る</button><button class="tbtn" data-a="party">編成</button><div class="wfp">${G.party.map(id=>`<img src="${face(id)}">`).join('')}<small>戦闘力 <b>${fm(G.party.reduce((s,id)=>s+power(id),0))}</b></small></div></div>`;
  ACT={tab:k=>{k=+k;if(!TABS[k][1]()){log('🔒 '+TABS[k][2]);return;}QM.tab=k;QM.sel=null;render();},ch:id=>{const x=chById(id);if(!chOpen(x)){log('🔒 前の章の大ボスを倒すと開放');return;}QM.ch[QM.tab]=id;QM.sel=null;render();},
-  sel:id=>{const x=L.find(y=>y.id===id);if(!x||!qOpen(c,x)){log('🔒 前のクエストをクリアすると開放');return;}if(QM.sel!==id){QM.sel=id;render();}},
+  sel:id=>{const x=L.find(y=>y.id===id);if(!x||!qOpen(c,x)){log('🔒 前のクエストをクリアすると開放');return;}QM.sel=id;QM.view='info';render();},
   go:id=>{const x=L.find(y=>y.id===id);if(!x)return;QM.on=false;qStart(c,x);},back:()=>{QM.on=false;townMenu();},party:()=>{QM.on=false;partyScreen();}};
  const sr=cmd.querySelector('.wrow.sel');if(sr&&sr.scrollIntoView)sr.scrollIntoView({block:'nearest'});const cs=cmd.querySelector('.qch31.on');if(cs&&cs.scrollIntoView)cs.scrollIntoView({block:'nearest',inline:'center'});}
+/* ---------- ver0.32 クエスト情報（専用のタブ） ----------
+ 一覧でクエストを選ぶと、このタブに移る。上の画面は出撃前の対峙（敵とパーティ）。概要・出現する敵（戦闘ごと）・報酬・パーティを見て出撃する */
+function renderInfo(c,q,vd,m){const L=qsOf(c),i=L.indexOf(q),cn=qCount(q.id),rk=qRank(q),n=q.w.length,cl=qCleared(q.id);
+ $('#labels').innerHTML=`<div class="wmr"><span class="g">${fm(G.gold)} G</span><span class="t">灯力 ${fm(G.tou||0)}</span><span class="s31"><img src="${ICON.seishou}">${G.mats.seishou||0}</span></div>
+  <div class="wmt${vd?' vd':''}"><small>${esc(c.ch)}　${c.dyn?'':'No.'+(i+1)}${vd?'　◆虚蝕化':''}</small><b>${esc(q.n)}</b><span>${lvTag(q.lv)}　戦闘×${n}</span></div>`;
+ log((m?m+'<br>':'')+'<b>クエスト情報</b>　敵と報酬を確かめて出撃');
+ const foe=k=>{const d=ED[k]||{},kn=known(k)||cl,hide=d.boss&&!kn,cat=rankOf(k);
+  return`<div class="qf32${d.boss?' b '+cat:''}"><img src="${zimg(k,hide)}" alt=""><b>${hide?'？？？':esc(d.name||k)}</b>${d.boss?`<em class="rk31 ${cat}">${cat==='big'?'大ボス':'中ボス'}</em>`:''}${kn&&d.weak&&d.weak.length?`<small>弱点 ${d.weak.map(esc).join('・')}</small>`:''}</div>`;};
+ const waves=q.w.map((w,j)=>{const es=waveOf(w).e.map(kindOf),u=[];es.forEach(k=>{const f=u.find(x=>x[0]===k);f?f[1]++:u.push([k,1]);});
+  return`<div class="qw32"><div class="qwh32"><span>${j+1}戦目</span>${waveOf(w).lv&&waveOf(w).lv!==q.lv?`<small>Lv${waveOf(w).lv}</small>`:''}</div><div class="qwl32">${u.map(([k,c2])=>foe(k).replace('</b>',`</b>${c2>1?`<i>×${c2}</i>`:''}`)).join('')}</div></div>`;}).join('');
+ const rw=[...(!cn&&q.first?[`<span class="fr">初回報酬：${firstTxt(q.first)}</span>`]:[]),`<span>宝箱：${rk==='big'?'金の宝箱（確定）':rk==='mid'?'銀の宝箱（確定）':'まれに銅の宝箱'}</span>`,...(q.lv>=70?[`<span class="ss31">${MATS.seishou.n}が出る</span>`]:[]),...(vd?['<span>虚蝕化：ドロップと灯力・宝箱が増える</span>']:[])];
+ const pw=G.party.reduce((s2,id)=>s2+power(id),0);
+ const cmd=$('#cmd');cmd.className='panel wmap qm31 qi32';
+ cmd.innerHTML=`<div class="wtabs t31 qt32"><button data-a="list">◀ クエスト一覧</button><button class="on">クエスト情報</button></div>
+  <div class="qinfo32">
+   <div class="qh32${rk?' r-'+rk:''}">${rk?`<em class="rk31 ${rk}">${rk==='big'?'大ボス':'中ボス'}</em>`:''}<b>${esc(q.n)}</b><span>${lvTag(q.lv)}　<span class="bn">戦闘×${n}</span>${cn?`　<span class="cl">CLEAR${cn>1?' ×'+cn:''}</span>`:''}</span></div>
+   <div class="qd31">${esc(q.d||'')}</div>
+   <div class="qs32">出現する敵</div>${waves}
+   <div class="qs32">報酬</div><div class="qr31x">${rw.join('')}</div>
+   <div class="qs32">パーティ</div><div class="qp32">${G.party.map(id=>`<img src="${face(id)}" alt="">`).join('')}<small>戦闘力 <b>${fm(pw)}</b>${pw&&q.lv>Math.max(...G.party.map(id=>G.h[id].lv))+3?'　<em>推奨Lvより低い</em>':''}</small></div>
+  </div>
+  <div class="wfoot qfoot32"><button class="tbtn back" data-a="list">◀ 一覧</button><button class="tbtn" data-a="party">編成</button><button class="tbtn gold wgo" data-a="go">▼ 出 撃 ▼</button></div>`;
+ ACT={list:()=>{QM.view='list';render();},party:()=>{QM.on=false;QM.view='list';partyScreen();},go:()=>{QM.on=false;QM.view='list';qStart(c,q);}};
+ cmd.scrollTop=0;}
 function firstTxt(f){const o=[];if(f.g)o.push(fm(f.g)+'G');(f.mat||[]).forEach(([k,n])=>o.push(MATS[k].n+'×'+n));(f.it||[]).forEach(([k,n])=>o.push(ITEMS[k].n+'×'+n));if(f.loot)o.push('装備×'+f.loot.length);if(f.royal)o.push('王家の遺品×'+f.royal.length);return o.join('・')||'—';}
 function questMap(m){migQ();const ov=$('#ov');ov.classList.add('hide');ov.classList.remove('qi31ov','qc31ov','qr31ov','rw20ov');const p=worldMap31;p(m);}
 let worldMap31=null;
-{const _wm=worldMap;worldMap=function(m){try{if(scene!=='town')show('town');}catch(e){}try{const ov=$('#ov');if(!ov.classList.contains('ttl')){ov.classList.add('hide');ov.classList.remove('qi31ov','qc31ov','qr31ov','rw20ov');}}catch(e){}_wm('');try{render(m);tip('map');}catch(e){console.error(e);}};worldMap31=worldMap;}
-/* プレビュー：選んだクエストのボス（なければ最後の敵）とパーティ */
-function stillOf(k){if(QM.st.has(k))return QM.st.get(k);let c=null;try{c=V31E.still(k,64);}catch(e){}if(!c){try{c=hiImg(IMG[k],64,true);}catch(e){}}if(c&&typeof SPX!=='undefined'&&SPX.ready)QM.st.set(k,c);return c;}
+{const _wm=worldMap;worldMap=function(m){try{if(scene!=='town')show('town');}catch(e){}try{const ov=$('#ov');if(!ov.classList.contains('ttl')){ov.classList.add('hide');ov.classList.remove('qi31ov','qc31ov','qr31ov','rw20ov');}}catch(e){}_wm('');QM.view='list';try{render(m);tip('map');}catch(e){console.error(e);}};worldMap31=worldMap;}
+/* ver0.32：出撃前の画面。クエストに出る敵（ボスを先頭に最大 3 体）が左、パーティが右で向かい合う。
+   絵は戦闘と同じ原画（SPX）で、向きは FACING（図鑑で設定した向き → 既定：味方は左・敵は右）。未遭遇の敵はシルエット */
+function qmFoes(q){if(!q)return[];const ks=[];for(const w of q.w)for(const k of waveOf(w).e.map(kindOf))if(ED[k]&&!ks.includes(k))ks.push(k);
+ const bs=ks.filter(k=>ED[k].boss),ns=ks.filter(k=>!ED[k].boss);return[...bs.slice(-1),...ns].slice(0,3);}
+const QSLOT={1:[[40,92]],2:[[24,74],[50,92]],3:[[18,68],[54,76],[34,94]]};/* 敵の足元（後ろ→前）。前ほど大きく見えるよう最後をボスに */
+const HSLOT=[[116,62],[150,69],[128,84],[162,91]];
+function qmCv(spr,fk,side,area,sil){const key=spr+'|'+fk+'|'+side+'|'+area+'|'+(sil?1:0)+'|'+FACING.of(fk,side);if(QM.st.has(key))return QM.st.get(key);let f=null;
+ try{f=SPX.unitCv(spr,fk,side,{area});}catch(e){}if(f&&sil){const c=silOf(f.cv);f=Object.assign({},f,{cv:c});}if(f)QM.st.set(key,f);return f;}
 function drawQM(){const x0=QM.cur;if(!x0)return;const th=x0.th||'ash';if(!QM.bgs[th])QM.bgs[th]=makeBg(th,true);ctx.drawImage(QM.bgs[th],0,0);if(x0.vd){ctx.fillStyle='rgba(120,60,200,.24)';ctx.fillRect(0,0,W,H);}
- const bk=x0.boss;if(bk){const d=ED[bk]||{},big=d.boss,s=big?54:40,x=16,y=92-s+Math.round(Math.sin(tick/26)*1.5);let img=stillOf(bk);const kn=known(bk)||(x0.q&&qCleared(x0.q.id));if(img&&!kn)img=silOf(img);
-  ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(x+s*.15,91,s*.7,3);if(img)ctx.drawImage(img,x,y,s,s);}
- [[100,30],[134,37],[112,52],[146,59]].slice(0,G.party.length).map((p,i)=>[p,G.party[i]]).sort((a,b)=>a[0][1]-b[0][1]).forEach(([[x,y],id],i)=>{const yy=y+((tick>>5)+i)%2;ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(x+7,y+31,18,2);ctx.drawImage(hiImg(IMG[id],48,true),x,yy,32,32);});
+ const k=bK(),zi=Math.max(1,Math.floor(k*.75)),u=k/zi;/* 1 ドット＝zi 画素（整数倍でドットをそろえる）。u＝論理 1px あたりのドット数 */
+ const put=(f,fx,fy,bob)=>{if(!f)return;ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=false;
+  ctx.fillStyle='rgba(0,0,0,.35)';const sw=Math.round(f.w*zi*.32);ctx.fillRect(Math.round(fx*k-sw),Math.round(fy*k-zi),sw*2,zi*2);
+  ctx.drawImage(f.cv,Math.round(fx*k-(f.ax+.5)*zi),Math.round((fy+bob)*k-(f.ay+1)*zi),f.w*zi,f.h*zi);ctx.restore();};
+ const foes=SPX.ready?qmFoes(x0.q):[],sl=QSLOT[Math.max(1,foes.length)]||QSLOT[1],kn=k2=>known(k2)||(x0.q&&qCleared(x0.q.id));
+ const order=foes.slice().reverse();/* 後ろの列から描く（先頭＝ボスは最前列） */
+ if(SPX.ready){order.forEach((fk,i)=>{const d=ED[fk],[fx,fy]=sl[sl.length-1-i]||sl[0],big=d.boss?d.rank==='big'||TERMS.charCat(fk)==='big':false;
+   put(qmCv(d.spr||fk,fk,1,(d.boss?(big?46:40):32)*u,!kn(fk)),fx,fy,Math.round(Math.sin(tick/26+i)*1.2));});
+  G.party.map((id,i)=>[HSLOT[i],id,i]).filter(x=>x[0]).sort((a,b)=>a[0][1]-b[0][1]).forEach(([[fx,fy],id,i])=>put(qmCv(id,id,0,30*u,false),fx,fy,((tick>>5)+i)%2));}
  const g=ctx.createLinearGradient(0,84,0,H);g.addColorStop(0,'rgba(5,6,15,0)');g.addColorStop(1,'rgba(5,6,15,.9)');ctx.fillStyle=g;ctx.fillRect(0,84,W,H-84);}
 {const _d=draw;draw=function(){if(QM.on&&scene==='town'&&$('#cmd').classList.contains('qm31')){tick++;const k=bK();if(cv.width!==W*k||cv.height!==H*k){cv.width=W*k;cv.height=H*k;}ctx.setTransform(k,0,0,k,0,0);ctx.imageSmoothingEnabled=false;try{drawQM();}catch(e){}requestAnimationFrame(draw);return;}QM.on=false;_d();};}
 

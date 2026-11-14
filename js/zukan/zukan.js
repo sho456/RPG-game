@@ -6,7 +6,15 @@
   ・下部タブ：人物・技・星臨 の 3 種（敵は 人物・技）
   ・呼称・分類は TERMS（js/data/terms.js）に従う */
 const ZUKAN=(()=>{
-const ZK={t:'e',from:'home',dt:'prof'};
+const ZK={t:'e',from:'home',dt:'prof',cat:'all',fam:'all'};
+/* ver0.32 敵の系統：戦闘で使う原画（SPX のデータ id）から決める。原画の無い敵（旧リグ）はリグの名前から */
+const FAMS=[['slime','スライム'],['beast','獣'],['dragon','竜'],['knight','騎士・武者'],['golem','巨像'],['spirit','霊・影'],['shroom','茸'],['jelly','海月'],['human','人型'],['other','その他']];
+const FAMID={slime:'slime',wolf:'beast',goldwolf:'beast',drake:'dragon',boss9:'dragon',knight:'knight',gknight:'knight',golem:'golem',
+ banjin:'spirit',shade:'spirit',icespirit:'spirit',bookghost:'spirit',shroom:'shroom',jelly:'jelly',queen:'human',ninja:'human'};
+function famOf(k){const d=ED[k];if(!d)return'other';if(d.fam)return d.fam;let id='';
+ try{const r=typeof SPX!=='undefined'&&SPX.parse(d.spr||k);if(r){id=r.id;if(SPX.D[id]&&SPX.D[id].kind==='hum'&&!FAMID[id])return'human';}}catch(e){}
+ if(!id){try{const inf=SPRX.info(d.spr||k);id=inf&&inf.rig||'';}catch(e){}}
+ return FAMID[id]||'other';}
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const DEV=()=>{try{return!!(G&&G.dev);}catch(e){return false;}};
 const zkList=()=>({e:zkEnemies(),h:Object.keys(PROF),i:zkEquip()});
@@ -21,11 +29,18 @@ function list(m){if(typeof TSC!=='undefined'&&(TSC==='home'||TSC==='bar'))ZK.fro
  const L=zkList(),ne=L.e.filter(seenE).length,nh=L.h.filter(joined).length,ni=L.i.filter(seenI).length,t=ZK.t;
  log((m||'<b>図鑑</b>　タップで詳細（正面・待機・星臨の基準画像）')+`<br><small>敵 ${ne}/${L.e.length}　${TERMS.CHAR.playable} ${nh}/${L.h.length}　装備 ${ni}/${L.i.length}</small>`);
  let body='';
- if(t==='e')body='<div class="zgrid z23">'+L.e.map((k,i)=>{const s=seenE(k),c=TERMS.charCat(k);return`<button class="ztile${s?'':' un'}${c!=='normal'?' bs':''} zc-${c}" data-a="e" data-v="${k}"><em>${String(i+1).padStart(2,'0')}</em><img src="${zimg(k,!s)}" alt=""><span>${s?esc(ED[k].name):'？？？'}</span></button>`;}).join('')+'</div>';
+ if(t==='e'){/* ver0.32：区分（通常敵／ボス）と系統で絞り込む。番号は全体の通し番号のまま */
+  const inCat=k=>ZK.cat==='all'||(ZK.cat==='normal'?TERMS.charCat(k)==='normal':TERMS.charCat(k)!=='normal'),inFam=k=>ZK.fam==='all'||famOf(k)===ZK.fam;
+  const fams=FAMS.filter(([f])=>L.e.some(k=>inCat(k)&&famOf(k)===f));if(ZK.fam!=='all'&&!fams.some(([f])=>f===ZK.fam))ZK.fam='all';
+  const cnt=fn=>L.e.filter(fn).length;
+  body=`<div class="zf32"><div class="zfc32">${[['all','すべて'],['normal','通常敵'],['boss','ボス']].map(([k,n])=>`<button class="${ZK.cat===k?'on':''}" data-a="cat" data-v="${k}">${n}<small>${cnt(x=>k==='all'||(k==='normal'?TERMS.charCat(x)==='normal':TERMS.charCat(x)!=='normal'))}</small></button>`).join('')}</div>
+   <div class="zff32"><button class="${ZK.fam==='all'?'on':''}" data-a="fam" data-v="all">全系統</button>${fams.map(([f,n])=>`<button class="${ZK.fam===f?'on':''}" data-a="fam" data-v="${f}">${n}<small>${cnt(x=>inCat(x)&&famOf(x)===f)}</small></button>`).join('')}</div></div>`;
+  const vis=L.e.map((k,i)=>[k,i]).filter(([k])=>inCat(k)&&inFam(k));
+  body+='<div class="zgrid z23">'+vis.map(([k,i])=>{const s=seenE(k),c=TERMS.charCat(k);return`<button class="ztile${s?'':' un'}${c!=='normal'?' bs':''} zc-${c}" data-a="e" data-v="${k}"><em>${String(i+1).padStart(2,'0')}</em><img src="${zimg(k,!s)}" alt=""><span>${s?esc(ED[k].name):'？？？'}</span></button>`;}).join('')+'</div>'+(vis.length?'':'<div class="zn32">該当する敵がいない</div>');}
  if(t==='h')body='<div class="zhg">'+L.h.map(id=>{const j=joined(id);return`<button class="zhc${j?'':' un'}" data-a="h" data-v="${id}" style="--ec:${elCol(id)}"><img src="${j?art(id):zimg(id,1)}" alt=""><b>${j?esc(HB[id].name):'？？？'}</b><small>${j?esc(clsOf(id)):'未加入'}</small></button>`;}).join('')+'</div>';
  if(t==='i')body='<div class="zig">'+L.i.map((x,i)=>{const s=seenI(x),ik=icKey(x);return`<button class="zic${s?'':' un'}" data-a="i" data-v="${i}">${ik?`<img src="${s?IC21.render(ik,4):IC21.shadow(ik)}" alt="">`:''}<b>${s?esc(x.n):'？？？'}</b><small>${esc(TERMS.equipName(eqSlot(x)))}・${esc(x.t)}</small></button>`;}).join('')+'</div>';
  panel(`<div class="ftabs zt23" style="grid-template-columns:repeat(3,1fr)">${[['e','敵'],['h','仲間'],['i','装備']].map(([k,n])=>`<button class="${t===k?'on':''}" data-a="tab" data-v="${k}">${n}</button>`).join('')}</div>${body}<button class="tbtn back wide" data-a="back">戻る</button>`,
-  {tab:k=>{ZK.t=k;list();},e:k=>detail('e',k,'prof'),h:id=>detail('h',id,'prof'),i:i=>detail('i',+i),back});}
+  {tab:k=>{ZK.t=k;list();},cat:k=>{ZK.cat=k;list();},fam:k=>{ZK.fam=k;list();},e:k=>detail('e',k,'prof'),h:id=>detail('h',id,'prof'),i:i=>detail('i',+i),back});}
 
 /* ---------- 詳細 ---------- */
 function detail(type,key,dt){const L=zkList()[type],idx=type==='i'?key:L.indexOf(key);if(idx<0)return;if(dt)ZK.dt=dt;
@@ -104,4 +119,4 @@ function equipHTML(x){const s=seenI(x)||DEV(),ik=icKey(x),L0=x.k.startsWith('set
 
 /* 入口（ホーム・酒場・開発者メニューから呼ばれる関数を差し替える） */
 zkMenu=list;zkEnemy=k=>detail('e',k,'prof');zkHero=id=>detail('h',id,'prof');
-return{list,detail,ZK};})();
+return{famOf,FAMS,list,detail,ZK};})();

@@ -9,8 +9,13 @@ const FACING=(()=>{
 const L='L',R='R';
 const has=x=>(typeof ED!=='undefined'&&!!ED[x])||(typeof HB!=='undefined'&&!!HB[x]);
 /* 描画用のキー（'rio_aw' 'vo_slime' 'tr_rio2' 'slimek' 'rio|…'）→ 向きを保存するキー */
+/* ver0.32：見た目のキー（ED[k].spr。v31 の敵の 'tr_goldwolf4' など）→ 敵の id。戦闘は見た目のキーで描くので、
+   図鑑で敵の id に保存した向きが戦闘でも効くように引き直す */
+let SPRA=null;
+function sprAlias(k){if(!SPRA){SPRA={};if(typeof ED!=='undefined')for(const e in ED){const sp=ED[e]&&ED[e].spr;if(sp&&!SPRA[sp])SPRA[sp]=e;}}return SPRA[k]||null;}
 function key(pk){let k=String(pk||'').split('|')[0];const m=/^[A-Za-z0-9_]+/.exec(k);k=(m?m[0]:k).replace(/_aw$/,'');
- if(/k$/.test(k)&&!has(k)&&has(k.slice(0,-1)))k=k.slice(0,-1);return k;}
+ if(/k$/.test(k)&&!has(k)&&has(k.slice(0,-1)))k=k.slice(0,-1);
+ if(!has(k)){const a=sprAlias(k)||sprAlias(k.replace(/^vo_/,''));if(a)k=a;}return k;}
 function isFoe(k){k=key(k).replace(/^vo_/,'');return typeof ED!=='undefined'&&!!ED[k]&&!(typeof HB!=='undefined'&&HB[k]);}
 /* 既定の向き。side（0＝味方の列／1＝敵の列）が分かっていればそれを優先する */
 function base(k,side){if(side===0)return L;if(side===1)return R;return isFoe(k)?R:L;}
@@ -21,4 +26,4 @@ function set(k,dir,side){k=key(k);G.zdir=G.zdir||{};if(dir===base(k,side))delete
 function toggle(k,side){const nx=of(k,side)===L?R:L;set(k,nx,side);return nx;}
 const mirror=(artFace,want)=>(artFace||L)!==want;
 const LS=[];
-return{L,R,key,isFoe,base,saved,of,isRight,set,toggle,mirror,onChange:f=>LS.push(f)};})();
+return{L,R,key,isFoe,base,saved,of,isRight,set,toggle,mirror,onChange:f=>LS.push(f),resetAlias:()=>{SPRA=null;}};})();
