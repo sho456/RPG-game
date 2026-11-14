@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 """味方の原画 → js/spx-data-heroes.js（spx-data.js の同じキャラを上書きする）
 
-・rio・celes・gald・mire・hakua・noah・erna・valk（2026-11 の新原画）：正面・待機・星臨を横に 3 体並べたシート（<id>_v2.jpg）。from_trio で切り出す。
+・味方 12 人（2026-11 の新原画）：正面・待機・星臨を横に 3 体並べたシート（<id>_v2.jpg）。from_trio で切り出す。
   待機・星臨は原画で右を向いているので反転して左向きに。正面は原画のまま。
   戦闘不能は待機を寝かせて作り、他のポーズ（攻撃・詠唱・被弾…）は 1 枚絵（single）として spx.js が待機の絵を動かす
-・jin：1 枚絵（jin.jpg）。待機・正面に使い、他のポーズは spx.js が 1 枚絵を動かして表す。戦闘不能は体を寝かせ、柴犬は座らせたまま
-・jin_K：既存データの調整。原画（柴犬の相棒）に合わせ、相棒の獣の毛並みを橙と白に
+・jin：戦闘不能は体だけを寝かせ、相棒の柴犬は座らせたまま（lay_down_with_pet）
 ・rio の色違い last3（虚神ノクス）も作る
-大きさは「正面」の背丈を各サイズのドット数にそろえ、全ポーズを同じ倍率で縮める。
+大きさは『足元から目までの高さ』×体格（assets_src/character_scale.json の hero）を各サイズのドット数の規格にそろえ、全ポーズを同じ倍率で縮める。
 足元（ax, ay）は最下段付近の不透明画素の中央値（倒れた姿は横幅の中央）。
 使い方：python3 tools/build_spx_heroes.py [プレビュー.png]
 """
@@ -123,10 +122,11 @@ def from_auto(fname, names, rows, split=None):
     return out
 
 
-def from_trio(fname, names=('front', 'stance', 'awk'), band=(.2, .85), thr=30, hole=10, ring=150, erase=None):
+def from_trio(fname, names=('front', 'stance', 'awk'), band=(.2, .85), thr=30, hole=10, ring=150, erase=None, shadow=False):
     """正面・待機・星臨を横に 3 体並べたシート（<id>_v2.jpg）。背景は外周の中央値の単色。
     ラベル（上下の文字・枠）は高さの帯 band の外にあるので拾わない。帯の中の大きい成分を左から names に割り当てる。
-    erase：(X, Y) → 消す所の真偽。原画に紛れ込んだ余計な絵（ガルドの正面の横の小さな騎士）を消す"""
+    erase：(X, Y) → 消す所の真偽。原画に紛れ込んだ余計な絵（ガルドの正面の横の小さな騎士）を消す。
+    shadow：足元に描かれた灰色の影（楕円）を消す（ゲームが影を描くので二重になる）"""
     img = np.asarray(Image.open(ORIG(fname)).convert('RGB')).astype(np.float64)
     bg = np.median(np.concatenate([img[0], img[-1], img[:, 0], img[:, -1]]), 0)
     fg = fg_mask(img, thr, bg, hole, ring)
@@ -139,12 +139,69 @@ def from_trio(fname, names=('front', 'stance', 'awk'), band=(.2, .85), thr=30, h
     H = img.shape[0]
     cand = [i + 1 for i, o in enumerate(objs) if band[0] * H < (o[0].start + o[0].stop) / 2 < band[1] * H]
     big = sorted(sorted(cand, key=lambda li: -sizes[li - 1])[:len(names)], key=lambda li: objs[li - 1][1].start)
-    return {nm: crop_of(img, pieces(fg, li, lab2, objs, sizes, pad=6, small=40)) for li, nm in zip(big, names)}
+    out = {nm: crop_of(img, pieces(fg, li, lab2, objs, sizes, pad=6, small=40)) for li, nm in zip(big, names)}
+    return {nm: no_shadow(c) for nm, c in out.items()} if shadow else out
+
+
+def no_shadow(c, tol=30):
+    """足元の影：最下段の色（無彩色の灰）に近い色で、最下段からつながっている所を、下 1/4 の範囲で消す"""
+    r, a = c
+    m = a > 0
+    H = m.shape[0]
+    bot = m[-3:]
+    sc = np.median(r[-3:][bot], 0)
+    if sc.max() - sc.min() > 25:   # 最下段が灰色でない＝影は無い
+        return c
+    near = m & (np.abs(r - sc).max(2) <= tol)
+    near[:int(H * .75)] = False
+    lab, _ = nd.label(near)
+    seeds = set(np.unique(lab[-3:])) - {0}
+    m2 = m & ~np.isin(lab, list(seeds))
+    l2, n2 = nd.label(m2)   # 影の縁に残った粒を落とす
+    if n2 > 1:
+        s2 = nd.sum(m2, l2, range(1, n2 + 1))
+        m2 = np.isin(l2, [i + 1 for i, v in enumerate(s2) if v >= max(40, s2.max() * .002)])
+    return crop_of(r, m2)
 
 
 def lay_down(c):
     """待機の絵を寝かせて戦闘不能にする（頭が左＝敵の側）"""
     return np.rot90(c[0], 1).copy(), np.rot90(c[1], 1).copy()
+
+
+def lay_down_with_pet(c, pet_hue=(12, 42)):
+    """相棒の獣（ジンの柴犬：橙の毛）は座らせたまま、乗り手だけを寝かせる。柴犬は頭の横（左）に寄り添わせる"""
+    r, a = c
+    H, W = a.shape
+    hsv = np.asarray(Image.fromarray(r.astype(np.uint8)).convert('HSV')).astype(np.float64)
+    hue = hsv[:, :, 0] * 360 / 255
+    org = (a > 0) & (hue >= pet_hue[0]) & (hue <= pet_hue[1]) & (hsv[:, :, 1] > 115) & (hsv[:, :, 2] > 120)
+    org[:int(H * .55)] = False
+    l3, n3 = nd.label(org)
+    if not n3:
+        return lay_down(c)
+    o = nd.find_objects(l3)[int(np.argmax(nd.sum(org, l3, range(1, n3 + 1))))]
+    py, px = max(4, int(H * .015)), max(4, int(W * .015))
+    box = np.zeros_like(a, bool)
+    box[max(0, o[0].start - py):H, max(0, o[1].start - px):o[1].stop + px] = True
+    dog = (a > 0) & box
+    body = (a > 0) & ~dog
+    l4, _ = nd.label(body)
+    s4 = nd.sum(body, l4, range(1, l4.max() + 1))
+    body = np.isin(l4, [i + 1 for i, v in enumerate(s4) if v >= s4.max() * .01])
+    br, ba = crop_of(r, body)
+    dr, da = crop_of(r, dog)
+    br, ba = np.rot90(br, 1).copy(), np.rot90(ba, 1).copy()
+    Hh = max(ba.shape[0], da.shape[0])
+    Wd = da.shape[1] + ba.shape[1] - int(da.shape[1] * .15)
+    rr, aa = np.zeros((Hh, Wd, 3)), np.zeros((Hh, Wd))
+    ox = Wd - ba.shape[1]
+    rr[Hh - ba.shape[0]:, ox:] = br
+    aa[Hh - ba.shape[0]:, ox:] = ba
+    sel = da > 0
+    rr[Hh - da.shape[0]:, :da.shape[1]][sel] = dr[sel]
+    aa[Hh - da.shape[0]:, :da.shape[1]][sel] = 1
+    return rr, aa
 
 
 def flip(c):
@@ -241,9 +298,18 @@ def aw_col(c):
     return np.array(colorsys.hsv_to_rgb(h, s, v)) * 255
 
 
+EYE0 = .745   # 規格：足元から目までの高さ＝dots × EYE0 × body（リオの正面の目の高さの割合。assets_src/character_scale.json の hero）
+HERO_SCALE = json.load(open(os.path.join(ROOT, 'assets_src', 'character_scale.json'))).get('hero', {})
+
+
 def build_hero(hid, F, head_from='front', head_k=.37, ref_k=1.0, single=False, head_skip=0.0, head_at=None, head_atK=None):
-    """F：ポーズ名→(rgb, alpha)。'awk' があれば <hid>_K も作る"""
-    ref_h = F['front'][1].shape[0] * ref_k
+    """F：ポーズ名→(rgb, alpha)。'awk' があれば <hid>_K も作る。
+    大きさ：character_scale.json の hero[hid]（eye・body）があれば『足元から目までの高さ』で全員の規格をそろえる。
+    無ければ従来どおり正面の背丈（× ref_k）。一覧のサムネイル（u）は枠に収めるため常に正面の背丈"""
+    fh = F['front'][1].shape[0]
+    hs = HERO_SCALE.get(hid)
+    ref_h = fh * (1 - hs['eye']) / (EYE0 * hs['body']) if hs else fh * ref_k
+    ref_of = lambda sk: fh if sk[0] == 'u' else ref_h
     names = [k for k in F if k != 'awk']
     pal = make_pal([F[k] for k in names], ref_h)
     C = {'face': 'L', 'kind': 'hum', 'pal': [hexs(c) for c in pal], 'sizes': {}}
@@ -251,7 +317,7 @@ def build_hero(hid, F, head_from='front', head_k=.37, ref_k=1.0, single=False, h
         C['single'] = 1   # 1 枚絵：spx.js がポーズに合わせて絵を動かす
     prev = []
     for sk, dots in SIZES:
-        ks = dots / ref_h
+        ks = dots / ref_of(sk)
         want = FIELD if sk[0] == 'f' else BATTLE
         tiles = []
         for nm in want:
@@ -274,7 +340,7 @@ def build_hero(hid, F, head_from='front', head_k=.37, ref_k=1.0, single=False, h
         for sk, dots in SIZES:
             if sk[0] == 'f':
                 continue
-            ks = dots / ref_h
+            ks = dots / ref_of(sk) * (hs.get('seirin', 1.0) if hs else 1.0)
             idx, ax, ay = render(F['awk'], palK, ks, dots, 'awk')
             S = pack([('awk', idx, ax, ay)], palK)
             S.update({'k': round(ks, 5), 'dots': dots})
@@ -286,127 +352,13 @@ def build_hero(hid, F, head_from='front', head_k=.37, ref_k=1.0, single=False, h
     return out, prev
 
 
-# ---------- 既存データの修正（jin_K の元データは assets_src/legacy/spx-legacy.json に保管。tools/spx_normalize.py 参照） ----------
-D0 = json.load(open(os.path.join(ROOT, 'assets_src', 'legacy', 'spx-legacy.json')))
-
-
-def decode(c, sk):
-    S = c['sizes'][sk] if sk != 'heads' else c['heads']
-    im = np.asarray(Image.open(io.BytesIO(base64.b64decode(S['png'].split(',')[1]))).convert('RGBA')).astype(np.float64)
-    return S, im
-
-
-def requant(entries, ncol=34):
-    """entries：[(サイズ, 名前, RGBA, ax, ay)]。全サイズ共通のパレットを作り直し、アトラスを組み直す"""
-    px = np.vstack([e[2][e[2][:, :, 3] > 0][:, :3] for e in entries])
-    uniq = np.unique(np.round(px).astype(int), axis=0)
-    if len(uniq) <= ncol:   # 色が増えていなければ元の色をそのまま使う
-        pal = uniq.astype(np.float64)
-    else:
-        sub = px[np.random.default_rng(5).choice(len(px), min(len(px), 9000), replace=False)]
-        pal = kmeans(sub, ncol - 1)
-    order = sorted(range(len(pal)), key=lambda i: -lum(pal[i]))
-    pal = pal[order]
-    by = {}
-    for sk, nm, rgba, ax, ay in entries:
-        idx = to_pal_idx(rgba[:, :, :3], rgba[:, :, 3] > 0, pal)
-        by.setdefault(sk, []).append((nm, idx, ax, ay))
-    return pal, by
-
-
-def fix_jin_K(jin):
-    """相棒の獣（左側の四足）を、原画の柴犬に合わせて橙と白の毛並みに。乗り手の黒と金の鎧はそのまま。
-    大きさは新しいジン（1 枚絵）の背丈の 1.1 倍に合わせ、各サイズに最も近い大きさの旧データを当てる"""
-    c = D0['jin_K']
-    entries = []
-    oldh = {sk: c['sizes'][sk]['frames']['awk'][3] for sk in c['sizes']}
-    pick = {}
-    for sk in c['sizes']:
-        want = 1.1 * jin['sizes'][sk]['frames']['stance'][3]
-        pick[sk] = min(oldh, key=lambda s2: abs(oldh[s2] - want))
-    for sk in c['sizes']:
-        S, im = decode(c, pick[sk])
-        x, y, w, h, ax, ay = S['frames']['awk']
-        f = im[y:y + h, x:x + w].copy()
-        cols = np.arange(w)[None, :].repeat(h, 0)
-        rows = np.arange(h)[:, None].repeat(w, 1)
-        beast = (cols < w * .40) & (rows > h * .22)
-        for yy, xx in zip(*np.where(beast & (f[:, :, 3] > 0))):
-            r, g, b = f[yy, xx, :3] / 255
-            hh, ss, vv = colorsys.rgb_to_hsv(r, g, b)
-            if vv < .12:
-                continue
-            if ss < .35 and vv > .55:          # 明るい毛 → 白い胸毛
-                nh, ns, nv = 34 / 360, .12, min(1, vv * 1.1)
-            else:                               # 茶・金の毛 → 柴犬の橙
-                nh, ns, nv = 26 / 360, min(1, .55 + ss * .4), min(1, vv * 1.18 + .05)
-            f[yy, xx, :3] = np.array(colorsys.hsv_to_rgb(nh, ns, nv)) * 255
-        entries.append((sk, 'awk', f, ax, ay))
-    pal, by = requant(entries)
-    K = {'face': 'L', 'kind': 'hum', 'pal': [hexs(p) for p in pal], 'sizes': {}}
-    prev = []
-    for sk in c['sizes']:
-        S = pack(by[sk], pal)
-        S.update({'k': jin['sizes'][sk]['k'], 'dots': jin['sizes'][sk]['dots']})
-        K['sizes'][sk] = S
-        if sk == 'B84':
-            prev.append(('jin_K ' + sk, by[sk], pal))
-    Sh, imh = decode(c, 'heads')
-    he = [(nm, to_pal_idx(imh[y:y + h, x:x + w, :3], imh[y:y + h, x:x + w, 3] > 0, pal), 0, 0)
-          for nm, (x, y, w, h, _, _) in Sh['frames'].items()]
-    K['heads'] = pack(he, pal)
-    return K, prev
-
-
-# ---------- ジン：1 枚絵から戦闘不能を作る ----------
-def jin_frames():
-    img = np.asarray(Image.open(ORIG('jin.jpg')).convert('RGB')).astype(np.float64)
-    fg = fg_mask(img, 28)
-    lab2, _ = nd.label(fg)
-    sizes = nd.sum(fg, lab2, range(1, lab2.max() + 1))
-    keep = [i + 1 for i, s in enumerate(sizes) if s >= 40]
-    m = np.isin(lab2, keep)
-    stance = crop_of(img, m)
-    # 柴犬：左下の領域から、爪（灰色の金属）を除いた最大の塊
-    H, W = m.shape
-    hsv = np.array(Image.fromarray(img.astype(np.uint8)).convert('HSV')).astype(np.float64)
-    xs = np.arange(W)[None, :].repeat(H, 0)
-    ys = np.arange(H)[:, None].repeat(W, 1)
-    claw = (hsv[:, :, 1] < 40) & (hsv[:, :, 2] > 90) & (xs > 225)
-    region = m & (xs < 345) & (ys > 530) & ~claw
-    l3, _ = nd.label(region)
-    s3 = nd.sum(region, l3, range(1, l3.max() + 1))
-    dog = l3 == (int(np.argmax(s3)) + 1)
-    dog = nd.binary_closing(dog, iterations=2) & m
-    body = m & ~dog
-    l4, _ = nd.label(body)
-    s4 = nd.sum(body, l4, range(1, l4.max() + 1))
-    body = np.isin(l4, [i + 1 for i, s in enumerate(s4) if s >= s4.max() * .01])
-    br, ba = crop_of(img, body)
-    dr, da = crop_of(img, dog)
-    # 体を左へ 90°（頭が左＝敵の側、仰向け）。柴犬は座ったまま、頭の左に寄り添わせる
-    br, ba = np.rot90(br, 1).copy(), np.rot90(ba, 1).copy()
-    Hh = max(ba.shape[0], da.shape[0])
-    Wd = da.shape[1] + ba.shape[1] - int(da.shape[1] * .15)
-    rr, aa = np.zeros((Hh, Wd, 3)), np.zeros((Hh, Wd))
-    ox = Wd - ba.shape[1]
-    rr[Hh - ba.shape[0]:, ox:] = br
-    aa[Hh - ba.shape[0]:, ox:] = ba
-    sel = da > 0
-    sub_r = rr[Hh - da.shape[0]:, :da.shape[1]]
-    sub_a = aa[Hh - da.shape[0]:, :da.shape[1]]
-    sub_r[sel] = dr[sel]
-    sub_a[sel] = 1
-    down = (rr, aa)
-    return {'front': stance, 'stance': stance, 'down': down}
-
-
 # ---------- 作成 ----------
 # （ver0.31 までのリオ rio_sheet.png・ヴァルク valk_sheet.jpg の切り出し表は、新原画への差し替えで不要になったので外した。git の履歴に残っている）
 
 data, prev = {}, []
 # 新原画：正面・待機・星臨の 3 体シート。原画の待機・星臨は右向き → 反転して左向き（正面は原画のまま）
 GALD_GHOST = lambda X, Y: (Y > 640) & (Y < 1000) & (X < 935) & ((X >= 809) | ((X >= 700) & (Y < 800 + (X - 620) * .535)))   # 正面の盾の右上に紛れ込んだ小さな騎士
+BALZA_FX = lambda X, Y: (X > 700) & (X < 850) & (Y > 740) & (Y < 960)   # 正面の右の炎の飾り（待機の絵の左に紛れる）
 TRIO = {   # id: (原画, from_trio の設定, build_hero の設定)
     'rio': ('rio_v2.jpg', {}, {'head_skip': .1}),             # 顔グラは逆立った髪の分を飛ばす
     'celes': ('celes_v2.jpg', {'ring': 60}, {'head_skip': .26}),    # 暗い背景：すき間も輪郭も暗いので輪の判定を緩める。顔グラは帽子の分を飛ばす
@@ -416,11 +368,16 @@ TRIO = {   # id: (原画, from_trio の設定, build_hero の設定)
     'noah': ('noah_v2.jpg', {}, {'head_at': (.6, .11), 'head_atK': (.49, .21)}),   # 杖・翼・光輪が頭より高い
     'erna': ('erna_v2.jpg', {}, {'head_atK': (.54, .2)}),      # 星臨は弓が頭より高い
     'valk': ('valk_v2.jpg', {}, {'head_skip': .1}),            # 顔グラは角の分を飛ばす
+    'balza': ('balza_v2.jpg', {'shadow': True, 'erase': BALZA_FX}, {'head_atK': (.41, .16)}),   # 足元の影と、正面の横の炎の飾りを消す。星臨の顔グラは槌を避ける
+    'jin': ('jin_v2.jpg', {}, {}),                             # 柴犬（相棒）は戦闘不能でも座ったまま（PET）
+    'shion': ('shion_v2.jpg', {}, {}),
+    'crow': ('crow_v2.jpg', {}, {'head_at': (.49, .2), 'head_atK': (.47, .22)}),   # 鎌が頭より高い
 }
+PET = {'jin'}
 for hid, (fn, opt, hopt) in TRIO.items():
     F = from_trio(fn, **opt)
     F['stance'], F['awk'] = flip(F['stance']), flip(F['awk'])
-    F['down'] = lay_down(F['stance'])
+    F['down'] = lay_down_with_pet(F['stance']) if hid in PET else lay_down(F['stance'])
     o, p = build_hero(hid, F, single=True, **hopt)
     data.update(o)
     prev += p
@@ -441,16 +398,8 @@ def last3(c):
     return np.array(colorsys.hsv_to_rgb(h2 / 360, s2, v2)) * 255
 data['rio']['vars'] = {'last3': [hexs(last3(np.array([int(x[1:3], 16), int(x[3:5], 16), int(x[5:7], 16)]))) for x in data['rio']['pal'][:-1]] + [data['rio']['pal'][-1]]}
 
-o, p = build_hero('jin', jin_frames(), head_from='stance', head_k=.33, ref_k=1.08, single=True)
-data.update(o)
-prev += p
-
-K, p = fix_jin_K(data['jin'])
-data['jin_K'] = K
-prev += p
-
 with open(OUT, 'w') as f:
-    f.write('/* 自動生成：tools/build_spx_heroes.py（提供原画 assets_src/originals と assets_src/legacy の修正）。手で編集しない */\n')
+    f.write('/* 自動生成：tools/build_spx_heroes.py（提供原画 assets_src/originals）。手で編集しない */\n')
     f.write('Object.assign(SPX_DATA,' + json.dumps(data, separators=(',', ':'), ensure_ascii=False) + ');\n')
 print('wrote', OUT, os.path.getsize(OUT), list(data))
 

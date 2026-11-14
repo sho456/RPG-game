@@ -11,12 +11,12 @@ assets_src/
   originals/               提供原画（シート・1 枚絵）。ここが絵の正本
   chars/<id>/              素材パック（マスター原画・連続フレーム・character.json）。tools/spx_import.py が読む
   templates/               制作テンプレート（アクションの台帳 actions.json・マスター原画の依頼文）
-  character_scale.json     縮尺の正本（星臨を通常の体格にそろえる倍率）
+  character_scale.json     縮尺の正本（hero＝味方の大きさの規格：目の高さ・体格。seirin＝旧データの星臨の倍率）
   legacy/spx-legacy.json   旧ビルドの素材（noah_K・jin_K と、補正前の星臨 'orig:<id>_K'）。実行時は使わない
 tools/
   spx_import.py            素材パック → js/sprite/data/spx-data-chars.js（縮尺統一・足元合わせ・パレット・複数サイズ・anims）
   spx_qa.py                品質確認（一覧サムネイル・正面/待機/星臨の並び・連続フレームの滑り/色/つなぎ目）
-  build_spx_heroes.py      味方の原画 → js/sprite/data/spx-data-heroes.js（rio・celes・gald・mire・hakua・noah・erna・valk・jin、星臨 _K、jin_K の修正）
+  build_spx_heroes.py      味方の原画 → js/sprite/data/spx-data-heroes.js（味方 12 人と星臨 _K。大きさの規格は character_scale.json の hero）
   build_spx_enemies.py     敵の原画 → js/sprite/data/spx-data-enemy.js
   spx_normalize.py         spx-data.js の正規化（向きの焼き込み・重複の除去・背面の補完・星臨の縮尺・一覧用サイズ）。何度実行しても同じ結果
   spx_common.py            縮小・パレット・PNG 化の共通処理
