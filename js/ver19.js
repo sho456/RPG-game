@@ -134,7 +134,8 @@ async function finish(u){const c=u._act;u._act=null;const A=u.A;if(!A||A.none)re
 function onHurt(t,d){const A=t.A;if(!A||A.none)return;const c=CUR&&CUR.a._act,sk=CUR?CUR.sk:{},r=LAST||{},fx=(c&&c.fx)||{type:sk.k==='mag'?'elem':'burst'},away=t.side===0?1:-1,[x,y]=mid(t),[fx0,fy0]=foot(t),D=dims(t),col=elCol(sk.el);
  if(!d){A.kbv+=away*2.4;return;}
  const pw=Math.max(.35,Math.min(1.7,d/t.mhp*5+(r.crit?.5:0)+(fx.big?.4:0)))*(t.guard?.4:1)*(t.boss?.55:1);A.flash=5;A.kbv+=away*pw*2.6;
- if(t.alive&&t.hp>0&&!t.guard){const hp=A.rig.type==='hum'?ANIM.HST.hit:(ANIM.MST[A.name]||{}).hit;if(hp){to(t,hp,50);const tk=A.hitT=(A.hitT||0)+1;setTimeout(()=>{if(A.hitT===tk&&!t._act&&t.alive)idle(t,220);},260*ANIM.SP());}}
+ if(t.alive&&t.hp>0&&!t.guard&&V19.ext&&V19.ext.react&&V19.ext.react(t,pw,r)){/* ver0.35：味方の被弾は一撃の重さで変わる（js/battle/data/motion-heroes.js） */}
+ else if(t.alive&&t.hp>0&&!t.guard){const hp=A.rig.type==='hum'?ANIM.HST.hit:(ANIM.MST[A.name]||{}).hit;if(hp){to(t,hp,50);const tk=A.hitT=(A.hitT||0)+1;setTimeout(()=>{if(A.hitT===tk&&!t._act&&t.alive)idle(t,220);},260*ANIM.SP());}}
  const sc=Math.max(.8,Math.min(1.8,D.h/24)),flip=CUR&&CUR.a.side===1;
  switch(fx.type){
   case'slash':{let[a0,a1]=fx.arc||[-2.3,.7];if(flip){a0=3.1416-a0;a1=3.1416-a1;}FX19.slash(x,y,{a0,a1,r:(fx.r||13)*(fx.big?1.25:1),w:fx.big?4.6:3.2,col:PHYS.includes(sk.el)||!sk.el?'#e8f0ff':col,dur:fx.big?280:220});FX19.spray(x,y,fx.big?9:5,['#ffffff',col],1.5,.06,16);if(!PHYS.includes(sk.el)&&sk.el)FX19.elem(sk.el,x,y,.65*sc);break;}
@@ -169,7 +170,7 @@ function onHurt(t,d){const A=t.A;if(!A||A.none)return;const c=CUR&&CUR.a._act,sk
   try{return await pr;}finally{idle(u,260);}};}
 {const _rs=reso;reso=async function(u){const pr=_rs(u);try{document.querySelectorAll('#cut canvas[data-id]').forEach(c=>cutArt(c,c.dataset.id+'_aw'));resoPair().forEach(h=>{const A=setup(h);if(A.none)return;to(h,AWK,220,'back');const[fx,fy]=foot(h);FX19.circle(fx,fy,'#ff9ad6',{dur:1500,r:18});FX19.gather(...mid(h),'#ffffff',20,700);});}catch(e){console.error(e);}
   try{return await pr;}finally{B.heroes.forEach(h=>{if(h!==u&&h.A&&h.A.act)idle(h,260);});}};}
-{const _end=V17F.end;end=async function(win){if(win&&B){try{B.heroes.forEach((h,i)=>{if(!h.alive||!h.A||h.A.none)return;setTimeout(async()=>{move(h,0,0,380,'lin',7);await to(h,VIC.a,180,'out');await to(h,VIC.b,200,'in');},i*90);});await T(820);}catch(e){console.error(e);}}const r=await _end(win);try{if(win&&B&&/レベルアップ/.test($('#ov').innerHTML))B.heroes.forEach(h=>{if(h.alive&&h.A&&!h.A.none)FX19.buff(...mid(h));});}catch(e){}return r;};}
+{const _end=V17F.end;end=async function(win){if(win&&B){try{B.heroes.forEach((h,i)=>{if(!h.alive||!h.A||h.A.none)return;setTimeout(async()=>{if(V19.ext&&V19.ext.victory&&V19.ext.victory(h,i))return;/* ver0.35：キャラごとの勝利の動き */move(h,0,0,380,'lin',7);await to(h,VIC.a,180,'out');await to(h,VIC.b,200,'in');},i*90);});await T(820);}catch(e){console.error(e);}}const r=await _end(win);try{if(win&&B&&/レベルアップ/.test($('#ov').innerHTML))B.heroes.forEach(h=>{if(h.alive&&h.A&&!h.A.none)FX19.buff(...mid(h));});}catch(e){}return r;};}
 /* 回復・復活・補助などの文字ポップに合わせてエフェクトを出す（ver0.18 の仕組みを新エフェクトで引き継ぐ） */
 pop=function(u,txt,col,small,kind,el){V17F.pop(u,txt,col,small,kind,el);if(!B||!u||u.x==null||!u.A||u.A.none)return;try{const s=String(txt),[x,y]=mid(u);if(V19.ext&&V19.ext.popFx(u,s,kind))return;
   if(/^\+\d+$/.test(s))FX19.heal(x,y);else if(s==='REVIVE'||s==='奇跡！')FX19.pillar(...foot(u));else if(/^AG\+|^SP\+|HASTE|充填/.test(s))FX19.buff(x,y,/SP/.test(s)?'#6fb2ff':/HASTE/.test(s)?'#8ff0a8':'#ffe27a');
