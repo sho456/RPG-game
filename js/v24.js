@@ -238,7 +238,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-h22="news"
  const vn=V22.HM.news||'';ovOpen(`<div class="nw22"><div class="nh"><b>お知らせ</b></div>${vn||''}${NEWS24}${V23.NEWS23||''}</div><button class="tbtn back wide" data-a="close">閉じる</button>`,{close:ovClose});},true);
 /* 同時に大量の表示を出す確認用 */
 function stress(){if(!inBattle())return;const E=aliveE(),Hs=B.heroes;let k=0;
- const one=()=>{if(!inBattle())return;E.forEach((e,i)=>{pop(e,Math.round(200+Math.random()*9000),'#fff',false,['','weak','crit weak','crit'][(k+i)%4],['斬','炎','雷','光'][(k+i)%4]);if((k+i)%3===0)pop(e,'MISS','#fff',true);});
+ const one=()=>{if(!inBattle())return;E.forEach((e,i)=>{pop(e,Math.round(200+Math.random()*9000),'#fff',false,['','weak','crit weak','crit'][(k+i)%4],['斬','熱','雷','陽'][(k+i)%4]);if((k+i)%3===0)pop(e,'MISS','#fff',true);});
   Hs.forEach((h,i)=>{h.guard=(k+i)%2===0;pop(h,Math.round(80+Math.random()*600),'#f88',false,'hurt');if(i%2)setTimeout(()=>pop(h,'スタン','#ffe14a',true,'st20 dn'),30);});
   pop(Hs[0],'+'+(300+k*10),'#7dffa8');k++;};
  one();const iv=setInterval(()=>{if(k>=6||!inBattle()){clearInterval(iv);B&&B.heroes.forEach(h=>h.guard=false);return;}one();},260);}

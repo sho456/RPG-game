@@ -32,10 +32,10 @@ const S=k=>'tr_'+k;
 
 /* ---------- 敵の技 ---------- */
 Object.assign(EA,{
- astral:{n:'星光の審判',el:'光',k:'mag',pow:2.8,t:'all'},abyss:{n:'深淵の大渦',el:'氷',k:'mag',pow:2.8,t:'all'},endray:{n:'終焉の光',el:'闇',k:'mag',pow:3,t:'all'},
- tidal:{n:'星海の奔流',el:'氷',k:'mag',pow:1.15,t:'all'},voidslash:{n:'虚空斬',el:'闇',k:'phys',pow:1.6,t:'one'},holyspear:{n:'光の槍',el:'光',k:'mag',pow:1.5,t:'one'},
- starclaw:{n:'星爪',el:'斬',k:'phys',pow:1.3,t:'one'},quake:{n:'大地震',el:'地',k:'phys',pow:1.1,t:'all'},genesis:{n:'原初の鉄槌',el:'地',k:'phys',pow:3.2,t:'all'},
- tokiyomi:{n:'刻詠みの終',el:'闇',k:'mag',pow:3.1,t:'all'},hadou:{n:'覇竜の咆哮',el:'炎',k:'mag',pow:3.1,t:'all'}});
+ astral:{n:'星光の審判',el:'陽',k:'mag',pow:2.8,t:'all'},abyss:{n:'深淵の大渦',el:'冷',k:'mag',pow:2.8,t:'all'},endray:{n:'終焉の光',el:'陰',k:'mag',pow:3,t:'all'},
+ tidal:{n:'星海の奔流',el:'冷',k:'mag',pow:1.15,t:'all'},voidslash:{n:'虚空斬',el:'陰',k:'phys',pow:1.6,t:'one'},holyspear:{n:'光の槍',el:'陽',k:'mag',pow:1.5,t:'one'},
+ starclaw:{n:'星爪',el:'斬',k:'phys',pow:1.3,t:'one'},quake:{n:'大地震',el:'打',k:'phys',pow:1.1,t:'all'},genesis:{n:'原初の鉄槌',el:'打',k:'phys',pow:3.2,t:'all'},
+ tokiyomi:{n:'刻詠みの終',el:'陰',k:'mag',pow:3.1,t:'all'},hadou:{n:'覇竜の咆哮',el:'熱',k:'mag',pow:3.1,t:'all'}});
 try{for(const[k,f]of[['voidslash',[{k:'def',v:-20,t:2,p:.35}]],['tidal',[{k:'spd',v:-15,t:2,p:.3}]],['holyspear',[{k:'res',v:-15,t:2,p:.3}]],['starclaw',[{k:'poison',v:.03,t:2,p:.25}]]])EA[k].fx20=f.map(x=>Object.assign({on:'t'},x));}catch(e){}
 
 /* ---------- 敵の定義 ---------- */
@@ -44,39 +44,39 @@ const st=(mhp,atk,def,mag,res,spd)=>({mhp,atk,def,mag,res,spd});
 const BO=(name,spr,s,weak,ai,xp,gold,ilv,rank,x={})=>Object.assign({name,spr,weak,ai,xp,gold,ilv,rank,boss:true,sc:3,drop:Array(4).fill(['kakera',1])},s,x);
 const NEW={
  /* 各章の中ボス（本編） */
- m_wolf:BO('灰狼の頭目',S('wolf4'),st(720,52,18,20,14,13),['地','斬'],{every:3,charge:'bite',acts:[['claw',.6],['bite',.4]],summon:'wolf',sumLv:3},50,140,4,'mid',{sc:2,flip:0}),
- m_jade:BO('翠狼の主',S('goldwolf5'),st(1900,96,30,30,22,15),['炎','斬'],{every:3,charge:'bite',acts:[['claw',.5],['bite',.5]],summon:'jadewolf',sumLv:7},140,420,8,'mid',{sc:2}),
- m_knight:BO('聖堂騎士長',S('knight6'),st(3600,140,40,60,30,11),['光','雷'],{every:3,charge:'slam',acts:[['claw',.5],['slam',.5]],summon:'darkknight',sumLv:13},300,900,14,'mid'),
- m_oni:BO('鬼武者の首領',S('gknight5'),st(7000,220,62,60,50,13),['光','氷'],{every:3,charge:'slash2',acts:[['slash2',.6],['claw',.4]],summon:'onimusha',sumLv:26},800,2600,27,'mid'),
- m_guard:BO('近衛隊長',S('knight7'),st(9500,260,72,120,60,13),['雷','光'],{every:3,charge:'tide',acts:[['slash2',.5],['claw',.3],['tide',.2]],summon:'drowned',sumLv:33},1300,4200,34,'mid'),
- m_echo:BO('残響の番兵',S('golem8'),st(16000,380,98,400,96,16),['闇','雷'],{every:3,charge:'starfall',acts:[['slam',.5],['wave',.3],['curse',.2]],summon:'shade',sumLv:52},2500,8000,53,'mid'),
+ m_wolf:BO('灰狼の頭目',S('wolf4'),st(720,52,18,20,14,13),['打','斬'],{every:3,charge:'bite',acts:[['claw',.6],['bite',.4]],summon:'wolf',sumLv:3},50,140,4,'mid',{sc:2,flip:0}),
+ m_jade:BO('翠狼の主',S('goldwolf5'),st(1900,96,30,30,22,15),['熱','斬'],{every:3,charge:'bite',acts:[['claw',.5],['bite',.5]],summon:'jadewolf',sumLv:7},140,420,8,'mid',{sc:2}),
+ m_knight:BO('聖堂騎士長',S('knight6'),st(3600,140,40,60,30,11),['陽','雷'],{every:3,charge:'slam',acts:[['claw',.5],['slam',.5]],summon:'darkknight',sumLv:13},300,900,14,'mid'),
+ m_oni:BO('鬼武者の首領',S('gknight5'),st(7000,220,62,60,50,13),['陽','冷'],{every:3,charge:'slash2',acts:[['slash2',.6],['claw',.4]],summon:'onimusha',sumLv:26},800,2600,27,'mid'),
+ m_guard:BO('近衛隊長',S('knight7'),st(9500,260,72,120,60,13),['雷','陽'],{every:3,charge:'tide',acts:[['slash2',.5],['claw',.3],['tide',.2]],summon:'drowned',sumLv:33},1300,4200,34,'mid'),
+ m_echo:BO('残響の番兵',S('golem8'),st(16000,380,98,400,96,16),['陰','雷'],{every:3,charge:'starfall',acts:[['slam',.5],['wave',.3],['curse',.2]],summon:'shade',sumLv:52},2500,8000,53,'mid'),
  /* 天極の門（Lv70〜82） */
- g_slime:N('星霊スライム',S('slime4'),st(240,72,28,68,26,10),['闇','雷'],[['claw',.5],['tide',.5]],70,60,[['kakera',.3],['seishou',.012]]),
- g_knight:N('天門の衛士',S('knight4'),st(310,98,40,30,26,12),['闇','打'],[['slash2',.6],['claw',.4]],80,70,[['kiba',.4],['seishou',.012]],{flip:1}),
- g_wolf:N('天狼',S('goldwolf4'),st(260,100,30,20,20,18),['闇','炎'],[['claw',.4],['bite',.3],['starclaw',.3]],76,64,[['kiba',.5],['seishou',.012]]),
- g_spirit:N('星屑の精',S('icespirit4'),st(230,40,22,106,32,15),['闇','風'],[['holyspear',.5],['wave',.5]],78,66,[['kakera',.4],['seishou',.012]]),
- g_mid:BO('天門の守護獣',S('drake4'),st(40000,640,130,600,110,18),['闇','氷'],{every:3,charge:'astral',acts:[['claw',.4],['starclaw',.3],['holyspear',.3]],summon:'g_wolf',sumLv:74},2400,9000,76,'mid'),
- g_boss:BO('天門の女帝アストレア',S('queen4'),st(70000,700,140,760,130,19),['闇','雷'],{every:3,charge:'astral',acts:[['holyspear',.4],['wave',.3],['curse',.3]],summon:'g_knight',sumLv:80},4200,16000,82,'big',{flip:1}),
+ g_slime:N('星霊スライム',S('slime4'),st(240,72,28,68,26,10),['陰','雷'],[['claw',.5],['tide',.5]],70,60,[['kakera',.3],['seishou',.012]]),
+ g_knight:N('天門の衛士',S('knight4'),st(310,98,40,30,26,12),['陰','打'],[['slash2',.6],['claw',.4]],80,70,[['kiba',.4],['seishou',.012]],{flip:1}),
+ g_wolf:N('天狼',S('goldwolf4'),st(260,100,30,20,20,18),['陰','熱'],[['claw',.4],['bite',.3],['starclaw',.3]],76,64,[['kiba',.5],['seishou',.012]]),
+ g_spirit:N('星屑の精',S('icespirit4'),st(230,40,22,106,32,15),['陰','斬'],[['holyspear',.5],['wave',.5]],78,66,[['kakera',.4],['seishou',.012]]),
+ g_mid:BO('天門の守護獣',S('drake4'),st(40000,640,130,600,110,18),['陰','冷'],{every:3,charge:'astral',acts:[['claw',.4],['starclaw',.3],['holyspear',.3]],summon:'g_wolf',sumLv:74},2400,9000,76,'mid'),
+ g_boss:BO('天門の女帝アストレア',S('queen4'),st(70000,700,140,760,130,19),['陰','雷'],{every:3,charge:'astral',acts:[['holyspear',.4],['wave',.3],['curse',.3]],summon:'g_knight',sumLv:80},4200,16000,82,'big',{flip:1}),
  /* 星海の深淵（Lv84〜98） */
- a_jelly:N('深淵海月',S('jelly4'),st(260,46,22,112,24,13),['雷','光'],[['tidal',.5],['spore',.5]],90,74,[['kakera',.4],['seishou',.015]]),
- a_shade:N('星喰らいの影',S('shade4'),st(240,40,22,120,30,16),['光','炎'],[['curse',.5],['wave2',.5]],92,76,[['kakera',.4],['seishou',.015]]),
- a_rider:N('深淵の騎兵',S('gknight4'),st(350,112,44,30,26,13),['雷','光'],[['slash2',.5],['voidslash',.5]],96,80,[['kiba',.4],['seishou',.015]]),
- a_spore:N('星海の胞子',S('shroom4'),st(330,82,30,92,28,9),['炎','斬'],[['spore',.6],['claw',.4]],88,72,[['haiseki',.6],['seishou',.015]]),
+ a_jelly:N('深淵海月',S('jelly4'),st(260,46,22,112,24,13),['雷','陽'],[['tidal',.5],['spore',.5]],90,74,[['kakera',.4],['seishou',.015]]),
+ a_shade:N('星喰らいの影',S('shade4'),st(240,40,22,120,30,16),['陽','熱'],[['curse',.5],['wave2',.5]],92,76,[['kakera',.4],['seishou',.015]]),
+ a_rider:N('深淵の騎兵',S('gknight4'),st(350,112,44,30,26,13),['雷','陽'],[['slash2',.5],['voidslash',.5]],96,80,[['kiba',.4],['seishou',.015]]),
+ a_spore:N('星海の胞子',S('shroom4'),st(330,82,30,92,28,9),['熱','斬'],[['spore',.6],['claw',.4]],88,72,[['haiseki',.6],['seishou',.015]]),
  a_mid:BO('深海の巨像',S('golem4'),st(60000,780,160,700,140,16),['雷','打'],{every:3,charge:'abyss',acts:[['slam',.5],['tidal',.3],['claw',.2]],summon:'a_rider',sumLv:88},3200,14000,90,'mid'),
- a_boss:BO('星海竜リヴァイア',S('drake5'),st(100000,860,170,900,150,20),['雷','光'],{every:3,charge:'abyss',acts:[['bite',.35],['tidal',.35],['claw',.3]],summon:'a_jelly',sumLv:96},5600,24000,98,'big'),
+ a_boss:BO('星海竜リヴァイア',S('drake5'),st(100000,860,170,900,150,20),['雷','陽'],{every:3,charge:'abyss',acts:[['bite',.35],['tidal',.35],['claw',.3]],summon:'a_jelly',sumLv:96},5600,24000,98,'big'),
  /* 終焉の星域（Lv100〜118） */
- e_guard:N('終焉の番人',S('banjin4'),st(390,122,46,100,40,12),['光','雷'],[['claw',.4],['curse',.3],['wave',.3]],110,90,[['kakera',.5],['seishou',.02]]),
- e_drake:N('滅星竜の仔',S('drake6'),st(350,128,40,60,30,17),['氷','光'],[['claw',.4],['bite',.3],['dfire',.3]],108,88,[['kiba',.5],['seishou',.02]]),
- e_ninja:N('虚無の刺客',S('ninja4'),st(310,134,36,80,30,20),['光','打'],[['voidslash',.6],['claw',.4]],106,86,[['kakera',.4],['seishou',.02]]),
+ e_guard:N('終焉の番人',S('banjin4'),st(390,122,46,100,40,12),['陽','雷'],[['claw',.4],['curse',.3],['wave',.3]],110,90,[['kakera',.5],['seishou',.02]]),
+ e_drake:N('滅星竜の仔',S('drake6'),st(350,128,40,60,30,17),['冷','陽'],[['claw',.4],['bite',.3],['dfire',.3]],108,88,[['kiba',.5],['seishou',.02]]),
+ e_ninja:N('虚無の刺客',S('ninja4'),st(310,134,36,80,30,20),['陽','打'],[['voidslash',.6],['claw',.4]],106,86,[['kakera',.4],['seishou',.02]]),
  e_golem:N('終焉の巨兵',S('golem5'),st(470,120,60,30,40,8),['雷','打'],[['slam',.6],['quake',.4]],114,92,[['haiseki',.6],['seishou',.02]]),
- e_mid:BO('星蝕の騎士王',S('knight5'),st(90000,980,190,700,160,19),['光','雷'],{every:3,charge:'endray',acts:[['voidslash',.5],['slash2',.3],['curse',.2]],summon:'e_ninja',sumLv:108},4200,22000,110,'mid',{flip:1}),
- e_boss1:BO('星核の亡骸',S('golem6'),st(120000,1000,200,1000,180,18),['闇','雷'],{every:3,charge:'endray',acts:[['slam',.4],['wave',.3],['quake',.3]],summon:'e_guard',sumLv:114},0,0,118,'big',{intro:'星核の亡骸が崩れ落ちる。その奥から、黒い竜の王が身を起こした――'}),
- e_boss2:BO('終焉の星神ゼノス',S('valk4'),st(160000,1100,210,1100,190,20),['光'],{every:3,charge:'endray',acts:[['voidslash',.4],['dfire',.3],['curse',.3]],summon:'e_drake',sumLv:116},7400,40000,120,'big',{flip:1}),
+ e_mid:BO('星蝕の騎士王',S('knight5'),st(90000,980,190,700,160,19),['陽','雷'],{every:3,charge:'endray',acts:[['voidslash',.5],['slash2',.3],['curse',.2]],summon:'e_ninja',sumLv:108},4200,22000,110,'mid',{flip:1}),
+ e_boss1:BO('星核の亡骸',S('golem6'),st(120000,1000,200,1000,180,18),['陰','雷'],{every:3,charge:'endray',acts:[['slam',.4],['wave',.3],['quake',.3]],summon:'e_guard',sumLv:114},0,0,118,'big',{intro:'星核の亡骸が崩れ落ちる。その奥から、黒い竜の王が身を起こした――'}),
+ e_boss2:BO('終焉の星神ゼノス',S('valk4'),st(160000,1100,210,1100,190,20),['陽'],{every:3,charge:'endray',acts:[['voidslash',.4],['dfire',.3],['curse',.3]],summon:'e_drake',sumLv:116},7400,40000,120,'big',{flip:1}),
  /* 極限の星闘（Lv125〜140・何度でも挑める） */
- x_dragon:BO('天極の覇竜',S('drake7'),st(200000,1200,220,1150,200,21),['氷','闇'],{every:3,charge:'hadou',acts:[['claw',.35],['dfire',.35],['bite',.3]],summon:'e_drake',sumLv:119},9000,50000,121,'big'),
- x_nox:BO('虚神ノクス・極','last3',st(240000,1250,230,1300,220,21),['光'],{every:3,charge:'voidend',acts:[['mirror',.35],['curse',.35],['voidslash',.3]],summon:'a_shade',sumLv:121},10000,56000,123,'big',{flip:1}),
- x_queen:BO('刻の女帝',S('queen5'),st(280000,1300,240,1400,240,22),['炎','光'],{every:3,charge:'tokiyomi',acts:[['holyspear',.35],['chrono',.25],['wave',.4]],summon:'g_spirit',sumLv:123},11000,62000,125,'big',{flip:1}),
- x_titan:BO('原初の巨神',S('golem7'),st(340000,1400,260,1200,240,19),['雷','風'],{every:3,charge:'genesis',acts:[['slam',.4],['quake',.4],['claw',.2]],summon:'e_golem',sumLv:125},12000,70000,128,'big')};
+ x_dragon:BO('天極の覇竜',S('drake7'),st(200000,1200,220,1150,200,21),['冷','陰'],{every:3,charge:'hadou',acts:[['claw',.35],['dfire',.35],['bite',.3]],summon:'e_drake',sumLv:119},9000,50000,121,'big'),
+ x_nox:BO('虚神ノクス・極','last3',st(240000,1250,230,1300,220,21),['陽'],{every:3,charge:'voidend',acts:[['mirror',.35],['curse',.35],['voidslash',.3]],summon:'a_shade',sumLv:121},10000,56000,123,'big',{flip:1}),
+ x_queen:BO('刻の女帝',S('queen5'),st(280000,1300,240,1400,240,22),['熱','陽'],{every:3,charge:'tokiyomi',acts:[['holyspear',.35],['chrono',.25],['wave',.4]],summon:'g_spirit',sumLv:123},11000,62000,125,'big',{flip:1}),
+ x_titan:BO('原初の巨神',S('golem7'),st(340000,1400,260,1200,240,19),['雷','斬'],{every:3,charge:'genesis',acts:[['slam',.4],['quake',.4],['claw',.2]],summon:'e_golem',sumLv:125},12000,70000,128,'big')};
 for(const k in NEW){const d=NEW[k];if(d.boss){d.drop=k.startsWith('m_')?Array(3).fill(['kakera',1]):k.startsWith('x_')?[['seishou',1],['seishou',1],['seishou',.6],['seishou',.4],['kakera',1],['kakera',1]]:
  k.endsWith('mid')?[['seishou',.4],['kakera',1],['kakera',1],['kakera',1]]:[['seishou',1],['seishou',.5],['kakera',1],['kakera',1],['kakera',1]];}
  ED[k]=d;const b=d.spr.replace(/^tr_/,'').replace(/\d$/,'');const base={wolf:'wolf',goldwolf:'raiwolf',knight:'darkknight',gknight:'onimusha',golem:'golemkin',drake:'firedrake',queen:'boss6',jelly:'jelly',shade:'shade',shroom:'shroom',slime:'slime',icespirit:'yukirei',banjin:'boss',ninja:'boss4',valk:'valk',last:'last3'}[b]||'slime';

@@ -12,30 +12,30 @@ const V31B=(()=>{
 const{esc,fm,lbStage,capOf}=V31;
 /* ---------- 極技 ---------- */
 const XSK={
- x_rio1:{n:'天灯星斬',sp:45,el:'光',k:'phys',pow:4.2,t:'one',d:'光の極大斬撃・単体'},
- x_rio2:{n:'極光流星群',sp:55,el:'光',k:'phys',pow:.85,hits:3,t:'all',d:'光の3連撃・敵全体'},
- x_gald1:{n:'天崩撃',sp:40,el:'地',k:'phys',pow:3.6,t:'one',fx20:[{on:'t',k:'def',v:-30,t:3}],d:'地の極大打撃＋敵の防御-30%（3ターン）'},
+ x_rio1:{n:'天灯星斬',sp:45,el:'陽',k:'phys',pow:4.2,t:'one',d:'光の極大斬撃・単体'},
+ x_rio2:{n:'極光流星群',sp:55,el:'陽',k:'phys',pow:.85,hits:3,t:'all',d:'光の3連撃・敵全体'},
+ x_gald1:{n:'天崩撃',sp:40,el:'打',k:'phys',pow:3.6,t:'one',fx20:[{on:'t',k:'def',v:-30,t:3}],d:'地の極大打撃＋敵の防御-30%（3ターン）'},
  x_gald2:{n:'不落の聖壁',sp:45,k:'sup20',t:'self',fx20:[{on:'allies',k:'prot',v:35,t:3},{on:'self',k:'counter',v:1.5,t:3}],taunt20:3,d:'味方全員の被ダメ-35%（3ターン）＋3ターン挑発・反撃態勢',role:'guard'},
- x_mire1:{n:'ノヴァ・インフェルノ',sp:55,el:'炎',k:'mag',pow:2.6,t:'all',d:'炎の極大魔法・敵全体'},
- x_mire2:{n:'アブソリュート・ゼロ',sp:50,el:'氷',k:'mag',pow:4.6,t:'one',fx20:[{on:'t',k:'stun',v:1,t:1,p:.3}],d:'氷の極大魔法・単体＋30%で凍結'},
- x_shion1:{n:'瞬影千刃',sp:50,el:'風',k:'phys',pow:.62,hits:7,t:'one',d:'風の7連撃・単体'},
+ x_mire1:{n:'ノヴァ・インフェルノ',sp:55,el:'熱',k:'mag',pow:2.6,t:'all',d:'炎の極大魔法・敵全体'},
+ x_mire2:{n:'アブソリュート・ゼロ',sp:50,el:'冷',k:'mag',pow:4.6,t:'one',fx20:[{on:'t',k:'stun',v:1,t:1,p:.3}],d:'氷の極大魔法・単体＋30%で凍結'},
+ x_shion1:{n:'瞬影千刃',sp:50,el:'斬',k:'phys',pow:.62,hits:7,t:'one',d:'風の7連撃・単体'},
  x_shion2:{n:'影縫・極',sp:45,el:'斬',k:'phys',pow:2.2,t:'all',delay:40,d:'斬撃・敵全体＋行動を遅らせる'},
  x_noah1:{n:'天使の福音',sp:50,k:'sup20',t:'self',heal20:.6,cleanse20:1,fx20:[{on:'allies',k:'regen',v:.08,t:3}],d:'味方全員のHP60%回復・弱体解除＋継続回復（3ターン）',role:'heal'},
- x_noah2:{n:'ジャッジメント',sp:50,el:'光',k:'mag',pow:3,t:'all',d:'光の極大魔法・敵全体'},
+ x_noah2:{n:'ジャッジメント',sp:50,el:'陽',k:'mag',pow:3,t:'all',d:'光の極大魔法・敵全体'},
  x_erna1:{n:'天穿雷霆',sp:50,el:'雷',k:'phys',pow:4.6,t:'one',pierce20:.5,d:'雷の極大射撃・単体。防御を半分無視'},
  x_erna2:{n:'流星雨',sp:50,el:'雷',k:'phys',pow:.75,hits:3,t:'all',d:'雷の矢の雨・敵全体に3連撃'},
- x_balza1:{n:'灼熱の鉄槌',sp:45,el:'炎',k:'phys',pow:5,t:'one',w:1.3,d:'炎の極大打撃・単体（次の手番が遅い）'},
- x_balza2:{n:'炉心解放',sp:55,el:'炎',k:'phys',pow:2.5,t:'all',self20:[{k:'atk',v:30,t:3}],d:'炎・敵全体＋自分の攻撃+30%（3ターン）'},
- x_crow1:{n:'冥王の審判',sp:55,el:'闇',k:'mag',pow:2.8,t:'all',fx20:[{on:'t',k:'poison',v:.06,t:3,p:.6}],d:'闇の極大魔法・敵全体＋60%で毒'},
- x_crow2:{n:'魂葬',sp:50,el:'闇',k:'mag',pow:4.4,t:'one',drain:.3,d:'闇の極大魔法・単体。与ダメの30%を吸収'},
- x_hakua1:{n:'氷華千連',sp:50,el:'氷',k:'phys',pow:.45,hits:10,t:'one',d:'氷の10連撃・単体'},
- x_hakua2:{n:'絶対零拳',sp:45,el:'氷',k:'phys',pow:4,t:'one',fx20:[{on:'t',k:'stun',v:1,t:1,p:.5}],d:'氷の極大拳撃＋50%で凍結'},
- x_jin1:{n:'獣王天翔',sp:50,el:'風',k:'phys',pow:2.3,t:'all',d:'風・敵全体の大技'},
- x_jin2:{n:'ポポ・メテオ',sp:45,el:'地',k:'phys',pow:4.4,t:'one',d:'ポポと地の極大突撃・単体'},
+ x_balza1:{n:'灼熱の鉄槌',sp:45,el:'熱',k:'phys',pow:5,t:'one',w:1.3,d:'炎の極大打撃・単体（次の手番が遅い）'},
+ x_balza2:{n:'炉心解放',sp:55,el:'熱',k:'phys',pow:2.5,t:'all',self20:[{k:'atk',v:30,t:3}],d:'炎・敵全体＋自分の攻撃+30%（3ターン）'},
+ x_crow1:{n:'冥王の審判',sp:55,el:'陰',k:'mag',pow:2.8,t:'all',fx20:[{on:'t',k:'poison',v:.06,t:3,p:.6}],d:'闇の極大魔法・敵全体＋60%で毒'},
+ x_crow2:{n:'魂葬',sp:50,el:'陰',k:'mag',pow:4.4,t:'one',drain:.3,d:'闇の極大魔法・単体。与ダメの30%を吸収'},
+ x_hakua1:{n:'氷華千連',sp:50,el:'冷',k:'phys',pow:.45,hits:10,t:'one',d:'氷の10連撃・単体'},
+ x_hakua2:{n:'絶対零拳',sp:45,el:'冷',k:'phys',pow:4,t:'one',fx20:[{on:'t',k:'stun',v:1,t:1,p:.5}],d:'氷の極大拳撃＋50%で凍結'},
+ x_jin1:{n:'獣王天翔',sp:50,el:'斬',k:'phys',pow:2.3,t:'all',d:'風・敵全体の大技'},
+ x_jin2:{n:'ポポ・メテオ',sp:45,el:'打',k:'phys',pow:4.4,t:'one',d:'ポポと地の極大突撃・単体'},
  x_celes1:{n:'時空断裂',sp:50,el:null,k:'mag',pow:4.2,t:'one',d:'時の極大魔法・単体'},
  x_celes2:{n:'永劫の刻',sp:50,k:'sup20',t:'self',fx20:[{on:'allies',k:'spd',v:40,t:3},{on:'allies',k:'atk',v:20,t:3},{on:'allies',k:'mag',v:20,t:3}],ct20:.5,d:'味方全員の素早さ+40%・攻撃/魔力+20%（3ターン）',role:'buff'},
- x_valk1:{n:'竜王滅炎',sp:55,el:'炎',k:'phys',pow:2.6,t:'all',d:'炎・敵全体の大技'},
- x_valk2:{n:'黒竜断',sp:50,el:'闇',k:'phys',pow:4.8,t:'one',d:'闇の極大斬撃・単体'}};
+ x_valk1:{n:'竜王滅炎',sp:55,el:'熱',k:'phys',pow:2.6,t:'all',d:'炎・敵全体の大技'},
+ x_valk2:{n:'黒竜断',sp:50,el:'陰',k:'phys',pow:4.8,t:'one',d:'闇の極大斬撃・単体'}};
 for(const k in XSK)XSK[k].x31=1;
 Object.assign(SK,XSK);
 try{TERMS.reset();}catch(e){}
@@ -65,22 +65,22 @@ const CP={
  c_mire3:{n:'魔導の深淵',d:'魔法の与ダメ+35%',out:(a,t,sk)=>sk&&sk.k==='mag'?1.35:1},
  c_mire4:{n:'属性支配',d:'弱点を突いた魔法の与ダメ+40%',out:(a,t,sk)=>sk&&sk.k==='mag'&&isWeak(t,sk)?1.4:1},
  c_shion3:{n:'影の極意',d:'素早さ+25%',make:u=>{u.spd=+(u.spd*1.25).toFixed(2);}},
- c_shion4:{n:'千影',d:'単体攻撃のあと40%で追撃（風・威力0.8）',acted:(u,sk)=>{if(sk&&(sk.t==='one'||sk.basic)&&(sk.k==='phys'||sk.basic)){const t=aliveE().sort((a,b)=>a.hp-b.hp)[0];if(t&&Math.random()<.4)fuQ(u,t,{n:'千影',el:'風',k:'phys',pow:.8,t:'one'});}}},
+ c_shion4:{n:'千影',d:'単体攻撃のあと40%で追撃（風・威力0.8）',acted:(u,sk)=>{if(sk&&(sk.t==='one'||sk.basic)&&(sk.k==='phys'||sk.basic)){const t=aliveE().sort((a,b)=>a.hp-b.hp)[0];if(t&&Math.random()<.4)fuQ(u,t,{n:'千影',el:'斬',k:'phys',pow:.8,t:'one'});}}},
  c_noah3:{n:'大いなる慈愛',d:'手番の開始時、味方全員のHPを5%回復',turn:()=>aliveH().forEach(h=>{if(h.hp<h.mhp){const v=Math.round(h.mhp*.05);h.hp=Math.min(h.mhp,h.hp+v);pop(h,'+'+v,'#7dffa8',true);}})},
  c_noah4:{n:'聖域の守り',d:'戦闘開始時、味方全員の受けるダメージ-25%（4ターン）',start:()=>aliveH().forEach(h=>V20.addSt(h,'prot',25,4))},
  c_erna3:{n:'必中の狙撃',d:'会心率+25%',critB:()=>25},
  c_erna4:{n:'天穿つ雷',d:'雷属性の与ダメ+40%',out:(a,t,sk)=>sk&&sk.el==='雷'?1.4:1},
- c_balza3:{n:'灼熱の炉心',d:'炎属性の与ダメ+40%',out:(a,t,sk)=>sk&&sk.el==='炎'?1.4:1},
+ c_balza3:{n:'灼熱の炉心',d:'熱属性の与ダメ+40%',out:(a,t,sk)=>sk&&sk.el==='熱'?1.4:1},
  c_balza4:{n:'鋼の肉体',d:'HP50%以上のとき受けるダメージ-25%',inc:t=>t.hp>=t.mhp*.5?.75:1},
  c_crow3:{n:'死神の加護',d:'HP30%以下の敵への与ダメ+60%',out:(a,t)=>t.hp<=t.mhp*.3?1.6:1},
  c_crow4:{n:'魂の収穫',d:'敵を倒すとAG+25・SP+20',kill:a=>{if(!a.aw)a.ag=Math.min(100,a.ag+25);a.sp=Math.min(100,a.sp+20);}},
  c_hakua3:{n:'氷華絢爛',d:'多段攻撃の各撃の与ダメ+30%',out:(a,t,sk)=>sk&&(sk.hits>1||sk.k==='rhythm')?1.3:1},
- c_hakua4:{n:'凍てつく拳',d:'氷属性の与ダメ+40%',out:(a,t,sk)=>sk&&sk.el==='氷'?1.4:1},
+ c_hakua4:{n:'凍てつく拳',d:'冷属性の与ダメ+40%',out:(a,t,sk)=>sk&&sk.el==='冷'?1.4:1},
  c_jin3:{n:'獣王の血',d:'与ダメ+20%・受けるダメージ-15%',out:()=>1.2,inc:()=>.85},
- c_jin4:{n:'ポポの本気',d:'行動のあと50%でポポが追撃（地・威力1.2）',acted:(u,sk)=>{if(sk&&(sk.k==='phys'||sk.k==='mag'||sk.basic)){const t=aliveE().sort((a,b)=>a.hp-b.hp)[0];if(t&&Math.random()<.5)fuQ(u,t,{n:'ポポの本気',el:'地',k:'phys',pow:1.2,t:'one'});}}},
+ c_jin4:{n:'ポポの本気',d:'行動のあと50%でポポが追撃（地・威力1.2）',acted:(u,sk)=>{if(sk&&(sk.k==='phys'||sk.k==='mag'||sk.basic)){const t=aliveE().sort((a,b)=>a.hp-b.hp)[0];if(t&&Math.random()<.5)fuQ(u,t,{n:'ポポの本気',el:'打',k:'phys',pow:1.2,t:'one'});}}},
  c_celes3:{n:'時の支配者',d:'戦闘開始時、味方全員の素早さ+25%（4ターン）',start:()=>aliveH().forEach(h=>V20.addSt(h,'spd',25,4))},
  c_celes4:{n:'刻の加速',d:'魔法の与ダメ+30%',out:(a,t,sk)=>sk&&sk.k==='mag'?1.3:1},
- c_valk3:{n:'竜王の威厳',d:'炎・闇属性の与ダメ+40%',out:(a,t,sk)=>sk&&(sk.el==='炎'||sk.el==='闇')?1.4:1},
+ c_valk3:{n:'竜王の威厳',d:'炎・陰属性の与ダメ+40%',out:(a,t,sk)=>sk&&(sk.el==='熱'||sk.el==='陰')?1.4:1},
  c_valk4:{n:'竜の再生',d:'手番の開始時、HPを最大HPの8%回復',turn:u=>{if(u.hp<u.mhp){const v=Math.round(u.mhp*.08);u.hp=Math.min(u.mhp,u.hp+v);pop(u,'+'+v,'#7dffa8',true);}}}};
 Object.assign(V20.PS,TP,CP);
 for(const id in V20.CPS){if(!V20.CPS[id].includes('c_'+id+'3'))V20.CPS[id].push('c_'+id+'3','c_'+id+'4');}
@@ -164,6 +164,6 @@ function upMenu(m){const id=BS.id,h=G.h[id],N=BOARD2[id],U=b2(id),n=BS.sel&&N[BS
 {const _ch=charHTML;charHTML=function(id,tab,ed){let s=_ch(id,tab,ed);try{if(tab==='st'){const st=stats(id),rows=[['与ダメ',st.dmgP],['技の威力',st.skDmg],['会心ダメ',st.critDmg],['被ダメ軽減',Math.min(60,st.dmgCut)]].filter(x=>x[1]>0)
    .map(([k,v])=>`<div class="sr x31"><span><i class="gn">◆</i>${k}</span><b>+${v}%</b></div>`).join('');
   if(rows)s=s.replace(/(ドロップ率<\/span><b>[^<]*<\/b><\/div>)/,'$1'+rows);}
- if(tab==='bd'&&G.h[id].lv>=OPEN_LV){const ps=psOf(id).map(p=>V20.PS[p]).filter(Boolean);s=s.replace(/(<div class="sh2">ジョブ<\/div>)/,`<div class="sh2">天星盤「${esc(BDEF[id].star)}・天」</div><div class="stx">解放 ${b2(id).length-1}／${Object.keys(BOARD2[id]).length-1}　天星ポイント残り <b>${tenLeft(id)}</b>${ps.length?'<br>天星パッシブ：'+ps.map(p=>esc(p.n)).join('・'):''}</div>$1`);}}catch(e){console.error(e);}return s;};}
+ if(tab==='bd'&&G.h[id].lv>=OPEN_LV){const ps=psOf(id).map(p=>V20.PS[p]).filter(Boolean);s=s.replace(/(<i class="tsb-anchor" hidden><\/i>)/,`<div class="sh2">天星盤「${esc(BDEF[id].star)}・天」</div><div class="stx">解放 ${b2(id).length-1}／${Object.keys(BOARD2[id]).length-1}　天星ポイント残り <b>${tenLeft(id)}</b>${ps.length?'<br>天星パッシブ：'+ps.map(p=>esc(p.n)).join('・'):''}</div>$1`);}}catch(e){console.error(e);}return s;};}
 
 return{XSK,TP,CP,PSP,BOARD2,build2,tenTotal,tenLeft,canUnlock2,auto2,psOf,OPEN_LV,b2};})();

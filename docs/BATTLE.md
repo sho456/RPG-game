@@ -6,7 +6,8 @@
 ---
 
 > **ver0.37 から戦闘の進行は RS 式のターン制**（`js/rs/battle.js` が `run` を置き換える）。仕組み・数値・データの場所は [RS-SYSTEM.md](RS-SYSTEM.md)。
-> `run` → ターンの始め（BP 回復）→ `inputPhase`（全員の `chooseRoot`／`autoPick`）→ `buildOrder`（素早さ順）→ `heroExec`（BP・連携・ひらめき → `doAction`）／`enemyExec`（`enemyTurn`）→ ターンの終わり（星臨の残り）。
+> `run` → ターンの始め（BP 回復）→ `inputPhase`（全員の `chooseRoot`／`autoPick`）→ `buildOrder`（素早さ順）→ `heroExec`（BP・LP・ひらめき → `doAction`）／`enemyExec`（`enemyTurn`）→ ターンの終わり（星臨の残り）。
+> **ver0.38**：戦場の配置（陣形の立ち位置 `HK23.placeHeroes`）・コマンド入力中のスライド・行動順・連続戦闘の移行演出は `js/v38/battle-ui.js`。HP/LP・命中は `js/rs/battle.js` と `js/rs/core.js`。
 > 下の図の `nextActor`・`heroTurn` は、演出ビューア（`B.opts.viewer`）の戦闘だけで使う。`chooseRoot`・`autoPick`・`pickHero`・`preview`・`repOK`・`skillList` は js/rs/ で丸ごと置き換えている（包みではないので下の表には出ない）。
 
 ## 1. 全体の流れ（ロジック：js/engine.js。ver0.36 まで）
@@ -19,7 +20,7 @@ startBattle(list, opts)          敵・味方のユニットを作り（enemy() 
     ├ enemyTurn(e)               敵の AI → doAction
     │  └ doAction(u, sk, t)      技 1 回分（対象が複数・連撃なら hit を何回も）
     │     └ hit(a, t, sk)        1 発分：calc（ダメージ計算）→ hurt（HP を減らす）→ pop（数字）→ kill（撃破）
-    ├ awaken(u) / reso(u)        星臨・共鳴技（カットイン）
+    ├ awaken(u)                  星臨（カットイン）。共鳴技は ver0.38 で廃止
     └ end(win)                   勝敗・報酬（rewards）・画面の切り替え
 ```
 
@@ -88,7 +89,7 @@ startBattle(list, opts)          敵・味方のユニットを作り（enemy() 
 <!-- wrapmap:begin -->
 | 関数 | 読み込み順の流れ（**太字**＝定義、（控え）＝V17F に控えた時点、＊＝控えを包む） |
 |---|---|
-| `startBattle` | **engine.js** → ch8.js → ver18-battle.js → ver19.js → v20-battle.js → v21.js → v22.js → v23.js → v24.js → v25.js → battle/seq.js → rs/battle.js |
+| `startBattle` | **engine.js** → ch8.js → ver18-battle.js → ver19.js → v20-battle.js → v21.js → v22.js → v23.js → v24.js → v25.js → battle/seq.js → rs/battle.js → v38/core.js → v38/battle-ui.js |
 | `run` | **engine.js** |
 | `nextActor` | **engine.js** |
 | `heroTurn` | **engine.js** → v20-battle.js → v22.js → v25.js → battle/viewer.js |
@@ -97,27 +98,25 @@ startBattle(list, opts)          敵・味方のユニットを作り（enemy() 
 | `hit` | **engine.js** → ver19-pre.js（控え） → ver19.js＊ → v20-battle.js → rs/battle.js → rs/battle.js |
 | `calc` | **engine.js** → ch8.js → ch9.js → ver19.js → v20-battle.js → v20-battle.js → data/terms.js → v31/core.js → rs/battle.js |
 | `hurt` | **engine.js** → ver19.js → v20-battle.js → rs/battle.js |
-| `kill` | **engine.js** → ver19-pre.js（控え） → ver19.js＊ |
+| `kill` | **engine.js** → ver19-pre.js（控え） → ver19.js＊ → rs/battle.js |
 | `pop` | **engine.js** → **ch5.js** → ver19-pre.js（控え） → ver19.js＊ → v25.js＊ |
 | `awaken` | **engine.js** → ch8.js → ver19-pre.js（控え） → ver19.js＊ → v22.js → v23.js → v25.js → battle/viewer.js → rs/battle.js |
 | `endAw` | **engine.js** |
-| `reso` | **engine.js** → **awaken.js** → ver18-art.js → ver19.js → v22.js |
-| `end` | **engine.js** → ver19-pre.js（控え） → ver19.js＊ → v20-ui.js → v31/quests.js |
+| `end` | **engine.js** → ver19-pre.js（控え） → ver19.js＊ → v20-ui.js → v31/quests.js → rs/battle.js |
 | `rewards` | **engine.js** → ch8.js → ch9.js → v20-ui.js → v31/core.js → v31/quests.js |
-| `enemy` | **engine.js** → v31/enemies.js → v32.js |
+| `enemy` | **engine.js** → v31/enemies.js → v32.js → v38/core.js |
 | `hero` | **engine.js** → ver18-battle.js → v20-battle.js → v31/items.js → v31/board.js → rs/core.js |
-| `refresh` | **engine.js** → **ch5.js** → v20-ui.js → v22.js → v24.js → v25.js → v31/quests.js → rs/ui.js |
-| `draw` | **engine.js** → ver16.js → ver17.js → ver19.js → v21.js → v22.js → v23.js → v25.js → sprite/spx.js → v31/quests.js |
+| `refresh` | **engine.js** → **ch5.js** → v20-ui.js → v22.js → v24.js → v25.js → v31/quests.js |
+| `draw` | **engine.js** → ver16.js → ver17.js → ver19.js → v21.js → v22.js → v23.js → v25.js → sprite/spx.js → v31/quests.js → v38/battle-ui.js |
 | `frameOf` | **sprite/legacy/px.js** → sprite/legacy/px-enemy.js → ver19-art.js → sprite/spx.js |
 
 戦闘以外で 4 回以上包まれている関数：
 
-- `title`（18）：**town.js** → ver16.js → ver18-town.js → ver19.js → v20-ui.js → v21.js → v22.js → v22.js → v23.js → v24.js → v25.js → v30.js → v31/core.js → v31/quests.js → v32.js → v33.js → battle/version.js → rs/ui.js
+- `title`（18）：**town.js** → ver16.js → ver18-town.js → ver19.js → v20-ui.js → v21.js → v22.js → v22.js → v23.js → v24.js → v25.js → v30.js → v31/core.js → v31/quests.js → v32.js → v33.js → battle/version.js → v38/menu.js
 - `dvMenu`（15）：**dev.js** → ch9.js → ver16.js → ver17.js → ver18-town.js → v20-ui.js → v21.js → v22.js → v23.js → v24.js → v25.js → v29.js → v30.js → v31/quests.js → battle/viewer.js
-- `show`（11）：**core.js** → ver17.js → ver18-town.js → v20-ui.js → v20-ui.js → v22.js → v23.js → v23.js → v24.js → v25.js → rs/ui.js
-- `migrate`（9）：**items.js** → ch8.js → ch9.js → ver17.js → ver18-field.js → v31/items.js → v31/quests.js → v32.js → rs/core.js
-- `townMenu`（6）：**town.js** → ch9.js → ver17.js → v21.js → v23.js → v31/quests.js
+- `show`（11）：**core.js** → ver17.js → ver18-town.js → v20-ui.js → v20-ui.js → v22.js → v23.js → v23.js → v24.js → v25.js → v38/battle-ui.js
+- `migrate`（10）：**items.js** → ch8.js → ch9.js → ver17.js → ver18-field.js → v31/items.js → v31/quests.js → v32.js → rs/core.js → v38/core.js
+- `townMenu`（7）：**town.js** → ch9.js → ver17.js → v21.js → v23.js → v31/quests.js → v38/menu.js
 - `charHTML`（6）：**ver17.js** → v20-ui.js → v22.js → v31/core.js → v31/board.js → rs/ui.js
 - `enterField`（5）：**field.js** → ch8.js → ver17.js → ver18-field.js → v23.js
-- `panel`（5）：**town.js** → ver18-town.js → v20-ui.js → v22.js → rs/ui.js
 <!-- wrapmap:end -->

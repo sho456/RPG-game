@@ -40,16 +40,16 @@ for(const k of['crow','erna','balza']){IMG[k]=mk(SPR[k]);IMG[k+'_w']=mk(SPR[k],n
 for(const[k,b,pal]of[['raiwolf','wolf',{g:'#d8c040',G:'#7a6a20',w:'#fff8c0',x:'#40c0ff'}],['ironslime','slime',{v:'#7a8494',V:'#3a4250',p:'#c8d0dc'}],['golemkin','golem',{a:'#8a6a4a',A:'#4a3a2a'}],
  ['minerghost','gald',{a:'#6a5a4a',A:'#3a3028',r:'#8a6a2a',R:'#4a3a10',s:'#9a8a7a',d:'#3a3028',y:'#c0a060',e:'#ffb030'}],['golemboss','golem',{a:'#3a3a44',A:'#1a1a22',o:'#ff6020',y:'#ff9040',u:'#ff6020'}],
  ['boss4','crow',{V:'#1a1028',v:'#3a1a48',x:'#ff2040',e:'#ff2040'}],['boss4b','crow',{V:'#101820',v:'#2a3a48',x:'#40ffff',e:'#40ffff'}],['ernaE','erna',{}]]){SPR[k]=SPR[b];IMG[k]=mk(SPR[b],pal);IMG[k+'_w']=mk(SPR[b],null,'#ffffff');}
-Object.assign(EA,{arrow:{n:'狙撃',el:'突',k:'phys',pow:1.3,t:'one'},rain:{n:'五月雨射ち',el:'突',k:'phys',pow:.7,t:'all'},senju:{n:'千呪',el:'闇',k:'mag',pow:2.6,t:'all'},
- meltdown:{n:'溶鉄の奔流',el:'炎',k:'mag',pow:2.4,t:'all'},bolt:{n:'雷撃',el:'雷',k:'mag',pow:1.2,t:'one'}});
+Object.assign(EA,{arrow:{n:'狙撃',el:'突',k:'phys',pow:1.3,t:'one'},rain:{n:'五月雨射ち',el:'突',k:'phys',pow:.7,t:'all'},senju:{n:'千呪',el:'陰',k:'mag',pow:2.6,t:'all'},
+ meltdown:{n:'溶鉄の奔流',el:'熱',k:'mag',pow:2.4,t:'all'},bolt:{n:'雷撃',el:'雷',k:'mag',pow:1.2,t:'one'}});
 Object.assign(ED,{
- raiwolf:{name:'雷狼',mhp:160,atk:58,def:16,mag:30,res:12,spd:15,weak:['地','氷'],xp:24,gold:16,drop:[['kiba',.45]],acts:[['claw',.5],['bite',.3],['bolt',.2]]},
+ raiwolf:{name:'雷狼',mhp:160,atk:58,def:16,mag:30,res:12,spd:15,weak:['打','冷'],xp:24,gold:16,drop:[['kiba',.45]],acts:[['claw',.5],['bite',.3],['bolt',.2]]},
  ironslime:{name:'鉄スライム',mhp:170,atk:50,def:30,mag:20,res:14,spd:7,weak:['雷','打'],xp:22,gold:18,drop:[['haiseki',.5]],acts:[['claw',.6],['press',.4]]},
  golemkin:{name:'鉱石ゴーレム',mhp:260,atk:60,def:28,mag:10,res:12,spd:6,weak:['雷','打'],xp:28,gold:20,drop:[['haiseki',.5],['kakera',.1]],acts:[['slam',1]],sc:2},
- minerghost:{name:'坑道の亡者',mhp:210,atk:62,def:18,mag:30,res:14,spd:10,weak:['光','炎'],xp:26,gold:18,drop:[['kakera',.2]],acts:[['claw',.6],['curse',.4]],flip:1},
- golemboss:{name:'黒鉄の巨像',mhp:5600,atk:330,def:66,mag:220,res:40,spd:15,weak:['雷','氷'],sc:3,boss:true,xp:1500,gold:1500,drop:[['kakera',1],['kakera',1],['haiseki',1]],ai:{every:3,charge:'meltdown',acts:[['slam',.7],['claw',.3]],summon:'golemkin',sumLv:20},ilv:20},
- boss4:{name:'虚蝕のクロウ',mhp:8000,atk:190,def:58,mag:250,res:58,spd:13,weak:['光','雷'],sc:3,boss:true,xp:2200,gold:2500,drop:[['kakera',1],['kakera',1],['kakera',1],['kakera',1]],ai:{every:3,charge:'senju',acts:[['curse',.4],['wave2',.3],['claw',.3]],summon:'minerghost',sumLv:22},ilv:23,flip:1},
- ernaE:{name:'弓手エルナ',mhp:4200,atk:200,def:48,mag:80,res:48,spd:17,weak:['地','氷'],xp:900,gold:0,drop:[],acts:[['arrow',.65],['rain',.35]],flip:1,sc:2}});
+ minerghost:{name:'坑道の亡者',mhp:210,atk:62,def:18,mag:30,res:14,spd:10,weak:['陽','熱'],xp:26,gold:18,drop:[['kakera',.2]],acts:[['claw',.6],['curse',.4]],flip:1},
+ golemboss:{name:'黒鉄の巨像',mhp:5600,atk:330,def:66,mag:220,res:40,spd:15,weak:['雷','冷'],sc:3,boss:true,xp:1500,gold:1500,drop:[['kakera',1],['kakera',1],['haiseki',1]],ai:{every:3,charge:'meltdown',acts:[['slam',.7],['claw',.3]],summon:'golemkin',sumLv:20},ilv:20},
+ boss4:{name:'虚蝕のクロウ',mhp:8000,atk:190,def:58,mag:250,res:58,spd:13,weak:['陽','雷'],sc:3,boss:true,xp:2200,gold:2500,drop:[['kakera',1],['kakera',1],['kakera',1],['kakera',1]],ai:{every:3,charge:'senju',acts:[['curse',.4],['wave2',.3],['claw',.3]],summon:'minerghost',sumLv:22},ilv:23,flip:1},
+ ernaE:{name:'弓手エルナ',mhp:4200,atk:200,def:48,mag:80,res:48,spd:17,weak:['打','冷'],xp:900,gold:0,drop:[],acts:[['arrow',.65],['rain',.35]],flip:1,sc:2}});
 ED.boss4b=Object.assign({},ED.boss4,{name:'虚蝕の残影'});ED.ernaE.solo=1;
 HB.erna={name:'エルナ',mhp:210,atk:38,def:18,mag:22,res:18,spd:14,g:{mhp:'C',atk:'A',def:'C',mag:'B',res:'C',spd:'A'},skills:['raiya','nerai','samidare']};
 HB.balza={name:'バルザ',mhp:300,atk:44,def:30,mag:8,res:18,spd:7,g:{mhp:'A',atk:'S',def:'A',mag:'D',res:'C',spd:'D'},skills:['tekkai','netsuda','shuuri']};
@@ -59,12 +59,12 @@ Object.assign(SK,{
  kantsuu:{n:'貫通射',sp:30,el:'突',k:'phys',pow:2.3,t:'one',d:'突・単体の大技'},jinrai:{n:'迅雷',sp:35,el:'雷',k:'phys',pow:1,t:'all',d:'雷・敵全体'},
  raisen:{n:'雷閃',el:'雷',k:'phys',pow:1.5,t:'one',gauge:20,d:'雷の必殺射（ゲージ20）'},juuten:{n:'充填',k:'charge',t:'self',gauge:10,d:'次の手番で天穿を撃てる（ゲージ10）'},
  tenkuu:{n:'天穿',el:'突',k:'phys',pow:4.4,t:'one',gauge:40,req:'charged',delay:60,d:'充填後に解禁・大打撃＋行動を大きく遅らせる（ゲージ40）'},
- tekkai:{n:'鉄塊落とし',sp:20,el:'打',k:'phys',pow:1.6,t:'one',d:'打撃・単体'},netsuda:{n:'熱打',sp:20,el:'炎',k:'phys',pow:1.4,t:'one',d:'炎属性の打撃'},shuuri:{n:'応急修理',sp:20,k:'guardRegen',t:'self',d:'防御し、HP15%回復'},
- daichi:{n:'大地割り',sp:35,el:'地',k:'phys',pow:1,t:'all',d:'地・敵全体'},gouen:{n:'業炎撃',sp:35,el:'炎',k:'phys',pow:2.2,t:'one',d:'炎・単体の大技'},
- tanda:{n:'鍛打',el:'打',k:'phys',pow:1.4,t:'one',d:'打撃（熱で威力上昇）'},yakiire:{n:'焼入れ',el:'炎',k:'phys',pow:1.1,t:'all',d:'炎・敵全体'},youtetsu:{n:'溶鉄爆砕',k:'release2',t:'all',d:'星臨解除・熱を全体へ（溜めすぎると反動）'},
- noroi:{n:'呪い',sp:15,el:'闇',k:'mag',pow:1.4,t:'one',d:'闇の魔法・単体'},yaminami:{n:'闇の波動',sp:30,el:'闇',k:'mag',pow:.9,t:'all',d:'闇・敵全体'},kyuumei:{n:'吸命',sp:25,el:'闇',k:'mag',pow:1.1,t:'one',drain:.5,d:'与えたダメージの半分を回復'},
- shisen:{n:'死の宣告',sp:35,el:'闇',k:'mag',pow:2.4,t:'one',d:'闇・単体の大技'},yamisaki:{n:'闇裂き',sp:35,el:'闇',k:'mag',pow:1.2,t:'all',d:'闇・敵全体'},
- judan:{n:'呪弾',el:'闇',k:'mag',pow:1.6,t:'one',hpCost:.08,d:'HP8%を払う闇弾'},hanten:{n:'呪詛反転',el:'闇',k:'mag',pow:1,t:'all',delay:30,hpCost:.1,d:'HP10%を払い全体攻撃＋遅延'},
+ tekkai:{n:'鉄塊落とし',sp:20,el:'打',k:'phys',pow:1.6,t:'one',d:'打撃・単体'},netsuda:{n:'熱打',sp:20,el:'熱',k:'phys',pow:1.4,t:'one',d:'熱属性の打撃'},shuuri:{n:'応急修理',sp:20,k:'guardRegen',t:'self',d:'防御し、HP15%回復'},
+ daichi:{n:'大地割り',sp:35,el:'打',k:'phys',pow:1,t:'all',d:'地・敵全体'},gouen:{n:'業炎撃',sp:35,el:'熱',k:'phys',pow:2.2,t:'one',d:'炎・単体の大技'},
+ tanda:{n:'鍛打',el:'打',k:'phys',pow:1.4,t:'one',d:'打撃（熱で威力上昇）'},yakiire:{n:'焼入れ',el:'熱',k:'phys',pow:1.1,t:'all',d:'炎・敵全体'},youtetsu:{n:'溶鉄爆砕',k:'release2',t:'all',d:'星臨解除・熱を全体へ（溜めすぎると反動）'},
+ noroi:{n:'呪い',sp:15,el:'陰',k:'mag',pow:1.4,t:'one',d:'闇の魔法・単体'},yaminami:{n:'闇の波動',sp:30,el:'陰',k:'mag',pow:.9,t:'all',d:'闇・敵全体'},kyuumei:{n:'吸命',sp:25,el:'陰',k:'mag',pow:1.1,t:'one',drain:.5,d:'与えたダメージの半分を回復'},
+ shisen:{n:'死の宣告',sp:35,el:'陰',k:'mag',pow:2.4,t:'one',d:'闇・単体の大技'},yamisaki:{n:'闇裂き',sp:35,el:'陰',k:'mag',pow:1.2,t:'all',d:'闇・敵全体'},
+ judan:{n:'呪弾',el:'陰',k:'mag',pow:1.6,t:'one',hpCost:.08,d:'HP8%を払う闇弾'},hanten:{n:'呪詛反転',el:'陰',k:'mag',pow:1,t:'all',delay:30,hpCost:.1,d:'HP10%を払い全体攻撃＋遅延'},
  shikyou:{n:'死経',k:'pct',t:'all',req:'lowhp',d:'HP25%以下で解禁・敵の現在HPを大きく削る'}});
 AW.erna={name:'天穿つ眼',type:'ゲージ消費',turns:99,cmds:['raisen','juuten','tenkuu']};
 AW.balza={name:'炉心解放',type:'蓄積型',turns:5,cmds:['tanda','yakiire','youtetsu']};
@@ -78,7 +78,6 @@ BDEF.erna=mkB('天弓座',[['atkP'],['crit'],['spd'],['weakDmg'],['mhpP'],['defP
 BDEF.balza=mkB('炉心座',[['atkP'],['defP'],['mhpP'],['resP'],['crit'],['spGain']],['2,-3','-2,-1','-3,2','2,1'],'daichi','gouen',[[{atkP:12},'剛腕：攻撃+12%'],[{defP:15},'鉄肌：防御+15%'],[{awDmg:20},'灼熱：星臨中与ダメ+20%'],[{mhpP:15},'頑健：最大HP+15%']]);
 BDEF.crow=mkB('冥府座',[['magP'],['mhpP'],['spd'],['resP'],['awDmg'],['crit']],['3,-1','-1,-2','-2,3','1,2'],'shisen','yamisaki',[[{magP:12},'冥魔：魔力+12%'],[{mhpP:15},'不死：最大HP+15%'],[{awDmg:20},'怨嗟：星臨中与ダメ+20%'],[{weakDmg:20},'呪眼：弱点ダメ+20%']]);
 ['erna','balza','crow'].forEach(k=>BOARD[k]=buildBoard(k));
-Object.assign(RESO,{'erna,rio':'星穿ちの矢','balza,gald':'鋼鉄の城砦','crow,mire':'冥炎','crow,noah':'贖罪の祈り','balza,erna':'雷火の鏃','crow,shion':'影喰らい'});
 const GAUGE=['mire','erna'];
 const MAP4=["YYYYYYYYYYYYYYYYYYYY","YrrrrrrYYrrBrrYYrrrY","YrrCrrrYYrrrrrYYrrrY","YrrrrrrrrrrrrrrrrrrY","YYYYrrYYYYYYYYrrYYYY","YrrrrrrrrYYrrrrrrrrY","YrlllllrrYYrrrrrrVrY","YrrrrrlrrrrrrrrrrrrY","YYYrrrlrrYYrrrrrrCrY","YrrrrrlrrYYrrYYYYYYY","YrrrrrrrrrrrrrrrrrrY","YYYYYYYYrrrYYYYYYYYY","TT..R..Y,,,Y..R...TT","T.......,,,.......TT","T..R...,,,...C....TT","TT....,,,.....RR..TT","T....,,,...........T","T...,,,.....T..E...T","TT..,,......TT.....T","T....,,,...........T","T..R...,,,....R...TT","TT......,,,.......TT","T...G....,,,....G..T","T.........,,,......T","TT..RR.....,,,....TT","T...........,,,...TT","T..C........,,,....T","TT.........,,,....TT","TTT.......,,,....TTT","TTTT.....,,,....TTTT","TTTTTT...,S,..TTTTTT","TTTTTTTTTTTTTTTTTTTT"].map(r=>r.padEnd(20,'T').slice(0,20));
 AREAS.raimei={name:'雷鳴高原・黒鉄鉱山',map:MAP4,lv:[17,23],groups:[['raiwolf'],['raiwolf','raiwolf'],['ironslime','raiwolf'],['ironslime','ironslime','raiwolf']],
@@ -103,7 +102,7 @@ function openSheet(id,tab='st'){const ids=G.members,sh=$('#sheet'),s=stats(id),h
  const row=(k,v)=>`<div class="sr"><span>${k}</span><b>${v}</b></div>`;let body='';
  if(tab==='st')body=`<div class="sgrid">${row('最大HP',s.mhp)}${row('攻撃',s.atk)}${row('防御',s.def)}${row('魔力',s.mag)}${row('精神',s.res)}${row('素早さ',+s.spd.toFixed(1))}${row('会心率',(6+s.crit)+'%')}${row('弱点ダメ','+'+s.weakDmg+'%')}${row('開始時AG',s.startAG)}${row('星臨中与ダメ','+'+s.awDmg+'%')}${row('攻撃時SP','+'+(10+s.spGain))}${row('ドロップ率','+'+s.drop+'%')}</div>
  <div class="sh2">成長傾向</div><div class="gro">${['mhp','atk','def','mag','res','spd'].map(k=>`<span>${{mhp:'HP',atk:'攻',def:'防',mag:'魔',res:'精',spd:'速'}[k]}<i class="g${b.g[k]}">${b.g[k]}</i></span>`).join('')}</div>
- <div class="sh2">星盤・ジョブ</div><div class="stx">星盤「${BDEF[id].star}」　解放 ${h.board.length-1}／残りポイント ${ptsLeft(id)}<br>ジョブ：${h.job?JOBS[h.job].n+' Lv'+h.jobs[h.job].lv:'なし'}<br>パッシブ：${learned(id).map(p=>{const[j,i]=p.split(':');return JOBS[j].ps[i][2];}).join('・')||'なし'}${s.atkEl?'<br>通常攻撃：'+s.atkEl+'属性':''}</div>`;
+ <div class="sh2">星盤</div><div class="stx">星盤「${BDEF[id].star}」　解放 ${h.board.length-1}／残りポイント ${ptsLeft(id)}${s.atkEl?'<br>通常攻撃：'+s.atkEl+'属性':''}</div>`;
  if(tab==='eq')body=SLOTS6.map(sl=>{const it=h.eq[sl]&&findItem(h.eq[sl]);return`<div class="seq"><div class="sl">${SLOTN[sl]}</div>${it?`<div>${ihtml(it)}<br><small>${detailTxt(it)}</small></div>`:'<div style="color:#667">なし</div>'}</div>`;}).join('');
  if(tab==='sk')body=`<div class="sh2">星臨「${A2.name}」<small>（${A2.type}・位階${ROMAN[h.awLv||1]}）</small></div><div class="stx">${AWD[id]}<br>${[...A2.cmds,...((h.awLv||1)>=3?['goku'+id]:[])].map(k=>`<b>${SK[k].n}</b>：${SK[k].d||''}`).join('<br>')}</div><div class="sh2">技</div><div class="stx">${skillList(id).map(k=>`<b>${SK[k].n}</b> <small>SP${SK[k].sp||0}</small>：${SK[k].d||''}`).join('<br>')}</div>`;
  const i=ids.indexOf(id),pv=ids[(i-1+ids.length)%ids.length],nx=ids[(i+1)%ids.length],hp=h.hp??s.mhp;

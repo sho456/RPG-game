@@ -5,23 +5,22 @@ for(const[k,b,pal]of[['snowwolf','wolf',{g:'#e8eef8',G:'#8a9ab0',w:'#ffffff',x:'
  ['yukirei','bookghost',{V:'#a0c8e0',w:'#f0f8ff',q:'#80a0c0',p:'#c8e8ff',o:'#40a0ff'}],['onimusha','gald',{a:'#a03030',A:'#601818',r:'#202020',R:'#101010',s:'#c09080',d:'#302020',y:'#e0c040',e:'#ffe040'}],
  ['boss5','wolf',{g:'#f4f8ff',G:'#90b0d0',w:'#ffffff',x:'#a040ff'}]]){SPR[k]=SPR[b];IMG[k]=mk(SPR[b],pal);IMG[k+'_w']=mk(SPR[b],null,'#ffffff');}
 IIS.fist=["","...MMMMM....","..MmmmmmM...","..MmMmMmM...","..MmmmmmMM..","..MmmmmmmM..","...MmmmmM...","...MbbbbM...","...bbbbbb...","...bbbbbb..."];ITYPE.unshift(['手甲','fist']);
-Object.assign(EA,{blizzard:{n:'絶対氷河',el:'氷',k:'mag',pow:2.5,t:'all'},icewave:{n:'氷華の息',el:'氷',k:'mag',pow:1.2,t:'all'},slash2:{n:'鬼斬り',el:'斬',k:'phys',pow:1.5,t:'one'}});
+Object.assign(EA,{blizzard:{n:'絶対氷河',el:'冷',k:'mag',pow:2.5,t:'all'},icewave:{n:'氷華の息',el:'冷',k:'mag',pow:1.2,t:'all'},slash2:{n:'鬼斬り',el:'斬',k:'phys',pow:1.5,t:'one'}});
 Object.assign(ED,{
- snowwolf:{name:'雪狼',mhp:170,atk:62,def:18,mag:20,res:14,spd:16,weak:['炎','雷'],xp:30,gold:20,drop:[['kiba',.5]],acts:[['claw',.6],['bite',.4]]},
- iceslime:{name:'氷スライム',mhp:180,atk:54,def:24,mag:40,res:20,spd:8,weak:['炎','打'],xp:28,gold:20,drop:[['haiseki',.5]],acts:[['claw',.5],['icewave',.5]]},
- yukirei:{name:'雪霊',mhp:160,atk:30,def:16,mag:70,res:12,spd:14,weak:['炎','光'],xp:32,gold:22,drop:[['kakera',.25]],acts:[['curse',.5],['icewave',.5]]},
- onimusha:{name:'鬼武者',mhp:240,atk:72,def:26,mag:20,res:16,spd:11,weak:['光','氷'],xp:36,gold:26,drop:[['kiba',.3],['kakera',.2]],acts:[['slash2',.6],['claw',.4]],flip:1},
- boss5:{name:'氷華の妖狐',mhp:10000,atk:250,def:72,mag:285,res:70,spd:16,weak:['炎','雷'],sc:3,boss:true,xp:3600,gold:4000,drop:[['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1]],
+ snowwolf:{name:'雪狼',mhp:170,atk:62,def:18,mag:20,res:14,spd:16,weak:['熱','雷'],xp:30,gold:20,drop:[['kiba',.5]],acts:[['claw',.6],['bite',.4]]},
+ iceslime:{name:'氷スライム',mhp:180,atk:54,def:24,mag:40,res:20,spd:8,weak:['熱','打'],xp:28,gold:20,drop:[['haiseki',.5]],acts:[['claw',.5],['icewave',.5]]},
+ yukirei:{name:'雪霊',mhp:160,atk:30,def:16,mag:70,res:12,spd:14,weak:['熱','陽'],xp:32,gold:22,drop:[['kakera',.25]],acts:[['curse',.5],['icewave',.5]]},
+ onimusha:{name:'鬼武者',mhp:240,atk:72,def:26,mag:20,res:16,spd:11,weak:['陽','冷'],xp:36,gold:26,drop:[['kiba',.3],['kakera',.2]],acts:[['slash2',.6],['claw',.4]],flip:1},
+ boss5:{name:'氷華の妖狐',mhp:10000,atk:250,def:72,mag:285,res:70,spd:16,weak:['熱','雷'],sc:3,boss:true,xp:3600,gold:4000,drop:[['kakera',1],['kakera',1],['kakera',1],['kakera',1],['kakera',1]],
   ai:{every:3,charge:'blizzard',acts:[['claw',.4],['bite',.3],['icewave',.3]],summon:'yukirei',sumLv:29},ilv:30}});
 HB.hakua={name:'ハクア',mhp:260,atk:46,def:22,mag:24,res:26,spd:15,g:{mhp:'B',atk:'S',def:'C',mag:'C',res:'B',spd:'A'},skills:['shouken','hyouken','renken']};
-Object.assign(SK,{shouken:{n:'掌拳',sp:15,el:'打',k:'phys',pow:1.3,t:'one',d:'打撃・単体'},hyouken:{n:'氷拳',sp:20,el:'氷',k:'phys',pow:1.5,t:'one',d:'氷属性の拳'},renken:{n:'連拳',sp:25,el:'打',k:'phys',pow:.6,hits:3,t:'one',d:'打撃3連打'},
- tsurara:{n:'氷柱落とし',sp:35,el:'氷',k:'phys',pow:1,t:'all',d:'氷・敵全体'},kakato:{n:'踵落とし',sp:35,el:'打',k:'phys',pow:2.3,t:'one',d:'打撃・単体の大技'},
- ranbu:{n:'乱舞',k:'rhythm',t:'one',d:'光る輪が重なる瞬間にタップで連撃（最大12）。12連で凍結'},hyoukajin:{n:'氷華陣',el:'氷',k:'phys',pow:1.2,t:'all',d:'氷・敵全体'}});
+Object.assign(SK,{shouken:{n:'掌拳',sp:15,el:'打',k:'phys',pow:1.3,t:'one',d:'打撃・単体'},hyouken:{n:'氷拳',sp:20,el:'冷',k:'phys',pow:1.5,t:'one',d:'冷属性の拳'},renken:{n:'連拳',sp:25,el:'打',k:'phys',pow:.6,hits:3,t:'one',d:'打撃3連打'},
+ tsurara:{n:'氷柱落とし',sp:35,el:'冷',k:'phys',pow:1,t:'all',d:'氷・敵全体'},kakato:{n:'踵落とし',sp:35,el:'打',k:'phys',pow:2.3,t:'one',d:'打撃・単体の大技'},
+ ranbu:{n:'乱舞',k:'rhythm',t:'one',d:'光る輪が重なる瞬間にタップで連撃（最大12）。12連で凍結'},hyoukajin:{n:'氷華陣',el:'冷',k:'phys',pow:1.2,t:'all',d:'氷・敵全体'}});
 AW.hakua={name:'氷華乱舞',type:'入力型',turns:2,cmds:['ranbu','hyoukajin']};
 AWD.hakua='タイミングよくタップするほど連撃が伸びる（最大12）。12連成功で敵を凍結';
 BDEF.hakua=mkB('氷華座',[['atkP'],['spd'],['crit'],['mhpP'],['defP'],['weakDmg','resP']],['2,-3','-2,-1','-3,2','2,1'],'tsurara','kakato',[[{atkP:12},'剛拳：攻撃+12%'],[{crit:10},'見切り：会心率+10%'],[{spd:2},'疾駆：素早さ+2'],[{weakDmg:20},'急所：弱点ダメ+20%']]);
 BOARD.hakua=buildBoard('hakua');
-Object.assign(RESO,{'hakua,mire':'氷炎の舞','hakua,rio':'灯華一閃','hakua,shion':'雪影','gald,hakua':'氷壁の陣'});
 const MAP5=["####################","#hhhhhhhhBhhhhhhhhh#","#hhhhhhhhhhhhhhhhUh#","#hCh#hhhhhhhhh#hhhh#","#hhh#hhhhhhhhh#hhhh#","#######hhhhhh#######","TTTTTT#hhhhhh#TTTTTT","TTTT...,,,,,,...TTTT","TTT...,,,,,,,,...TTT","TT..T..,,,,,,..T..TT","T....iiiiiiiiii....T","T.C.iiiiRiiiiiii...T","T...iiiiiiiiiRiii..T","T..iiiRiiiiiiiiii..T","T...iiiiiiiiiiii...T","TT...,,,,,,,,,,..G.T","T..G..,,,,,,,,....TT","TT.....,,,,,,.....TT","T..TT...,,,,...C..TT","T..TT...,,,,......TT","TT.....,,,,....TT..T","T~~~...,,,,......~~T","T~~~~..,,,,.....~~~T","TT~~...,,,,..C...~TT","TTT....,,,,......TTT","TTTT....,,,....TTTTT","TTTTTT..,S,.TTTTTTTT","TTTTTTTTTTTTTTTTTTTT"].map(r=>r.padEnd(20,'T').slice(0,20));
 AREAS.kouka={name:'東方の島・氷華の社',map:MAP5,lv:[24,30],groups:[['snowwolf'],['snowwolf','snowwolf'],['iceslime','snowwolf'],['yukirei','iceslime'],['iceslime','iceslime','snowwolf']],
  libGroups:[['onimusha'],['onimusha','yukirei'],['yukirei','yukirei'],['onimusha','onimusha']],crew:[{gold:4000},{loot:[27,2]},{item:'feather',n:3},{loot:[28,3]}],boss:{kind:'boss5',lv:30},bflag:'boss5',theme:'ice',rec:'推奨Lv24〜30',

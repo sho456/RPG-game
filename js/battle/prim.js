@@ -1,7 +1,7 @@
 /* ===== ver0.34 戦闘エフェクトの部品（BXP） =====
  技の演出は、この部品を「形・色・動き・規模」の値を変えて組み合わせて作る（js/battle/data/）。
  すべて (x, y, o) の形。x,y は戦場の論理座標。o の共通項目：
-   ramp  色の並び（属性名 '炎' など／色 1 つ／色の配列。明るい → 暗い）
+   ramp  色の並び（属性名 '熱' など／色 1 つ／色の配列。明るい → 暗い）
    s     大きさの倍率　dur 長さ ms　delay 遅れ ms　layer 層（0 下・1 上・2 画面）　dir 前の向き（-1 左・1 右）
  きまり（Agent Sprite Forge の codeart2d の指針）：
    ・1 コマで読める形にする　・命中の瞬間に形が完成する　・熱い色 → 冷たい色へ、透明にはせず小さくして消す
@@ -98,14 +98,14 @@ function bolt(x,y,o={}){const fr=o.from||[x+(h1(1,x)-.5)*24,y-(o.h||80)],rp=ramp
   for(let i=0;i<6;i++){const a=i/6*TAU+t*9;D(x+Math.cos(a)*(3+t*11),y+Math.sin(a)*(1.5+t*5),rp[1]);}},o.layer==null?1:o.layer,o.delay||0);}
 
 /* ---- 氷の結晶：地面から生え、最後に砕け散る ---- */
-function shards(x,y,o={}){const n=o.n||5,rp=ramp(o.ramp||'氷'),sz=o.s||1,seed=Math.random()*99,by=y+(o.base==null?6:o.base);let broke=0;
+function shards(x,y,o={}){const n=o.n||5,rp=ramp(o.ramp||'冷'),sz=o.s||1,seed=Math.random()*99,by=y+(o.base==null?6:o.base);let broke=0;
  return add(o.dur||460,(t,e)=>{const d=g.dot;if(t>.8){if(!broke){broke=1;burst(x,y-4,10,{ramp:rp,speed:1.6,g:.12,life:22,up:.5,kind:1});}if((Math.floor(t*40)&1))return;}
   for(let j=0;j<n;j++){const gr=eo3(cl(t*3.4-j*.2));if(gr<=0)continue;const dx=(j-(n-1)/2)*4.6*sz+(h1(j,seed)-.5)*3,h0=(8+h1(j,seed+1)*10+(j===Math.floor(n/2)?5:0))*sz,hh=h0*gr,lean=(h1(j,seed+2)-.5)*.5,w0=(2.4+h1(j,seed+3)*1.6)*sz;
    for(let q=0;q<hh;q+=d){const u=q/hh,w=(u<.25?u/.25:1-(u-.25)/.75)*w0+d,cx=x+dx+lean*q;R(cx-w/2,by-q,w/2,d,u>.8?rp[0]:rp[1]);R(cx,by-q,w/2,d,u>.8?rp[1]:rp[3]);}
    D(x+dx+lean*hh,by-hh,rp[0]);}},o.layer==null?1:o.layer,o.delay||0);}
 
 /* ---- 炎：ゆらめく舌が立ち、火の粉が昇る ---- */
-function flame(x,y,o={}){const sz=o.s||1,w=(o.w||9)*sz,hh=(o.h||24)*sz,rp=ramp(o.ramp||'炎'),by=y+(o.base==null?5:o.base);
+function flame(x,y,o={}){const sz=o.s||1,w=(o.w||9)*sz,hh=(o.h||24)*sz,rp=ramp(o.ramp||'熱'),by=y+(o.base==null?5:o.base);
  burst(x,y-2,o.embers==null?8:o.embers,{ramp:rp,speed:.8,up:.9,g:-.03,life:28,kind:2,r:w*.5});
  return add(o.dur||420,t=>{const d=g.dot,H2=(t<.28?eo(t/.28):1-ei((t-.28)/.72))*hh,ph=Math.floor(t*16),cols=Math.max(3,Math.round(w/1.7));
   for(let i=0;i<cols;i++){const m=(i-(cols-1)/2)/((cols-1)/2||1),h2=H2*(1-m*m*.8)*(.72+((i*7+ph*3)%5)*.07);
@@ -126,7 +126,7 @@ function spikes(x,y,o={}){const n=o.n||4,sz=o.s||1,rp=ramp(o.ramp||'地'),dir=o.
    for(let q=0;q<hh;q+=d){const v=q/hh,w=(1-v)*w0+d,cx=x+dx+lean*q;R(cx-w/2,by-q,w*.42,d,rp[1]);R(cx-w/2+w*.42,by-q,w*.58,d,v>.6?rp[2]:rp[3]);}}},o.layer==null?1:o.layer,o.delay||0);}
 
 /* ---- 球：暗い（または光る）球がふくらむ。mode 'implode' は縮んで弾ける ---- */
-function orb(x,y,o={}){const r0=(o.r||9)*(o.s||1),rp=ramp(o.ramp||'闇'),core=o.core||rp[4],imp=o.mode==='implode';let done=0;
+function orb(x,y,o={}){const r0=(o.r||9)*(o.s||1),rp=ramp(o.ramp||'陰'),core=o.core||rp[4],imp=o.mode==='implode';let done=0;
  return add(o.dur||440,t=>{const env=imp?(t<.7?1-eo(t/.7)*.75:0):(t<.5?eo(t/.5):1-ei((t-.5)/.5)),r=r0*env;
   if(imp&&t>=.7){if(!done){done=1;flare(x,y,{ramp:rp,rays:8,s:1.3});shock(x,y,{ramp:rp,r1:r0*1.9});}return;}
   if(r<g.dot)return;disc(x,y,r,core);ringDots(x,y,r,[rp[1],rp[2]],{dense:5.5});if(r>3)D(x-r*.4,y-r*.4,rp[0],2);
@@ -157,7 +157,7 @@ function speedlines(x,y,o={}){const n=Math.round((o.n||18)*(Q().rich?1:.5)),col=
 function petals(x,y,o={}){burst(x,y,o.n||10,{ramp:o.ramp||['#ffffff','#ffd8ec','#ff9ad6','#d868a8','#8a3a70'],speed:o.speed||1.1,up:o.up==null?.7:o.up,g:o.g==null?.035:o.g,drag:.96,life:o.life||44,kind:3,r:o.r||6,layer:o.layer});}
 
 /* ---- きらめき：武器の先などに出る小さな十字の光（予備動作の合図） ---- */
-function glint(x,y,o={}){const rp=ramp(o.ramp||'光'),sz=(o.s||1)*4.5;
+function glint(x,y,o={}){const rp=ramp(o.ramp||'陽'),sz=(o.s||1)*4.5;
  return add(o.dur||220,t=>{const l=sz*(t<.35?t/.35:1-(t-.35)/.65),d=g.dot;for(let q=-l;q<=l;q+=d){D(x+q,y,Math.abs(q)<l*.4?rp[0]:rp[2]);D(x,y+q,Math.abs(q)<l*.4?rp[0]:rp[2]);}if(l>2){D(x+l*.4,y+l*.4,rp[1]);D(x-l*.4,y-l*.4,rp[1]);D(x+l*.4,y-l*.4,rp[1]);D(x-l*.4,y+l*.4,rp[1]);}},o.layer==null?1:o.layer,o.delay||0);}
 
 /* ---- 守りの膜：六角の網目の盾。当たると波打つ ---- */

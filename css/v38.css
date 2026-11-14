@@ -1,0 +1,194 @@
+/* ===== ver0.38 戦闘画面・編成画面・画面全体の整理 ===== */
+:root{--g38:#e9c46a;--g38l:#fff1c2;--n38:#0b1530;--p38:300px;--sl38:0px;--ez38:cubic-bezier(.22,.8,.24,1)}
+
+/* ==================== 戦闘：不要になった表示 ==================== */
+#app.v38[data-sc="battle"] #bp24,#app.v38 #rshud,#app.v38 .b22aw,#app.v38 #bt22 .b22rt span:nth-child(2){display:none !important}
+
+/* ==================== 戦闘：スライド（コマンド入力中は戦場ごと上へ） ==================== */
+#app.v38[data-sc="battle"] #cv,#app.v38[data-sc="battle"] #labels,#app.v38[data-sc="battle"] #pops,#app.v38[data-sc="battle"] #hl24,
+#app.v38[data-sc="battle"] #fx25,#app.v38[data-sc="battle"] #mk25,#app.v38[data-sc="battle"] #rt22{translate:0 0;transition:translate .5s var(--ez38)}
+#app.v38.in38[data-sc="battle"] #cv,#app.v38.in38[data-sc="battle"] #labels,#app.v38.in38[data-sc="battle"] #pops,#app.v38.in38[data-sc="battle"] #hl24,
+#app.v38.in38[data-sc="battle"] #fx25,#app.v38.in38[data-sc="battle"] #mk25,#app.v38.in38[data-sc="battle"] #rt22{translate:0 var(--sl38);transition:translate .42s var(--ez38)}
+#app.v38[data-sc="battle"] #stage{background:#05070f}
+
+/* ==================== 戦闘：コマンド欄（RS 風） ==================== */
+#app.v38[data-sc="battle"] #cmd.c38{position:absolute;z-index:5;left:0;right:0;bottom:0;height:var(--p38);margin:0;padding:0 !important;display:block;overflow:visible;
+ opacity:1 !important;visibility:visible !important;pointer-events:auto !important;transform:translateY(105%) !important;transition:transform .38s var(--ez38) !important}
+#app.v38.in38[data-sc="battle"] #cmd.c38{transform:translateY(0) !important;transition:transform .42s var(--ez38) !important}
+#app.v38[data-sc="battle"] #cmd:not(.c38){display:none !important}
+.c38p{position:absolute;inset:0 0 calc(var(--sab,0px) + 56px) 0;display:flex;flex-direction:column;gap:5px;padding:7px max(8px,var(--sal,0px)) 6px max(8px,var(--sar,0px));
+ background:linear-gradient(180deg,rgba(18,58,62,.96),rgba(8,26,38,.97) 46px,rgba(5,14,26,.98));border-top:2px solid #6fe0c8;box-shadow:0 -6px 18px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.25)}
+.c38p::before{content:'';position:absolute;left:0;right:0;top:-2px;height:2px;background:linear-gradient(90deg,transparent,#d8fff4,transparent);opacity:.8}
+.c38w{position:absolute;inset:0 0 56px;display:grid;place-items:center;color:#9fd8d0;background:rgba(5,14,26,.92)}
+/* 1 段目：顔・名前・星臨 */
+.c38h{display:flex;align-items:center;gap:8px;min-height:40px;animation:c38in .28s var(--ez38)}
+@keyframes c38in{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+.c38h .fc{width:40px;height:40px;image-rendering:pixelated;border:2px solid var(--ec,#8af);border-radius:6px;background:radial-gradient(circle at 50% 35%,rgba(255,255,255,.25),rgba(0,0,0,.35));flex:none}
+.c38h .nm{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.1}
+.c38h .nm b{font-size:17px;font-weight:900;color:#fff;letter-spacing:.04em;text-shadow:0 1px 0 #000,0 0 6px rgba(0,0,0,.6)}
+.c38h .nm small{font-size:11px;color:#9fe8d8;font-weight:700}
+.c38h .aw{position:relative;flex:none;width:76px;height:34px;border-radius:17px;border:2px solid rgba(255,226,122,.45);background:#10182e;color:#c8ccd8;font:800 12px/1 inherit;overflow:hidden;cursor:pointer}
+.c38h .aw i{position:absolute;inset:0;width:var(--g,0%);background:linear-gradient(90deg,#5a4a20,#b08a30)}
+.c38h .aw b{position:relative}
+.c38h .aw.rdy{border-color:#fff1c2;color:#2a1600;animation:pulse .8s infinite alternate}
+.c38h .aw.rdy i{width:100%;background:linear-gradient(180deg,#fff6c8,#ffd34a 55%,#e09a10)}
+.c38h .aw.on{border-color:#ffe27a;color:#fff3b0}.c38h .aw.on i{width:100%;background:linear-gradient(90deg,#6a3a90,#c05ad8)}
+/* 2 段目：HP・LP・BP */
+.c38s{display:grid;grid-template-columns:1.55fr .9fr 1.25fr;gap:5px}
+.c38s span{position:relative;display:flex;align-items:baseline;gap:3px;height:24px;padding:0 7px;border-radius:3px;border:1px solid rgba(160,240,220,.35);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(0,0,0,.25));overflow:hidden}
+.c38s em{font:italic 800 11px/24px var(--num,inherit);color:#9fe8d8;margin-right:2px}
+.c38s b{font:800 15px/24px var(--num,inherit);color:#fff}
+.c38s small{font-size:10px;color:#9fb4c8}
+.c38s .hp i{position:absolute;left:0;bottom:0;height:2px;width:var(--r);background:linear-gradient(90deg,#5adc7a,#b8ff9a)}
+.c38s .hp.dy{border-color:#ff6a6a}.c38s .hp.dy b{color:#ff8a8a}.c38s .hp.dy i{background:#ff5a5a}
+.c38s .lp b{color:#ffb8c8}
+.c38s .bp b{color:#7fd6ff}.c38s .bp u{margin-left:auto;text-decoration:none;font-size:10px;font-weight:800;color:#8ff0a8}
+/* サブ画面の見出し */
+.c38t{display:flex;align-items:center;gap:8px;height:24px}
+.c38t button{width:30px;height:24px;border-radius:4px;border:1px solid rgba(160,240,220,.45);background:#123040;display:grid;place-items:center}
+.c38t svg{width:14px;height:14px;fill:#bff4ea}
+.c38t b{font-size:13px;color:#fff}
+/* 技の一覧 */
+.c38l{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:4px;padding:2px 1px;scrollbar-width:none}
+.c38l::-webkit-scrollbar{display:none}
+.c38l .r{position:relative;display:flex;align-items:center;gap:8px;min-height:44px;padding:0 6px 0 9px;border-radius:4px;text-align:left;color:#fff;cursor:pointer;
+ border:1px solid rgba(120,200,220,.38);background:linear-gradient(180deg,rgba(32,70,96,.85),rgba(12,30,48,.9));box-shadow:inset 0 1px 0 rgba(255,255,255,.12);transition:transform .08s,filter .08s}
+.c38l .r:active{transform:scale(.985);filter:brightness(1.25)}
+.c38l .r:first-child,.c38l .r.ougi{border-color:#8ff4ff;background:linear-gradient(180deg,rgba(40,120,150,.9),rgba(14,50,72,.92));box-shadow:0 0 10px rgba(110,230,255,.35),inset 0 1px 0 rgba(255,255,255,.25)}
+.c38l .r.ougi{border-color:#ffe27a;background:linear-gradient(180deg,rgba(130,96,30,.9),rgba(60,36,10,.92))}
+.c38l .r:disabled{opacity:.42;filter:saturate(.3);cursor:default}
+.c38l .r .hx20.el{flex:none}
+.c38l .r>img{width:30px;height:30px;image-rendering:pixelated;flex:none}
+.c38l .r .n{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:0 6px;font-size:15px;font-weight:800;line-height:1.2;letter-spacing:.02em}
+.c38l .r .n em{font-style:normal;font-size:10px;padding:0 5px;border-radius:2px;background:#e8b030;color:#2a1600}
+.c38l .r .n small{font-size:10px;color:#ffe27a}
+.c38l .r .n small.d{flex-basis:100%;color:#9fb4c8;font-weight:600}
+.c38l .r .c{flex:none;display:flex;flex-direction:column;align-items:flex-end;font:800 16px/1 var(--num,inherit);color:#fff}
+.c38l .r .c small{font-size:9px;color:#9fe8d8;margin-right:2px}
+.c38l .r .c .lpc{color:#ffb8c8;font-size:10px;margin-top:2px}
+.c38l .r.ng .c{color:#ff8a8a}
+.c38l .r .inf{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font:italic 900 14px/1 Georgia,serif;color:#fff;background:radial-gradient(circle at 35% 30%,#7af0b0,#1a9a5a);border:1px solid #c8ffe0}
+/* 下の段：戻る・道具・交代 */
+.c38f{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.c38f button{height:32px;display:flex;align-items:center;justify-content:center;gap:5px;border-radius:4px;border:1px solid rgba(160,240,220,.45);background:linear-gradient(180deg,#1e5a52,#0e2e30);color:#e8fff8;font-size:12px;font-weight:800}
+.c38f button svg{width:15px;height:15px;fill:currentColor}
+.c38f button:disabled{opacity:.35}
+
+/* ==================== 戦闘：下の帯（AUTO・リピート） ==================== */
+#app.v38[data-sc="battle"] #bbar.b38{position:absolute;z-index:6;left:max(8px,var(--sal,0px));right:max(8px,var(--sar,0px));bottom:calc(var(--sab,0px) + 6px);width:auto !important;transform:none !important;display:grid !important;grid-template-columns:1fr 1fr 1fr !important;gap:6px !important;margin:0 !important;padding:0 !important}
+#app.v38 #bbar.b38 button{height:42px;border-radius:4px;font-weight:900;font-size:13px;line-height:1.1;padding:0 4px}
+#app.v38 #bbar.b38 button small{display:block;font-size:8px;font-weight:700}
+#app.v38 #bbar.b38 .au{border:2px solid #fff1c2;background:linear-gradient(180deg,#f8e2a0,#d8a848 55%,#a8781e);color:#3a2000;box-shadow:inset 0 1px 0 #fff8e0,0 2px 0 rgba(0,0,0,.5)}
+#app.v38 #bbar.b38 .au small{color:#5a3a08}
+#app.v38 #bbar.b38 .au.on{background:linear-gradient(180deg,#fff6c8,#ffd34a 55%,#e09a10);box-shadow:0 0 12px rgba(255,214,90,.95);animation:pulse .8s infinite alternate}
+#app.v38 #bbar.b38 .rp{border:2px solid #ffe0c0;background:linear-gradient(180deg,#f0a050,#c05a18 55%,#7a3008);color:#fff}
+#app.v38 #bbar.b38 .rp small{color:#ffe8d0}#app.v38 #bbar.b38 .rp:disabled{opacity:.45;filter:saturate(.3)}
+
+/* ==================== 戦闘：上の帯（行動順） ==================== */
+#q38{display:flex;align-items:center;gap:3px;margin:5px 0 0 10px;height:22px}
+#q38 i{position:relative;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;flex:none;border:1px solid rgba(255,255,255,.55);background:#22406a;overflow:hidden;font-style:normal}
+#q38 i img{width:22px;height:22px;image-rendering:pixelated;margin-top:2px}
+#q38 i.e{background:radial-gradient(circle,#a02838,#4a0c18);border-color:#ff9aa8}
+#q38 i.e.b{border-color:#ffd34a;box-shadow:0 0 4px #ffb030}
+#q38 i b{font-size:10px;color:#fff;font-weight:900}
+#q38 i.c{width:24px;height:24px;border:2px solid #fff1c2;box-shadow:0 0 6px #ffe27a}
+#q38 i+i::before{content:'';position:absolute}
+
+/* ==================== 戦闘：味方の HP（常に表示・瀕死・気絶） ==================== */
+#app.v38.v25[data-sc="battle"] #hl24,#app.v38.v25[data-sc="battle"]:not(.hl25) #hl24{opacity:1;pointer-events:none}
+#app.v38.v25[data-sc="battle"] #hl24 .hl{pointer-events:auto}
+#hl24 .hl.dy38 .v{filter:drop-shadow(0 0 3px rgba(255,60,60,.95)) hue-rotate(-30deg) saturate(1.6);animation:dy38 .7s ease-in-out infinite alternate}
+@keyframes dy38{from{opacity:.75}to{opacity:1}}
+#hl24 .hl[data-lp]:not([data-lp=""])::after{content:attr(data-lp);display:block;margin-top:1px;padding:0 5px;border-radius:3px;font:800 11px/15px var(--num,inherit);color:#ffd0d8;background:rgba(80,10,24,.85);border:1px solid #ff8aa0}
+#hl24 .hl[data-z="z"]::after{color:#888;background:rgba(20,20,24,.85);border-color:#555}
+
+/* ==================== 連続戦闘：次の戦闘への移行 ==================== */
+#wv38{position:absolute;inset:0;z-index:40;pointer-events:none;display:none}
+#wv38.on{display:block}
+#wv38 .bg{position:absolute;inset:0;background:linear-gradient(100deg,rgba(4,8,20,0) 0%,rgba(4,8,20,.96) 18%,rgba(10,20,44,.98) 50%,rgba(4,8,20,.96) 82%,rgba(4,8,20,0) 100%);transform:translateX(-110%);animation:wv38a .45s var(--ez38) forwards}
+#wv38 .tx{position:absolute;left:0;right:0;top:40%;transform:translateY(-50%);text-align:center;color:#fff;opacity:0;animation:wv38t .4s .18s var(--ez38) forwards}
+#wv38 .tx small{display:block;font-size:12px;color:#9fd8ff;letter-spacing:.1em}
+#wv38 .tx b{display:block;font:italic 800 34px/1.1 "Jost","Barlow Condensed",sans-serif;letter-spacing:.08em;text-shadow:0 0 14px rgba(120,200,255,.8),2px 2px 0 #000}
+#wv38 .tx b em{font-style:italic;color:#ffe27a}#wv38 .tx b i{font-size:20px;color:#9fb4d8}
+#wv38 .tx span{display:inline-block;margin-top:6px;padding:2px 12px;font:italic 800 14px/20px "Jost",sans-serif;letter-spacing:.12em;color:#2a1600;background:linear-gradient(90deg,#ffd34a,#fff3b0,#ffd34a)}
+#wv38 .tx p{margin:10px 16px 0;font-size:11px;color:#cfe0ff;line-height:1.6}
+#wv38.out .bg{animation:wv38b .5s var(--ez38) forwards}#wv38.out .tx{animation:wv38o .3s ease forwards}
+@keyframes wv38a{to{transform:translateX(0)}}@keyframes wv38b{from{transform:translateX(0)}to{transform:translateX(110%)}}
+@keyframes wv38t{from{opacity:0;transform:translate(30px,-50%)}to{opacity:1;transform:translate(0,-50%)}}@keyframes wv38o{to{opacity:0;transform:translate(-30px,-50%)}}
+
+/* ==================== 編成画面 ==================== */
+.ps38{display:flex;flex-direction:column;gap:8px;padding-bottom:6px}
+.ps38 .hd{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-radius:6px;border:1px solid rgba(233,196,106,.5);background:linear-gradient(180deg,rgba(40,32,14,.85),rgba(14,12,22,.9))}
+.ps38 .hd>b{font-size:17px;font-weight:900;letter-spacing:.1em;color:#fff1c2}
+.ps38 .hd span{display:flex;align-items:baseline;gap:6px}.ps38 .hd small{font-size:10px;color:#cdbf98}
+.ps38 .hd strong{font:italic 800 22px/1 var(--num,inherit);color:#ffe27a;text-shadow:0 0 8px rgba(255,200,80,.5)}
+.ps38 .cs{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.pc38{position:relative;display:flex;flex-direction:column;gap:3px;padding:20px 3px 4px;border-radius:5px;cursor:pointer;
+ border:2px solid #c89a3a;background:linear-gradient(180deg,#3a2c10,#16120c 30%,#100e16);box-shadow:inset 0 0 0 1px #5a4418,0 3px 8px rgba(0,0,0,.5)}
+.pc38.sel{border-color:#fff1c2;box-shadow:0 0 0 2px #ffd34a,0 0 14px rgba(255,214,90,.7)}
+.pc38.emp{align-items:center;justify-content:center;min-height:300px;border-style:dashed;border-color:#6a5a3a;color:#a89a7a;background:rgba(20,18,26,.6)}
+.pc38.emp b{font-size:30px}
+.pc38 .cr{position:absolute;left:50%;top:-10px;transform:translateX(-50%);width:44px;height:26px;display:grid;place-items:center;clip-path:polygon(15% 0,85% 0,100% 50%,85% 100%,15% 100%,0 50%);background:linear-gradient(180deg,#fff3b0,#e0a830 50%,#8a5a10)}
+.pc38 .cr b{font:900 15px/1 Georgia,serif;color:#3a1c00;text-shadow:0 1px 0 rgba(255,255,255,.6)}
+.pc38 .ar{position:relative;height:118px;border-radius:3px;overflow:hidden;background:radial-gradient(ellipse at 50% 75%,color-mix(in srgb,var(--ec) 45%,transparent),transparent 70%),linear-gradient(180deg,#1a2040,#0a0c18)}
+.pc38 .ar svg{position:absolute;inset:0;width:100%;height:100%;opacity:.35}
+.pc38 .ar img{position:absolute;left:50%;bottom:2px;transform:translateX(-50%);height:104%;image-rendering:pixelated}
+.pc38 .ar .no{position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;display:grid;place-items:center;font:800 10px/1 inherit;font-style:normal;color:#2a1600;background:#ffe27a}
+.pc38 .nm{display:flex;align-items:center;gap:3px;padding:2px 3px;border-radius:3px;background:linear-gradient(90deg,#2a2440,#141228);border:1px solid #4a4068}
+.pc38 .nm img{width:16px;height:16px;image-rendering:pixelated;flex:none}
+.pc38 .nm span{font-size:12px;font-weight:900;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc38 .pw{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;padding:2px 4px;border-radius:3px;background:#0c0a14;border:1px solid #3a3050}
+.pc38 .pw small{font-size:9px;color:#ffd34a;font-weight:800}.pc38 .pw em{font-style:normal;font-size:9px;color:#9aa4c8}
+.pc38 .pw b{flex-basis:100%;text-align:right;font:800 15px/1.1 var(--num,inherit);color:#fff}
+.pc38 .eq{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:3px;border-radius:3px;background:linear-gradient(180deg,#4a3410,#2a1c08);border:1px solid #8a6a2a}
+.pc38 .eq img,.pc38 .eq i{width:100%;aspect-ratio:1;image-rendering:pixelated;border-radius:2px;background:rgba(0,0,0,.35);display:block}
+.pc38 .eq img.r2{background:rgba(80,120,255,.25)}.pc38 .eq img.r3{background:rgba(255,190,60,.25)}.pc38 .eq img.r4{background:rgba(255,90,200,.28)}
+.pc38 .ob{align-self:center;position:relative;width:52px;height:52px;margin:2px 0;border-radius:50%;border:2px solid #c89a3a;background:radial-gradient(circle at 50% 40%,#3a2a12,#0e0a06);display:grid;place-items:center;cursor:pointer}
+.pc38 .ob i{position:absolute;inset:8px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff,var(--ec) 45%,#2a1040);box-shadow:0 0 10px var(--ec)}
+.pc38 .ob small{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:9px;font-weight:800;padding:0 4px;border-radius:2px;color:#fff;background:#2a2238}
+.pc38 .ob.rdy small{background:#d89a20;color:#2a1600}
+.pc38 .fp{display:flex;align-items:center;gap:3px;margin-top:3px}
+.pc38 .fp span{flex:1;font-size:10px;font-weight:800;color:#e8e2ff;text-align:center;line-height:1.2}.pc38 .fp span b{color:#5adcff;font-size:9px}
+.pm38{position:relative;width:34px;height:34px;flex:none;border-radius:3px;background:#05060c;border:1px solid #5a5070}
+.pm38 i{position:absolute;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:1px;background:#5a5470}
+.pm38 i.me{background:#ffd34a;box-shadow:0 0 5px #ffd34a}
+.pm38.big{width:64px;height:64px}.pm38.big i{width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:3px;background:#3a5aa8;color:#fff;font:800 10px/16px inherit;font-style:normal;text-align:center}
+.ps38 .fb{display:flex;align-items:stretch;gap:6px;padding:4px;border-radius:4px;border:1px solid #6a5a3a;background:linear-gradient(180deg,#1c1824,#0c0a12)}
+.ps38 .fb .fn{flex:1;display:flex;align-items:baseline;gap:8px;padding:6px 10px;border:0;background:none;color:#fff;text-align:left}
+.ps38 .fb .fn small{font-size:10px;color:#cdbf98}.ps38 .fb .fn b{font-size:15px;font-weight:900;letter-spacing:.05em}
+.ps38 .fb .fc{flex:none;padding:0 14px;border-radius:3px;border:2px solid #ffd0a0;background:linear-gradient(180deg,#f07a30,#b8401a);color:#fff;font-weight:900;font-size:13px;text-shadow:1px 1px 0 #5a1a00}
+.ps38 .pa{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.ps38 .bh{font-size:13px;font-weight:800;color:#ffe27a;border-left:3px solid #ffd34a;padding-left:6px}.ps38 .bh small{color:#9aa4c8}
+.ps38 .bn{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.pb38{display:flex;flex-direction:column;align-items:center;padding:4px 2px;border-radius:4px;border:1px solid #3a4068;background:linear-gradient(180deg,#1a2040,#0c0e1e);cursor:pointer}
+.pb38.sel{border-color:#ffd34a;box-shadow:0 0 8px rgba(255,214,90,.7)}
+.pb38 img{height:48px;image-rendering:pixelated}.pb38 b{font-size:12px;color:#fff}.pb38 small{font-size:9px;color:#9aa4c8}
+.ps38 .ft{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+/* 陣形の選択 */
+.fm38{display:flex;flex-direction:column;gap:6px}
+.fm38 .hd b{font-size:16px;color:#fff1c2}.fm38 .hd small{display:block;font-size:11px;color:#9aa4c8}
+.fm38 .f{display:flex;gap:10px;align-items:flex-start;padding:8px;border-radius:5px;border:1px solid #3a4068;background:linear-gradient(180deg,#151a34,#0a0c1a);color:#fff;text-align:left}
+.fm38 .f.on{border-color:#ffd34a;box-shadow:inset 0 0 0 1px #ffd34a}
+.fm38 .tx{flex:1;min-width:0}.fm38 .tx>b{font-size:14px}.fm38 .tx>b em{margin-left:6px;font-style:normal;font-size:10px;padding:0 5px;border-radius:2px;background:#ffd34a;color:#2a1600}
+.fm38 .tx>small{display:block;font-size:11px;color:#b8c0e0;margin:2px 0 4px}
+.fm38 ol{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.fm38 li{display:flex;align-items:baseline;gap:5px;font-size:11px}.fm38 li i{font-style:normal;width:14px;height:14px;border-radius:2px;background:#3a5aa8;text-align:center;font-size:9px;line-height:14px}
+.fm38 li span{width:4.2em;flex:none;color:#fff;font-weight:700}.fm38 li small{color:#8ff0a8}
+
+/* ==================== キャラ詳細：能力（7 能力値） ==================== */
+.ctabs.t38{display:grid !important;grid-template-columns:repeat(4,1fr) !important}
+.st38{display:flex;flex-direction:column;gap:6px;margin:6px 0}
+.st38 .w{display:flex;align-items:baseline;gap:8px;padding:5px 8px;border-radius:4px;background:rgba(16,20,48,.6);border:1px solid #3a4068}
+.st38 .w b{font-size:14px;color:#fff1c2}.st38 .w small{font-size:11px;color:#9aa4c8}
+.st38 .lb{display:grid;grid-template-columns:.7fr 2fr;gap:4px}
+.st38 .lb span{display:flex;align-items:baseline;gap:6px;padding:4px 8px;border-radius:4px;background:rgba(16,20,48,.6);border:1px solid #3a4068}
+.st38 .lb em{font:italic 800 11px/1 inherit;color:#9fe8d8}.st38 .lb b{font:800 15px/1 var(--num,inherit);color:#fff}.st38 .lb b small{font-size:9px;color:#9aa4c8;margin-left:2px}
+.st38 .g7{display:grid;grid-template-columns:1fr 1fr;gap:3px 6px}
+.st38 .g7 .r{display:grid;grid-template-columns:1fr auto;align-items:baseline;padding:4px 7px;border-radius:4px;background:rgba(16,20,48,.55);border:1px solid transparent}
+.st38 .g7 .r.wp{border-color:rgba(255,214,90,.45)}
+.st38 .g7 .r span{font-size:12px;color:#cfd4f2}.st38 .g7 .r span i{font-style:normal;display:inline-block;width:14px;margin-right:4px;text-align:center;font-size:10px;font-weight:800;border-radius:3px;background:rgba(255,255,255,.12)}
+.st38 .g7 .r b{font-size:15px;color:#fff}.st38 .g7 .r small{grid-column:1/-1;font-size:9px;color:#8890b8;line-height:1.35}
+
+/* ==================== スマホの小さい画面 ==================== */
+@media (max-height:700px){.c38l .r{min-height:38px}.c38h{min-height:34px}.c38h .fc{width:34px;height:34px}.pc38 .ar{height:96px}}
+@media (max-width:360px){.pc38 .nm span{font-size:11px}.pc38 .pw b{font-size:13px}.c38l .r .n{font-size:14px}}

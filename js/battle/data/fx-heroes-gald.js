@@ -5,7 +5,7 @@
 /* 盾撃：盾を構えたまま体ごとぶつかる。六角の盾の残像が相手に刻まれ、輪が縮む（行動の遅れ） */
 BXS.def('tateuchi',{kind:'melee',dashMs:230,
  strike:{ms:180,do:[[0,'pose',{mL:-1,mS:1,mF:-2},120],[125,'pose',{mL:2,mF:9},50,'in'],[125,'ghost',{col:'#c8d8ff',n:2,gap:26}]]},
- impact:[[0,'fx','ward',{dx:-4,ramp:IRON,r:11,dur:280}],[0,'fx','shock',{ramp:'打',r1:14,dur:220}],[0,'fx','flare',{ramp:'打',rays:4,s:1}],[130,'fx','shock',{ramp:'氷',r0:13,r1:3,dash:1,dur:300}],[0,'shake',5]]});
+ impact:[[0,'fx','ward',{dx:-4,ramp:IRON,r:11,dur:280}],[0,'fx','shock',{ramp:'打',r1:14,dur:220}],[0,'fx','flare',{ramp:'打',rays:4,s:1}],[130,'fx','shock',{ramp:'冷',r0:13,r1:3,dash:1,dur:300}],[0,'shake',5]]});
 /* 地裂斬：大剣を地面に叩き込み、裂け目から岩の槍が相手の足元を貫く */
 BXS.def('chiretsu',{kind:'melee',dashMs:240,
  strike:{ms:310,do:[[0,'pose',{mU:2,mL:-3,mB:-3,mS:-2},200],[210,'pose',{mL:3,mB:7,mS:3,mF:5},70,'in'],[210,'ghost',{col:'#f0d090',n:2,gap:30}]]},
@@ -28,7 +28,7 @@ BXS.def('tettsui',{kind:'melee',dashMs:240,
  impact:[[0,'fx','shock',{on:'tf',ramp:'打',r0:3,r1:20,sq:.3,layer:0,thick:2}],[70,'fx','shock',{on:'tf',ramp:'打',r0:3,r1:28,sq:.3,layer:0}],[0,'fx','flare',{ramp:'打',rays:6,s:1.5}],[0,'fx','dust',{on:'tf',n:7,s:1.3}],[0,'shake',8]]});
 /* 堅守（星臨）：金の輪が外から締まり、城壁のような光の膜になる */
 BXS.def('kenshu',{kind:'self',
- pre:{ms:320,do:[[0,'pose',{mS:2,mL:-2,mF:-1},120],[0,'fx','shock',{on:'a',ramp:'buff',r0:28,r1:13,thick:2,dur:260}],[150,'fx','ward',{on:'a',ramp:'光',r:17,dur:520}],[150,'fx','circle',{on:'af',ramp:'buff',r:14,style:6,step:1,dur:600}],[200,'fx','glint',{on:'ah',ramp:'buff',s:1.4}]]}});
+ pre:{ms:320,do:[[0,'pose',{mS:2,mL:-2,mF:-1},120],[0,'fx','shock',{on:'a',ramp:'buff',r0:28,r1:13,thick:2,dur:260}],[150,'fx','ward',{on:'a',ramp:'陽',r:17,dur:520}],[150,'fx','circle',{on:'af',ramp:'buff',r:14,style:6,step:1,dur:600}],[200,'fx','glint',{on:'ah',ramp:'buff',s:1.4}]]}});
 /* 城壁崩し（星臨）：受け止めた力を地に流し、足元から大地の波を放つ。敵の下から岩の槍と地の柱 */
 BXS.def('houkai',{kind:'cast',big:1,
  pre:{ms:460,do:[[0,'dim',.5,220],[0,'bars',1],[0,'pose',{mS:2,mB:2},200],[0,'fx','circle',{on:'af',ramp:'地',r:18,style:4,step:1,dur:1000,runes:8}],[0,'fx','gather',{on:'a',ramp:'地',n:20,ms:420,r:26}],[300,'pose',{mS:-2,mB:-3,mU:1},140]]},

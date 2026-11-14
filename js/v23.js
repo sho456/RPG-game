@@ -163,7 +163,7 @@ function dev23(m){log((m||`<b>${VER23}</b>　戦闘画面・ダメージ表示�
   {l:'戦闘：大型ボス',s:'演技エリアに収まるか',f:()=>devBattle([{kind:'boss9',lv:60}],'ryuu',{theme:'lava'})},
   {l:'ダメージ表示の見本',s:'Critical・Weak・Guard・Miss',f:()=>{devBattle([{kind:'boss',lv:5},{kind:'slime',lv:5}],'haido');setTimeout(sample,1400);}},
   {l:'図鑑（モーション再生）',f:()=>zkMenu()},{l:'探索（テキスト切り替え）',f:()=>enterField('midori')},{l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
-function sample(){if(!B)return;const e=B.enemies[0],s=B.enemies[1],h=B.heroes;let i=0;const q=[()=>pop(e,128,'#fff',false,''),()=>pop(e,864,'#fff',false,'weak','光'),()=>pop(e,2480,'#fff',false,'crit weak','打'),
+function sample(){if(!B)return;const e=B.enemies[0],s=B.enemies[1],h=B.heroes;let i=0;const q=[()=>pop(e,128,'#fff',false,''),()=>pop(e,864,'#fff',false,'weak','陽'),()=>pop(e,2480,'#fff',false,'crit weak','打'),
   ()=>{h[1].guard=true;pop(h[1],412,'#f88',false,'hurt');setTimeout(()=>pop(h[1],'スタン','#ffe14a',true,'st20 dn'),40);},()=>pop(h[2],'MISS','#fff',true),()=>pop(h[3],'+640','#7dffa8'),()=>{h[1].guard=false;}];
  const go=()=>{if(i<q.length){try{q[i++]();}catch(x){}setTimeout(go,520);}};go();}
 {const _dv=dvMenu;dvMenu=function(m){_dv(m);try{addCmd(VER23+' 戦闘画面・図鑑','配置・ダメージ表示・'+SEIRIN.n+'演出・図鑑',dev23,0,'ready');}catch(e){}};}

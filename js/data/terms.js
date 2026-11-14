@@ -13,7 +13,7 @@
   ・装備の枠 → 分類：w＝武器、body（鎧・外套）・sub（盾・護符）＝主防具、head（兜・冠・額当て）＝服防具、acc＝装飾品
   ・敵：ED[k].rank（'normal'|'mid'|'big'）。未指定なら boss 指定とエリアのボスかどうかから決める
   ・技：SK[k].cat で個別に指定できる（未指定なら k・威力・使い手から自動判定）
-  ・Resist：ED[k].resist＝['氷'] のように指定。弱点でない属性で当てると 0.5 倍、「Resist」と表示 */
+  ・Resist：ED[k].resist＝['冷'] のように指定。弱点でない属性で当てると 0.5 倍、「Resist」と表示 */
 const TERMS=(()=>{
 /* ---------- 呼称 ---------- */
 const CHAR={playable:'プレイアブルキャラ',normal:'通常敵',mid:'中ボス',big:'大ボス'};
@@ -58,7 +58,7 @@ const isKana=n=>/^[゠-ヿ・ー\s]+$/.test(String(n||''));
 let SEIRIN_SET=null;
 function seirinSet(){if(SEIRIN_SET)return SEIRIN_SET;const s=new Set();try{for(const id in AW)(AW[id].cmds||[]).forEach(k=>s.add(k));}catch(e){}
  try{for(const k in SK)if(/^goku/.test(k)||['zen','reso','release','release2','kenshu'].includes(SK[k].k))s.add(k);}catch(e){}return SEIRIN_SET=s;}
-/* 技を使えるキャラ（初期・Lv習得・星盤・ジョブ） */
+/* 技を使えるキャラ（初期・Lv習得・星盤） */
 let OWN=null;
 function owners(){if(OWN)return OWN;OWN={};const add=(k,id)=>{(OWN[k]=OWN[k]||new Set()).add(id);};
  try{for(const id in HB)(HB[id].skills||[]).forEach(k=>add(k,id));}catch(e){}
@@ -106,7 +106,7 @@ try{GUARD.cat='guard';}catch(e){}
 /* 自動判定と違う区分にしたい技（祈りの系統は魔法として扱う） */
 try{for(const[k,c]of[['kaihou','mag_heal']])if(SK[k])SK[k].cat=c;}catch(e){}
 /* Resist（耐性）：自分と同じ属性の攻撃に強い敵（ver0.29 で追加。弱点と重ならないものだけ） */
-try{for(const[k,el]of[['iceslime','氷'],['snowwolf','氷'],['yukirei','氷'],['boss5','氷'],['lavaslime','炎'],['firedrake','炎'],['ember','炎'],['boss9','炎'],['raiwolf','雷']])
+try{for(const[k,el]of[['iceslime','冷'],['snowwolf','冷'],['yukirei','冷'],['boss5','冷'],['lavaslime','熱'],['firedrake','熱'],['ember','熱'],['boss9','熱'],['raiwolf','雷']])
   if(ED[k]&&!(ED[k].weak||[]).includes(el))ED[k].resist=[el];}catch(e){}
 /* ダメージ計算：耐性を足す（弱点・会心の判定はそのまま。Resist は弱点でないときだけ） */
 {const _c=calc;calc=function(a,t,sk){const r=_c(a,t,sk);try{if(r&&!r.weak&&sk&&sk.el&&TERMS.resists(t,sk.el)){r.d=Math.max(1,Math.round(r.d*TERMS.RESIST_MUL));r.resist=true;}}catch(e){}return r;};}

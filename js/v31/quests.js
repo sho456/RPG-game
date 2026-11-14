@@ -1,12 +1,12 @@
 /* ===== ver0.31 クエスト制（マップ探索の廃止） =====
  1. 出撃先はクエスト一覧。章ごとに複数のクエストがあり、区切りに中ボス・大ボスのクエストがある。
-    1 つのクエストで 2〜4 回の戦闘が続くものもある（戦闘の合間に HP は回復しない。倒れた仲間は HP20% で起きる）
+    1 つのクエストで 2〜4 回の戦闘が続くものもある（戦闘の合間に HP・LP は回復しない。倒れた仲間は LP が残っていれば HP20% で起きる。ver0.38 から敵を全滅させると自動で次の戦闘へ）
  2. 表記：一覧に「戦闘×3」「中ボス」「大ボス」「推奨Lv」「CLEAR／クリア回数」、戦闘中に「BATTLE 2/3」、
     出発時に「BATTLE 1/3」の見出し、報酬画面に宝箱とクエスト名、最後に「QUEST CLEAR」とクリアボーナス
  3. 宝箱は敵が落とす（通常の敵はまれに銅の宝箱、中ボスは銀、大ボスは金。金の宝箱からはレジェンドや天極の星晶も）
  4. 仲間の加入・クロウの選択・残響・エンディングは、該当クエストの初回クリア後のイベントになった
  5. 虚蝕化：本編の章のうち 1 つが、出撃 3 回ごとに入れ替わりで虚蝕化（敵が強いぶん、ドロップと灯力が増える）
- 6. 全滅してもお金は減らない（クエスト失敗。それまでに得た報酬は残る）。戦闘の合間に撤退もできる
+ 6. 全滅してもお金は減らない（クエスト失敗。それまでに得た報酬は残る）。戦闘中のメニュー（≡）から撤退もできる
  旧データ：ボスの旗・仲間の加入・塔の到達階・残響・回廊の到達層から、クリア済みのクエストを自動で決める */
 'use strict';
 function qCleared(id){return!!(G&&G.qs&&G.qs.c&&G.qs.c[id]);}
@@ -83,7 +83,7 @@ function waveBanner0(boss){try{if(scene!=='battle'||!QR)return;const st=$('#stag
  const n=QR.q.w.length;d.innerHTML=`<small>${esc(QR.q.n)}</small><b>BATTLE ${QR.wave+1}<i>/${n}</i></b>${boss?`<em>${boss==='big'?'BOSS BATTLE':'中ボス戦'}</em>`:QR.wave+1===n&&n>1?'<em>FINAL BATTLE</em>':''}`;st.appendChild(d);setTimeout(()=>d.remove(),2200);}catch(e){}}
 
 /* ---------- 進行 ---------- */
-function qStart(c,q){if(!G.party.length)return;healAll();G.sorties++;let vd=false;try{vd=c.tab===0&&voidArea(G.sorties)===c.area;}catch(e){}
+function qStart(c,q){if(!G.party.length)return;healAll();LV0=null;G.sorties++;let vd=false;try{vd=c.tab===0&&voidArea(G.sorties)===c.area;}catch(e){}
  QR={c,q,wave:0,vd,tot:{xp:0,gold:0,tou:0,items:0,chests:[]},lv0:Object.fromEntries(G.members.map(id=>[id,G.h[id].lv]))};save();
  const go=()=>runWave();if(q.pre&&!QS().seen[q.id]){QS().seen[q.id]=1;save();talk(q.pre,go);}else go();}
 function runWave(){const{c,q}=QR,w=waveOf(q.w[QR.wave]),lv=w.lv||q.lv;let list=w.e.map(kindOf).map(k=>({kind:k,lv}));
@@ -92,19 +92,13 @@ function runWave(){const{c,q}=QR,w=waveOf(q.w[QR.wave]),lv=w.lv||q.lv;let list=w
  try{VOIDED=!!QR.vd;}catch(e){}AREA=c.area;F=null;A=null;
  if(c.dyn==='kairou'){try{const f=q.f0+QR.wave*3;kst().cur=f;AREAS.kairou=makeKairouArea(w.e.some(k=>/^kb/.test(k))?q.f0+9:f);A=AREAS.kairou;AREA='kairou';}catch(e){}}
  startBattle(list,{boss,stages:w.stages,stageLv:w.slv||lv,event:w.ev||null,theme:q.th||c.th,quest:true,onEnd:waveEnd});
- if(c.dyn==='kairou'&&B)B.opts.boss=boss;waveBanner(rk);}
+ if(c.dyn==='kairou'&&B)B.opts.boss=boss;if(QR.wave===0||rk)waveBanner(rk);}
 function waveEnd(mode){try{VOIDED=false;}catch(e){}if(!QR)return enterTown();
  if(mode==='flee')return qFail('flee');QR.wave++;if(QR.wave<QR.q.w.length)interlude();else qClear();}
 const partyHP=()=>`<div class="qhp31">${G.party.map(id=>{const s=stats(id),hp=G.h[id].hp??s.mhp,r=Math.max(0,Math.min(1,hp/s.mhp));return`<div><img src="${face(id)}"><span><b>${esc(HB[id].name)}</b><i><u style="width:${r*100}%;background:${r>.5?'#5adc7a':r>.25?'#ffd34a':'#ff5a5a'}"></u></i><small>${fm(hp)} / ${fm(s.mhp)}</small></span></div>`;}).join('')}</div>`;
 function ovShow(html,cls){const ov=$('#ov');ov.classList.remove('hide','rw20ov','ttl');ov.className=(ov.className||'').replace(/\bq\w+31ov\b/g,'');ov.classList.add(cls||'qi31ov');ov.innerHTML=html;ov.scrollTop=0;return ov;}
-function interlude(){const{q}=QR,n=q.w.length,w=waveOf(q.w[QR.wave]),es=w.e.map(kindOf),boss=es.find(k=>ED[k]&&ED[k].boss);
- const nm=es.map(k=>ED[k]?(ED[k].boss&&!known(k)?'？？？':ED[k].name):k);
- ovShow(`<div class="qi31"><div class="qt31">${esc(q.n)}</div><div class="qbn31"><small>NEXT</small>BATTLE <b>${QR.wave+1}</b><i>/${n}</i></div>
-  <div class="qnx31">${boss?`<em class="${rankOf(boss)}">${rankOf(boss)==='big'?'大ボス':'中ボス'}</em>`:''}次の相手：${nm.map(esc).join('・')}</div>
-  <div class="qst31"><span>ここまで</span><b>EXP ${fm(QR.tot.xp)}</b><b>${fm(QR.tot.gold)} G</b><b>装備 ${QR.tot.items}</b><b>宝箱 ${QR.tot.chests.length}</b></div>
-  ${partyHP()}<div class="qno31">戦闘の合間に HP は回復しない（倒れた仲間は HP20% で立ち上がる）</div>
-  <button class="big gold" id="qgo">次の戦闘へ ▶</button><button class="big" id="qret">撤退する<small>得た報酬は持ち帰る</small></button></div>`);
- $('#qgo').onclick=()=>{SFX.sel();runWave();};$('#qret').onclick=()=>{SFX.sel();qFail('retreat');};}
+/* ver0.38：連続戦闘は自動で次へ（移行演出は autoNext）。撤退は戦闘中のメニューから */
+function interlude(){runWave();}
 function lvUps(){const o=[];for(const id of G.members){const a=QR.lv0[id]||G.h[id].lv,b=G.h[id].lv;if(b>a)o.push(`${HB[id].name} Lv${a}→<b>${b}</b>`);}return o;}
 function giveFirst(f){const o=[];if(!f)return o;if(f.g){G.gold+=f.g;o.push(fm(f.g)+'G');}(f.it||[]).forEach(([k,n])=>{addItem(k,n);o.push(`${ITEMS[k].n}×${n}`);});
  (f.mat||[]).forEach(([k,n])=>{G.mats[k]=(G.mats[k]||0)+n;o.push(`<span class="ss31">${MATS[k].n}×${n}</span>`);});
@@ -131,7 +125,15 @@ function qFail(kind){const q=QR&&QR.q;try{VOIDED=false;}catch(e){}
  QR=null;save();$('#qok').onclick=()=>{SFX.sel();healAll();questMap();};$('#qtown').onclick=()=>{SFX.sel();enterTown('灯都へ帰還した。仲間のHPが全回復した。');};}
 /* 全滅：クエスト中はお金を失わない／勝利：報酬画面に表記を足す */
 {const _end=end;end=async function(win){if(!win&&B&&B.opts&&B.opts.quest&&QR){B.over=true;$('#cmd').innerHTML='';B.heroes.forEach(h=>{G.h[h.id].hp=Math.max(h.hp,Math.ceil(h.mhp*.2));});save();await wait(300);qFail('lose');return;}
- const r=await _end(win);try{if(win&&B&&B.opts&&B.opts.quest&&QR)decorateReward();}catch(e){console.error(e);}return r;};}
+ const r=await _end(win);try{if(win&&B&&B.opts&&B.opts.quest&&QR){if(QR.wave+1<QR.q.w.length)autoNext();else decorateReward();}}catch(e){console.error(e);}return r;};}
+/* ver0.38：敵を全滅させたら、報酬画面を挟まずに次の戦闘へ（獲得したものは移行演出の中に小さく出す） */
+let LV0=null;
+async function autoNext(){const ov=$('#ov');ov.classList.add('hide');ov.classList.remove('rw20ov');ov.innerHTML='';
+ const n=QR.q.w.length,i=QR.wave+2,w=waveOf(QR.q.w[QR.wave+1]),es=w.e.map(kindOf),boss=es.find(k=>ED[k]&&ED[k].boss),last=i===n;
+ const ups=lvUps().filter(x=>!LV0||!LV0.includes(x));LV0=lvUps();
+ const sub=[`EXP ${fm(QR.tot.xp)}`,`${fm(QR.tot.gold)} G`,QR.tot.chests.length?`宝箱 ${QR.tot.chests.length}`:'',...ups].filter(Boolean).join('　');
+ const go=B&&B.opts&&B.opts.onEnd;await V38B.waveOut({q:QR.q.n,i,n,tag:boss?(rankOf(boss)==='big'?'BOSS BATTLE':'中ボス戦'):last?'FINAL BATTLE':'',sub});
+ if(go)go(true);V38B.waveIn();}
 /* ---------- 初回クリア後のイベント ---------- */
 function recruitAsk(P,done){const id=P.who;ovShow(`<div class="qr31"><img src="${art(id)}"><b>${esc(HB[id].name)}</b><small>仲間にしますか？</small><button class="big gold" id="qy">仲間にする</button><button class="big" id="qn">今はやめる</button></div>`,'qr31ov');
  $('#qy').onclick=()=>{SFX.aw();G.flags[P.flag]=1;newMember(id);save();toastMsg(`<b>${HB[id].name}が仲間になった！</b>`+(G.party.includes(id)?'':'（控えに入った）'));done();};
@@ -237,8 +239,8 @@ function nextQ(){try{for(const tab of[2,1,0]){if(!TABS[tab][1]())continue;for(co
 try{TIPS.map=['クエスト',['章を選んで、クエストをタップすると詳細が開く。<b>▼出撃▼</b>で出発。','1つのクエストで<b>戦闘が何回か続く</b>ことがある（BATTLE 1/3 など）。戦闘の合間にHPは回復しない。','<b>中ボス・大ボス</b>は章の区切り。<b>宝箱は敵が落とす</b>。クリアしたクエストは何度でも挑める。']];
  TIPS.town[1][1]='<b>出撃</b>：クエストを選んで冒険へ。<br><b>編成</b>：仲間の入れ替え・装備・星盤はここから。';}catch(e){}
 
-try{TIPS.how=['遊び方',['<b>灯都</b>で準備 → <b>出撃</b>でクエストへ → 章の<b>大ボス</b>を倒すと次の章へ。灯都に戻るとHP全回復＆自動セーブ。','1つのクエストで戦闘が何回か続くことがある。<b>宝箱は敵が落とす</b>（中ボスは銀、大ボスは金）。','戦闘：弱点を突いて大ダメージ、ゲージ100%で<b>星臨</b>（行動を消費しない）。2人星臨で<b>共鳴技</b>。','Lv60からは<b>天星盤</b>、Lv99からは<b>限界突破</b>（天極の星晶）でLv120まで。']];}catch(e){}
-const HOWTO='<b>遊び方</b><br>・灯都で準備→「出撃」でクエストを選ぶ。章の区切りに<b>中ボス・大ボス</b>。1つのクエストで戦闘が何回か続くこともある。<br>・<b>宝箱は敵が落とす</b>（まれに銅、中ボスは銀、大ボスは金）。<br>・戦闘：技を2回タップで決定。弱点を突いて大ダメージ、ゲージ100%で<b>星臨</b>（行動を消費しない）。2人星臨で<b>共鳴技</b>。<br>・灯都に戻るとHP全回復＆自動セーブ。<b>編成</b>で装備と星盤。Lv60から<b>天星盤</b>、Lv99から<b>限界突破</b>でLv120まで。';
+try{TIPS.how=['遊び方',['<b>灯都</b>で準備 → <b>出撃</b>でクエストへ → 章の<b>大ボス</b>を倒すと次の章へ。灯都に戻るとHP全回復＆自動セーブ。','1つのクエストで戦闘が何回か続くことがある。<b>宝箱は敵が落とす</b>（中ボスは銀、大ボスは金）。','戦闘：弱点を突いて大ダメージ、ゲージ100%で<b>星臨</b>（行動を消費しない）。','Lv60からは<b>天星盤</b>、Lv99からは<b>限界突破</b>（天極の星晶）でLv120まで。']];}catch(e){}
+const HOWTO='<b>遊び方</b><br>・灯都で準備→「出撃」でクエストを選ぶ。章の区切りに<b>中ボス・大ボス</b>。1つのクエストで戦闘が何回か続くこともある（敵を全滅させると自動で次の戦闘へ）。<br>・<b>宝箱は敵が落とす</b>（まれに銅、中ボスは銀、大ボスは金）。<br>・戦闘：ターンの始めに全員の技・術を選ぶ（BPを使う）。弱点の属性を突いて大ダメージ、ゲージ100%で<b>星臨</b>（行動を消費しない）。HPが0で気絶しLP-1、LPが残っていれば回復術で復活。<br>・灯都に戻るとHP・LP全回復＆自動セーブ。<b>編成</b>で装備と星盤。Lv60から<b>天星盤</b>、Lv99から<b>限界突破</b>でLv120まで。';
 {const _t=title;title=function(){_t();try{const h=$('#hw');if(h)h.innerHTML=HOWTO;}catch(e){}};try{const h=$('#hw');if(h)h.innerHTML=HOWTO;}catch(e){}}
 /* ---------- 開発者メニュー ---------- */
 function devQuests(){menu([...CH.filter(c=>c.tab!==undefined).map(c=>({l:`${c.ch} ${c.n}`,s:`${qsOf(c).length}クエスト`,f:()=>menu([...qsOf(c).map(q=>({l:q.n,s:`Lv${q.lv}・戦闘×${q.w.length}`,f:()=>{QM.on=false;qStart(c,q);}})),{l:'戻る',cls:'back',f:devQuests}],true)})),{l:'戻る',cls:'back',f:()=>dev31()}],true);}
@@ -252,4 +254,6 @@ function dev31(m){log(m||`<b>${V31.VER}</b>　クエスト制・Lv120・天星�
 {const _dv=dvMenu;dvMenu=function(m){_dv(m);try{addCmd(V31.VER+' クエスト・Lv120','クエスト制・天星盤・装備枠・エンドコンテンツ',dev31,0,'ready');}catch(e){}};}
 try{devAreas=function(){devQuests();};}catch(e){}
 
-return{QS,qById,qsOf,chOpen,qOpen,qStart,questMap,migQ,krQ,openChest,QM,render,qRank,bossOf,get QR(){return QR;},dev31,devEnd,devAll};})();
+/* ver0.38：戦闘中のメニューから撤退（それまでに得た報酬は持ち帰る） */
+function retreat(){if(!QR)return;if(B){B.over=true;B.heroes.forEach(h=>{G.h[h.id].hp=h.alive?h.hp:Math.ceil(h.mhp*.2);});}$('#cmd').innerHTML='';try{ovClose();}catch(e){}save();qFail('retreat');}
+return{retreat,QS,qById,qsOf,chOpen,qOpen,qStart,questMap,migQ,krQ,openChest,QM,render,qRank,bossOf,get QR(){return QR;},dev31,devEnd,devAll};})();

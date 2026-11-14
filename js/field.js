@@ -179,7 +179,7 @@ function fieldMenu(m){F.pause=false;if(m)log(m);
 function pauseMenu(m){F.pause=true;F.p.path=[];log(m||'<b>PAUSE</b>　時間が止まっている'+goldTxt());
  menu([{l:'ステータス',f:()=>openSheet(G.party[0])},{l:'回復',s:`ポーション×${G.items.potion}`,dis:!G.items.potion,f:fieldHeal},{l:'持ち物',f:()=>pauseMenu(bagTxt())},{l:'閉じる',cls:'back',f:()=>fieldMenu('探索を再開')}]);}
 function statusView(id){const h=G.h[id],o=nextM(id);
- log(statLine(id)+`<br><small>次のLvまで${nextXP(h.lv)-h.xp}　星ポイント残り${ptsLeft(id)}　ジョブ：${h.job?JOBS[h.job].n+' Lv'+h.jobs[h.job].lv:'なし'}</small><br>技：${skillList(id).map(k=>SK[k].n).join('・')}<br>装備：`+
+ log(statLine(id)+`<br><small>次のLvまで${nextXP(h.lv)-h.xp}　星ポイント残り${ptsLeft(id)}</small><br>技：${skillList(id).map(k=>SK[k].n).join('・')}<br>装備：`+
   SLOTS6.map(s=>{const it=h.eq[s]&&findItem(h.eq[s]);return it?ihtml(it):'';}).filter(Boolean).join('、'));
  menu([{l:`${HB[o].name}を見る`,f:()=>statusView(o)},{l:'戻る',cls:'back',f:()=>pauseMenu()}]);}
 function fieldHeal(){const id=G.party.map(i=>({i,r:(G.h[i].hp??stats(i).mhp)/stats(i).mhp})).sort((a,b)=>a.r-b.r)[0].i;

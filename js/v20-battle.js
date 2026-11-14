@@ -63,38 +63,38 @@ const fuQ=(a,t,sk)=>{(B.q20=B.q20||[]).push({a,t,sk:Object.assign({_fu:1},sk)});
 const PS={
  /* --- キャラクター専用 --- */
  c_rio1:{n:'灯火の導き',d:'戦闘開始時、味方全員の攻撃・魔力+8%（3ターン）',start:u=>{aliveH().forEach(h=>{addSt(h,'atk',8,3);addSt(h,'mag',8,3);});}},
- c_rio2:{n:'空白の共鳴',d:'星臨中の仲間がいる間、自分の与ダメ+20%',out:a=>B.heroes.some(h=>h!==a&&h.aw&&h.alive)?1.2:1},
+ c_rio2:{n:'空白の灯',d:'星臨中の仲間がいる間、自分の与ダメ+20%',out:a=>B.heroes.some(h=>h!==a&&h.aw&&h.alive)?1.2:1},
  c_gald1:{n:'鉄壁の誓い',d:'HPが50%以上のとき、受けるダメージ-15%',inc:t=>t.hp>=t.mhp*.5?.85:1},
  c_gald2:{n:'報復の盾',d:'単体攻撃を受けると35%で反撃（打・威力0.8）',hurt:(t,a,d,sk)=>{if(a&&a.side===1&&sk&&sk.t==='one'&&d>0&&Math.random()<.35)(B.cq20=B.cq20||[]).push({a:t,t:a,sk:{n:'報復の盾',el:'打',k:'phys',pow:.8,t:'one',_fu:1}});}},
  c_mire1:{n:'双極循環',d:'直前と違う属性の魔法を使うと与ダメ+20%',out:(a,t,sk)=>sk.k==='mag'&&sk.el&&a._le20&&a._le20!==sk.el?1.2:1,acted:(u,sk)=>{if(sk.k==='mag'&&sk.el)u._le20=sk.el;}},
  c_mire2:{n:'魔力暴走',d:'会心が出るとSP+8、対象の精神-15%（2ターン）',hit:(a,t,sk,r)=>{if(r.crit){a.sp=Math.min(100,a.sp+8);if(t.alive)addSt(t,'res',-15,2);}}},
  c_shion1:{n:'影走り',d:'戦闘開始時、素早さ+20%（3ターン）',start:u=>addSt(u,'spd',20,3)},
- c_shion2:{n:'追い打ち',d:'単体攻撃で弱点を突くと30%で追撃（風・威力0.5）',hit:(a,t,sk,r)=>{if(r.weak&&sk.t==='one'&&t.alive&&Math.random()<.3)fuQ(a,t,{n:'追い打ち',el:'風',k:'phys',pow:.5,t:'one'});}},
+ c_shion2:{n:'追い打ち',d:'単体攻撃で弱点を突くと30%で追撃（風・威力0.5）',hit:(a,t,sk,r)=>{if(r.weak&&sk.t==='one'&&t.alive&&Math.random()<.3)fuQ(a,t,{n:'追い打ち',el:'斬',k:'phys',pow:.5,t:'one'});}},
  c_noah1:{n:'慈愛の機構',d:'手番の開始時、HPが最も低い味方を最大HPの6%回復',turn:u=>{const h=aliveH().filter(x=>x.hp<x.mhp).sort((a,b)=>a.hp/a.mhp-b.hp/b.mhp)[0];if(h){const v=Math.round(h.mhp*.06);h.hp=Math.min(h.mhp,h.hp+v);pop(h,'+'+v,'#7dffa8');}}},
  c_noah2:{n:'聖印の加護',d:'ノアが回復した味方は受けるダメージ-15%（2ターン）',healed:(u,t)=>addSt(t,'prot',15,2)},
  c_erna1:{n:'鷹の目',d:'弱点を突く攻撃は会心率+25%',critB:(a,t,sk)=>t.weak&&sk.el&&t.weak.includes(sk.el)?25:0},
  c_erna2:{n:'狙撃態勢',d:'HPが満タンの敵への与ダメ+30%',out:(a,t)=>t.hp>=t.mhp?1.3:1},
  c_balza1:{n:'炉の熱',d:'攻撃するたびに与ダメ+5%（最大+25%・戦闘中）',out:a=>1+.05*Math.min(5,a._heat20||0),acted:(u,sk)=>{if(sk.k==='phys'||sk.k==='mag'||sk.basic)u._heat20=Math.min(5,(u._heat20||0)+1);}},
  c_balza2:{n:'不屈',d:'HP30%以下で与ダメ+20%・受けるダメージ-25%',out:a=>lowHP(a,.3)?1.2:1,inc:t=>lowHP(t,.3)?.75:1},
- c_crow1:{n:'呪詛の残り香',d:'闇属性の攻撃が当たると30%で毒（3ターン）',hit:(a,t,sk)=>{if(elIs(sk,'闇')&&t.alive&&Math.random()<.3)addSt(t,'poison',.04,3);}},
+ c_crow1:{n:'呪詛の残り香',d:'陰属性の攻撃が当たると30%で毒（3ターン）',hit:(a,t,sk)=>{if(elIs(sk,'陰')&&t.alive&&Math.random()<.3)addSt(t,'poison',.04,3);}},
  c_crow2:{n:'血の契約',d:'敵を倒すとHP10%回復・SP+10',kill:a=>{const v=Math.round(a.mhp*.1);a.hp=Math.min(a.mhp,a.hp+v);a.sp=Math.min(100,a.sp+10);pop(a,'+'+v,'#7dffa8',true);}},
  c_hakua1:{n:'連撃の型',d:'同じ敵を続けて攻撃するたび与ダメ+6%（最大+30%）',out:(a,t)=>1+.06*Math.min(5,a._ct20===t?a._cn20||0:0),hit:(a,t)=>{if(a._ct20===t)a._cn20=(a._cn20||0)+1;else{a._ct20=t;a._cn20=0;}}},
- c_hakua2:{n:'氷華の気',d:'氷属性で攻撃した敵の素早さ-15%（2ターン）',hit:(a,t,sk)=>{if(elIs(sk,'氷')&&t.alive)addSt(t,'spd',-15,2);}},
- c_jin1:{n:'ポポの援護',d:'行動のあと25%でポポが追撃（地・威力0.6）',acted:(u,sk)=>{if(sk.k==='phys'||sk.k==='mag'||sk.basic){const t=aliveE().sort((a,b)=>a.hp-b.hp)[0];if(t&&Math.random()<.25)fuQ(u,t,{n:'ポポの援護',el:'地',k:'phys',pow:.6,t:'one'});}}},
+ c_hakua2:{n:'氷華の気',d:'冷属性で攻撃した敵の素早さ-15%（2ターン）',hit:(a,t,sk)=>{if(elIs(sk,'冷')&&t.alive)addSt(t,'spd',-15,2);}},
+ c_jin1:{n:'ポポの援護',d:'行動のあと25%でポポが追撃（地・威力0.6）',acted:(u,sk)=>{if(sk.k==='phys'||sk.k==='mag'||sk.basic){const t=aliveE().sort((a,b)=>a.hp-b.hp)[0];if(t&&Math.random()<.25)fuQ(u,t,{n:'ポポの援護',el:'打',k:'phys',pow:.6,t:'one'});}}},
  c_jin2:{n:'野生の勘',d:'HP50%以下のとき20%で攻撃を回避',dodge:t=>lowHP(t,.5)?20:0},
  c_celes1:{n:'刻読み',d:'戦闘開始時、味方全員の素早さ+10%（3ターン）',start:u=>aliveH().forEach(h=>addSt(h,'spd',10,3))},
  c_celes2:{n:'時の歪み',d:'魔法が当たった敵を25%で遅らせる',hit:(a,t,sk)=>{if(sk.k==='mag'&&t.alive&&Math.random()<.25){t.ct+=(t.boss?15:35)/Math.max(1,t.spd);pop(t,'DELAY','#7fd6ff',true);}}},
- c_valk1:{n:'竜鱗',d:'炎・闇属性で受けるダメージ-30%',inc:(t,a,sk)=>sk&&elIs(sk,'炎','闇')?.7:1},
+ c_valk1:{n:'竜鱗',d:'炎・陰属性で受けるダメージ-30%',inc:(t,a,sk)=>sk&&elIs(sk,'熱','陰')?.7:1},
  c_valk2:{n:'竜の闘志',d:'攻撃を受けるたび攻撃+4%（最大+20%・戦闘中）',hurt:t=>{if(t.alive&&(t._fg20||0)<5){t._fg20=(t._fg20||0)+1;base0(t);t._b0.atk=Math.round(t._b0.atk*1.04);recalc(t);}}},
  /* --- 武器 --- */
- w_light:{n:'光刃の加護',d:'光属性の与ダメ+{v}%',v:15,out:(a,t,sk,v)=>elIs(sk,'光')?1+v/100:1},
+ w_light:{n:'光刃の加護',d:'陽属性の与ダメ+{v}%',v:15,out:(a,t,sk,v)=>elIs(sk,'陽')?1+v/100:1},
  w_mikiri:{n:'見切り',d:'会心率+{v}%',v:8,critB:(a,t,sk,v)=>v},
  w_yuuki:{n:'勇気の刃',d:'HP80%以上のとき与ダメ+{v}%',v:12,out:(a,t,sk,v)=>a.hp>=a.mhp*.8?1+v/100:1},
  w_guard:{n:'守護者',d:'受けるダメージ-{v}%',v:8,inc:(t,a,sk,v)=>1-v/100},
  w_taunt:{n:'挑戦者',d:'挑発・防御中に受けるダメージ-{v}%',v:20,inc:(t,a,sk,v)=>t.taunt>0||t.guard?1-v/100:1},
- w_quake:{n:'地鳴り',d:'地属性の与ダメ+{v}%',v:15,out:(a,t,sk,v)=>elIs(sk,'地')?1+v/100:1},
- w_fire:{n:'炎の頁',d:'炎属性の与ダメ+{v}%',v:15,out:(a,t,sk,v)=>elIs(sk,'炎')?1+v/100:1},
- w_ice:{n:'氷の頁',d:'氷属性の与ダメ+{v}%',v:15,out:(a,t,sk,v)=>elIs(sk,'氷')?1+v/100:1},
+ w_quake:{n:'地鳴り',d:'打属性の与ダメ+{v}%',v:15,out:(a,t,sk,v)=>elIs(sk,'打')?1+v/100:1},
+ w_fire:{n:'炎の頁',d:'熱属性の与ダメ+{v}%',v:15,out:(a,t,sk,v)=>elIs(sk,'熱')?1+v/100:1},
+ w_ice:{n:'氷の頁',d:'冷属性の与ダメ+{v}%',v:15,out:(a,t,sk,v)=>elIs(sk,'冷')?1+v/100:1},
  w_wisdom:{n:'知識の泉',d:'戦闘開始時のSP+{v}',v:20,start:(u,v)=>{u.sp=Math.min(100,u.sp+Math.round(v));}},
  w_twin:{n:'二刀の冴え',d:'通常攻撃のあと{v}%で追撃（威力0.4）',v:30,acted:(u,sk,v)=>{if(sk.basic){const t=aliveE()[0];if(t&&Math.random()<v/100)fuQ(u,t,{n:'二刀の冴え',el:'斬',k:'phys',pow:.4,t:'one'});}}},
  w_vital:{n:'急所狙い',d:'弱点を突いたときの会心率+{v}%',v:15,critB:(a,t,sk,v)=>sk&&sk.el&&t.weak&&t.weak.includes(sk.el)?v:0},
@@ -107,19 +107,19 @@ const PS={
  w_weakshot:{n:'急所射ち',d:'弱点を突いたときの与ダメ+{v}%',v:15,out:(a,t,sk,v)=>t.weak&&sk.el&&t.weak.includes(sk.el)?1+v/100:1},
  w_heavy:{n:'重撃',d:'与ダメ+{v}%（代わりに素早さ-5%）',v:10,make:u=>{u.spd=+(u.spd*.95).toFixed(2);},out:(a,t,sk,v)=>1+v/100},
  w_crush:{n:'破砕',d:'攻撃が当たると15%で敵の防御-{v}%（2ターン）',v:20,hit:(a,t,sk,r,d,v)=>{if(t.alive&&!sk._fu&&Math.random()<.15)addSt(t,'def',-Math.round(v),2);}},
- w_forge:{n:'炉熱',d:'炎属性の与ダメ+{v}%',v:15,out:(a,t,sk,v)=>elIs(sk,'炎')?1+v/100:1},
+ w_forge:{n:'炉熱',d:'熱属性の与ダメ+{v}%',v:15,out:(a,t,sk,v)=>elIs(sk,'熱')?1+v/100:1},
  w_drain:{n:'吸魂',d:'与ダメの{v}%をHPとして吸収',v:5,hit:(a,t,sk,r,d,v)=>{if(d>0&&a.hp<a.mhp){const h=Math.max(1,Math.round(d*v/100));a.hp=Math.min(a.mhp,a.hp+h);}}},
  w_reaper:{n:'死神の鎌',d:'HP30%以下の敵への与ダメ+{v}%',v:25,out:(a,t,sk,v)=>lowHP(t,.3)?1+v/100:1},
- w_dark:{n:'闇の刃',d:'闇属性の与ダメ+{v}%',v:15,out:(a,t,sk,v)=>elIs(sk,'闇')?1+v/100:1},
+ w_dark:{n:'闇の刃',d:'陰属性の与ダメ+{v}%',v:15,out:(a,t,sk,v)=>elIs(sk,'陰')?1+v/100:1},
  w_rush:{n:'疾風拳',d:'多段攻撃の各撃の与ダメ+{v}%',v:10,out:(a,t,sk,v)=>sk.hits>1||sk.k==='rhythm'?1+v/100:1},
- w_frost:{n:'凍拳',d:'氷属性の与ダメ+{v}%',v:15,out:(a,t,sk,v)=>elIs(sk,'氷')?1+v/100:1},
+ w_frost:{n:'凍拳',d:'冷属性の与ダメ+{v}%',v:15,out:(a,t,sk,v)=>elIs(sk,'冷')?1+v/100:1},
  w_chi:{n:'気功',d:'手番の開始時にHPを最大HPの{v}%回復',v:3,turn:(u,v)=>{if(u.hp<u.mhp){const h=Math.round(u.mhp*v/100);u.hp=Math.min(u.mhp,u.hp+h);pop(u,'+'+h,'#7dffa8',true);}}},
  w_wild:{n:'野性',d:'HP50%以下のとき与ダメ+{v}%',v:15,out:(a,t,sk,v)=>lowHP(a,.5)?1+v/100:1},
- w_earth:{n:'大地の爪',d:'地属性の与ダメ+{v}%',v:15,out:(a,t,sk,v)=>elIs(sk,'地')?1+v/100:1},
+ w_earth:{n:'大地の爪',d:'打属性の与ダメ+{v}%',v:15,out:(a,t,sk,v)=>elIs(sk,'打')?1+v/100:1},
  w_hunt:{n:'狩猟本能',d:'HP半分以下の敵への与ダメ+{v}%',v:12,out:(a,t,sk,v)=>t.hp<=t.mhp*.5?1+v/100:1},
  w_clock:{n:'刻の針',d:'素早さ+{v}%',v:10,make:(u,v)=>{u.spd=+(u.spd*(1+v/100)).toFixed(2);}},
  w_star:{n:'星詠み',d:'魔法の与ダメ+{v}%',v:12,out:(a,t,sk,v)=>sk.k==='mag'?1+v/100:1},
- w_fang:{n:'竜牙',d:'攻撃のあと{v}%で追撃（炎・威力0.5）',v:12,acted:(u,sk,v)=>{if(sk.k==='phys'||sk.basic){const t=aliveE()[0];if(t&&Math.random()<v/100)fuQ(u,t,{n:'竜牙',el:'炎',k:'phys',pow:.5,t:'one'});}}},
+ w_fang:{n:'竜牙',d:'攻撃のあと{v}%で追撃（炎・威力0.5）',v:12,acted:(u,sk,v)=>{if(sk.k==='phys'||sk.basic){const t=aliveE()[0];if(t&&Math.random()<v/100)fuQ(u,t,{n:'竜牙',el:'熱',k:'phys',pow:.5,t:'one'});}}},
  w_dblood:{n:'竜の血',d:'敵を倒すとAG+{v}',v:15,kill:(a,t,v)=>{if(!a.aw)a.ag=Math.min(100,a.ag+v);}}};
 /* キャラごとの専用パッシブと、武器種ごとの候補 */
 const CPS={rio:['c_rio1','c_rio2'],gald:['c_gald1','c_gald2'],mire:['c_mire1','c_mire2'],shion:['c_shion1','c_shion2'],noah:['c_noah1','c_noah2'],erna:['c_erna1','c_erna2'],
@@ -145,30 +145,30 @@ function sumEv(u,ev,...a){let s=0;for(const p of(u.ps20||[])){const P=PS[p.id];i
    pierce20：防御・精神の一部を無視　purge20：敵の強化を消し、消した数だけ威力上昇　self20：使用後に自分へ付与 */
 const NSK={
  kobu:{n:'鼓舞の灯',sp:25,k:'sup20',t:'self',fx20:[{on:'allies',k:'atk',v:15,t:3},{on:'allies',k:'mag',v:15,t:3}],d:'味方全員の攻撃・魔力+15%（3ターン）',role:'buff'},
- torirensan:{n:'灯火連斬',sp:35,el:'光',k:'phys',pow:.62,hits:3,t:'one',cond20:'brk',d:'光の3連撃。HP半分以下の敵には威力1.5倍'},
+ torirensan:{n:'灯火連斬',sp:35,el:'陽',k:'phys',pow:.62,hits:3,t:'one',cond20:'brk',d:'光の3連撃。HP半分以下の敵には威力1.5倍'},
  teppekikamae:{n:'鉄壁の構え',sp:20,k:'sup20',t:'self',fx20:[{on:'self',k:'def',v:40,t:3},{on:'self',k:'res',v:40,t:3}],taunt20:2,d:'自分の防御・精神+40%（3ターン）＋2ターン挑発',role:'guard'},
  saigan:{n:'砕岩撃',sp:25,el:'打',k:'phys',pow:1.3,t:'one',fx20:[{on:'t',k:'def',v:-25,t:3}],d:'打撃＋敵の防御-25%（3ターン）'},
- prism:{n:'プリズム・ブランド',sp:22,el:'炎',k:'mag',pow:.8,t:'one',fx20:[{on:'t',k:'weak',el:'炎',t:3},{on:'t',k:'weak',el:'氷',t:3}],d:'炎の魔法＋敵に炎・氷の弱点を刻む（3ターン）'},
- meteor:{n:'メテオスウォーム',sp:45,el:'炎',k:'mag',pow:.42,hits:3,t:'all',d:'炎の隕石を3回、敵全体へ（消費大）'},
+ prism:{n:'プリズム・ブランド',sp:22,el:'熱',k:'mag',pow:.8,t:'one',fx20:[{on:'t',k:'weak',el:'熱',t:3},{on:'t',k:'weak',el:'冷',t:3}],d:'炎の魔法＋敵に炎・氷の弱点を刻む（3ターン）'},
+ meteor:{n:'メテオスウォーム',sp:45,el:'熱',k:'mag',pow:.42,hits:3,t:'all',d:'炎の隕石を3回、敵全体へ（消費大）'},
  dokujin:{n:'毒刃',sp:15,el:'突',k:'phys',pow:1,t:'one',fx20:[{on:'t',k:'poison',v:.05,t:3,p:.75}],d:'突き＋75%で毒（最大HP5%×3ターン）'},
- genei:{n:'幻影乱舞',sp:30,el:'風',k:'phys',pow:.4,hits:4,t:'one',cond20:'spd',d:'風の4連撃。敵より速いほど威力上昇（最大+40%）'},
+ genei:{n:'幻影乱舞',sp:30,el:'斬',k:'phys',pow:.4,hits:4,t:'one',cond20:'spd',d:'風の4連撃。敵より速いほど威力上昇（最大+40%）'},
  regene:{n:'リジェネレイト',sp:25,k:'sup20',t:'self',fx20:[{on:'allies',k:'regen',v:.08,t:3}],d:'味方全員に継続回復（最大HP8%×3ターン）',role:'heal'},
- dispel:{n:'ディスペル・ライト',sp:25,el:'光',k:'mag',pow:1,t:'one',purge20:1,d:'光の魔法＋敵の強化を全て消す（消した数×30%威力上昇）'},
+ dispel:{n:'ディスペル・ライト',sp:25,el:'陽',k:'mag',pow:1,t:'one',purge20:1,d:'光の魔法＋敵の強化を全て消す（消した数×30%威力上昇）'},
  ashidome:{n:'足止めの矢',sp:20,el:'突',k:'phys',pow:1,t:'one',delay:30,fx20:[{on:'t',k:'spd',v:-30,t:3}],d:'射撃＋敵の素早さ-30%（3ターン）・行動を遅らせる'},
- senkou:{n:'穿光の矢',sp:30,el:'光',k:'phys',pow:1.55,t:'one',pierce20:.5,d:'光の矢。敵の防御を半分無視する'},
- kaentanda:{n:'火炎鍛打',sp:25,el:'炎',k:'phys',pow:1.35,t:'one',self20:[{k:'atk',v:20,t:3}],d:'炎の一撃＋自分の攻撃+20%（3ターン）'},
- daichiwari:{n:'大地割り',sp:40,el:'地',k:'phys',pow:1,t:'all',w:1.35,fx20:[{on:'t',k:'spd',v:-20,t:2}],d:'敵全体に地の衝撃＋素早さ-20%（2ターン）。次の手番が遅い'},
- fushoku:{n:'腐食の呪い',sp:20,el:'闇',k:'mag',pow:.6,t:'one',fx20:[{on:'t',k:'def',v:-25,t:3},{on:'t',k:'res',v:-25,t:3}],d:'闇の呪い＋敵の防御・精神-25%（3ターン）'},
- tamakurai:{n:'魂喰らい',sp:35,el:'闇',k:'mag',pow:1.35,t:'one',drain:.4,cond20:'debuff',d:'闇の魔法。与ダメの40%を吸収。弱体1つにつき威力+25%'},
+ senkou:{n:'穿光の矢',sp:30,el:'陽',k:'phys',pow:1.55,t:'one',pierce20:.5,d:'光の矢。敵の防御を半分無視する'},
+ kaentanda:{n:'火炎鍛打',sp:25,el:'熱',k:'phys',pow:1.35,t:'one',self20:[{k:'atk',v:20,t:3}],d:'炎の一撃＋自分の攻撃+20%（3ターン）'},
+ daichiwari:{n:'大地割り',sp:40,el:'打',k:'phys',pow:1,t:'all',w:1.35,fx20:[{on:'t',k:'spd',v:-20,t:2}],d:'敵全体に地の衝撃＋素早さ-20%（2ターン）。次の手番が遅い'},
+ fushoku:{n:'腐食の呪い',sp:20,el:'陰',k:'mag',pow:.6,t:'one',fx20:[{on:'t',k:'def',v:-25,t:3},{on:'t',k:'res',v:-25,t:3}],d:'闇の呪い＋敵の防御・精神-25%（3ターン）'},
+ tamakurai:{n:'魂喰らい',sp:35,el:'陰',k:'mag',pow:1.35,t:'one',drain:.4,cond20:'debuff',d:'闇の魔法。与ダメの40%を吸収。弱体1つにつき威力+25%'},
  hyakuretsu:{n:'百裂拳',sp:35,el:'打',k:'phys',pow:.32,hits:6,t:'one',d:'打撃6連打。弱点なら1撃ごとに大きく響く'},
- hyouketsu:{n:'氷結掌',sp:25,el:'氷',k:'phys',pow:1.2,t:'one',fx20:[{on:'t',k:'stun',v:1,t:1,p:.35}],d:'氷の掌打＋35%で凍結（1回休み。ボスは遅延）'},
- popototsu:{n:'ポポ突撃',sp:20,el:'地',k:'phys',pow:.65,hits:2,t:'one',fx20:[{on:'t',k:'atk',v:-15,t:2}],d:'ポポと2連撃＋敵の攻撃-15%（2ターン）'},
+ hyouketsu:{n:'氷結掌',sp:25,el:'冷',k:'phys',pow:1.2,t:'one',fx20:[{on:'t',k:'stun',v:1,t:1,p:.35}],d:'氷の掌打＋35%で凍結（1回休み。ボスは遅延）'},
+ popototsu:{n:'ポポ突撃',sp:20,el:'打',k:'phys',pow:.65,hits:2,t:'one',fx20:[{on:'t',k:'atk',v:-15,t:2}],d:'ポポと2連撃＋敵の攻撃-15%（2ターン）'},
  kemonohoko:{n:'獣の咆哮',sp:30,k:'sup20',t:'self',fx20:[{on:'allies',k:'atk',v:20,t:3},{on:'enemies',k:'def',v:-10,t:3}],d:'味方全員の攻撃+20%・敵全体の防御-10%（3ターン）',role:'buff'},
  chronoslow:{n:'クロノスロウ',sp:30,el:null,k:'mag',pow:.7,t:'all',fx20:[{on:'t',k:'spd',v:-25,t:3}],d:'時の魔法・敵全体＋素早さ-25%（3ターン）'},
  hastearea:{n:'ヘイストエリア',sp:30,k:'sup20',t:'self',fx20:[{on:'allies',k:'spd',v:25,t:3}],ct20:.3,d:'味方全員の素早さ+25%（3ターン）＋次の手番を早める',role:'buff'},
  ryurinkamae:{n:'竜鱗の構え',sp:20,k:'sup20',t:'self',fx20:[{on:'self',k:'shield',v:.22,t:99},{on:'self',k:'counter',v:1,t:3}],d:'最大HP22%の障壁＋3ターン反撃態勢（威力1.0）',role:'guard'},
- kokuryu:{n:'黒竜の吐息',sp:40,el:'闇',k:'mag',pow:.95,t:'all',fx20:[{on:'t',k:'poison',v:.04,t:3,p:.4}],d:'闇の吐息・敵全体＋40%で毒（3ターン）'},
- /* 職業・汎用（誰でも：ジョブLv5で習得） */
+ kokuryu:{n:'黒竜の吐息',sp:40,el:'陰',k:'mag',pow:.95,t:'all',fx20:[{on:'t',k:'poison',v:.04,t:3,p:.4}],d:'闇の吐息・敵全体＋40%で毒（3ターン）'},
+ /* 汎用の技（旧来のもの。今の技・術は js/rs/data.js） */
  seiten:{n:'星天の加護',sp:30,k:'sup20',t:'self',fx20:[{on:'allies',k:'prot',v:20,t:3}],d:'味方全員の受けるダメージ-20%（3ターン）',role:'guard'},
  kaihou:{n:'解き放つ祈り',sp:20,k:'sup20',t:'self',cleanse20:1,heal20:.15,d:'味方全員の弱体を消し、HP15%回復',role:'heal'}};
 Object.assign(SK,NSK);
@@ -176,8 +176,6 @@ Object.assign(SK,NSK);
 const LSK={rio:[[8,'kobu'],[28,'torirensan']],gald:[[8,'saigan'],[28,'teppekikamae']],mire:[[8,'prism'],[28,'meteor']],shion:[[8,'dokujin'],[28,'genei']],
  noah:[[8,'regene'],[28,'dispel']],erna:[[8,'ashidome'],[28,'senkou']],balza:[[8,'kaentanda'],[28,'daichiwari']],crow:[[8,'fushoku'],[28,'tamakurai']],
  hakua:[[8,'hyouketsu'],[28,'hyakuretsu']],jin:[[8,'popototsu'],[28,'kemonohoko']],celes:[[8,'chronoslow'],[28,'hastearea']],valk:[[8,'ryurinkamae'],[28,'kokuryu']]};
-/* ジョブにも新しい技（癒し手Lv5：解き放つ祈り／重騎士Lv5：星天の加護） */
-try{if(JOBS.iyashi&&!JOBS.iyashi.sk.some(s=>s[1]==='kaihou'))JOBS.iyashi.sk.push([5,'kaihou']);if(JOBS.juukishi&&!JOBS.juukishi.sk.some(s=>s[1]==='seiten'))JOBS.juukishi.sk.push([5,'seiten']);}catch(e){}
 {const _sl=skillList;skillList=function(id){const s=_sl(id),lv=(G.h[id]&&G.h[id].lv)||1;for(const[l,k]of(LSK[id]||[]))if(lv>=l&&!s.includes(k))s.push(k);return s;};}
 
 /* ==================== 4. 敵の新戦術 ==================== */
@@ -230,7 +228,7 @@ const RALLY=['darkknight','onimusha','shade','yukirei','bookghost'];
  try{const r=LASTC||{};fixWeak(t);
   if(a.side===0&&!sk._fu)each(a,'hit',t,sk,r,d);
   /* 追加効果は1回の行動で、相手1体につき1度だけ */
-  if(sk.fx20&&B){B._fx20=B._fx20||new Set();if(!B._fx20.has(t)){B._fx20.add(t);for(const f of sk.fx20){if(f.on!=='t')continue;if(f.p!=null&&Math.random()>=f.p)continue;if(!t.alive)break;
+  if(sk.fx20&&B){B._fx20=B._fx20||new Set();if(!B._fx20.has(t)){B._fx20.add(t);for(const f of sk.fx20){if(f.on!=='t')continue;if(f.p!=null&&Math.random()>=(typeof RSC!=='undefined'?RSC.ailP(a,t,f):f.p))continue;if(!t.alive)break;
     addSt(t,f.k,f.v,f.t,f.el?{el:f.el}:{});}}}
   if(a.side===0&&!t.alive&&!sk._fu)each(a,'kill',t);
  }catch(e){console.error(e);}
@@ -252,7 +250,7 @@ async function support(u,sk){u.sp-=sk.sp||0;log(`${u.name}の<b>${sk.n}</b>！`)
  for(const f of ps){const tg=f.on==='self'?[u]:f.on==='allies'?aliveH():f.on==='enemies'?aliveE():[];for(const t of tg){let v=f.v;if(f.k==='shield')v=Math.round(t.mhp*f.v);addSt(t,f.k,v,f.t,f.el?{el:f.el}:{});if(t.side===0){const[x,y]=midOf(t);fx(isBuff({k:f.k,v})?'buff':'ring',x,y,col);}}}
  if(sk.taunt20){u.taunt=Math.max(u.taunt||0,sk.taunt20);}
  if(sk.cleanse20){let n=0;aliveH().forEach(h=>{n+=clearSt(h,s=>!isBuff(s));});if(n)log(`${u.name}の<b>${sk.n}</b>！ 弱体を${n}つ打ち消した`);}
- if(sk.heal20){const hb=1+sumEv(u,'healB')/100;aliveH().forEach(h=>{const v=Math.round(h.mhp*sk.heal20*hb);h.hp=Math.min(h.mhp,h.hp+v);pop(h,'+'+v,'#7dffa8');each(u,'healed',h);});}
+ if(sk.heal20){const hb=1+sumEv(u,'healB')/100;aliveH().forEach(h=>{const v=Math.round(h.mhp*sk.heal20*hb*(h.healRecv||1));h.hp=Math.min(h.mhp,h.hp+v);pop(h,'+'+v,'#7dffa8');each(u,'healed',h);});}
  if(sk.ct20)aliveH().forEach(h=>{if(h!==u)h.ct=Math.max(0,h.ct*(1-sk.ct20));});
  refresh();await wait(380);try{ANIM.idle(u,200);}catch(e){}setCT(u,sk.w||1);}
 
@@ -285,7 +283,7 @@ async function support(u,sk){u.sp-=sk.sp||0;log(`${u.name}の<b>${sk.n}</b>！`)
  B._fx20=new Set();const r=await _et(e);await drain(B.cq20);return r;};}
 
 /* オート：支援技も使う */
-{const _ap=autoPick;autoPick=function(u){const r=_ap(u);try{if(!r||r.aw||!r.sk||r.sk.k==='reso'||u.aw)return r;
+{const _ap=autoPick;autoPick=function(u){const r=_ap(u);try{if(!r||r.aw||!r.sk||u.aw)return r;
   const own=(u.skills||[]).map(k=>SK[k]).filter(s=>s&&s.k==='sup20'&&(s.sp||0)<=u.sp);
   const heal=own.find(s=>s.role==='heal'&&aliveH().some(h=>h.hp<h.mhp*.5));if(heal)return{sk:heal};
   const bf=own.find(s=>s.role!=='heal'&&!(s.fx20||[]).every(f=>f.on==='enemies'||(f.on==='self'?hasSt(u,f.k):aliveH().every(h=>hasSt(h,f.k)))));if(bf&&Math.random()<.35)return{sk:bf};

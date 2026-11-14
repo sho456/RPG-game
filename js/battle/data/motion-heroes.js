@@ -52,7 +52,7 @@ BXS.def('hakua:atk',{kind:'melee',dashMs:150,
  strike:[{ms:80,do:[[0,'pose',{mL:2,mF:6},50,'in'],[0,'ghost',{col:'#bff4ff',n:2,gap:18,dur:150}]]},
          {ms:95,do:[[0,'pose',{mL:4,mB:3,mF:8,mS:-1},60,'in'],[0,'ghost',{col:'#bff4ff',n:2,gap:18,dur:150}]]},
          {ms:130,do:[[0,'pose',{mR:-25,mU:3,mF:7},90,'in'],[0,'ghost',{col:'#bff4ff',n:3,gap:22,dur:170}]]}],
- impact:c=>[[0,'fx','flare',{ramp:'氷',rays:8,s:c.n%3===0?1.3:.9,rot:c.n*.5}],[0,'fx','shock',{ramp:'氷',r0:1,r1:c.n%3===0?13:9,dur:200}],[0,'fx','sparks',{ramp:'氷',n:4}],[0,'shake',c.n%3===0?5:2]]});
+ impact:c=>[[0,'fx','flare',{ramp:'冷',rays:8,s:c.n%3===0?1.3:.9,rot:c.n*.5}],[0,'fx','shock',{ramp:'冷',r0:1,r1:c.n%3===0?13:9,dur:200}],[0,'fx','sparks',{ramp:'冷',n:4}],[0,'shake',c.n%3===0?5:2]]});
 /* ジン（爪）：身を沈めて飛びかかり、三本の爪あとを刻む */
 BXS.def('jin:atk',{kind:'melee',dashMs:200,
  strike:{ms:170,do:[[0,'pose',{mS:2,mL:-1},90],[95,'pose',{mL:4,mB:3,mF:6,mU:3,mS:-2},70,'in'],[95,'ghost',{col:'#e8c890',n:2,gap:24}]]},
@@ -63,17 +63,17 @@ BXS.def('valk:atk',{kind:'melee',dashMs:230,
  impact:[[0,'fx','crescent',{ramp:DRAGON,r:18,w:6,a0:-2.2,a1:1,dur:270,edge:1}],[40,'fx','flame',{on:'tf',s:.6,dur:320,embers:5}],[0,'fx','flare',{ramp:DRAGON,s:1.2}],[0,'shake',6]]});
 /* ミレイユ（魔導書）：足元に三角の陣。書から火の魔弾を撃つ */
 BXS.def('mire:atk',{kind:'cast',
- strike:{ms:330,do:[[0,'pose',{mB:-2,mS:-1,mU:1},160],[0,'fx','circle',{on:'af',ramp:'炎',r:8,style:3,step:1,dur:300,glow:0}],[60,'fx','gather',{on:'a',dx:6,dy:-6,ramp:'炎',n:6,ms:150,r:9}],
-  [200,'pose',{mB:2,mF:1},50],[200,'fx','proj',{on:'a',dx:8,dy:-6,to:'t',kind:'orb',ramp:'炎',ms:130}]]},
- impact:[[0,'fx','flame',{s:.55,dur:300,embers:5}],[0,'fx','flare',{ramp:'炎',rays:6,s:.9}],[0,'shake',2]]});
+ strike:{ms:330,do:[[0,'pose',{mB:-2,mS:-1,mU:1},160],[0,'fx','circle',{on:'af',ramp:'熱',r:8,style:3,step:1,dur:300,glow:0}],[60,'fx','gather',{on:'a',dx:6,dy:-6,ramp:'熱',n:6,ms:150,r:9}],
+  [200,'pose',{mB:2,mF:1},50],[200,'fx','proj',{on:'a',dx:8,dy:-6,to:'t',kind:'orb',ramp:'熱',ms:130}]]},
+ impact:[[0,'fx','flame',{s:.55,dur:300,embers:5}],[0,'fx','flare',{ramp:'熱',rays:6,s:.9}],[0,'shake',2]]});
 /* ノア（聖杖）：頭上に光の輪。弧を描いて落ちる光の珠 */
 BXS.def('noah:atk',{kind:'cast',
- strike:{ms:340,do:[[0,'pose',{mU:2,mS:-1},170],[0,'fx','shock',{on:'ah',ramp:'光',r0:2,r1:7,sq:.3,dur:300}],[200,'pose',{mB:2},50],[200,'fx','proj',{on:'ah',dx:4,to:'t',kind:'orb',ramp:'光',ms:140,arc:9,s:.8}]]},
- impact:[[0,'fx','pillar',{on:'tf',ramp:'光',w:3.5,h:40,dur:300}],[0,'fx','glint',{ramp:'光',s:1.2}],[0,'shake',2]]});
+ strike:{ms:340,do:[[0,'pose',{mU:2,mS:-1},170],[0,'fx','shock',{on:'ah',ramp:'陽',r0:2,r1:7,sq:.3,dur:300}],[200,'pose',{mB:2},50],[200,'fx','proj',{on:'ah',dx:4,to:'t',kind:'orb',ramp:'陽',ms:140,arc:9,s:.8}]]},
+ impact:[[0,'fx','pillar',{on:'tf',ramp:'陽',w:3.5,h:40,dur:300}],[0,'fx','glint',{ramp:'陽',s:1.2}],[0,'shake',2]]});
 /* クロウ（大鎌・呪術）：手元に闇を溜め、鎌の形の波として飛ばす。当たると内へ潰れる */
 BXS.def('crow:atk',{kind:'cast',
- strike:{ms:330,do:[[0,'pose',{mL:-2,mB:2},170],[0,'fx','orb',{on:'a',dx:8,dy:-2,ramp:'闇',r:4,dur:200,orbit:4}],[190,'pose',{mL:3,mB:3,mF:2},50,'in'],[190,'fx','proj',{on:'a',dx:9,dy:-2,to:'t',kind:'wave',ramp:'闇',ms:140,arc:0}]]},
- impact:[[0,'fx','orb',{ramp:'闇',r:7,mode:'implode',dur:300}],[0,'shake',3]]});
+ strike:{ms:330,do:[[0,'pose',{mL:-2,mB:2},170],[0,'fx','orb',{on:'a',dx:8,dy:-2,ramp:'陰',r:4,dur:200,orbit:4}],[190,'pose',{mL:3,mB:3,mF:2},50,'in'],[190,'fx','proj',{on:'a',dx:9,dy:-2,to:'t',kind:'wave',ramp:'陰',ms:140,arc:0}]]},
+ impact:[[0,'fx','orb',{ramp:'陰',r:7,mode:'implode',dur:300}],[0,'shake',3]]});
 /* セレス（時の杖）：浮いたまま杖を振り、星の欠片を一直線に撃つ。当たると輪が縮む（時が巻き戻る印） */
 BXS.def('celes:atk',{kind:'cast',
  strike:{ms:310,do:[[0,'pose',{mU:4,mB:-1},160],[0,'fx','circle',{on:'af',ramp:ASTRAL,r:8,style:6,step:1,spin:-3,dur:300,glow:0}],[190,'pose',{mU:3,mB:2},50],[190,'fx','proj',{on:'a',dx:8,dy:-5,to:'t',kind:'shard',ramp:ASTRAL,ms:120,arc:0}]]},
@@ -93,15 +93,15 @@ function react(t,pw,r){if(!t||t.side!==0||!t.A||t.A.none||!t.A.rig||!t.A.rig.spx
 /* ---------- 5. 勝利 ---------- */
 const T=ms=>ANIM.T(ms),to=(h,p,ms,e)=>ANIM.to(h,p,ms,e),fx=(n,h,w,o)=>{const[x,y]=BX.at(h,w);BXP[n](x+(o&&o.dx||0)*BX.dir(h),y+(o&&o.dy||0),o||{});};
 const VICT={
- async rio(h){ANIM.move(h,0,0,340,'lin',8);await to(h,{mU:3,mB:-2,mS:-2},170);fx('glint',h,'head',{dx:4,dy:-2,ramp:'光',s:1.3});await to(h,{mB:-2,mS:-1,mU:1},200,'in');},/* 跳ねて剣を掲げる */
+ async rio(h){ANIM.move(h,0,0,340,'lin',8);await to(h,{mU:3,mB:-2,mS:-2},170);fx('glint',h,'head',{dx:4,dy:-2,ramp:'陽',s:1.3});await to(h,{mB:-2,mS:-1,mU:1},200,'in');},/* 跳ねて剣を掲げる */
  async gald(h){await to(h,{mS:2,mL:1},220);fx('dust',h,'foot',{n:4});BX.shake(2);await to(h,{mS:-1,mB:-3},260,'out');},/* 剣を地に突き、胸を張る */
- async mire(h){for(let i=0;i<2;i++){ANIM.move(h,0,0,220,'lin',5);await to(h,{mS:-1,mU:1},110);await to(h,{mS:1},110);}fx('rise',h,'foot',{ramp:'炎',n:6,w:10});await to(h,{mB:-2,mS:-1},160);},/* 小さく二度跳ねる */
+ async mire(h){for(let i=0;i<2;i++){ANIM.move(h,0,0,220,'lin',5);await to(h,{mS:-1,mU:1},110);await to(h,{mS:1},110);}fx('rise',h,'foot',{ramp:'熱',n:6,w:10});await to(h,{mB:-2,mS:-1},160);},/* 小さく二度跳ねる */
  async shion(h){ANIM.move(h,0,0,330,'lin',11);BX.ghost(h,{col:'#8ff0a8',n:4,gap:60});await to(h,{mR:-360,mU:2},330,'lin');await to(h,{mR:0,mS:1,mL:1},10);await to(h,{mL:1,mS:0},140);},/* 後ろへ宙返り */
- async noah(h){fx('rise',h,'foot',{ramp:'光',n:10,w:12,h:30});await to(h,{mU:4,mS:-1},420,'io');fx('shock',h,'head',{ramp:'光',r0:2,r1:9,sq:.3});await to(h,{mU:3,mS:-1,mB:-1},260);},/* 光に包まれて浮く */
+ async noah(h){fx('rise',h,'foot',{ramp:'陽',n:10,w:12,h:30});await to(h,{mU:4,mS:-1},420,'io');fx('shock',h,'head',{ramp:'陽',r0:2,r1:9,sq:.3});await to(h,{mU:3,mS:-1,mB:-1},260);},/* 光に包まれて浮く */
  async erna(h){await to(h,{mL:-2,mB:-3},200);fx('glint',h,'head',{dx:6,dy:-4,ramp:'雷',s:1.2});await to(h,{mL:-1,mB:-2,mS:-1},240);},/* 弓を高く掲げる */
  async balza(h){await to(h,{mS:-2,mU:2},160);await to(h,{mS:3},70,'in');BX.shake(4);fx('dust',h,'foot',{n:6,s:1.2});fx('shock',h,'foot',{ramp:'地',r1:14,sq:.3,layer:0});await to(h,{mS:-1,mB:-2},260);},/* 足を踏み鳴らして笑う */
- async crow(h){fx('gather',h,'mid',{ramp:'闇',n:10,r:16,ms:420});await to(h,{mL:-2,mB:-1},420,'io');fx('orb',h,'mid',{dx:7,dy:-3,ramp:'闇',r:3,dur:420,orbit:4});await to(h,{mL:-1},200);},/* 静かに背を伸ばし、指先に火を灯す */
- async hakua(h){await to(h,{mF:5,mL:2},70,'in');fx('flare',h,'mid',{dx:10,ramp:'氷',s:.8,rays:6});await to(h,{mF:0},90);await to(h,{mF:5,mL:3,mB:2},70,'in');fx('flare',h,'mid',{dx:10,dy:-3,ramp:'氷',s:.8,rays:6,rot:.5});ANIM.move(h,0,0,260,'lin',7);await to(h,{mU:2,mS:-2,mB:-2},240);},/* 二連の突きから拳を突き上げる */
+ async crow(h){fx('gather',h,'mid',{ramp:'陰',n:10,r:16,ms:420});await to(h,{mL:-2,mB:-1},420,'io');fx('orb',h,'mid',{dx:7,dy:-3,ramp:'陰',r:3,dur:420,orbit:4});await to(h,{mL:-1},200);},/* 静かに背を伸ばし、指先に火を灯す */
+ async hakua(h){await to(h,{mF:5,mL:2},70,'in');fx('flare',h,'mid',{dx:10,ramp:'冷',s:.8,rays:6});await to(h,{mF:0},90);await to(h,{mF:5,mL:3,mB:2},70,'in');fx('flare',h,'mid',{dx:10,dy:-3,ramp:'冷',s:.8,rays:6,rot:.5});ANIM.move(h,0,0,260,'lin',7);await to(h,{mU:2,mS:-2,mB:-2},240);},/* 二連の突きから拳を突き上げる */
  async jin(h){for(let i=0;i<2;i++){ANIM.move(h,0,0,260,'lin',10);await to(h,{mS:-2,mB:-1},130);await to(h,{mS:2},130,'in');fx('dust',h,'foot',{n:3});}await to(h,{mS:-1,mB:-2},160);},/* 大きく二度跳ねる */
  async celes(h){fx('petals',h,'mid',{ramp:ASTRAL,n:10,r:10});await to(h,{mU:6,mL:-1},260,'io');fx('circle',h,'foot',{ramp:ASTRAL,r:10,style:6,step:2,dur:700});await to(h,{mU:5,mB:-1},300);},/* 高く浮き、星を散らす */
  async valk(h){await to(h,{mS:1,mB:3},200);BX.shake(5);fx('shock',h,'mid',{ramp:DRAGON,r0:4,r1:22,dur:380});fx('shock',h,'mid',{ramp:DRAGON,r0:2,r1:15,dur:320,delay:110});await to(h,{mS:-2,mB:-3,mL:-1},110,'out');await T(260);}};/* 身を沈めてから天へ咆える */

@@ -15,7 +15,7 @@ import os, re, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DOC = os.path.join(ROOT, 'docs', 'BATTLE.md')
 BATTLE = ['startBattle', 'run', 'nextActor', 'heroTurn', 'enemyTurn', 'doAction', 'hit', 'calc', 'hurt', 'kill', 'pop',
-          'awaken', 'endAw', 'reso', 'end', 'rewards', 'enemy', 'hero', 'refresh', 'draw', 'frameOf']
+          'awaken', 'endAw', 'end', 'rewards', 'enemy', 'hero', 'refresh', 'draw', 'frameOf']
 
 order = re.findall(r'<script src="([^"]+)"', open(os.path.join(ROOT, 'index.html')).read())
 DEF = re.compile(r'^(?:async\s+)?function\s+([A-Za-z_]\w*)\s*\(', re.M)

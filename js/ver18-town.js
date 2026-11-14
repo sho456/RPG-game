@@ -158,7 +158,7 @@ townMenu=function(m){WMS.on=false;TSC='home';if(scene!=='town')show('town');cons
  const tile=(go,ic,l,s,b)=>`<button class="hn${b?' on':''}" data-go="${go}"><img src="${ICON[ic]}"><b>${l}</b><small>${s}</small>${b?`<i>${b===true?'!':b}</i>`:''}</button>`;
  const c=$('#cmd');c.className='home';c.innerHTML=`<button class="hgo" data-go="go"><img src="${ICON.go}"><span><b>出 撃</b><small>ワールドマップへ　出撃${G.sorties}回</small></span><em>戦闘力<b>${fmt(G.party.reduce((s,id)=>s+power(id),0))}</b></em><div class="hgf">${G.party.map(id=>`<img src="${face(id)}">`).join('')}</div></button>
   <div class="hgrid">${tile('party','eq','編成','装備・星盤',pts)}${tile('tavern','bar','酒場','依頼・絆・図鑑',bn+qn||0)}${tile('smith','smith','鍛冶屋','強化・売買',0)}${tile('shop','shop','道具屋','回復薬・素材',0)}
-  ${tile('appraise','eye','鑑定屋',un?`未鑑定 ${un}`:'未鑑定品を鑑定',un||0)}${tile('star','star','星詠みの塔','星盤・ジョブ・試練',pts)}${tile('dev','door','街の発展',`施設を育てる`,gd?true:0)}${tile('rec','rec','記録・設定','セーブ・書き出し',0)}</div>`;
+  ${tile('appraise','eye','鑑定屋',un?`未鑑定 ${un}`:'未鑑定品を鑑定',un||0)}${tile('star','star','星詠みの塔','星盤・試練・試練',pts)}${tile('dev','door','街の発展',`施設を育てる`,gd?true:0)}${tile('rec','rec','記録・設定','セーブ・書き出し',0)}</div>`;
  tip('town');};
 document.addEventListener('click',e=>{const t=e.target.closest('[data-go]');if(!t||scene!=='town'||TSC!=='home'||t.disabled)return;if(!t.closest('#cmd.home')&&!t.closest('#labels'))return;SFX.sel();goFac(t.dataset.go);});
 {const _sh=show;show=function(m){_sh(m);if(m!=='town')TSC='other';};}

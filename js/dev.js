@@ -6,7 +6,7 @@ function devGear(){G.inv=G.inv.filter(i=>!i.dev);for(const id of G.members){cons
 function devGame(){SAVE=DEVKEY;migrate(newGame());G.dev=1;G.gold=999999;G.tou=99999;
  for(const id of Object.keys(HB))if(!G.members.includes(id))newMember(id);
  Object.assign(G.flags,{boss1:true,boss2:true,boss3:true,boss4:true,boss5:true,boss6:true,boss7:true,mireMet:1,noahMet:1,ernaMet:1,balzaMet:1,crowChoice:'save',hakuaMet:1,jinMet:1,celesMet:1,valkMet:1});
- for(const id of G.members){const h=G.h[id];h.lv=55;h.xp=0;h.hp=null;h.awLv=3;for(const j in JOBS)h.jobs[j]={lv:10,xp:0};}
+ for(const id of G.members){const h=G.h[id];h.lv=55;h.xp=0;h.hp=null;h.awLv=3;}
  for(const k in G.fac)G.fac[k]=5;G.tower={cp:26,cur:26,max:30};G.kairou={cp:31,cur:31,max:31};devGear();devItems();devLegs();devRoyal();save();}
 function devItems(){for(const k in ITEMS)G.items[k]=9;for(const k in MATS)G.mats[k]=99;for(const k in STONES)G.stones[k]=9;}
 function devLegs(){Object.keys(LEG).filter(k=>!LEG[k].uq).forEach(k=>{const it=devLeg(k);if(it)G.inv.push(it);});}

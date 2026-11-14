@@ -108,6 +108,13 @@ W.sword=(C,T,x={})=>{const lv=T.lv;
  guard(C,x.guardC||T.t,8.2,lv>=2?5.6:4.6,1.8,{balls:lv>=1});
  if(lv>=3||x.ggem)dgem(C,x.ggem||T.gem,9.1,0,1.2);
  blade(C,x.blade||T.m,10,26.6,lv>=2?2.1:1.9,{tip:3.6,fuller:lv>=1?.7:0,edge:lv>=3?P.ice:null});};
+/* 短剣（ver0.38）：短い刃・小さな鍔・柄頭の宝石 */
+W.dagger=(C,T,x={})=>{const lv=T.lv;
+ C.dell(T.t,5.2,0,1.7,1.7);if(lv>=2)dgem(C,x.pgem||T.gem||P.gemV,5.2,0,.8);
+ grip(C,x.grip||T.g,6,11.4,2);
+ guard(C,x.guardC||T.t,11.6,lv>=2?4.6:3.8,1.6,{balls:lv>=1,sweep:lv>=2?.8:0});
+ if(lv>=3||x.ggem)dgem(C,x.ggem||T.gem,12.4,0,1);
+ blade(C,x.blade||T.m,13.2,23.6,lv>=2?1.9:1.7,{tip:3.4,w2:1.2,edge:lv>=3?P.ice:null,single:lv>=1});};
 W.gsword=(C,T,x={})=>{const lv=T.lv;
  C.dell(T.t,.6,0,2.1,2.1);grip(C,x.grip||T.g,1.6,7.4,2.4,1.4);
  C.dpoly(x.guardC||T.t,[[7.4,-6.4],[9.6,-6.4],[10.4,-4],[10.4,4],[9.6,6.4],[7.4,6.4],[8.2,4],[8.2,-4]]);

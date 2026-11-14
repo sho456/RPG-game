@@ -18,9 +18,6 @@ function syncIMG(){for(const k in SPDEF){try{const d=SPDEF[k],f=frameOf(k,'idle'
 syncIMG();
 {const _vk=voidKind;voidKind=function(k){const vk=_vk(k);try{if(!IMG[vk]||IMG[vk].width===16){const key=resolveSpr(vk),t=trimCanvas(frameOf(key,'idle',0,'').c);IMG[vk]=t;IMG[vk+'_w']=whiteOf(t);}}catch(e){}return vk;};}
 /* 行動順バー：新しい顔ドットで描き直す */
-/* 星臨・共鳴技のカットイン */
-if(typeof reso==='function'){const _rs=reso;reso=async function(u){const p=_rs(u);try{$('#cut').querySelectorAll('canvas').forEach(c=>{const id=c.dataset.id;if(!id||!SPDEF[id])return;c.width=c.height=24;const g=c.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(portrait(id,awO(1),24),0,0);});}catch(e){}
-  if(B){B.heroes.filter(h=>h.aw&&h.alive).forEach(h=>{setAni(h,'awaken',{sp:aSp(9),hold:1});const[mx]=uMid(h);FX('awaken',mx,feet(h)[1],{c:'#ff9ad6'});});}await p;if(B)B.heroes.forEach(h=>{if(h.alive&&h.an&&h.an.k==='awaken')setAni(h,'idle');});};}
 /* 会話の顔グラ（表情5種）：目・眉・口を描き分ける */
 exprFace=function(id,ex='n'){const key=id+':'+ex;if(EXC[key])return EXC[key];const k=SPDEF[id]?id:'rio',d=SPDEF[k],S=4,N=16,src=portrait(k,'',N),c=document.createElement('canvas');c.width=c.height=N*S;const g=c.getContext('2d');g.imageSmoothingEnabled=false;
  const t=document.createElement('canvas');t.width=t.height=N;const q=t.getContext('2d');q.drawImage(src,0,0);

@@ -27,21 +27,19 @@ const LATE=new Set(['dmgP','skDmg','critDmg','dmgCut']);
 try{Object.assign(SHORT,{dmgP:'与',skDmg:'威',critDmg:'撃',dmgCut:'護',magP:'魔',drop:'ド'});}catch(e){}
 
 /* ---------- 武器種と名前付き武器 ---------- */
-const WT={rio:'剣',gald:'大剣',mire:'魔導書',noah:'杖',shion:'双剣',erna:'弓',balza:'斧',crow:'大鎌',hakua:'手甲',jin:'爪',celes:'砂時計',valk:'竜剣'};
+const WT={rio:'剣',gald:'大剣',mire:'杖',noah:'杖',shion:'短剣',erna:'弓',balza:'斧',crow:'杖',hakua:'体術',jin:'双剣',celes:'杖',valk:'大剣'};
 /* [レアリティ, 名前, 固有の効果] */
 const WN={
  剣:[[1,'騎士の剣',{crit:4}],[1,'疾風の剣',{spd:.6}],[2,'蒼月の剣',{weakDmg:14}],[2,'灯火の剣',{atkP:6}],[3,'星剣ルミナス',{awDmg:16}],[3,'天剣アルクス',{atkP:9}]],
- 大剣:[[1,'守護の大剣',{defP:5}],[1,'岩砕の大剣',{atkP:4}],[2,'城壁の大剣',{mhpP:8}],[2,'獅子王の大剣',{crit:6}],[3,'聖騎士の大剣',{defP:10}],[3,'大地の大剣',{atkP:9}]],
- 魔導書:[[1,'炎の魔導書',{magP:4}],[1,'氷の魔導書',{spGain:4}],[2,'双極の魔導書',{weakDmg:14}],[2,'星詠みの魔導書',{magP:7}],[3,'原初の魔導書',{magP:10}],[3,'紅蓮の魔導書',{awDmg:16}]],
- 杖:[[1,'祈りの杖',{resP:5}],[1,'癒しの杖',{spGain:4}],[2,'聖銀の杖',{magP:6}],[2,'天啓の杖',{startAG:14}],[3,'大司教の杖',{resP:10}],[3,'星霊の杖',{magP:9}]],
- 双剣:[[1,'影の双剣',{crit:4}],[1,'疾風の双剣',{spd:.6}],[2,'夜叉の双剣',{atkP:6}],[2,'燕返しの双剣',{spd:1}],[3,'朧月の双剣',{crit:9}],[3,'修羅の双剣',{atkP:9}]],
- 弓:[[1,'狩人の弓',{crit:4}],[1,'雷の弓',{weakDmg:10}],[2,'鷹目の弓',{crit:7}],[2,'迅雷の弓',{spd:.9}],[3,'天狼の弓',{weakDmg:20}],[3,'流星の弓',{atkP:9}]],
+ 短剣:[[1,'影の短剣',{crit:4}],[1,'疾風の短剣',{spd:.6}],[2,'夜叉の短剣',{atkP:6}],[2,'燕返しの短剣',{spd:1}],[3,'朧月の短剣',{crit:9}],[3,'修羅の短剣',{atkP:9}]],
+ 大剣:[[1,'守護の大剣',{defP:5}],[1,'岩砕の大剣',{atkP:4}],[1,'竜鱗の大剣',{defP:5}],[1,'火竜の大剣',{atkP:4}],[2,'城壁の大剣',{mhpP:8}],[2,'獅子王の大剣',{crit:6}],[2,'黒鱗の大剣',{atkP:7}],[2,'竜騎士の大剣',{crit:6}],
+  [3,'聖騎士の大剣',{defP:10}],[3,'大地の大剣',{atkP:9}],[3,'灼竜の大剣',{atkP:10}],[3,'竜王家の大剣',{awDmg:16}]],
  斧:[[1,'鍛冶師の斧',{atkP:4}],[1,'戦士の斧',{mhpP:5}],[2,'溶岩の斧',{atkP:7}],[2,'巨人の斧',{defP:7}],[3,'炎帝の斧',{atkP:10}],[3,'山砕きの斧',{awDmg:16}]],
- 大鎌:[[1,'呪いの大鎌',{magP:4}],[1,'闇夜の大鎌',{crit:4}],[2,'死神の大鎌',{weakDmg:14}],[2,'魂狩りの大鎌',{magP:7}],[3,'葬送の大鎌',{magP:10}],[3,'黄泉の大鎌',{awDmg:16}]],
- 手甲:[[1,'拳士の手甲',{atkP:4}],[1,'氷の手甲',{spd:.6}],[2,'吹雪の手甲',{crit:6}],[2,'武神の手甲',{atkP:7}],[3,'氷帝の手甲',{atkP:10}],[3,'金剛の手甲',{defP:10}]],
- 爪:[[1,'獣の爪',{atkP:4}],[1,'狩猟の爪',{crit:4}],[2,'獣王の爪',{atkP:7}],[2,'疾風の爪',{spd:.9}],[3,'大地の爪',{mhpP:10}],[3,'神獣の爪',{atkP:10}]],
- 砂時計:[[1,'刻の砂時計',{spd:.6}],[1,'銀の砂時計',{magP:4}],[2,'星の砂時計',{magP:7}],[2,'逆巻きの砂時計',{startAG:14}],[3,'永劫の砂時計',{magP:10}],[3,'時の女王の砂時計',{spd:1.4}]],
- 竜剣:[[1,'竜鱗の竜剣',{defP:5}],[1,'火竜の竜剣',{atkP:4}],[2,'黒鱗の竜剣',{atkP:7}],[2,'竜騎士の竜剣',{crit:6}],[3,'灼竜の竜剣',{atkP:10}],[3,'竜王家の竜剣',{awDmg:16}]]};
+ 体術:[[1,'拳士の手甲',{atkP:4}],[1,'氷の手甲',{spd:.6}],[2,'吹雪の手甲',{crit:6}],[2,'武神の手甲',{atkP:7}],[3,'氷帝の手甲',{atkP:10}],[3,'金剛の手甲',{defP:10}]],
+ 弓:[[1,'狩人の弓',{crit:4}],[1,'雷の弓',{weakDmg:10}],[2,'鷹目の弓',{crit:7}],[2,'迅雷の弓',{spd:.9}],[3,'天狼の弓',{weakDmg:20}],[3,'流星の弓',{atkP:9}]],
+ 杖:[[1,'祈りの杖',{resP:5}],[1,'癒しの杖',{spGain:4}],[1,'熱の杖',{magP:4}],[1,'刻の杖',{spd:.6}],[1,'呪いの杖',{magP:4}],[2,'聖銀の杖',{magP:6}],[2,'天啓の杖',{startAG:14}],[2,'双極の杖',{weakDmg:14}],[2,'死神の杖',{weakDmg:14}],[2,'星の杖',{magP:7}],
+  [3,'大司教の杖',{resP:10}],[3,'星霊の杖',{magP:9}],[3,'原初の杖',{magP:10}],[3,'時の女王の杖',{spd:1.4}],[3,'葬送の杖',{magP:10}]],
+ 双剣:[[1,'獣の双剣',{atkP:4}],[1,'狩猟の双剣',{crit:4}],[2,'獣王の双剣',{atkP:7}],[2,'疾風の双剣',{spd:.9}],[3,'大地の双剣',{mhpP:10}],[3,'神獣の双剣',{atkP:10}]]};
 /* 終盤の系統（装備Lv60・90 から）：武器の名前は「系統＋の＋武器種」 */
 const LATEW=[[60,1,'星鉄',{dmgP:4}],[60,2,'星銀',{skDmg:10}],[90,3,'天極',{dmgP:8,critDmg:15}]];
 
@@ -72,7 +70,7 @@ Object.assign(LEG,{
  haou:{n:'覇王の盾',slot:'sub',d:'戦闘開始時、最大HP25%の障壁を張る'},tengan:{n:'天眼の冠',slot:'sub',d:'会心率+15%・会心ダメ+50%'},
  shuuen:{n:'終焉の指輪',slot:'acc',d:'与ダメ+20%'},seishin:{n:'星神の首飾り',slot:'acc',d:'技の威力+30%'},
  fue:{n:'不壊の大剣',slot:'w',who:'gald',d:'挑発・防御中に受けるダメージ-40%'},tsukikage:{n:'月影の双剣',slot:'w',who:'shion',d:'素早さ+20%・会心率+10%'},
- tenkei:{n:'天恵の杖',slot:'w',who:'noah',d:'回復量+50%'},enjin:{n:'炉神の斧',slot:'w',who:'balza',d:'炎属性の与ダメ+40%'},
+ tenkei:{n:'天恵の杖',slot:'w',who:'noah',d:'回復量+50%'},enjin:{n:'炉神の斧',slot:'w',who:'balza',d:'熱属性の与ダメ+40%'},
  juushin:{n:'獣神の爪',slot:'w',who:'jin',d:'HP50%以下のとき与ダメ+50%・被ダメ-20%'}});
 for(const k in LEG)LEG[k].slot=NS(LEG[k].slot);
 /* レジェンドの見た目（既存の絵から近いものを使う） */
@@ -84,7 +82,7 @@ const LPS={
  L_haou:{n:'覇王の盾',d:LEG.haou.d,start:u=>V20.addSt(u,'shield',Math.round(u.mhp*.25),99)},
  L_fue:{n:'不壊の大剣',d:LEG.fue.d,inc:t=>t.taunt>0||t.guard?.6:1},
  L_tenkei:{n:'天恵の杖',d:LEG.tenkei.d,healB:()=>50},
- L_enjin:{n:'炉神の斧',d:LEG.enjin.d,out:(a,t,sk)=>sk&&sk.el==='炎'?1.4:1},
+ L_enjin:{n:'炉神の斧',d:LEG.enjin.d,out:(a,t,sk)=>sk&&sk.el==='熱'?1.4:1},
  L_juushin:{n:'獣神の爪',d:LEG.juushin.d,out:a=>a.hp<=a.mhp*.5?1.5:1,inc:t=>t.hp<=t.mhp*.5?.8:1}};
 Object.assign(V20.PS,LPS);
 {const _h=hero;hero=function(id){const u=_h(id);try{u.ps20=u.ps20||[];for(const l of u.legs||[])if(LPS['L_'+l]&&!u.ps20.some(p=>p.id==='L_'+l))u.ps20.push({id:'L_'+l,v:0});}catch(e){console.error(e);}return u;};}
@@ -102,7 +100,7 @@ function catPick(slot,rar,ilv){const L=CAT[slot].filter(e=>(e[4]||0)<=ilv);const
  return pick(L.filter(e=>e[0]===0));}
 function setBase(it,b,mul=1){it.base={};for(const k in b){const[a,c]=b[k];let v=(a+c*it.ilv)*mul;it.base[k]=k==='spd'?+v.toFixed(1):Math.round(v);}}
 function weaponName(it){const t=WT[it.who];if(!t||it.leg)return;const late=LATEW.filter(([lv,r])=>it.ilv>=lv&&r===it.rar);
- if(late.length&&Math.random()<.5){const[, ,nm,fx]=pick(late);it.name=nm+'の'+t;addFx(it,fx);return;}
+ if(late.length&&Math.random()<.5){const[, ,nm,fx]=pick(late);it.name=nm+'の'+(t==='体術'?'手甲':t);addFx(it,fx);return;}
  const ns=(WN[t]||[]).filter(x=>x[0]===it.rar);if(!ns.length)return;const[,nm,fx]=pick(ns);it.name=nm;addFx(it,fx);for(const k in it.base)it.base[k]=Math.round(it.base[k]*(1+.04*it.rar));}
 function inflate(it){const g=GINF(it.ilv);if(g===1)return;for(const k in it.base)it.base[k]=k==='spd'?+(it.base[k]*Math.sqrt(g)).toFixed(1):Math.round(it.base[k]*g);}
 genItem=function(ilv,minR=0,bonus=0,slot=null,rarFix=null){
@@ -120,7 +118,7 @@ genItem=function(ilv,minR=0,bonus=0,slot=null,rarFix=null){
  if(it.leg)it.name=LEG[it.leg].n;
  const keys=Object.keys(OPS).filter(k=>ilv>=60||!LATE.has(k));
  for(let i=0;i<rar;i++){
-  if(Math.random()<.12&&!it.ops.some(o=>o.k==='atkEl')){it.ops.push({k:'atkEl',v:pick(['光','地','打'])});continue;}
+  if(Math.random()<.12&&!it.ops.some(o=>o.k==='atkEl')){it.ops.push({k:'atkEl',v:pick(['陽','熱','雷'])});continue;}
   const av=keys.filter(k=>!it.ops.some(o=>o.k===k));if(!av.length)break;const k=pick(av),[,,a,b]=OPS[k];
   let v=(a+(b-a)*Math.random())*(.6+.4*Math.min(1,ilv/10))*(1+rar*.08);it.ops.push({k,v:k==='spd'?+v.toFixed(1):Math.max(1,Math.round(v))});}
  it.sock=Array(it.rar>=3?2:it.rar>=2?1:0).fill(null);return it;};
@@ -136,7 +134,7 @@ try{royalRand=ilv=>royalItem(pick(['main','sub','crown','acc']),ilv);}catch(e){}
 /* ---------- 見た目（アイコン） ---------- */
 const TIER=['星鋼','銅','鉄','鋼'];
 const tierOf=it=>{const n=it.name||'';for(const t of TIER)if(n.startsWith(t+'の'))return t;return MATL(it.ilv||1);};
-const WK=[['竜剣','dsword'],['大剣','gsword'],['双剣','dual'],['魔導書','tome'],['大鎌','scythe'],['砂時計','glass'],['手甲','fist'],['爪','claw'],['剣','sword'],['杖','staff'],['弓','bow'],['斧','axe']];
+const WK=[['大剣','gsword'],['双剣','dual'],['短剣','dagger'],['手甲','fist'],['剣','sword'],['杖','staff'],['弓','bow'],['斧','axe'],['竜剣','dsword'],['魔導書','tome'],['大鎌','scythe'],['砂時計','glass'],['爪','claw']];
 const NAMED={'灯の護符':'charm','守りの護符':'charm','魔除けの護符':'charm','天使の護符':'charm','生命の指輪':'ring_life','疾風の指輪':'ring_wind','俊足の指輪':'ring_wind','魔石の首飾り':'neck_mag','賢者の首飾り':'neck_mag','星霊の首飾り':'neck_mag',
  '星砂の首飾り':'neck_sand','癒しの首飾り':'neck_sand','星銀の首飾り':'neck_sand','天極の首飾り':'L_senkou','天極の指輪':'L_kiseki','覇者の指輪':'L_futago','王家の冠':'S_royal_head','王家の鎧':'S_royal_body','王家の盾':'S_royal_sub','王家の指輪':'S_royal_acc',
  '星の冠':'S_royal_head','天極の冠':'S_royal_head'};

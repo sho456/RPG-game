@@ -45,7 +45,7 @@ function loadMenu(){log('書き出した文字列を貼り付けて「読み込�
 function title(){SAVE='astral_save_v1';show('title');const ov=$('#ov');ov.classList.remove('hide');ov.classList.add('ttl');const has=!!loadSave();let warn=false;
  ov.innerHTML=`<canvas id="tcv" width="180" height="320"></canvas><div class="tlogo">ASTRAL<br>BREAKER</div><div class="tsub">〜 星継ぎの灯 〜</div>
  <div class="tmenu"><button class="big" id="newg">はじめから</button><button class="big gold" id="cont" ${has?'':'disabled style="opacity:.35"'}>つづきから</button><button class="big" id="howto" style="height:40px;font-size:13px">遊び方</button></div>
- <div class="note" id="hw" style="display:none"><b>遊び方</b><br>・灯都で準備→「出撃」で各地へ。タップした場所へ歩く。<br>・魔物に<b>自分からぶつかると先制攻撃</b>。宝箱・採取ポイントを探そう。<br>・戦闘：弱点を突いて大ダメージ、AG100で<b>星臨</b>（行動を消費しない）。2人星臨で<b>共鳴技</b>。<br>・街に戻るとHP全回復＆自動セーブ。<b>星詠みの塔</b>で星盤とジョブ。</div>
+ <div class="note" id="hw" style="display:none"><b>遊び方</b><br>・灯都で準備→「出撃」で各地へ。タップした場所へ歩く。<br>・魔物に<b>自分からぶつかると先制攻撃</b>。宝箱・採取ポイントを探そう。<br>・戦闘：弱点を突いて大ダメージ、AG100で<b>星臨</b>（行動を消費しない）。<br>・街に戻るとHP全回復＆自動セーブ。<b>星詠みの塔</b>で星盤とジョブ。</div>
  <div class="tfoot"><button id="devg">開発者モード</button><div class="ver" id="verL">ver0.17</div></div>`;
  $('#howto').onclick=()=>{const h=$('#hw');h.style.display=h.style.display==='none'?'block':'none';};
  $('#devg').onclick=()=>{au();devStart();};
@@ -124,7 +124,7 @@ for(const k in STONES){const c=document.createElement('canvas');c.width=c.height
 const stoneTxt=k=>`${ii(ICON['st_'+k],STONES[k].c)}${STONES[k].n}（${Object.entries(STONES[k].v).map(([a,b])=>opTxt({k:a,v:b})).join('')}）`;
 const FAC={bar:['酒場','bar',l=>`戦闘の経験値+${(l-1)*5}%`],smith:['鍛冶屋','smith',l=>`強化上限+${Math.min(12,2+2*l)}${l>=2?'・OP付け替え':''}${l>=3?'・ソケット加工':''}${l>=4?'・品揃えにレア':''}`],
  eye:['鑑定屋','eye',l=>`鑑定でレジェンドに化ける確率${(l-1)*5}%・鑑定料${(l-1)*10}%引き`],shop:['道具屋','shop',l=>'品揃え：'+Object.values(ITEMS).filter(i=>(i.lv||1)<=l).map(i=>i.n).join('・')],
- tower:['星詠みの塔','star',l=>`ジョブ経験値+${(l-1)*15}%`],store:['倉庫','rec',l=>`持ち物の上限${200+(l-1)*75}個`],garden:['空中庭園','go',l=>l?`出撃ごとに素材と星石が育つ（Lv${l}）`:'未建設：建てると出撃のたびに素材が育つ']};
+ tower:['星詠みの塔','star',l=>`ひらめき率+${(l-1)*10}%`],store:['倉庫','rec',l=>`持ち物の上限${200+(l-1)*75}個`],garden:['空中庭園','go',l=>l?`出撃ごとに素材と星石が育つ（Lv${l}）`:'未建設：建てると出撃のたびに素材が育つ']};
 const fcost=(k,l)=>k==='garden'&&!l?{tou:60,gold:1000,haiseki:10}:{tou:40*l*l,gold:500*l*l,[l>=3?'kakera':'haiseki']:l>=3?l*2:l*6};
 const invCap=()=>200+(G.fac.store-1)*75;
 const ecap=()=>Math.min(12,2+2*G.fac.smith);

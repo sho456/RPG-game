@@ -1,12 +1,13 @@
-/* ===== ver0.37 戦闘システム刷新（能力値・習得・技セット・アビリティ・星盤・セーブ）=====
+/* ===== 戦闘システム（能力値・習得・技セット・アビリティ・陣形・セーブ）=====
  データは js/rs/data.js（RSD）。ここでは既存の仕組みに組み込む。
- ・能力値：8 種（腕力・体力・器用さ・素早さ・知力・精神・愛・魅力）。旧来の「攻撃」は武器種ごとの能力の配分から決まる
-   （Lv1 の強さは旧来と同じになるよう主能力を自動で決める。防御＝体力・精神＝精神・魔力＝知力・素早さ＝素早さ÷3 は旧来と同じ値）
-   器用さ→会心率、愛→回復量、魅力→追加効果の成功率・OD の溜まりやすさ
- ・技・術：キャラごとに 6 種（Lv・ひらめき・星盤・天星盤）＋ジョブの技 1 種。戦闘に持ち込めるのは 4 つ（技セット）
+ ・能力値：7 種（腕力・体力・器用さ・素早さ・知力・精神・魅力）。
+   旧来の内部値はこう対応する：防御＝体力、精神＝精神、魔力＝知力、素早さ（行動順の目盛り）＝素早さ÷3。
+   「攻撃」（技の威力）は武器種ごとの能力の配分から決まる（Lv1 の強さは旧来と同じになるよう主能力を自動で決める）
+ ・HP・LP・BP：LP はキャラごとの最大値。BP は［初期・最大・毎ターンの回復］をキャラごとに持つ
+ ・技・術：キャラごとに 6 種（Lv・ひらめき・星盤・天星盤）。戦闘に持ち込めるのは 4 つ（技セット）
  ・アビリティ：3 つ（Lv1・25・50 で解放、段階 I〜V）。星盤・天星盤のノードで強化
- ・星臨：AW の中身を「星臨アビリティ＋奥義」に置き換える
- セーブに増える項目：G.h[id].sset（技セット）・skx（技の熟練）・glim（ひらめいた技）・sseen（自動でセットした技）・G.form（陣形） */
+ ・陣形：並び順ごとの立ち位置と能力の補正
+ セーブの項目：G.h[id].sset（技セット）・skx（技の熟練）・glim（ひらめいた技）・sseen・lp（今のLP）・G.form（陣形） */
 'use strict';
 const RSC=(()=>{
 const D=RSD;
@@ -24,33 +25,54 @@ try{Object.assign(TERMS.GROUP,{phys:'技',mag:'術',seirin:'星臨',passive:'ア
  for(const k in N)if(TERMS.SKILL[k]){TERMS.SKILL[k].n=N[k];TERMS.SKILL[k].s=N[k].replace(/（.*）/,'');}TERMS.reset();}catch(e){console.error(e);}
 /* キャラの技の一覧（図鑑・演出ビューア・区分の判定が参照する）を新しい 6 種に。旧来の Lv 習得表（V20.LSK）は空にする */
 try{for(const id in D.LEARN){if(HB[id])HB[id].skills=D.LEARN[id].map(x=>x[0]);if(V20.LSK[id])V20.LSK[id]=[];}TERMS.reset();}catch(e){console.error(e);}
-/* ジョブの技は 1 つずつに統合 */
-try{for(const j in JOBS)if(D.JOBSK[j])JOBS[j].sk=[[1,D.JOBSK[j]]];}catch(e){console.error(e);}
 /* 道具・能力の呼び名 */
 try{if(ITEMS.ether)ITEMS.ether.d='BPを全回復';}catch(e){}
-try{if(OPS.spGain)OPS.spGain[0]='通常攻撃時BP';}catch(e){}
+try{if(OPS.spGain)OPS.spGain[0]='BP回復力';}catch(e){}
 
-/* ==================== 能力値（8 種） ==================== */
-function prof8(id){const b=HB[id],P=D.HERO[id]||{w:'剣',hand:{}},w=D.WPN[P.w]||D.WPN['剣'],g=b.g||{};
+/* ==================== 能力値（7 種） ==================== */
+const HP0=id=>D.HERO[id]||{w:'剣',el:null,lp:8,bp:[D.BP.start,D.BP.max,D.BP.regen],hand:{}};
+function prof7(id){const b=HB[id],P=HP0(id),W=D.WPN[P.w]||D.WPN['剣'],w=W.w,g=b.g||{};
  const base={vit:[b.def,g.def||'C'],wil:[b.res,g.res||'C'],int:[b.mag,g.mag||'C'],agi:[b.spd*3,g.spd||'C']};
  for(const k in P.hand)base[k]=P.hand[k].slice();
  const pk=Object.keys(w).sort((x,y)=>w[y]-w[x])[0];let rest=0;
  for(const k in w)if(k!==pk){if(!base[k])base[k]=[20,'C'];rest+=w[k]*base[k][0];}
  base[pk]=[Math.max(5,(b.atk-rest)/w[pk]),g.atk||'C'];
- for(const k of D.ST8)if(!base[k])base[k]=[20,'C'];
- return{base,w,pk,wp:P.w};}
-const PROF8={};const pf=id=>PROF8[id]||(PROF8[id]=prof8(id));
+ for(const k of D.ST7)if(!base[k])base[k]=[20,'C'];
+ return{base,w,pk,wp:P.w,W};}
+const PROF7={};const pf=id=>PROF7[id]||(PROF7[id]=prof7(id));
 /* Lv の能力値（装備・星盤を含まない素の値） */
-function rs8(id,lv){const P=pf(id),o={};for(const k of D.ST8){const[b0,gr]=P.base[k],f=k==='agi'?.3:1;let v=b0*(1+(GR[gr]||.06)*f*(lv-1));if(k!=='agi')v*=INF(lv);o[k]=Math.round(v);}return o;}
+function rs7(id,lv){const P=pf(id),o={};for(const k of D.ST7){const[b0,gr]=P.base[k],f=k==='agi'?.3:1;let v=b0*(1+(GR[gr]||.06)*f*(lv-1));if(k!=='agi')v*=INF(lv);o[k]=Math.round(v);}return o;}
 const comp=(w,s)=>{let v=0;for(const k in w)v+=w[k]*s[k];return v;};
-function derived(s){const m=D.ST8.reduce((a,k)=>a+s[k],0)/8;
- return{mean:m,critB:clamp(Math.round((s.dex/m-.8)*25),0,15),healMul:+clamp(.7+.4*s.lov/m,.8,1.6).toFixed(2),ailMul:+clamp(.6+.5*s.cha/m,.8,1.5).toFixed(2),odMul:+clamp(.8+.25*s.cha/m,.9,1.25).toFixed(2)};}
-{const _s=stats;stats=function(id){const o=_s(id);try{if(!HB[id]||!G.h[id])return o;const h=G.h[id],lv=h.lv,P=pf(id),s=rs8(id,lv);
+const mean7=s=>D.ST7.reduce((a,k)=>a+(s[k]||0),0)/7;
+/* 魅力：回復を受けたときの回復量（自分の能力値の平均との比） */
+const healRecv=s=>+clamp(.7+.45*s.cha/Math.max(1,mean7(s)),.85,1.45).toFixed(2);
+/* 魅力：回復アビリティの回復量 */
+const healAb=s=>+clamp(.75+.35*s.cha/Math.max(1,mean7(s)),.85,1.35).toFixed(2);
+/* 戦闘ユニットの 7 能力（味方：装備込みの値／敵：旧来の値から作る） */
+function unit7(u){if(u.s7)return u.s7;if(u.side===1){const a=u.atk||1,m=u.mag||1,sp=Math.round((u.spd||10)*3*(1+.018*Math.max(0,(u.lv||1)-1)));/* 敵の素早さは味方と同じ成長の目盛りに */
+  return u.s7={str:a,vit:u.def||1,dex:sp,agi:sp,int:m,wil:u.res||1,cha:Math.round((a+m)/4)};}
+ return u.s7={str:u.atk,vit:u.def,dex:u.atk,agi:Math.round(u.spd*3),int:u.mag,wil:u.res,cha:20};}
+{const _s=stats;stats=function(id){const o=_s(id);try{if(!HB[id]||!G.h[id])return o;const h=G.h[id],lv=h.lv,P=pf(id),s=rs7(id,lv);
   let g={},bo={};try{g=gear(id);bo=bonus(id);}catch(e){}
   const old=HB[id].atk*(1+(GR[HB[id].g.atk]||.06)*(lv-1))*INF(lv),now=comp(P.w,s),pP=(g.atkP||0)+(bo.atkP||0);
   o.atk=Math.max(1,Math.round(o.atk+(now-old)*(1+pP/100)));
-  const d=derived(s);o.crit=(o.crit||0)+d.critB;Object.assign(o,{rs8:s,rsW:P.wp,healMul:d.healMul,ailMul:d.ailMul,odMul:d.odMul,ougiUp:(bo.ougiUp||0)+abUps(id).O*30});
+  /* 装備・星盤込みの 7 能力（体力・精神・知力・素早さは内部値から） */
+  const s7=Object.assign({},s,{vit:o.def,wil:o.res,int:o.mag,agi:Math.round(o.spd*3)});
+  const X=HP0(id);
+  Object.assign(o,{s7,rsW:P.wp,healRecv:healRecv(s7),healAb:healAb(s7),lpMax:X.lp,bp0:X.bp[0],bpMax:X.bp[1],bpReg:X.bp[2],
+   ougiUp:(bo.ougiUp||0)+abUps(id).O*30});
  }catch(e){console.error(e);}return o;};}
+/* 命中率（0〜1）。同じ尺度どうしを比べる：
+ 技＝器用さ（自分の能力値の平均との比）＋素早さ（攻撃側 対 防御側）／術＝知力（平均との比）＋知力 対 精神
+ 目安：ふつうは 92〜100%、素早い相手には外れやすく、器用なキャラは当てやすい */
+const rel=(s,k,u)=>u&&u.side===1?1:s[k]/Math.max(1,mean7(s));/* 敵は標準（1.0） */
+function hitRate(a,t,sk){if(!a||!t||a.side===t.side||!sk)return 1;const A=unit7(a),T=unit7(t);
+ if(sk.k==='mag'){const x=A.int,y=T.wil;return clamp(.95+.08*(rel(A,'int',a)-1)+.1*(x-y)/Math.max(1,x+y),.8,1);}
+ const x=A.agi,y=T.agi;return clamp(.94+.12*(rel(A,'dex',a)-1)+.12*(x-y)/Math.max(1,x+y),.75,1);}
+/* 追加効果の成功率：状態異常は知力と魅力、能力変化・耐性変化は知力。相手の精神で下がる */
+const STATK7=['atk','def','mag','res','spd','crit','weak','mark'];
+function ailP(a,t,f){const p=f.p==null?1:f.p;if(!a||!t||a.side===t.side)return p;const A=unit7(a),T=unit7(t);
+ const x=STATK7.includes(f.k)?A.int:(A.int+A.cha)/2,y=T.wil;return Math.min(1,p*clamp(1+.8*(x-y)/Math.max(1,x+y),.4,1.6));}
 
 /* ==================== 技・術の習得とセット ==================== */
 const hh=id=>{const h=G.h[id];if(!h)return null;h.skx=h.skx||{};h.glim=h.glim||[];h.sseen=h.sseen||[];return h;};
@@ -59,9 +81,9 @@ function learned(id){const h=hh(id),o=[];if(!h)return o;
  for(const[k,how,lv]of D.LEARN[id]||[]){let ok=false;
   if(how==='lv')ok=h.lv>=lv;else if(how==='glim')ok=h.glim.includes(k);else if(how==='board')ok=(h.board||[]).includes('2,-2');else if(how==='board2')ok=(h.board2||[]).includes('2,-2');
   if(ok)o.push(k);}
- if(h.job&&D.JOBSK[h.job])o.push(D.JOBSK[h.job]);return o;}
+ return o;}
 /* 習得の方法の表示 */
-function howTxt(id,k){const e=(D.LEARN[id]||[]).find(x=>x[0]===k);if(!e){const j=Object.keys(D.JOBSK).find(x=>D.JOBSK[x]===k);return j?`ジョブ「${JOBS[j].n}」`:'';}
+function howTxt(id,k){const e=(D.LEARN[id]||[]).find(x=>x[0]===k);if(!e)return'';
  const[,how,lv]=e,g=SK[k].glim;return how==='lv'?`Lv${lv}`:how==='glim'?`ひらめき（Lv${lv}以上で「${SK[g.from].n}」を使うと閃くことがある）`:how==='board'?'星盤':'天星盤（Lv60〜）';}
 skillList=function(id){return learned(id);};
 /* 技セット（最大 4）。空きがあれば新しく覚えた技を自動で入れる（一度外した技は勝手に戻さない） */
@@ -76,10 +98,13 @@ function moveSet(id,k,d){const h=hh(id);setOf(id);const i=h.sset.indexOf(k),j=i+
 const profN=(id,k)=>{const h=hh(id);return h?h.skx[k]||0:0;};
 const profLv=(id,k)=>{const n=profN(id,k);let l=1;for(let i=0;i<D.PROF.length;i++)if(n>=D.PROF[i])l=i+1;return Math.min(10,l);};
 const profMul=(id,k)=>1+(profLv(id,k)-1)*.02;
-function costOf(u,sk){if(!sk||sk.basic||sk.k==='item'||sk.k==='reso')return 0;let c=sk.bp!=null?sk.bp:0;if(!c)return 0;
+function costOf(u,sk){if(!sk||sk.basic||sk.k==='item')return 0;let c=sk.bp!=null?sk.bp:0;if(!c)return 0;
  if(u&&u.side===0&&G.h[u.id]){const l=profLv(u.id,keyOf(sk));c-=(l>=4?1:0)+(l>=8?1:0);}
  try{c-=RSB.sumE(u,'bpcut',e=>RSB.cnd(e.c,u,null,sk));}catch(e){}
  return Math.max(1,c);}
+/* 回復術：使うと LP を消費する（自分の LP が 0 になる使い方はできない） */
+const isHealSpell=sk=>!!sk&&sk.ty==='術'&&(sk.k==='heal'||sk.k==='healAll'||sk.role==='heal'||!!sk.heal20)&&!sk.ougi;
+const lpCost=sk=>isHealSpell(sk)?D.HPLP.healLp:0;
 let KEYM=null;
 function keyOf(sk){if(!sk)return null;if(sk._k)return sk._k;if(!KEYM){KEYM=new Map();for(const k in SK)KEYM.set(SK[k],k);}return KEYM.get(sk)||null;}
 for(const k in D.NEW)SK[k]._k=k;
@@ -111,7 +136,7 @@ function effTxt(e){const c=e.c?cn(e.c):'',cc=c?`${c}、`:'',ON={self:'自分',al
  switch(e.t){
   case'dmg':return`${cc}与ダメ+${e.v}%`;case'cut':return e.v<0?`${cc}被ダメ+${-e.v}%`:`${cc}被ダメ-${e.v}%`;case'crit':return`${cc}会心率+${e.v}%`;case'critd':return`会心ダメ+${e.v}%`;
   case'stat':return`${{atk:'攻撃',def:'防御',mag:'魔力',res:'精神',spd:'素早さ',mhp:'最大HP'}[e.k]}+${e.v}%`;case'bp0':return`初期BP+${e.v}`;case'bpr':return`毎ターンのBP回復+${e.v}`;case'bpmax':return`BP上限+${e.v}`;
-  case'bpcut':return`${cc}消費BP-${e.v}`;case'od':return`OD上昇+${e.v}%`;case'chain':return`連携ダメ+${e.v}%`;case'ag':return`星臨ゲージ上昇+${e.v}%`;case'heal':return`回復量+${e.v}%`;
+  case'bpcut':return`${cc}消費BP-${e.v}`;case'st7':return`${D.ST7N[e.k]}${e.v>=0?'+':''}${e.v}%`;case'ag':return`星臨ゲージ上昇+${e.v}%`;case'heal':return`回復量+${e.v}%`;
   case'regen':return`毎ターン、${ON[e.on]||'自分'}のHPを${e.v}%回復`;
   case'start':return e.k==='shield'?`戦闘開始時、${ON[e.on]}に最大HP${e.v}%の障壁`:`戦闘開始時、${ON[e.on]}の${{atk:'攻撃',def:'防御',mag:'魔力',res:'精神',spd:'素早さ',prot:'被ダメ軽減'}[e.k]}${e.k==='prot'?e.v+'%':'+'+e.v+'%'}（${e.d}T）`;
   case'onaw':return`星臨した時、${ON[e.on]}の${{spd:'素早さ',def:'防御',atk:'攻撃'}[e.k]}${e.v>0?'+':''}${e.v}%（${e.d}T）`;
@@ -162,18 +187,31 @@ try{for(const x of['1','2','3','O'])V20.PS['ab_up'+x]={n:x==='O'?'奥義強化':
   u.rsE=abEffects(id);
   for(const e of u.rsE)if(e.t==='stat')applyStat(u,e);
   u.awTurn=(u.awTurn||0)+u.rsE.filter(e=>e.t==='awturn').reduce((a,e)=>a+e.v,0);
-  u.bpMax=D.BP.max;u.sp=D.BP.start;
+  const W=D.WPN[u.rsW]||D.WPN['剣'];u.wpn=u.rsW;u.elem=W.el;
+  u.s7=Object.assign({},u.s7||{});
+  u.bpMax=u.bpMax||D.BP.max;u.sp=u.bp0!=null?u.bp0:D.BP.start;
+  const h=G.h[id];u.lpMax=u.lpMax||8;u.lp=h&&h.lp!=null?clamp(h.lp,0,u.lpMax):u.lpMax;
+  if(u.lp<=0){u.alive=false;u.hp=0;}
  }catch(e){console.error(e);}return u;};}
 function applyStat(u,e){const k=e.k,m=1+e.v/100;if(k==='mhp'){const r=u.mhp?u.hp/u.mhp:1;u.mhp=Math.round(u.mhp*m);u.hp=Math.max(u.alive?1:0,Math.round(u.mhp*r));}else if(k==='spd')u.spd=+(u.spd*m).toFixed(2);else if(u[k]!=null)u[k]=Math.round(u[k]*m);
  if(u._b0&&u._b0[k]!=null)u._b0[k]=k==='spd'?+(u._b0[k]*m).toFixed(2):Math.round(u._b0[k]*m);}
+/* 7 能力の補正（陣形）：内部値にも反映する */
+const ST2IN={vit:'def',wil:'res',int:'mag',agi:'spd'};
+function applySt7(u,k,v){const m=1+v/100;if(u.s7&&u.s7[k]!=null)u.s7[k]=Math.round(u.s7[k]*m);
+ if(ST2IN[k])applyStat(u,{k:ST2IN[k],v});
+ else if(k==='str'||k==='dex'){const w=(D.WPN[u.wpn]||D.WPN['剣']).w[k]||0;if(w)applyStat(u,{k:'atk',v:v*w});}
+ else if(k==='cha'&&u.s7){u.healRecv=healRecv(u.s7);u.healAb=healAb(u.s7);}}
 
 /* ==================== 陣形 ==================== */
 const formOf=()=>D.FORM[G&&G.form]?G.form:'seikan';
-function formEffects(i){const F=D.FORM[formOf()];return(F.s[i]||[]).map(f=>Object.assign({src:F.n},f));}
-function applyForm(u,i){u.rsE=(u.rsE||[]).filter(e=>!e.form);const fe=formEffects(i).map(e=>Object.assign(e,{form:1}));for(const e of fe)if(e.t==='stat')applyStat(u,e);u.rsE=u.rsE.concat(fe);u.rsSlot=i;}
+function formEffects(i,f){const F=D.FORM[f||formOf()];return(F.s[i]||[]).map(x=>Object.assign({src:F.n},x));}
+function applyForm(u,i){u.rsE=(u.rsE||[]).filter(e=>!e.form);const fe=formEffects(i).map(e=>Object.assign(e,{form:1}));
+ for(const e of fe){if(e.t==='stat')applyStat(u,e);if(e.t==='st7')applySt7(u,e.k,e.v);}u.rsE=u.rsE.concat(fe);u.rsSlot=i;}
+/* 立ち位置（0〜1）。並び順 i の場所 */
+const formPos=(i,f)=>{const F=D.FORM[f||formOf()];return(F.p&&F.p[i])||[.5,i/3];};
 
 /* ==================== セーブ ==================== */
-{const _m=migrate;migrate=function(g){const r=_m(g);try{const G0=r||g;G0.form=G0.form||'seikan';for(const id in G0.h){const h=G0.h[id];if(!h)continue;h.skx=h.skx||{};h.glim=h.glim||[];h.sseen=h.sseen||[];}}catch(e){console.error(e);}return r;};}
+{const _m=migrate;migrate=function(g){const r=_m(g);try{const G0=r||g;if(!D.FORM[G0.form])G0.form='seikan';for(const id in G0.h){const h=G0.h[id];if(!h)continue;h.skx=h.skx||{};h.glim=h.glim||[];h.sseen=h.sseen||[];h.job=null;h.sset=Array.isArray(h.sset)?h.sset.filter(k=>!/^j_/.test(k)):h.sset;}}catch(e){console.error(e);}return r;};}
 
-return{D,pf,rs8,derived,learned,howTxt,setOf,toggleSet,moveSet,profN,profLv,profMul,costOf,keyOf,abRank,abUps,abEffects,awEffects,abDesc,abNext,abName,effTxt,resolve,active,
- formOf,formEffects,applyForm,applyStat,esc,clamp};})();
+return{D,pf,rs7,unit7,healRecv,healAb,hitRate,ailP,isHealSpell,lpCost,learned,howTxt,setOf,toggleSet,moveSet,profN,profLv,profMul,costOf,keyOf,abRank,abUps,abEffects,awEffects,abDesc,abNext,abName,effTxt,resolve,active,
+ formOf,formEffects,formPos,applyForm,applyStat,applySt7,esc,clamp};})();

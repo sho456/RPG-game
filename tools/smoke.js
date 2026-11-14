@@ -102,6 +102,18 @@ if (SHOTS) fs.mkdirSync(SHOTS, {recursive: true});
     /* 決着しなかった戦闘は打ち切る。進行中の手番が終わるまで待ってから次へ（古い戦闘の処理が次の戦闘に触れないように） */
     await step(name + ':close', `(()=>{if(B){B.over=true;}auto=false;setSpeed(1);try{document.querySelector('#ov').classList.add('hide');}catch(e){}})()`, 2500);
   }
+  /* ver0.38：連続戦闘のクエスト（戦闘 2 回以上）を AUTO で回し、ボタンを押さずに最後の戦闘まで進むか */
+  if (!NOBATTLE) {
+    await step('quest-auto', () => {auto = true;AM = 'f';setSpeed(2);speed = 4;G.party = ['rio', 'gald', 'celes', 'mire'];for (const id of G.members) {G.h[id].lv = 40;G.h[id].hp = null;}
+      for (const c of QD.CH) for (const q of c.qs || []) if (q.w.length >= 3 && q.lv <= 20) {window.__q = q.w.length;V31Q.qStart(c, q);return;}}, 500);
+    const t0 = Date.now();let last = -1;
+    while (Date.now() - t0 < 90000) {const st = await p.evaluate(() => ({w: V31Q.QR ? V31Q.QR.wave : -1, ov: !document.querySelector('#ov').classList.contains('hide')})).catch(() => ({w: -1}));
+      last = st.w;if (st.ov) break;await p.waitForTimeout(400);}
+    const n = await p.evaluate(() => window.__q);
+    if (last !== n - 1) errs.push(['quest-auto', `連続戦闘が最後まで自動で進まない（到達 ${last + 1}/${n}）`]);
+    await shot('085_quest_auto');
+    await step('quest-auto:close', () => {auto = false;setSpeed(1);if (B) B.over = true;}, 1500);
+  }
   await step('town-end', () => {try {enterTown();} catch (e) {townMenu();}}, 600);await shot('09_town_end');
 
   /* 演出の総当たり（--fx）：演出ビューアで、味方全員の全技・星臨（通常／短縮／省略）・敵の全行動を 1 回ずつ再生する。

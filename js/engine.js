@@ -48,25 +48,25 @@ const SFX={sel:()=>tone(880,.04,'square',.03),hit:()=>tone(240,.12,'square',.06,
 
 /* ===== データ ===== */
 const SK={
- koujin:{n:'光刃',sp:20,el:'光',k:'phys',pow:1.7,t:'one',d:'光の斬撃・単体'},
+ koujin:{n:'光刃',sp:20,el:'陽',k:'phys',pow:1.7,t:'one',d:'光の斬撃・単体'},
  harai:{n:'斬り払い',sp:25,el:'斬',k:'phys',pow:.9,t:'all',d:'斬撃・敵全体'},
  teate:{n:'応急手当',sp:20,k:'heal',pow:.35,t:'ally',d:'味方のHP35%回復'},
  tateuchi:{n:'盾撃',sp:15,el:'打',k:'phys',pow:1.2,t:'one',delay:35,d:'打撃＋行動を遅らせる'},
- chiretsu:{n:'地裂斬',sp:25,el:'地',k:'phys',pow:1.6,t:'one',d:'地属性の重い一撃'},
+ chiretsu:{n:'地裂斬',sp:25,el:'打',k:'phys',pow:1.6,t:'one',d:'打属性の重い一撃'},
  chouhatsu:{n:'挑発',sp:15,k:'taunt',t:'self',d:'敵の単体攻撃を引きつける'},
- seikou:{n:'星光斬',sp:0,el:'光',k:'phys',pow:3.0,t:'one',d:'光の大斬撃・単体'},
- ryusei:{n:'流星連斬',sp:0,el:'光',k:'phys',pow:1.4,t:'all',d:'光の斬撃・敵全体'},
- keishou:{n:'継承・城壁崩し',sp:0,el:'地',k:'phys',pow:3,t:'all',req:'gald',d:'ガルドの星臨を模倣（ガルド星臨後）'},
+ seikou:{n:'星光斬',sp:0,el:'陽',k:'phys',pow:3.0,t:'one',d:'光の大斬撃・単体'},
+ ryusei:{n:'流星連斬',sp:0,el:'陽',k:'phys',pow:1.4,t:'all',d:'光の斬撃・敵全体'},
+ keishou:{n:'継承・城壁崩し',sp:0,el:'打',k:'phys',pow:3,t:'all',req:'gald',d:'ガルドの星臨を模倣（ガルド星臨後）'},
  tettsui:{n:'鉄槌',sp:0,el:'打',k:'phys',pow:1.5,t:'one',d:'打撃・単体'},
  kenshu:{n:'堅守',k:'kenshu',t:'self',d:'被ダメ半減・蓄積1.5倍'},
  houkai:{n:'城壁崩し',k:'release',t:'all',d:'星臨解除・蓄積を全体へ放出'}};
 const AW={rio:{name:'灯星継承',type:'ターン制',turns:3,cmds:['seikou','ryusei','keishou']},
  gald:{name:'不落城塞',type:'蓄積型',turns:4,cmds:['tettsui','kenshu','houkai']}};
 const EA={claw:{n:'攻撃',el:'斬',k:'phys',pow:1,t:'one'},bite:{n:'噛みつき',el:'突',k:'phys',pow:1.4,t:'one'},press:{n:'のしかかり',el:'打',k:'phys',pow:1.25,t:'one'},
- wave:{n:'虚の波動',el:'闇',k:'mag',pow:1.15,t:'all'},roar:{n:'虚滅の咆哮',el:'闇',k:'mag',pow:3.0,t:'all'}};
-const ED={slime:{name:'虚蝕スライム',mhp:150,atk:34,def:10,mag:16,res:14,spd:7,weak:['光','打'],xp:10,gold:6,drop:[['haiseki',.25],['kakera',.12]]},
- wolf:{name:'灰狼',mhp:130,atk:40,def:12,mag:8,res:10,spd:13,weak:['地','斬'],xp:14,gold:9,drop:[['kiba',.4],['haiseki',.2]]},
- boss:{name:'虚ろの番人',mhp:1250,atk:62,def:26,mag:54,res:20,spd:10,weak:['光','打'],sc:3,boss:true,xp:150,gold:200,drop:[['kakera',1],['kakera',1],['kakera',1]]}};
+ wave:{n:'虚の波動',el:'陰',k:'mag',pow:1.15,t:'all'},roar:{n:'虚滅の咆哮',el:'陰',k:'mag',pow:3.0,t:'all'}};
+const ED={slime:{name:'虚蝕スライム',mhp:150,atk:34,def:10,mag:16,res:14,spd:7,weak:['陽','打'],xp:10,gold:6,drop:[['haiseki',.25],['kakera',.12]]},
+ wolf:{name:'灰狼',mhp:130,atk:40,def:12,mag:8,res:10,spd:13,weak:['打','斬'],xp:14,gold:9,drop:[['kiba',.4],['haiseki',.2]]},
+ boss:{name:'虚ろの番人',mhp:1250,atk:62,def:26,mag:54,res:20,spd:10,weak:['陽','打'],sc:3,boss:true,xp:150,gold:200,drop:[['kakera',1],['kakera',1],['kakera',1]]}};
 const HB={rio:{name:'リオ',mhp:240,atk:36,def:20,mag:28,res:22,spd:12,g:{mhp:'B',atk:'B',def:'B',mag:'B',res:'B',spd:'B'},skills:['koujin','harai','teate']},
  gald:{name:'ガルド',mhp:330,atk:31,def:32,mag:8,res:24,spd:8,g:{mhp:'S',atk:'B',def:'S',mag:'D',res:'A',spd:'D'},skills:['tateuchi','chiretsu','chouhatsu']}};
 const GR={S:.09,A:.08,B:.07,C:.06,D:.05};
@@ -104,7 +104,7 @@ function startBattle(list,opts={}){show('battle');setH(128);
  const enemies=list.map((e,i)=>{let suf='';if(cnt[e.kind]>1){idx[e.kind]=(idx[e.kind]||0)+1;suf='ABCDE'[idx[e.kind]-1]||'';}
   return ED[e.kind].boss?enemy(e.kind,e.lv,18,34):enemy(e.kind,e.lv,sl[i%sl.length][0],sl[i%sl.length][1],suf);});
  const hs=G.party.map(hero);hs.forEach((h,i)=>{[h.x,h.y]=HPOS[hs.length][i];});
- B={opts,heroes:hs,enemies,reso:false,awUsed:new Set(),turns:0,shake:0,flashBg:0,parts:[],fx:[],cur:null,over:false};
+ B={opts,heroes:hs,enemies,awUsed:new Set(),turns:0,shake:0,flashBg:0,parts:[],fx:[],cur:null,over:false};
  BG=makeBg(opts.theme||battleTheme(!!opts.boss),!!opts.boss);
  [...B.heroes,...B.enemies].forEach(u=>{u.ct=100/u.spd*(.75+Math.random()*.3);});
  if(opts.first)B.heroes.forEach(h=>h.ct*=.2);
@@ -157,30 +157,19 @@ async function awaken(u){const A=AW[u.id];u.aw=true;u.awT=0;u.ag=GAUGE.includes(
  const cut=$('#cut');const c=document.createElement('canvas');c.width=16;c.height=16;c.getContext('2d').drawImage(IMG[u.spr+'_aw'],0,0);
  cut.style.background='';cut.innerHTML='';cut.appendChild(c);const tx=document.createElement('div');tx.innerHTML=`<div class="t">${u.name} ― 星臨${(u.awLv||1)>1?'・位階'+ROMAN[u.awLv]:''}</div><div class="b">${A.name}</div>`;cut.appendChild(tx);
  cut.classList.remove('show');void cut.offsetWidth;cut.classList.add('show');B.flashBg=30;SFX.aw();
- log(`<b>${u.name}、星臨――「${A.name}」！</b>`);refresh();await wait(1150);cut.classList.remove('show');
- if(canReso())log('二つの星片が<b>共鳴</b>している！ 共鳴技が使える');else if(B.heroes.filter(h=>h.aw).length>=2&&!B.reso)log('竜の血は、リオの灯にしか共鳴しない…');}
-function canReso(){if(B.reso)return false;const p=B.heroes.filter(h=>h.aw&&h.alive).slice(0,2);if(p.length<2)return false;return!p.some(h=>h.id==='valk')||p.some(h=>h.id==='rio');}
+ log(`<b>${u.name}、星臨――「${A.name}」！</b>`);refresh();await wait(1150);cut.classList.remove('show');}
 
 function endAw(u,silent){u._gk=0;if(u.id==='noah')B.domain=false;u.aw=false;u.awT=0;u.store=0;u.stk=0;u.second=false;if(u.legs&&u.legs.includes('koukagari'))u.ag=50;if(!silent){if(!u.noRecoil)u.ct+=20/spdOf(u)*5;log(`${u.name}の星臨が解けた（反動で行動が遅れる）`);}refresh();}
 
 async function release(g){const base=g.store*.9+st(g,'atk')*1.5;log(`<b>城壁崩し！</b> 蓄積した ${Math.round(g.store)} の力を解き放つ！`);
  B.flashBg=20;B.shake=14;SFX.brk();await wait(400);
- for(const e of aliveE()){await hit(g,e,{n:'城壁崩し',el:'地',k:'phys',fixed:base});await wait(120);}
+ for(const e of aliveE()){await hit(g,e,{n:'城壁崩し',el:'打',k:'phys',fixed:base});await wait(120);}
  endAw(g);}
-
-const resoPair=()=>B.heroes.filter(h=>h.aw&&h.alive).slice(0,2);
-const resoName=()=>RESO[resoPair().map(h=>h.id).sort().join(',')]||'星界共鳴';
-async function reso(u){B.reso=true;const ps=resoPair(),nm=resoName();
- const cut=$('#cut');cut.innerHTML=`<div><div class="t">共鳴技　${ps.map(h=>h.name).join('×')}</div><div class="b">${nm}</div></div>`;cut.classList.remove('show');void cut.offsetWidth;cut.classList.add('show');
- SFX.aw();B.flashBg=40;await wait(1100);cut.classList.remove('show');B.shake=16;
- const base=ps.reduce((a,h)=>a+Math.max(st(h,'atk'),st(h,'mag')),0)*3*(ps.some(h=>h.legs.includes('futago'))?2:1),el={rio:'光',gald:'地',mire:'炎',shion:'風',noah:'光',erna:'雷',balza:'炎',crow:'闇',hakua:'氷',jin:'地'}[ps[0].id];
- for(const e of aliveE()){await hit(u,e,{n:nm,el,k:'phys',fixed:base});await wait(120);}
- aliveH().forEach(h=>{const v=Math.round(h.mhp*.3);h.hp=Math.min(h.mhp,h.hp+v);pop(h,'+'+v,'#7dffa8');});SFX.heal();refresh();}
 
 /* ===== 行動 ===== */
 const awN=u=>AW[u.id].turns+(u.awTurn||0)+((u.awLv||1)-1);
 const awTag=h=>h.id==='gald'?' 蓄積'+Math.round(h.store):h.id==='mire'?` ゲージ${Math.round(h.ag)} 対消滅${h.stk||0}`:' 残'+(awN(h)-h.awT);
-const ATK=u=>MAG(u.id)?{n:'魔弾',el:u.atkEl||null,k:'mag',pow:.8,t:'one',basic:true}:({n:'攻撃',el:u.aw&&u.id==='rio'?'光':(u.atkEl||u.elem),k:'phys',pow:1,t:'one',basic:true});
+let ATK=u=>MAG(u.id)?{n:'魔弾',el:u.atkEl||null,k:'mag',pow:.8,t:'one',basic:true}:({n:'攻撃',el:u.aw&&u.id==='rio'?'陽':(u.atkEl||u.elem),k:'phys',pow:1,t:'one',basic:true});
 const GUARD={n:'防御',k:'guard',t:'self'};
 
 async function doAction(u,sk,t){
@@ -191,14 +180,13 @@ async function doAction(u,sk,t){
  if(sk.k==='healAll'){u.sp-=sk.sp;log(`${u.name}の${sk.n}！`);aliveH().forEach(h=>{const v=Math.round(h.mhp*sk.pow);h.hp=Math.min(h.mhp,h.hp+v);pop(h,'+'+v,'#7dffa8');});SFX.heal();setCT(u);refresh();await wait(500);return;}
  if(sk.k==='guardRegen'){u.sp-=sk.sp;u.guard=true;const v=Math.round(u.mhp*.15);u.hp=Math.min(u.mhp,u.hp+v);pop(u,'+'+v,'#7dffa8');log(`${u.name}の${sk.n}！`);SFX.heal();setCT(u,.8);refresh();await wait(450);return;}
  if(sk.k==='release'){await release(u);setCT(u);return;}
- if(sk.k==='reso'){await reso(u);setCT(u);return;}
  if(sk.k==='item'){await useItem(u,sk.id,t);setCT(u,.8);return;}
  if(sk.k==='roar'){aliveE().forEach(e=>{e.ct+=40/e.spd;pop(e,'DELAY','#7fd6ff',true);});aliveH().forEach(h=>{if(!h.aw)h.ag=Math.min(100,h.ag+15);});log(`${u.name}の<b>咆哮</b>！ 敵がすくみ、味方が奮い立つ`);B.shake=8;SFX.warn();setCT(u);refresh();await wait(500);return;}
  if(sk.k==='rhythm'){B.combo={n:0,tot:0};setTimeout(comboEnd,4000);log('<b>氷華乱舞</b>――白い輪が青い輪に重なった瞬間にタップ！');await wait(300);const n0=auto?Math.round(5+Math.random()*6):await rhythm(),n=Math.min(16,n0+(u.legs&&u.legs.includes('hyouga')?4:0));
-  log(`<b>${n}連撃！</b>`);u.tox=-10;for(let i=0;i<n&&t&&t.alive;i++){await hit(u,t,{n:'乱舞',el:i%3===2?'氷':'打',k:'phys',pow:.55});await wait(60);}u.tox=0;
+  log(`<b>${n}連撃！</b>`);u.tox=-10;for(let i=0;i<n&&t&&t.alive;i++){await hit(u,t,{n:'乱舞',el:i%3===2?'冷':'打',k:'phys',pow:.55});await wait(60);}u.tox=0;
   if(n0>=12&&t&&t.alive){t.ct+=150/t.spd;pop(t,'凍結','#bff4ff');log('<b>氷華終の型！</b> 敵が凍りついた');}setCT(u);return;}
  if(sk.k==='charge'){u.ag=Math.max(0,u.ag-(sk.gauge||0));u.charged=1;log(`${u.name}は弓を引き絞った…（天穿が撃てる）`);pop(u,'充填','#7fd6ff',true);setCT(u,.6);refresh();await wait(400);return;}
- if(sk.k==='release2'){const n=u.awT;log('<b>溶鉄爆砕！</b> 溜めた熱を叩きつける');B.shake=14;SFX.brk();for(const e of aliveE()){await hit(u,e,{n:sk.n,el:'炎',k:'phys',pow:1.6});await wait(100);}
+ if(sk.k==='release2'){const n=u.awT;log('<b>溶鉄爆砕！</b> 溜めた熱を叩きつける');B.shake=14;SFX.brk();for(const e of aliveE()){await hit(u,e,{n:sk.n,el:'熱',k:'phys',pow:1.6});await wait(100);}
   if(n>=4){const c=Math.round(u.mhp*.2);u.hp=Math.max(1,u.hp-c);pop(u,'-'+c,'#ff8a8a');log('熱が逆流した…！');}endAw(u);setCT(u);refresh();return;}
  if(sk.k==='pct'){log('<b>死経</b>――命を削る呪言が響く');B.flashBg=20;for(const e of aliveE()){const d=Math.max(1,Math.round(e.hp*(e.boss?.12:.4)));e.hp=Math.max(0,e.hp-d);e.flash=8;pop(e,d,'#b07cff');refresh();if(e.hp<=0)await kill(e);await wait(150);}setCT(u);return;}
  if(['haste','cheer','grace','scan'].includes(sk.k)){u.sp-=sk.sp||0;
@@ -253,11 +241,10 @@ async function heroTurn(u){
 
 function autoPick(u){
  if(u.ag>=100&&!u.aw&&B.heroes.filter(h=>h.aw).length<2)return{aw:true};
- if(canReso())return{sk:{k:'reso'}};
  if(u.id==='rio'&&!u.aw&&u.sp>=20){const low=aliveH().find(h=>h.hp<h.mhp*.35);if(low)return{sk:SK.teate,t:low};}
  const es=aliveE().sort((a,b)=>a.hp-b.hp);
  if(u.aw&&(u.awLv||1)>=3&&!u._gk&&!((SK['goku'+u.id].gauge||0)>u.ag)){u._gk=1;return{sk:SK['goku'+u.id],t:es[0]};}
- if(u.aw){if(u.id==='jin')return{sk:SK[aliveE().length>2?'shippuuga':'juuou'],t:es[0]};if(u.id==='hakua')return{sk:SK[aliveE().length>2?'hyoukajin':'ranbu'],t:es[0]};if(u.id==='erna')return{sk:SK[u.charged?'tenkuu':u.ag>=50?'juuten':'raisen'],t:es[0]};if(u.id==='balza')return{sk:SK[u.awT>=3?'youtetsu':'tanda'],t:es[0]};if(u.id==='crow')return{sk:SK[u.hp<=u.mhp*.25?'shikyou':'judan'],t:es[0]};if(u.id==='mire')return{sk:SK[(u.stk||0)>=3?'zettai':u.lastEl==='炎'?'blizz2':'fira2'],t:es[0]};if(u.id==='gald'&&u.awT>=2)return{sk:SK.houkai};return{sk:SK[AW[u.id].cmds[0]],t:es[0]};}
+ if(u.aw){if(u.id==='jin')return{sk:SK[aliveE().length>2?'shippuuga':'juuou'],t:es[0]};if(u.id==='hakua')return{sk:SK[aliveE().length>2?'hyoukajin':'ranbu'],t:es[0]};if(u.id==='erna')return{sk:SK[u.charged?'tenkuu':u.ag>=50?'juuten':'raisen'],t:es[0]};if(u.id==='balza')return{sk:SK[u.awT>=3?'youtetsu':'tanda'],t:es[0]};if(u.id==='crow')return{sk:SK[u.hp<=u.mhp*.25?'shikyou':'judan'],t:es[0]};if(u.id==='mire')return{sk:SK[(u.stk||0)>=3?'zettai':u.lastEl==='熱'?'blizz2':'fira2'],t:es[0]};if(u.id==='gald'&&u.awT>=2)return{sk:SK.houkai};return{sk:SK[AW[u.id].cmds[0]],t:es[0]};}
  for(const k of u.skills){const s=SK[k];if(!['phys','mag'].includes(s.k)||s.sp>u.sp)continue;const e=es.find(e=>e.known.has(s.el));if(e)return{sk:s,t:e};}
  return{sk:ATK(u),t:es[0]};}
 
@@ -270,8 +257,7 @@ function chooseRoot(u){return new Promise(res0=>{const res=v=>{B.res=null;res0(v
   const its=[{l:'たたかう',f:()=>pickT(u,ATK(u),root,res)},{l:u.aw?'星臨技':'スキル',f:()=>skillMenu(u,root,res)},
    {l:'星臨',s:u.aw?'発動中':`AG ${Math.floor(u.ag)}%`,cls:'aw'+(ready?' ready':''),dis:!ready,f:async()=>{$('#cmd').innerHTML='';await awaken(u);root();}},
    {l:'防御',s:'被ダメ半減',f:()=>res({sk:GUARD})},{l:'アイテム',f:()=>itemMenu(u,root,res)}];
-  if(canReso())its.push({l:'共鳴技',s:resoName(),cls:'reso',f:()=>res({sk:{k:'reso'}})});
-  else if(u.aw&&u.id==='rio')its.push({l:'星臨解除',s:'任意で解く',f:()=>{endAw(u);root();}});
+  if(u.aw&&u.id==='rio')its.push({l:'星臨解除',s:'任意で解く',f:()=>{endAw(u);root();}});
 
   const rs=G.members.filter(id=>!B.heroes.some(h=>h.id===id)&&G.h[id].hp!==0);
   its.push({l:'交代',s:rs.length?'控えと入替':'控えなし',dis:!rs.length||u.swapped||u.aw,f:()=>menu([...rs.map(id=>({l:HB[id].name,s:`Lv${G.h[id].lv}`,f:()=>res({swap:id})})),{l:'戻る',cls:'back',f:root}],true)});
@@ -332,7 +318,6 @@ function rewards(es){let xp=0,gold=0;const drops={};
  es.forEach(e=>{if(ED[e.kind].boss){const il=ED[e.kind].ilv||5;loot.push(addLoot(genItem(il,2,bonus)),addLoot(genItem(il,3,bonus)));}else if(Math.random()<.14*(1+bonus))loot.push(addLoot(genItem(e.lv,0,bonus)));});
  const ups=[];for(const id of G.members){const before=stats(id).mhp,hp=G.h[id].hp??before;const n=gainXP(id,xp);
   if(n){G.h[id].hp=hp+stats(id).mhp-before;ups.push(`${HB[id].name} Lv${G.h[id].lv}（星ポイント+${n*3}）`);}}
- ups.push(...jobXP(es));
  if(ups.length)SFX.aw();return{xp,gold,drops,ups,loot,tou,sts};}
 
 /* ===== 描画 ===== */
@@ -373,4 +358,4 @@ function refresh(){if(!B)return;
   const b=bbox(u.spr);c.getContext('2d').drawImage(IMG[sprKey(u)],b.x,b.y,b.w,b.h,(18-b.w)>>1,(18-b.h)>>1,b.w,b.h);d.appendChild(c);
   const sf=u.side&&/[ABC]$/.test(u.name)?u.name.slice(-1):'';if(sf){const t=document.createElement('b');t.textContent=sf;d.appendChild(t);}o.appendChild(d);});}
 const BBOX={};function bbox(k){if(BBOX[k])return BBOX[k];let x0=16,y0=16,x1=0,y1=0;SPR[k].forEach((r,y)=>[...r].forEach((c,x)=>{if(c!=='.'){x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y);}}));return BBOX[k]={x:x0,y:y0,w:x1-x0+1,h:y1-y0+1};}
-const ELC={'斬':'#cfd6e6','打':'#e0b98a','突':'#b9e0c9','炎':'#ff7a3a','氷':'#7fd6ff','雷':'#ffe14a','風':'#8ff0a8','地':'#d0a060','光':'#fff3a6','闇':'#b07cff'};
+const ELC={'斬':'#cfd6e6','打':'#e0b98a','突':'#b9e0c9','熱':'#ff7a3a','冷':'#7fd6ff','雷':'#ffe14a','風':'#8ff0a8','地':'#d0a060','陽':'#fff3a6','陰':'#b07cff'};

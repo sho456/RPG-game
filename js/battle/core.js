@@ -34,10 +34,10 @@ function measure(){const t=performance.now(),dt=t-lastF;lastF=t;if(dt>200||dt<=0
 const mix=(a,b,t)=>PX.mix(a,b,t),lit=(c,t=.5)=>PX.mix(c,'#ffffff',t),drk=(c,t=.4)=>PX.mix(c,'#000000',t);
 /* 属性の色の並び（明るい → 暗い。粒子は時間とともにこの順に冷える） */
 const RAMP={
- '炎':['#fff6c0','#ffd24a','#ff8a28','#e0401c','#7a1c10'],'氷':['#ffffff','#d8f6ff','#8fdcff','#4aa8e8','#2a5aa8'],
+ '熱':['#fff6c0','#ffd24a','#ff8a28','#e0401c','#7a1c10'],'冷':['#ffffff','#d8f6ff','#8fdcff','#4aa8e8','#2a5aa8'],
  '雷':['#ffffff','#fff8a0','#ffe14a','#c89a18','#6a5a10'],'風':['#ffffff','#e0ffe8','#8ff0a8','#3fbf78','#1f7a50'],
- '地':['#fff0c8','#f0d090','#d0a060','#8a6a3a','#4a3418'],'光':['#ffffff','#fffbe0','#fff3a6','#ffd65a','#c89a30'],
- '闇':['#f0e0ff','#c8a0ff','#9a5cf0','#5a2aa0','#22083c'],'斬':['#ffffff','#e8f0ff','#b8c8f0','#7888c0','#3a4478'],
+ '地':['#fff0c8','#f0d090','#d0a060','#8a6a3a','#4a3418'],'陽':['#ffffff','#fffbe0','#fff3a6','#ffd65a','#c89a30'],
+ '陰':['#f0e0ff','#c8a0ff','#9a5cf0','#5a2aa0','#22083c'],'斬':['#ffffff','#e8f0ff','#b8c8f0','#7888c0','#3a4478'],
  '打':['#ffffff','#fff0c0','#ffd070','#d09030','#6a4410'],'突':['#ffffff','#e0fff8','#a0f0e0','#50b8a8','#1f6a60'],
  heal:['#ffffff','#d8ffe4','#7dffa8','#38c070','#187a40'],buff:['#ffffff','#fff3b0','#ffe27a','#e0a830','#8a5a10'],
  debuff:['#f0d8ff','#c890f0','#8a50c0','#502878','#280a40'],blood:['#ffffff','#ffd0c8','#ff7a6a','#c83030','#601010'],
