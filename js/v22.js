@@ -233,7 +233,7 @@ drawHome=function(){if(!HM.on)return _drawHome();const off=HM.ty,eh=Math.max(0,H
  for(const[lx,ly]of[[22,HOME_H+30-29],[158,HOME_H+30-29],[36,HOME_H+108-29],[144,HOME_H+108-29]])if(ly<HOME_H+eh)lampGlow(lx,off+ly,10,.35+.1*Math.sin(tick/17+lx));
  if(G&&G.fac&&G.fac.garden){const gy=off+40+Math.round(Math.sin(tick/40)*2);ctx.drawImage(gardenIsle(),18,gy);}
  /* 広場を歩く仲間（広げた広場も使う） */
- if(G&&G.party){const W2=HM.walk,ymax=Math.min(HOME_H+eh-6,H-off-Math.round(150/SC)),ymin=124;while(W2.length<G.party.length)W2.push({x:60+W2.length*20,y:150+W2.length*5,tx:0,ty:0,w:20+W2.length*30,d:-1,mv:0});W2.length=G.party.length;
+ if(G&&G.party){const W2=HM.walk,ymax=Math.min(HOME_H+eh-6,H-off-Math.round(150/SC)),ymin=124;while(W2.length<G.party.length)W2.push({x:[34,146,66,114][W2.length%4],y:[150,154,166,170][W2.length%4],tx:0,ty:0,w:20+W2.length*30,d:-1,mv:0});/* ver0.32：最初から重ならないよう広場に散らす */W2.length=G.party.length;
   W2.forEach(w=>{if(w.y>ymax)w.y=ymax;if(w.w>0){w.w--;w.mv=0;if(!w.w){for(let t=0;t<8;t++){w.tx=40+Math.random()*100;w.ty=ymin+Math.random()*Math.max(10,ymax-ymin);if(Math.hypot((w.tx-90)/14,(w.ty-140)/9)>1.25)break;}}}
    else{const ddx=w.tx-w.x,ddy=w.ty-w.y,d=Math.hypot(ddx,ddy);if(d<.6){w.w=60+Math.random()*160|0;w.mv=0;}else{w.x+=ddx/d*.3;w.y+=ddy/d*.22;w.mv=1;if(Math.abs(ddx)>.3)w.d=ddx>0?1:-1;}}});
   W2.map((w,i)=>[w,G.party[i]]).sort((p,q)=>p[0].y-q[0].y).forEach(([w,id],i)=>drawSprite(SPDEF[id]?id:'rio',w.mv?'walk':'idle',w.mv?(tick>>3):(tick>>4)+i,FOPT,Math.round(w.x),Math.round(w.y)+off,w.d>0));}};

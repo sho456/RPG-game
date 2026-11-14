@@ -23,7 +23,10 @@ const VAR={slime4:{H:185,s:.9,l:1.15},knight4:{H:45,s:.8,l:1.2},goldwolf4:{H:210
  banjin4:{H:355,s:.9,l:.7},drake6:{H:345,s:1,l:.7},ninja4:{H:280,s:.7,l:.6},golem5:{H:260,s:.3,l:.55},knight5:{H:48,s:.5,l:.55},golem6:{H:270,s:.5,l:1.25},valk4:{H:265,s:.9,l:.8},
  drake7:{H:30,s:1.1,l:1.05},queen5:{H:290,s:.6,l:1.1},golem7:{H:15,s:1,l:.9},
  wolf4:{H:0,s:.2,l:.72},goldwolf5:{H:130,s:1.1,l:.8},knight6:{H:270,s:.5,l:.9},gknight5:{H:0,s:1,l:.8},knight7:{H:190,s:.7,l:.8},golem8:{H:250,s:.4,l:1.1}};
-function applyVars(){if(typeof SPX==='undefined')return;const D=SPX.D;for(const k in VAR){const m=/^([a-z]+?)(\d)$/.exec(k);if(!m||!D[m[1]])continue;const c=D[m[1]];c.vars=c.vars||{};c.vars['trial'+m[2]]=recolor(c.pal,VAR[k]);}}
+/* ver0.32：元のキーが系統の色違い（灰狼 wolf → 狼の原画 goldwolf の graywolf など）なら、その色違いから作り、名前を trial<段>@<元のキー> にする（spx.js の parse と対） */
+function applyVars(){if(typeof SPX==='undefined')return;const D=SPX.D,F=SPX.FAM||{};for(const k in VAR){const m=/^([a-z]+?)(\d)$/.exec(k);if(!m)continue;
+ const fm2=F[m[1]],id=fm2&&D[fm2[0]]?fm2[0]:m[1],c=D[id];if(!c)continue;c.vars=c.vars||{};
+ const src=fm2&&D[fm2[0]]?(fm2[1]&&c.vars[fm2[1]])||c.pal:c.pal;c.vars['trial'+m[2]+(id!==m[1]?'@'+m[1]:'')]=recolor(src,VAR[k]);}}
 try{applyVars();}catch(e){console.error(e);}
 const S=k=>'tr_'+k;
 

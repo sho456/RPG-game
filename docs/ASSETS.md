@@ -1,6 +1,6 @@
 # ドット絵・モーション・図鑑・呼称の管理ガイド（ver0.30）
 
-新しいキャラクター・アニメーションの制作手順は [PIPELINE.md](PIPELINE.md)。
+新しいキャラクター・アニメーションの制作手順は [PIPELINE.md](PIPELINE.md)。戦闘の仕組み（ロジック・モーション・エフェクト）は [BATTLE.md](BATTLE.md)。
 
 キャラクター・モーション・素材を大量に追加するときの手順と、ファイルの役割をまとめる。
 
@@ -20,6 +20,8 @@ tools/
   build_spx_enemies.py     敵の原画 → js/sprite/data/spx-data-enemy.js
   spx_normalize.py         spx-data.js の正規化（向きの焼き込み・重複の除去・背面の補完・星臨の縮尺・一覧用サイズ）。何度実行しても同じ結果
   spx_common.py            縮小・パレット・PNG 化の共通処理
+  smoke.js                 全画面の自動点検（Playwright。エラー・読み込み失敗・横はみ出しを集める）：node tools/smoke.js
+  wrapmap.py               関数の包み（ラップ）の流れ → docs/BATTLE.md の 5 章を書き換える
 js/
   data/terms.js            呼称・分類の共通規格（TERMS）
   data/skeleton-overrides.js  骨格の手動修正（SKEL_OVR）
@@ -36,6 +38,7 @@ js/
   v29.js                   ver0.29 のお知らせ・開発者メニュー
   v30.js                   ver0.30 の版表示・お知らせ・開発者メニュー（基準画像の並び）
   v32.js                   ver0.32：通常敵の大きさの平準化（ボスを除く）・向きの設定の移し替え・版表示
+  v33.js                   ver0.33：版表示・お知らせ（不具合の修正と整理の記録）
 ```
 
 ## 2. 呼称・分類（js/data/terms.js）
@@ -72,8 +75,10 @@ js/
    ポーズ名は `MOTION` の素材名（`stance front back ready lunge dash cast guard hit weak win down awk`）に合わせる。
    新しいポーズ（例：`skill_koujin`）は `BATTLE` に名前を足すと全サイズで作られる。
 3. 敵：`build_spx_enemies.py` に追加し、`spx.js` の `FAM`（色違い）と `DEF`（元のリグ・大きさ）に登録する。
-   原画を差し替えるときは `SOURCES` に原画を足し、古い並びの絵は `views=['skip']` にする（例：狼の系統 `enemies_snowwolf.jpg`。
-   原画のままが雪狼、雷狼・翠狼は `VARS.goldwolf` の色替え、v31 の天狼などは `js/v31/enemies.js` の `VAR` が自動で色替えする）。
+   原画を差し替えるときは `SOURCES` に原画を足し、古い並びの絵は `views=['skip']` にする。
+   例：狼の系統 `enemies_wolf.jpg`（原画のままが雪狼、灰狼・雷狼・翠狼は `VARS.goldwolf` の色替え）、狐の系統 `enemies_fox.jpg`（氷華の妖狐、天狐の残照は `VARS.fox`）。
+   v31 の色違い（天狼・灰狼の頭目…）は `js/v31/enemies.js` の `VAR` が、系統（`SPX.FAM`）を通して自動で色替えする（名前は `trial<段>@<元のキー>`）。
+   `enemies_snowwolf.jpg`（尾の多い狼）は ver0.33 で使わなくなった。
 4. `python3 tools/build_spx_heroes.py`（または enemies）→ `python3 tools/spx_normalize.py` を実行。
 5. 図鑑（正面・待機・星臨）と、開発者メニュー「基準画像の並び」で縮尺・足元を確認する。`python3 tools/spx_qa.py check` も通す。
 

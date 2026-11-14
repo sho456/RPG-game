@@ -28,7 +28,9 @@ const FAM={slime:['slime',''],moss:['slime','moss'],cursedslime:['slime','cursed
  boss:['banjin',''],boss3:['banjin','boss3'],
  /* ver0.26 第2弾：氷の精・毒茸・大海月・影法師・金の狼・緑の騎士・火竜 */
  yukirei:['icespirit',''],ember:['icespirit','ember'],shroom:['shroom',''],jelly:['jelly',''],shade:['shade',''],
- raiwolf:['goldwolf','raiwolf'],jadewolf:['goldwolf','jadewolf'],snowwolf:['goldwolf',''],/* 狼の系統：原画（白い氷の狼）のままが雪狼 */
+ raiwolf:['goldwolf','raiwolf'],jadewolf:['goldwolf','jadewolf'],snowwolf:['goldwolf',''],wolf:['goldwolf','graywolf'],/* 狼の系統：原画（白い狼）のままが雪狼 */
+ /* 狐の系統（ver0.32）：原画（氷の九尾）のままが氷華の妖狐、天狐の残照は金色 */
+ boss5:['fox',''],tower20:['fox','tenko'],
  dragonewt:['gknight',''],onimusha:['gknight','onimusha'],minerghost:['gknight','minerghost'],firedrake:['drake',''],last2:['drake','last2'],
  /* ver0.28：氷の女王・忍・虚神ノクス（リオの色違い） */
  boss6:['queen',''],boss4:['ninja',''],boss4b:['ninja','boss4b'],last3:['rio','last3']};
@@ -40,13 +42,15 @@ function parse(key){if(!key)return null;key=String(key).split('|')[0];let v='';i
  {const kb=kbFam(key);if(kb)return D[kb[0]]?{id:kb[0],v:kb[1]}:null;}
  if(key.endsWith('k')&&FAM[key.slice(0,-1)])key=key.slice(0,-1);
  if(FAM[key]&&D[FAM[key][0]]){const[id,fv]=FAM[key];return{id,v:v||fv};}
- const tr=/^tr_([a-z]+?)(\d)$/.exec(key);if(tr){v='trial'+tr[2];key=tr[1];}
+ const tr=/^tr_([a-z]+?)(\d)$/.exec(key);if(tr){v='trial'+tr[2];key=tr[1];
+  /* ver0.32：系統の色違い（灰狼の頭目 tr_wolf4 など）は系統の原画へ。色は js/v31/enemies.js の applyVars が trial<段>@<元のキー> に作る */
+  if(FAM[key]&&D[FAM[key][0]]){const[id,fv]=FAM[key];const vv=v+'@'+key;return{id,v:D[id].vars&&D[id].vars[vv]?vv:(fv||v)};}}
  if(key.endsWith('_aw')){v=v||'aw';key=key.slice(0,-3);}
  if(key.endsWith('k')&&!D[key]&&D[key.slice(0,-1)])key=key.slice(0,-1);
  return D[key]?{id:key,v}:null;}
 /* 色替え（パレットの各色を写像）。星臨はビルド時に作った専用パレット、試練の幻影・虚蝕化は既存と同じ式 */
 const mixHex2=(a,b,t)=>{const x=hex(a),y=hex(b);return toHex(x.map((v,i)=>v+(y[i]-v)*t));};
-const ENEW=new Set(['slime','knight','golem','banjin','icespirit','shroom','jelly','shade','goldwolf','gknight','drake','queen','ninja']);
+const ENEW=new Set(['slime','knight','golem','banjin','icespirit','shroom','jelly','shade','goldwolf','gknight','drake','queen','ninja','fox']);
 function palOf(id,v){const c=D[id],base=c.pal;
  if(v==='aw'&&c.palAw)return c.palAw;
  if(c.vars&&c.vars[v])return c.vars[v];
@@ -124,7 +128,7 @@ const DEF={rio:{base:'rio',wid:25,hgt:36},wolf:{base:'wolf',wid:72.5,hgt:43},bos
     騎士は人型の骨格（踏み込み・斬りつけの振り付け）を流用し、絵は 1 枚絵を傾けて動かす */
  slime:{base:'slime',wid:42,hgt:45},knight:{base:'gald',wid:36,hgt:54},golem:{base:'golem',wid:62,hgt:79,nsc:.86},banjin:{base:'boss',wid:33,hgt:63},
  icespirit:{base:'bookghost',wid:34,hgt:56},shroom:{base:'shroom',wid:40,hgt:54},jelly:{base:'shroom',wid:33,hgt:54},shade:{base:'bookghost',wid:40,hgt:61},
- goldwolf:{base:'wolf',wid:66,hgt:64},/* 狼の系統：新しい原画は尻尾のぶん横に広いので、横幅を少し広げる */gknight:{base:'gald',wid:31,hgt:47},drake:{base:'wolf',wid:62,hgt:75},
+ goldwolf:{base:'wolf',wid:62,hgt:62},fox:{base:'wolf',wid:60,hgt:58},/* 狼の系統：新しい原画は尻尾のぶん横に広いので、横幅を少し広げる */gknight:{base:'gald',wid:31,hgt:47},drake:{base:'wolf',wid:62,hgt:75},
  queen:{base:'noah',wid:30,hgt:62},ninja:{base:'crow',wid:31,hgt:54}};
 /* 仲間：元のリグを土台にし、背丈は元のリグの比（データ側のサイズも同じ比で作ってある） */
 const HEROES=['gald','mire','shion','noah','erna','balza','crow','hakua','jin','celes','valk'];
@@ -257,6 +261,6 @@ function onReady(){
 }
 /* 向きを変えたら、一覧・立ち絵の控えを作り直す */
 FACING.onChange(k=>{try{zReg(k);for(const x in UIC)if(x.startsWith('a|'+k))delete UIC[x];}catch(e){}});
-return{get ready(){return ready;},parse,heroFrame,monShape,pickSize,D,cut,palOf,zReg,artCv,unitCv,AWS,FB,DEF,animFrame,phase};})();
+return{get ready(){return ready;},FAM,parse,heroFrame,monShape,pickSize,D,cut,palOf,zReg,artCv,unitCv,AWS,FB,DEF,animFrame,phase};})();
 /* 履歴：ver0.26 敵のドット絵を提供原画へ／ver0.27 第2弾とリオ／ver0.28 ヴァルク・ジン・氷の女王・忍
    ver0.29 向きの窓口を FACING に一本化、原画の反転をデータへ焼き込み、図鑑の再生画面は js/zukan/ へ移した */

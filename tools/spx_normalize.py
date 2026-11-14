@@ -32,7 +32,17 @@ LEGACY = os.path.join(ROOT, 'assets_src', 'legacy', 'spx-legacy.json')
 SCALE = os.path.join(ROOT, 'assets_src', 'character_scale.json')
 HEADER = '/* 自動生成：旧 tools/build_spx.py の出力を tools/spx_normalize.py が整えたもの（提供原画 → パレット番号 PNG）。手で編集しない */\n'
 
-OVERRIDDEN = ['rio', 'jin', 'valk', 'noah_K', 'jin_K', 'valk_K']      # spx-data-heroes.js が上書きする
+def _keys_of(js):
+    try:
+        t = open(os.path.join(ROOT, 'js', 'sprite', 'data', js)).read()
+        return list(json.loads(t[t.index('{'):t.rindex(')')]))
+    except Exception:
+        return []
+
+
+# spx-data-heroes.js（味方 12 人の新原画）が上書きするキーと、新しい原画の系統に移った敵（灰狼 wolf → 狼の原画 goldwolf）。
+# 実行時は読み込むだけ無駄なので spx-data.js から外す（ver0.32：約 1.7MB 減）
+OVERRIDDEN = sorted(set(_keys_of('spx-data-heroes.js')) | {'wolf'})
 KEEP_LEGACY = ['noah_K', 'jin_K']                                      # 旧ビルドの素材（新原画への差し替えで今は使わない。保管のみ）
 FLIPF = {'gald': ['stance', 'front', 'ready', 'hit', 'cast', 'weak', 'win', 'stand', 'walk_a', 'walk_b'],
          'mire': ['stance', 'guard', 'weak', 'hit', 'stand', 'walk_a', 'walk_b'],

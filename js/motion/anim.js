@@ -15,7 +15,7 @@ const DISC={bl:1,ex:1,fx:1};
 function mixPose(a,b,t){const o={};for(const k in b){const x=a[k],y=b[k];o[k]=Array.isArray(y)?(Array.isArray(x)?[lerp(x[0],y[0],t),lerp(x[1],y[1],t)]:y):(typeof y==='number'&&typeof x==='number'&&!DISC[k])?lerp(x,y,t):(t<.5&&x!=null?x:y);}return o;}
 
 /* 敵ごとの派生形・倍率（色替えでも形や大きさを変える） */
-const KIND={boss5:{extra:'fox',sc:1.75},tower20:{extra:'fox',sc:1.6},firedrake:{extra:'drake'},last2:{extra:'drake',sc:1.9},
+const KIND={boss5:{sc:1.6},tower20:{sc:1.5},/* ver0.32：狐は原画（SPX の fox）になったので、旧リグの尾の重ね描き（extra:'fox'）は外した */firedrake:{extra:'drake'},last2:{extra:'drake',sc:1.9},
  boss9:{rig:'wolf',extra:'dragon',sc:2.3,pal:{g:'#4a2222',G:'#1a0a0a',w:'#ff7038',x:'#ffe040'}},
  jelly:{extra:'jelly'},shade:{extra:'shade'},yukirei:{extra:'yuki'},ember:{extra:'spirit'},boss3:{extra:'priest'},boss6:{extra:'queen'}};
 let look=null;const GS=1.2;/* 全体の表示倍率（ver0.18 の見た目の大きさに合わせる） */

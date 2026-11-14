@@ -41,9 +41,15 @@ SOURCES = [
         dict(id='shade', face='L', ncol=30, b=[34, 38, 44, 50, 56, 64, 72, 82, 94], f=24, z=46, u=52),
         dict(id='drake', face='R', ncol=36, b=[56, 64, 72, 82, 92, 104, 118, 134, 150, 170, 192, 216], f=44, z=46, u=64),
     ]),
-    # 狼の系統（雪狼・雷狼・翠狼・天狼…）：新しい原画（白い氷の狼）。1 体だけの絵。ring：白い毛の光沢を背景と見分ける。despeckle：周りの光の粒を落とす
-    ('enemies_snowwolf.jpg', [
-        dict(id='goldwolf', face='R', ncol=34, b=[64, 72, 82, 92, 104, 118, 134, 150, 170], f=40, z=46, u=64),
+    # 狼の系統（灰狼・雪狼・雷狼・翠狼・天狼・灰狼の頭目・翠狼の主）：白い狼の原画 1 枚から色替えで作る。
+    # （ver0.32 の 1 枚目 enemies_snowwolf.jpg＝尾の多い狼は、この原画と狐の原画に置き換えたので使わない）
+    # ring：白い毛の光沢を背景と見分ける。despeckle：周りの光の粒を落とす
+    ('enemies_wolf.jpg', [
+        dict(id='goldwolf', face='R', ncol=34, b=[56, 64, 72, 82, 92, 104, 118, 134, 150, 170], f=40, z=46, u=64),
+    ], {'ring': 120, 'despeckle': .004}),
+    # 狐の系統（氷華の妖狐・天狐の残照・回廊の番人）：氷の九尾の狐
+    ('enemies_fox.jpg', [
+        dict(id='fox', face='R', ncol=36, b=[56, 64, 72, 82, 92, 104, 118, 134, 150, 170, 192], f=40, z=46, u=64),
     ], {'ring': 120, 'despeckle': .004}),
     # 3 方向の絵：views に原画の左からの並び（idle＝戦闘で使う斜めの絵。right 向き）。shadow：足元の影を抜く
     ('enemies_queen.jpg', [
@@ -195,17 +201,25 @@ VARS = {
         'ember': [(HUE(160, 260, .08), lambda h, s, v: (((22 + (1 - v) * 40) / 360), min(1, s * 1.6 + .25), v * 1.02)),
                   (ANY, lambda h, s, v: (40 / 360, .25, v))],
     },
-    # 狼の系統（原画：白〜薄紫の毛・青灰の氷の棘・桃色の目・紺の輪郭）。原画のままが雪狼（snowwolf）
-    #   → 雷狼（raiwolf：金色の毛・茶の棘・青い目）・翠狼（jadewolf：翠の毛・暗い緑の棘・赤い目）
+    # 狼の系統（原画：白〜薄紫の毛・桃色の目・黒い鼻・紺の輪郭）。原画のままが雪狼（snowwolf）
+    #   → 灰狼（graywolf：灰色の毛・琥珀の目）・雷狼（raiwolf：金色の毛・青い目）・翠狼（jadewolf：翠の毛・赤い目）
     'goldwolf': {
+        'graywolf': [(lambda h, s, v: s >= .3 and hue_in(h, 285, 345), tint(32, sat=.85, val=1.0)),
+                     (lambda h, s, v: v < .25, lambda h, s, v: (h, s, v)),
+                     (ANY, lambda h, s, v: (228 / 360, .08 + (1 - v) * .16, (v ** 1.4) * .66))],
         'raiwolf':  [(lambda h, s, v: s >= .3 and hue_in(h, 285, 345), tint(200, sat=.8, val=1.0)),
                      (lambda h, s, v: v < .25, lambda h, s, v: (h, s, v)),
-                     (HUE(180, 214, .12), lambda h, s, v: (26 / 360, .55, v * .78)),
                      (ANY, lambda h, s, v: ((50 - (1 - v) * 34) / 360, min(.92, .62 + (1 - v) * 1.1), min(1, v * .97)))],
         'jadewolf': [(lambda h, s, v: s >= .3 and hue_in(h, 285, 345), tint(355, sat=.85, val=1.0)),
                      (lambda h, s, v: v < .25, lambda h, s, v: (h, s, v)),
-                     (HUE(180, 214, .12), lambda h, s, v: (105 / 360, .4, v * .62)),
                      (ANY, lambda h, s, v: ((158 + (1 - v) * 12) / 360, min(.75, .36 + (1 - v) * 1.1), v * .86))],
+    },
+    # 狐の系統（原画：水色の毛・白い胸毛・氷の結晶・紺の輪郭）。原画のままが氷華の妖狐（boss5）
+    #   → 天狐の残照（tenko：金色の毛・淡い金の結晶・紅の目）
+    'fox': {
+        'tenko': [(lambda h, s, v: v < .22, lambda h, s, v: (28 / 360, min(.7, s + .3), v)),
+                  (HUE(240, 290, .2), tint(352, sat=.75, val=1.0)),
+                  (ANY, lambda h, s, v: ((44 - (1 - v) * 22) / 360, min(.85, .22 + s * .55 + (1 - v) * .5), min(1, v * 1.0 + .03)))],
     },
     # 緑の騎士（原画：緑の鎧・赤い羽根飾りと外套・金の縁）→ 竜兵（そのまま）・鬼武者・坑道の亡者
     'gknight': {

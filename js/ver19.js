@@ -149,7 +149,7 @@ function onHurt(t,d){const A=t.A;if(!A||A.none)return;const c=CUR&&CUR.a._act,sk
 /* ---------- 既存関数を包む ---------- */
 {const _c=calc;calc=function(a,t,sk){const r=_c(a,t,sk);LAST=r;return r;};}
 {const _h=hurt;hurt=function(t,d){const r=_h(t,d);try{onHurt(t,r);}catch(e){console.error(e);}return r;};}
-{const _hit=V17F.hit;hit=async function(a,t,sk){try{await strike(a,t,sk);}catch(e){console.error(e);}
+{const _hit=V17F.hit;hit=async function(a,t,sk){if(!a||!t)return;/* ver0.32：対象が消えた攻撃（戦闘の切り替わり・召喚の入れ替わり）は何もしない */try{await strike(a,t,sk);}catch(e){console.error(e);}
   const n0=B.fx.length,was=t.alive;CUR={a,sk};LAST=null;const pr=_hit(a,t,sk);B.fx.length=Math.min(B.fx.length,n0);const r=LAST||{},c=a._act,big=c&&c.fx&&c.fx.big;CUR=null;
   await stop(a._act&&a._act.n>1&&sk.hits?26:38+(r.crit?70:0)+(r.weak?28:0)+(big?55:0));return pr;};}
 {const _da=V17F.doAction;doAction=async function(u,sk,t){try{await pre(u,sk,t);}catch(e){console.error(e);}try{return await _da(u,sk,t);}finally{try{await finish(u);}catch(e){console.error(e);}}};}

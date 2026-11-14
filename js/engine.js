@@ -314,8 +314,8 @@ async function enemyTurn(e){
 async function end(win){B.over=true;$('#cmd').innerHTML='';B.heroes.forEach(h=>{G.h[h.id].hp=Math.max(h.hp,Math.ceil(h.mhp*.2));});
  const ov=$('#ov');ov.classList.remove('hide');
  if(!win){if(B.opts.trial){G.party=B.opts.prevParty;save();ov.innerHTML=`<div class="logo" style="font-size:28px">試練失敗</div><div class="sub">幻影に押し返された。<br>鍛え直して、また挑もう（ペナルティなし）</div><button class="big" id="cont">灯都へ</button>`;$('#cont').onclick=()=>enterTown('試練の間から戻った…');return;}
-  G.gold=Math.floor(G.gold/2);save();
-  ov.innerHTML=`<div class="logo" style="font-size:28px">全滅…</div><div class="sub">虚蝕に呑まれ、灯都へ運ばれた。<br>所持金が半分になった（${G.gold}G）</div><button class="big" id="cont">灯都へ</button>`;
+  save();/* ver0.32：全滅してもお金は減らない（クエストと同じ決まり。それまでに得た報酬も残る） */
+  ov.innerHTML=`<div class="logo" style="font-size:28px">全滅…</div><div class="sub">虚蝕に呑まれ、灯都へ運ばれた。<br>所持金は失わなかった（${G.gold}G）</div><button class="big" id="cont">灯都へ</button>`;
   $('#cont').onclick=()=>enterTown('灯守たちに救われ、灯都で目を覚ました…');return;}
  const r=rewards(B.enemies);if(B.opts.boss&&A)G.flags[A.bflag]=true;save();
  const dr=Object.entries(r.drops).map(([k,n])=>`${MATS[k].n}×${n}`).join('・');
