@@ -22,23 +22,24 @@ PREVIEW = sys.argv[1] if len(sys.argv) > 1 else None
 ORIG = lambda n: os.path.join(ROOT, 'assets_src', 'originals', n)
 
 # ---------- キャラ定義 ----------
-# 原画ごとに、左から順にキャラを並べる。face：原画の向き（L＝左向き／正面、R＝右向き）。b/f/z/u：横幅のドット数
+# 原画ごとに、左から順にキャラを並べる。face：原画の向き（L＝左向き、R＝右向き）。b/f/z/u：横幅のドット数
+# ver0.36 の決まり：敵の原画は、正面向きのものも含めて「そのままの向き＝右向き」とする（戦闘・図鑑の既定は右向き。鏡写しにしない）
 SOURCES = [
     ('enemies_set1.jpg', [
-        dict(id='slime',  face='L', ncol=34, b=[40, 46, 52, 58, 66, 74, 84, 96], f=24, z=46, u=56),
-        dict(id='knight', face='L', ncol=38, b=[34, 38, 42, 48, 54, 60, 68, 78, 90], f=22, z=46, u=48),
-        dict(id='golem',  face='L', ncol=38, b=[46, 52, 58, 66, 74, 84, 96, 110, 126, 144, 164], f=40, z=46, u=56),
-        dict(id='banjin', face='L', ncol=36, b=[36, 42, 48, 56, 64, 72, 82, 94, 108], f=28, z=46, u=48),
+        dict(id='slime',  face='R', ncol=34, b=[40, 46, 52, 58, 66, 74, 84, 96], f=24, z=46, u=56),
+        dict(id='knight', face='R', ncol=38, b=[34, 38, 42, 48, 54, 60, 68, 78, 90], f=22, z=46, u=48),
+        dict(id='golem',  face='R', ncol=38, b=[46, 52, 58, 66, 74, 84, 96, 110, 126, 144, 164], f=40, z=46, u=56),
+        dict(id='banjin', face='R', ncol=36, b=[36, 42, 48, 56, 64, 72, 82, 94, 108], f=28, z=46, u=48),
     ]),
     ('enemies_set2.jpg', [
-        dict(id='icespirit', face='L', ncol=30, b=[30, 34, 38, 44, 50, 56, 64, 72, 82], f=20, z=46, u=44),
-        dict(id='shroom',    face='L', ncol=34, b=[34, 38, 44, 50, 56, 64, 72, 82, 94], f=24, z=46, u=52),
+        dict(id='icespirit', face='R', ncol=30, b=[30, 34, 38, 44, 50, 56, 64, 72, 82], f=20, z=46, u=44),
+        dict(id='shroom',    face='R', ncol=34, b=[34, 38, 44, 50, 56, 64, 72, 82, 94], f=24, z=46, u=52),
         dict(id='_goldwolf_old', views=['skip']),   # 旧・金の狼（enemies_snowwolf.jpg に差し替え。並びの数合わせに読むだけ）
-        dict(id='gknight',   face='L', ncol=36, b=[28, 32, 36, 40, 46, 52, 58, 66, 76], f=20, z=46, u=44),
+        dict(id='gknight',   face='R', ncol=36, b=[28, 32, 36, 40, 46, 52, 58, 66, 76], f=20, z=46, u=44),
     ]),
     ('enemies_set3.jpg', [
-        dict(id='jelly', face='L', ncol=34, b=[28, 32, 36, 42, 48, 54, 62, 70, 80], f=20, z=46, u=44),
-        dict(id='shade', face='L', ncol=30, b=[34, 38, 44, 50, 56, 64, 72, 82, 94], f=24, z=46, u=52),
+        dict(id='jelly', face='R', ncol=34, b=[28, 32, 36, 42, 48, 54, 62, 70, 80], f=20, z=46, u=44),
+        dict(id='shade', face='R', ncol=30, b=[34, 38, 44, 50, 56, 64, 72, 82, 94], f=24, z=46, u=52),
         dict(id='drake', face='R', ncol=36, b=[56, 64, 72, 82, 92, 104, 118, 134, 150, 170, 192, 216], f=44, z=46, u=64),
     ]),
     # 狼の系統（灰狼・雪狼・雷狼・翠狼・天狼・灰狼の頭目・翠狼の主）：白い狼の原画 1 枚から色替えで作る。
