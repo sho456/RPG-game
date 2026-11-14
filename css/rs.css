@@ -1,0 +1,97 @@
+/* ===== ver0.37 戦闘システム刷新（RS 式）の見た目 ===== */
+/* 技リストの上：何人目・BP */
+.btabs.v22 .rsbp{margin-left:auto;display:flex;align-items:baseline;gap:5px;padding:0 6px;color:#aab4dc;font-size:11px;white-space:nowrap}
+.btabs.v22 .rsbp b{color:#7fd6ff;font-size:14px;letter-spacing:.5px}
+.btabs.v22 .rsbp small{color:#8890b8;font-size:10px}
+.btabs.v22 .rsbp.od b{color:#ff9ad6}
+.blist.v22 .sk.ougi{border-color:rgba(255,226,122,.55);background:linear-gradient(180deg,rgba(130,96,30,.55),rgba(60,36,10,.55))}
+.blist.v22 .sk.ougi .nm{color:#ffe9a8}
+.blist.v22 .sk.odon{border-color:#ff9ad6;box-shadow:0 0 8px rgba(255,154,214,.6)}
+.blist.v22 .sk .nm .pl{margin-left:5px;font-style:normal;font-size:10px;color:#ffe27a;opacity:.85}
+
+/* 戦場：OD ゲージ・陣形・行動順（左下） */
+#rshud{position:absolute;left:4px;top:96px;z-index:6;display:flex;flex-direction:column;gap:3px;max-width:62%;pointer-events:none}
+#rshud .od{pointer-events:auto;display:flex;align-items:center;gap:4px;padding:2px 6px 2px 4px;border-radius:9px;background:rgba(8,10,28,.72);border:1px solid rgba(255,154,214,.35);width:130px;cursor:pointer}
+#rshud .od em{font-style:normal;font-weight:800;font-size:10px;color:#ff9ad6;letter-spacing:1px}
+#rshud .od .g{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden}
+#rshud .od .g i{display:block;height:100%;width:0;background:linear-gradient(90deg,#b05cff,#ff9ad6);transition:width .25s}
+#rshud .od span{min-width:30px;text-align:right;font-size:10px;color:#fff;font-weight:700}
+#rshud.full .od{border-color:#ff9ad6;box-shadow:0 0 10px rgba(255,154,214,.7);animation:rsodp 1s infinite alternate}
+#rshud.arm .od{background:rgba(110,30,90,.85)}
+@keyframes rsodp{from{box-shadow:0 0 4px rgba(255,154,214,.4)}to{box-shadow:0 0 14px rgba(255,154,214,.95)}}
+#rshud .fm{align-self:flex-start;font-size:9px;color:#ffe27a;background:rgba(8,10,28,.6);padding:1px 6px;border-radius:6px}
+#rshud .q{display:flex;flex-wrap:wrap;gap:2px}
+#rshud .q i{font-style:normal;font-size:9px;line-height:14px;padding:0 4px;border-radius:4px;background:rgba(40,80,140,.7);color:#e8f0ff;white-space:nowrap}
+#rshud .q i.e{background:rgba(140,40,50,.72)}
+#rshud .q i.c{outline:1px solid #ffe27a}
+
+/* 連携・OD・奥義・ひらめきの見出し */
+#rsban{position:absolute;left:50%;top:34%;z-index:8;transform:translate(-50%,0) scale(.8);opacity:0;pointer-events:none;text-align:center;white-space:nowrap;transition:opacity .18s,transform .18s}
+#rsban.on{opacity:1;transform:translate(-50%,0) scale(1)}
+#rsban b{display:block;font-family:"Jost","M PLUS Rounded 1c",sans-serif;font-style:italic;font-weight:800;font-size:30px;letter-spacing:2px;color:#fff;-webkit-text-stroke:1px #2a1400;text-shadow:0 0 10px rgba(255,200,90,.9),2px 2px 0 #000}
+#rsban small{display:block;margin-top:2px;font-size:11px;color:#ffe9b0;text-shadow:1px 1px 0 #000;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
+#rsban.chain b{color:#ffe27a}
+#rsban.chain.c4 b,#rsban.chain.c5 b{color:#ff9a5a;font-size:36px}
+#rsban.od b{color:#ff9ad6;text-shadow:0 0 14px rgba(255,120,220,.95),2px 2px 0 #000}
+#rsban.ougi b{color:#fff3b0;font-size:34px}
+#rsban.glim b{color:#bff4ff;text-shadow:0 0 12px rgba(140,230,255,.95),2px 2px 0 #000}
+
+/* キャラ詳細：技セット・アビリティ・能力値 */
+.ctabs.c22.rs37{display:grid;grid-template-columns:repeat(6,1fr)!important}
+.ctabs.c22.rs37 button{font-size:11px;padding-left:0;padding-right:0;white-space:nowrap}
+.rsset{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:4px 0 8px}
+.rsset .sl{position:relative;min-height:44px;border-radius:6px;border:1px dashed rgba(170,180,230,.35);background:rgba(12,16,40,.5);padding:14px 4px 3px;text-align:center}
+.rsset .sl.on{border:1px solid var(--ec,#8af);background:linear-gradient(180deg,rgba(40,60,120,.55),rgba(12,18,44,.55))}
+.rsset .sl i{position:absolute;left:4px;top:2px;font-style:normal;font-size:9px;color:#ffe27a}
+.rsset .sl b{display:block;font-size:11px;line-height:1.2;color:#fff}
+.rsset .sl small{font-size:9px;color:#9aa4d0}
+.sk22.rs37 .tg.rkx{background:rgba(255,226,122,.18);color:#ffe27a}
+.sk22.rs37 .tg.set{background:#ffe27a;color:#1a1200}
+.sk22.rs37.on{border-color:rgba(255,226,122,.6)}
+.sk22.rs37 .d{display:block}
+.sk22.rs37 .rsrow{display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap}
+.sk22.rs37 .rsrow small{flex:1;min-width:120px;color:#9aa4d0;font-size:10px}
+.sk22.rs37 .rsb{display:flex;gap:4px}
+.sk22.rs37 .rsb .tbtn{min-height:30px;padding:2px 10px;font-size:12px}
+.rsnote{margin:6px 0;padding:6px 8px;border-radius:6px;background:rgba(20,26,60,.55);color:#b8c0e6;font-size:11px;line-height:1.5}
+.rsab{margin:4px 0 8px;padding:7px 8px;border-radius:8px;border:1px solid rgba(255,184,107,.35);background:linear-gradient(180deg,rgba(60,40,24,.45),rgba(20,16,30,.5))}
+.rsab.lock{opacity:.6;border-color:rgba(160,160,200,.25)}
+.rsab .h{display:flex;align-items:center;gap:6px}
+.rsab .h .n{font-style:normal;width:18px;height:18px;border-radius:50%;background:#ffb86b;color:#2a1400;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.rsab .h b{color:#ffe9c8;font-size:14px}
+.rsab .h em{margin-left:auto;font-style:normal;font-size:11px;color:#ffb86b}
+.rsab ul{margin:5px 0 2px;padding-left:18px;color:#e6e8f8;font-size:12px;line-height:1.55}
+.rsab .nx{font-size:11px;color:#8ff0a8}
+.rsab .nx small{color:#9aa4d0}
+.rsab .src small{font-size:10px;color:#8890b8}
+.rsst{display:inline-flex;gap:2px}
+.rsst i{width:7px;height:7px;transform:rotate(45deg);background:rgba(255,255,255,.15)}
+.rsst i.on{background:#ffb86b;box-shadow:0 0 4px #ffb86b}
+ul.rsaw{margin:4px 0 8px;padding-left:18px;color:#ffe9b0;font-size:12px;line-height:1.6}
+.rs8h small{font-size:10px}
+.rs8{display:grid;grid-template-columns:1fr 1fr;gap:3px 8px;margin:4px 0}
+.rs8 .r{display:grid;grid-template-columns:1fr auto;align-items:baseline;padding:3px 6px;border-radius:5px;background:rgba(16,20,48,.55)}
+.rs8 .r span{font-size:12px;color:#cfd4f2}
+.rs8 .r span i{font-style:normal;display:inline-block;width:14px;margin-right:4px;text-align:center;font-size:10px;font-weight:800;border-radius:3px;background:rgba(255,255,255,.12)}
+.rs8 .r b{font-size:14px;color:#fff}
+.rs8 .r small{grid-column:1/-1;font-size:9px;color:#8890b8;line-height:1.3}
+
+/* 編成：陣形 */
+.rsfb{display:grid;grid-template-columns:auto 1fr;gap:0 8px;align-items:baseline;width:100%;margin:4px 0 6px;padding:6px 10px;border-radius:8px;border:1px solid rgba(255,226,122,.45);background:linear-gradient(180deg,rgba(60,48,20,.55),rgba(20,16,30,.55));color:#fff;text-align:left;font-family:inherit}
+.rsfb small{color:#ffe27a;font-size:10px}
+.rsfb b{font-size:14px}
+.rsfb span{grid-column:1/-1;font-size:10px;color:#b8c0e6}
+.rsfm .hd b{display:block;font-size:16px;color:#ffe27a}
+.rsfm .hd small{font-size:11px;color:#aab}
+.rsfm .f{margin:6px 0;padding:7px 8px;border-radius:8px;border:1px solid rgba(170,180,230,.25);background:rgba(14,18,44,.6);cursor:pointer}
+.rsfm .f.on{border-color:#ffe27a;box-shadow:0 0 8px rgba(255,226,122,.35)}
+.rsfm .f .n{display:flex;gap:6px;align-items:center}
+.rsfm .f .n b{color:#fff}
+.rsfm .f .n em{font-style:normal;font-size:10px;padding:0 5px;border-radius:4px;background:#ffe27a;color:#1a1200}
+.rsfm .f .d{font-size:11px;color:#c8cef0;margin:2px 0 4px}
+.rsfm .f .sl{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.rsfm .f .sl span{font-size:10px;color:#e8ecff;background:rgba(40,50,100,.45);border-radius:4px;padding:2px 4px}
+.rsfm .f .sl span i{font-style:normal;color:#ffe27a;margin-right:3px}
+.rsfm .f .sl span small{display:block;color:#9aa4d0;font-size:9px}
+#bt22 .b22hd #rshud{position:static;margin-top:5px;max-width:100%}
+.pi22t.stabs{grid-template-columns:repeat(4,1fr)!important}

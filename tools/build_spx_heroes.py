@@ -2,7 +2,8 @@
 """味方の原画 → js/spx-data-heroes.js（spx-data.js の同じキャラを上書きする）
 
 ・味方 12 人（2026-11 の新原画）：正面・待機・星臨を横に 3 体並べたシート（<id>_v2.jpg）。from_trio で切り出す。
-  待機・星臨は原画で右を向いているので反転して左向きに。正面は原画のまま。
+  向きの定義（ver0.37）：原画の待機・星臨の向きを「左向き」とする（assets_src/originals/celes_v2.jpg が基準）。
+  全プレイアブルキャラ（通常・星臨）の既定の向きなので、反転せず原画のまま使う。正面も原画のまま。
   戦闘不能は待機を寝かせて作り、他のポーズ（攻撃・詠唱・被弾…）は 1 枚絵（single）として spx.js が待機の絵を動かす
 ・jin：戦闘不能は体だけを寝かせ、相棒の柴犬は座らせたまま（lay_down_with_pet）
 ・rio の色違い last3（虚神ノクス）も作る
@@ -356,7 +357,7 @@ def build_hero(hid, F, head_from='front', head_k=.37, ref_k=1.0, single=False, h
 # （ver0.31 までのリオ rio_sheet.png・ヴァルク valk_sheet.jpg の切り出し表は、新原画への差し替えで不要になったので外した。git の履歴に残っている）
 
 data, prev = {}, []
-# 新原画：正面・待機・星臨の 3 体シート。原画の待機・星臨は右向き → 反転して左向き（正面は原画のまま）
+# 新原画：正面・待機・星臨の 3 体シート。ver0.37：原画の待機・星臨の向き＝左向き（定義）。反転しない
 GALD_GHOST = lambda X, Y: (Y > 640) & (Y < 1000) & (X < 935) & ((X >= 809) | ((X >= 700) & (Y < 800 + (X - 620) * .535)))   # 正面の盾の右上に紛れ込んだ小さな騎士
 BALZA_FX = lambda X, Y: (X > 700) & (X < 850) & (Y > 740) & (Y < 960)   # 正面の右の炎の飾り（待機の絵の左に紛れる）
 TRIO = {   # id: (原画, from_trio の設定, build_hero の設定)
@@ -376,7 +377,6 @@ TRIO = {   # id: (原画, from_trio の設定, build_hero の設定)
 PET = {'jin'}
 for hid, (fn, opt, hopt) in TRIO.items():
     F = from_trio(fn, **opt)
-    F['stance'], F['awk'] = flip(F['stance']), flip(F['awk'])
     F['down'] = lay_down_with_pet(F['stance']) if hid in PET else lay_down(F['stance'])
     o, p = build_hero(hid, F, single=True, **hopt)
     data.update(o)

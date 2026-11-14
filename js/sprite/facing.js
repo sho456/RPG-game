@@ -3,6 +3,8 @@
    （原画で逆を向いていたポーズは tools/spx_normalize.py がデータ側で反転済み）
  ・表示の既定の向き：プレイアブルキャラ＝左（敵の側）、敵＝右
  ・敵の原画（spx-data-enemy.js）は、正面向きのものも含めて全部 face='R'（原画のまま＝右向き）。ver0.36 の決まり
+ ・味方の原画の向き（ver0.37 の定義）：提供原画の待機・星臨の向き（assets_src/originals/celes_v2.jpg が基準）を「左向き」とする。
+   全プレイアブルキャラ（通常・星臨）の既定。tools/build_spx_heroes.py は反転せずに取り込む
  ・図鑑で変えた向き：G.zdir[キー]＝'L'|'R'（既定と同じなら保存しない）
  戦闘・待機・図鑑・編成・一覧の絵のすべてがここを通るので、どのモーションでも向きがそろう。
  鏡写しにするかどうかは mirror(素材の向き, 表示したい向き) の 1 行で決まる。 */
@@ -23,7 +25,9 @@ function base(k,side){if(side===0)return L;if(side===1)return R;return isFoe(k)?
 /* ver0.36：敵の原画の向きを「右向き」に統一した（騎士 2 種はデータの向きが逆だった）。それ以前に図鑑で保存した敵の向きは、
    誤った向きを直すためのものだったので一度だけ消す（味方の向きはそのまま） */
 function fix36(d){if(G.zdir36)return;G.zdir36=1;for(const k of Object.keys(d))if(isFoe(k))delete d[k];}
-function saved(k){const d=typeof G!=='undefined'&&G&&G.zdir;if(!d)return null;fix36(d);k=key(k);const v=d[k]||d[k.replace(/^vo_/,'')];return v===L||v===R?v:null;}
+/* ver0.37：味方の原画の向きの定義が変わった（以前は反転して取り込んでいた）。それ以前に図鑑で保存した味方の向きは一度だけ消す */
+function fix37(d){if(G.zdir37)return;G.zdir37=1;for(const k of Object.keys(d))if(!isFoe(k))delete d[k];}
+function saved(k){const d=typeof G!=='undefined'&&G&&G.zdir;if(!d)return null;fix36(d);fix37(d);k=key(k);const v=d[k]||d[k.replace(/^vo_/,'')];return v===L||v===R?v:null;}
 function of(k,side){return saved(k)||base(k,side);}
 const isRight=(k,side)=>of(k,side)===R;
 function set(k,dir,side){k=key(k);G.zdir=G.zdir||{};if(dir===base(k,side))delete G.zdir[k];else G.zdir[k]=dir;try{save();}catch(e){}LS.forEach(f=>{try{f(k);}catch(e){}});}
