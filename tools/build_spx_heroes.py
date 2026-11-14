@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """味方の原画 → js/spx-data-heroes.js（spx-data.js の同じキャラを上書きする）
 
-・rio：ラベル付きシート（rio_sheet.png）。ラベル（文字）とポーズは別の連結成分なので、枠ごとに最大の成分を拾う
+・rio・celes・gald・mire（2026-11 の新原画）：正面・待機・星臨を横に 3 体並べたシート（<id>_v2.jpg）。from_trio で切り出す。
+  待機・星臨は原画で右を向いているので反転して左向きに。正面は原画のまま。
+  戦闘不能は待機を寝かせて作り、他のポーズ（攻撃・詠唱・被弾…）は 1 枚絵（single）として spx.js が待機の絵を動かす
+・（旧）rio_sheet.png：ver0.31 までのリオのシート。ラベル（文字）とポーズは別の連結成分なので、枠ごとに最大の成分を拾う
 ・valk：ラベルなしシート（valk_sheet.jpg）。左上から順に 待機/正面/背面/攻撃/防御/歩き/走り/詠唱/被弾/瀕死/勝利/戦闘不能/(戦闘不能2)/覚醒
 ・jin：1 枚絵（jin.jpg）。待機・正面に使い、他のポーズは spx.js が 1 枚絵を動かして表す。戦闘不能は体を寝かせ、柴犬は座らせたまま
 ・noah_K：既存データ（assets_src/legacy/spx-legacy.json）の修正。右を向いていたので左右反転し、枠で切れていた翼を反対側の翼から補う
@@ -32,15 +35,25 @@ hexs = lambda c: '#%02x%02x%02x' % tuple(int(max(0, min(255, round(v)))) for v i
 
 
 # ---------- 背景抜き ----------
-def fg_mask(img, thr=24):
-    dist = (255 - img).max(2)
+def fg_mask(img, thr=24, bg=None, hole=None, ring=0):
+    """bg：背景色（既定は白）。単色背景のシートなら四隅・外周の中央値を渡す。
+    hole：内側の背景色の穴（腕と胴のすき間など）とみなす平均の色差。既定は従来の判定（大きい穴はすべて抜く）。
+    指定すると、背景にごく近い色の穴だけを抜く（白い刃・暗い影など、背景に近いが絵の一部の所を残す）。
+    ring：穴の周り（3 画素の輪）の背景との平均の色差の下限。本当のすき間は輪郭線（濃い色）に囲まれ、
+    刃や鎧の光沢は明るい色に囲まれるので、明るい背景ではこれで見分ける"""
+    dist = (255 - img).max(2) if bg is None else np.abs(img - np.asarray(bg, np.float64)).max(2)
     lab, n = nd.label(dist <= thr)
     border = set(np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))) - {0}
     fg = ~np.isin(lab, list(border))
     for i, (s_, o_) in enumerate(zip(nd.sum(np.ones_like(dist), lab, range(1, n + 1)), nd.find_objects(lab))):
         if i + 1 in border:
             continue
-        if s_ >= 250 or (s_ >= 60 and dist[o_][lab[o_] == i + 1].mean() < 5):
+        md = dist[o_][lab[o_] == i + 1].mean()
+        if hole is not None and s_ >= 60 and md < hole and ring:
+            sl = tuple(slice(max(0, q.start - 4), q.stop + 4) for q in o_)
+            me = lab[sl] == i + 1
+            md = md if dist[sl][nd.binary_dilation(me, iterations=3) & ~me].mean() > ring else 1e9
+        if (hole is None and (s_ >= 250 or (s_ >= 60 and md < 5))) or (hole is not None and s_ >= 60 and md < hole):
             fg[lab == i + 1] = False
     if thr > 24:   # JPEG：縁のにじみを落とす
         fg = nd.binary_opening(fg, iterations=1)
@@ -48,11 +61,11 @@ def fg_mask(img, thr=24):
     return fg
 
 
-def pieces(fg, main_label, lab2, objs, sizes, pad=4, inside=None):
+def pieces(fg, main_label, lab2, objs, sizes, pad=4, inside=None, small=12):
     mo = objs[main_label - 1]
     keep = [main_label]
     for i, o in enumerate(objs):
-        if i + 1 == main_label or sizes[i] < 12:
+        if i + 1 == main_label or sizes[i] < small:
             continue
         if inside and not inside(o):   # 枠の外に中心がある成分（ラベルの文字など）は拾わない
             continue
@@ -113,6 +126,30 @@ def from_auto(fname, names, rows, split=None):
     return out
 
 
+def from_trio(fname, names=('front', 'stance', 'awk'), band=(.2, .85), thr=30, hole=10, ring=150, erase=None):
+    """正面・待機・星臨を横に 3 体並べたシート（<id>_v2.jpg）。背景は外周の中央値の単色。
+    ラベル（上下の文字・枠）は高さの帯 band の外にあるので拾わない。帯の中の大きい成分を左から names に割り当てる。
+    erase：(X, Y) → 消す所の真偽。原画に紛れ込んだ余計な絵（ガルドの正面の横の小さな騎士）を消す"""
+    img = np.asarray(Image.open(ORIG(fname)).convert('RGB')).astype(np.float64)
+    bg = np.median(np.concatenate([img[0], img[-1], img[:, 0], img[:, -1]]), 0)
+    fg = fg_mask(img, thr, bg, hole, ring)
+    if erase is not None:
+        Y, X = np.mgrid[:fg.shape[0], :fg.shape[1]]
+        fg &= ~erase(X, Y)
+    lab2, _ = nd.label(fg)
+    objs = nd.find_objects(lab2)
+    sizes = nd.sum(fg, lab2, range(1, len(objs) + 1))
+    H = img.shape[0]
+    cand = [i + 1 for i, o in enumerate(objs) if band[0] * H < (o[0].start + o[0].stop) / 2 < band[1] * H]
+    big = sorted(sorted(cand, key=lambda li: -sizes[li - 1])[:len(names)], key=lambda li: objs[li - 1][1].start)
+    return {nm: crop_of(img, pieces(fg, li, lab2, objs, sizes, pad=6, small=40)) for li, nm in zip(big, names)}
+
+
+def lay_down(c):
+    """待機の絵を寝かせて戦闘不能にする（頭が左＝敵の側）"""
+    return np.rot90(c[0], 1).copy(), np.rot90(c[1], 1).copy()
+
+
 def flip(c):
     return c[0][:, ::-1].copy(), c[1][:, ::-1].copy()
 
@@ -127,9 +164,10 @@ def foot(m, name):
     return int(round(np.median(low))), ay
 
 
-def head_crop(rgb, a, L):
+def head_crop(rgb, a, L, skip=0.0):
+    """skip：上端から飛ばす割合（背の高い帽子・羽飾りの分。顔が枠に入るように）"""
     ys, xs = np.where(a > 0)
-    top = ys.min()
+    top = ys.min() + int(a.shape[0] * skip)
     band = xs[(ys >= top) & (ys < top + int(L * .85))]
     cx = int(round(np.median(band)))
     x0 = max(0, cx - L // 2)
@@ -181,8 +219,8 @@ def render(src, pal, kscale, dots, name):
     return idx, ax, ay
 
 
-def heads_of(src, pal, L):
-    r, a = head_crop(*src, L)
+def heads_of(src, pal, L, skip=0.0):
+    r, a = head_crop(*src, L, skip)
     tiles = []
     for nn in (20, 22, 48):
         col, m = shrink(r, a, nn)
@@ -202,7 +240,7 @@ def aw_col(c):
     return np.array(colorsys.hsv_to_rgb(h, s, v)) * 255
 
 
-def build_hero(hid, F, head_from='front', head_k=.37, ref_k=1.0, single=False):
+def build_hero(hid, F, head_from='front', head_k=.37, ref_k=1.0, single=False, head_skip=0.0):
     """F：ポーズ名→(rgb, alpha)。'awk' があれば <hid>_K も作る"""
     ref_h = F['front'][1].shape[0] * ref_k
     names = [k for k in F if k != 'awk']
@@ -226,7 +264,7 @@ def build_hero(hid, F, head_from='front', head_k=.37, ref_k=1.0, single=False):
         C['sizes'][sk] = S
         if sk in ('B84',):
             prev.append((hid + ' ' + sk, tiles, pal))
-    C['heads'] = heads_of(F[head_from], pal, int(round(F[head_from][1].shape[0] * head_k)))
+    C['heads'] = heads_of(F[head_from], pal, int(round(F[head_from][1].shape[0] * head_k)), head_skip)
     C['palAw'] = [hexs(aw_col(c)) for c in pal[:-1]] + [hexs(pal[-1])]
     out = {hid: C}
     if 'awk' in F:
@@ -242,7 +280,7 @@ def build_hero(hid, F, head_from='front', head_k=.37, ref_k=1.0, single=False):
             K['sizes'][sk] = S
             if sk == 'B84':
                 prev.append((hid + '_K ' + sk, [('awk', idx, ax, ay)], palK))
-        K['heads'] = heads_of(F['awk'], palK, int(round(F['awk'][1].shape[0] * head_k * .92)))
+        K['heads'] = heads_of(F['awk'], palK, int(round(F['awk'][1].shape[0] * head_k * .92)), head_skip)
         out[hid + '_K'] = K
     return out, prev
 
@@ -422,10 +460,21 @@ VALK_NAMES = ['stance', 'front', 'back', 'lunge', 'guard', 'walk_a', 'dash', 'ca
 VALK_FLIP = {'stance', 'lunge', 'guard', 'walk_a', 'dash', 'cast', 'hit', 'weak', 'win'}   # 翼（背中）が左・顔の見える側が右＝右向き
 
 data, prev = {}, []
-F = from_cells('rio_sheet.png', RIO_CELLS)
-o, p = build_hero('rio', F)
-data.update(o)
-prev += p
+# 新原画：正面・待機・星臨の 3 体シート。原画の待機・星臨は右向き → 反転して左向き（正面は原画のまま）
+GALD_GHOST = lambda X, Y: (Y > 640) & (Y < 1000) & (X < 935) & ((X >= 809) | ((X >= 700) & (Y < 800 + (X - 620) * .535)))   # 正面の盾の右上に紛れ込んだ小さな騎士
+TRIO = {   # id: (原画, from_trio の設定, build_hero の設定)
+    'rio': ('rio_v2.jpg', {}, {'head_skip': .1}),             # 顔グラは逆立った髪の分を飛ばす
+    'celes': ('celes_v2.jpg', {'ring': 60}, {'head_skip': .26}),    # 暗い背景：すき間も輪郭も暗いので輪の判定を緩める。顔グラは帽子の分を飛ばす
+    'gald': ('gald_v2.jpg', {'ring': 120, 'erase': GALD_GHOST}, {'head_skip': .12}),
+    'mire': ('mire_v2.jpg', {}, {}),
+}
+for hid, (fn, opt, hopt) in TRIO.items():
+    F = from_trio(fn, **opt)
+    F['stance'], F['awk'] = flip(F['stance']), flip(F['awk'])
+    F['down'] = lay_down(F['stance'])
+    o, p = build_hero(hid, F, single=True, **hopt)
+    data.update(o)
+    prev += p
 # 虚神ノクス（rio の色違い）：金髪→暗い紫、肌→薄紫、青い外套→濃紫、赤→桃色の光、銀→紫がかった鉄
 def last3(c):
     h, s, v = colorsys.rgb_to_hsv(*(np.array(c) / 255))

@@ -16,7 +16,7 @@ assets_src/
 tools/
   spx_import.py            素材パック → js/sprite/data/spx-data-chars.js（縮尺統一・足元合わせ・パレット・複数サイズ・anims）
   spx_qa.py                品質確認（一覧サムネイル・正面/待機/星臨の並び・連続フレームの滑り/色/つなぎ目）
-  build_spx_heroes.py      味方の原画 → js/sprite/data/spx-data-heroes.js（rio・valk・jin、星臨 _K、noah_K・jin_K の修正）
+  build_spx_heroes.py      味方の原画 → js/sprite/data/spx-data-heroes.js（rio・celes・gald・mire・valk・jin、星臨 _K、noah_K・jin_K の修正）
   build_spx_enemies.py     敵の原画 → js/sprite/data/spx-data-enemy.js
   spx_normalize.py         spx-data.js の正規化（向きの焼き込み・重複の除去・背面の補完・星臨の縮尺・一覧用サイズ）。何度実行しても同じ結果
   spx_common.py            縮小・パレット・PNG 化の共通処理
@@ -62,7 +62,8 @@ js/
 ## 4. 新しいキャラクター・ポーズを足す
 
 1. 原画を `assets_src/originals/` に置く。
-2. 味方：`build_spx_heroes.py` に切り出し（`from_cells` か `from_auto`）を足し、`build_hero()` を呼ぶ。
+2. 味方：`build_spx_heroes.py` に切り出し（`from_cells` か `from_auto`、正面・待機・星臨の 3 体並びなら `from_trio`）を足し、`build_hero()` を呼ぶ。
+   3 体並びのシートは `TRIO` に 1 行足すだけでよい（待機・星臨の反転、戦闘不能の生成、1 枚絵の動きの指定まで共通）。
    ポーズ名は `MOTION` の素材名（`stance front back ready lunge dash cast guard hit weak win down awk`）に合わせる。
    新しいポーズ（例：`skill_koujin`）は `BATTLE` に名前を足すと全サイズで作られる。
 3. 敵：`build_spx_enemies.py` に追加し、`spx.js` の `FAM`（色違い）と `DEF`（元のリグ・大きさ）に登録する。
