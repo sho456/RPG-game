@@ -132,10 +132,11 @@ const DEF={rio:{base:'rio',wid:25,hgt:36},wolf:{base:'wolf',wid:72.5,hgt:43},bos
  queen:{base:'noah',wid:30,hgt:62},ninja:{base:'crow',wid:31,hgt:54}};
 /* 仲間：元のリグを土台にし、背丈は元のリグの比（データ側のサイズも同じ比で作ってある） */
 const HEROES=['gald','mire','shion','noah','erna','balza','crow','hakua','jin','celes','valk'];
-function regRigs(){for(const id of HEROES)if(D[id]&&RIG[id]&&!DEF[id])DEF[id]={base:id,wid:25,hgt:RIG[id].hgt*36/37};
+/* 味方の背丈は全員 36 にそろえる（ver0.40）。原画の大きさは SPX の dots（正面の背丈）で正規化済みなので、旧リグの身長の差を持ち込まない */
+function regRigs(){for(const id of HEROES)if(D[id]&&RIG[id]&&!DEF[id])DEF[id]={base:id,wid:25,hgt:36};
  /* ver0.30：素材パック（tools/spx_import.py）で足したキャラ。味方は同じ id の旧リグ、敵はデータの rig（{base,wid,hgt,nsc}）を土台にする */
  for(const id in D){if(DEF[id]||id.endsWith('_K'))continue;const c=D[id];
-  if(c.kind==='hum'&&RIG[id]){DEF[id]={base:id,wid:25,hgt:RIG[id].hgt*36/37};if(!HEROES.includes(id))HEROES.push(id);}
+  if(c.kind==='hum'&&RIG[id]){DEF[id]={base:id,wid:25,hgt:36};if(!HEROES.includes(id))HEROES.push(id);}
   else if(c.kind==='mon'&&c.rig&&RIG[c.rig.base]){DEF[id]=Object.assign({wid:40,hgt:48},c.rig);ENEW.add(id);}}
  for(const id in D){const d=DEF[id];if(!d||!RIG[d.base])continue;const name='spx_'+id;
   const R=Object.assign(Object.create(RIG[d.base]),{spx:id,wid:d.wid,hgt:d.hgt,step:D[id].kind==='hum'?100:120,nsc:d.nsc||1});

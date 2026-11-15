@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.39';
+const VER='ver0.40';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,12 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　画面を見やすく整理しました<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　操作をわかりやすくしました<br><small>`+
+ `・<b>技・術セット</b>：技をタップでセット／外す。枠をタップしてから技をタップで、その枠に入れる（枠どうしで並べ替え）<br>`+
+ `・<b>陣形・配置</b>：戦場の図で、2 人をタップして立ち位置を入れ替えられる。陣形は下の帯で切り替え<br>`+
+ `・<b>戦闘のコマンド</b>：タップで指を動かし、もう一度タップで決定<br>`+
+ `・<b>戦闘の大きさ</b>：味方の背丈をそろえ、敵は種類（小型・中型・大型・ボス）ごとの大きさに。<b>アビリティ</b>は能力タブのいちばん上に</small></div>`+
+ `<div class="nt n38"><b>ver0.39</b>　画面を見やすく整理しました<br><small>`+
  `・<b>星盤</b>：説明文と凡例をなくし、星をタップすると下のカードに効果が出る形に。星盤／天星盤は切り替えタブに<br>`+
  `・<b>戦闘</b>：選んだコマンドに指のカーソル。弱点は赤・耐性は青く光る。HP・BPの表示はターンの始めだけ。行動順のアイコンは廃止<br>`+
  `・<b>技Lv</b>：熟練と統合し「技Lv」とゲージで表示。<b>編成</b>：並び番号・属性の球体・詳細の星盤の絵を削除</small></div>`+

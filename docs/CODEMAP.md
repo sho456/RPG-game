@@ -37,7 +37,7 @@
 | 31 | `js/sprite/legacy/dot-rig.js` | 9 | ver0.19 キャラクター・リグ（人型） | HUM SPRX |
 | 32 | `js/sprite/legacy/dot-heroes.js` | 26 | ver0.19 味方キャラクターのドット絵定義 |  |
 | 33 | `js/sprite/legacy/dot-mon.js` | 21 | ver0.19 敵キャラクターのドット絵定義 |  |
-| 34 | `js/motion/anim.js` | 13 | ver0.19 アニメーション管理 | ANIM |
+| 34 | `js/motion/anim.js` | 14 | ver0.19 アニメーション管理 | ANIM |
 | 35 | `js/motion/fx19.js` | 11 | ver0.19 戦闘エフェクト | FX19 |
 | 36 | `js/ver19.js` | 31 | ver0.19 ドット絵・待機モーション・戦闘演出の全面強化（戦闘への統合） | V19 |
 | 37 | `js/ver19-art.js` | 6 | ver0.19 絵柄の統一：顔グラ・立ち絵・会話の表情・探索／街／ワールドマップの歩き姿 | V19A |
@@ -74,26 +74,27 @@
 | 68 | `js/v32.js` | 3 | ver0.32 図鑑の絞り込み・敵の大きさ・向き・クエスト情報 | V32 |
 | 69 | `js/v33.js` | 2 | ver0.33 不具合の修正・戦闘の仕組みの整理・狼と狐の原画 | V33 |
 | 70 | `js/items/icons36.js` | 31 | ver0.36 武器・防具・装飾品のアイコンを作り直す（IC36） | IC36 |
-| 71 | `js/battle/core.js` | 13 | ver0.34 戦闘演出の基盤（BX） | BX |
-| 72 | `js/battle/prim.js` | 17 | ver0.34 戦闘エフェクトの部品（BXP） | BXP |
-| 73 | `js/battle/rig.js` | 6 | ver0.35 1 枚絵を曲げて動かす（BXR） | BXR |
-| 74 | `js/battle/seq.js` | 8 | ver0.34 技の演出の台帳と再生（BXS） | BXS |
-| 75 | `js/battle/data/fx-heroes-rio.js` | 7 | 技の演出：リオ（灯守見習い・片手剣・光） |  |
-| 76 | `js/battle/data/fx-heroes-gald.js` | 4 | 技の演出：ガルド（元騎士団長・大剣と盾・地） |  |
-| 77 | `js/battle/data/fx-heroes-mire.js` | 6 | 技の演出：ミレイユ（魔導書・炎と氷） |  |
-| 78 | `js/battle/data/motion-heroes.js` | 13 | ver0.35 味方のモーション（12 人） | BXM |
-| 79 | `js/battle/viewer.js` | 10 | ver0.34 演出の設定・星臨演出の長さ・演出ビューア | BXV |
-| 80 | `js/battle/version.js` | 2 | 戦闘演出の全面刷新（ver0.34〜）：版表示・お知らせ | V34 |
-| 81 | `js/rs/data.js` | 30 | ver0.37 戦闘システム刷新（データ） | RSD |
-| 82 | `js/rs/core.js` | 20 | 戦闘システム（能力値・習得・技セット・アビリティ・陣形・セーブ） | RSC |
-| 83 | `js/rs/battle.js` | 26 | 戦闘の進行（ターン制・BP・HP/LP） | RSB |
-| 84 | `js/rs/ui.js` | 18 | 戦闘システムの画面 | RSU |
-| 85 | `js/v38/core.js` | 4 | ver0.38 土台：攻撃属性 8 種・武器種 8 種・セーブの移行・LP | V38 |
-| 86 | `js/v38/battle-ui.js` | 6 | ver0.38 戦闘画面 | V38B |
-| 87 | `js/v38/party.js` | 6 | ver0.38 編成画面 | V38P |
-| 88 | `js/v38/menu.js` | 5 | ver0.38 画面全体の整理 | V38M |
-| 89 | `js/v38/help.js` | 7 | ver0.38 タップで詳細（V38H） | V38H |
-| 90 | `js/ui/board.js` | 5 | 星盤・天星盤の画面（ver0.39 で 1 ファイルにまとめた。画面の正本はここ） | BOARDUI |
+| 71 | `js/battle/size.js` | 2 | 戦闘の表示サイズ：敵の大きさを種類ごとにそろえる（ver0.40。正本） | BSIZE |
+| 72 | `js/battle/core.js` | 13 | ver0.34 戦闘演出の基盤（BX） | BX |
+| 73 | `js/battle/prim.js` | 17 | ver0.34 戦闘エフェクトの部品（BXP） | BXP |
+| 74 | `js/battle/rig.js` | 6 | ver0.35 1 枚絵を曲げて動かす（BXR） | BXR |
+| 75 | `js/battle/seq.js` | 8 | ver0.34 技の演出の台帳と再生（BXS） | BXS |
+| 76 | `js/battle/data/fx-heroes-rio.js` | 7 | 技の演出：リオ（灯守見習い・片手剣・光） |  |
+| 77 | `js/battle/data/fx-heroes-gald.js` | 4 | 技の演出：ガルド（元騎士団長・大剣と盾・地） |  |
+| 78 | `js/battle/data/fx-heroes-mire.js` | 6 | 技の演出：ミレイユ（魔導書・炎と氷） |  |
+| 79 | `js/battle/data/motion-heroes.js` | 13 | ver0.35 味方のモーション（12 人） | BXM |
+| 80 | `js/battle/viewer.js` | 10 | ver0.34 演出の設定・星臨演出の長さ・演出ビューア | BXV |
+| 81 | `js/battle/version.js` | 2 | 戦闘演出の全面刷新（ver0.34〜）：版表示・お知らせ | V34 |
+| 82 | `js/rs/data.js` | 30 | ver0.37 戦闘システム刷新（データ） | RSD |
+| 83 | `js/rs/core.js` | 20 | 戦闘システム（能力値・習得・技セット・アビリティ・陣形・セーブ） | RSC |
+| 84 | `js/rs/battle.js` | 26 | 戦闘の進行（ターン制・BP・HP/LP） | RSB |
+| 85 | `js/rs/ui.js` | 19 | 戦闘システムの画面 | RSU |
+| 86 | `js/v38/core.js` | 4 | ver0.38 土台：攻撃属性 8 種・武器種 8 種・セーブの移行・LP | V38 |
+| 87 | `js/v38/battle-ui.js` | 6 | ver0.38 戦闘画面 | V38B |
+| 88 | `js/v38/party.js` | 6 | ver0.38 編成画面 | V38P |
+| 89 | `js/v38/menu.js` | 5 | ver0.38 画面全体の整理 | V38M |
+| 90 | `js/v38/help.js` | 7 | ver0.38 タップで詳細（V38H） | V38H |
+| 91 | `js/ui/board.js` | 5 | 星盤・天星盤の画面（ver0.39 で 1 ファイルにまとめた。画面の正本はここ） | BOARDUI |
 
 ## 上書きの連鎖（2 ファイル以上で定義・上書きされる関数）
 
@@ -122,6 +123,7 @@
 | `rewards` | engine.js → ch8.js → ch9.js → v20-ui.js → v31/core.js → v31/quests.js |
 | `autoPick` | engine.js → ch8.js → ver17.js → v20-battle.js → rs/battle.js |
 | `doAction` | engine.js → ch8.js → v20-battle.js → v20-ui.js → v22.js |
+| `enemy` | engine.js → v31/enemies.js → v32.js → battle/size.js → v38/core.js |
 | `enemyTurn` | engine.js → v20-battle.js → v20-ui.js → v25.js → battle/viewer.js |
 | `face` | ui-assets.js → ver18-art.js → sprite/legacy/dot-rig.js → ver19-art.js → sprite/spx.js |
 | `frameOf` | sprite/legacy/px.js → sprite/legacy/px-enemy.js → ver19-art.js → sprite/spx.js → zukan/viewer.js |
@@ -132,7 +134,6 @@
 | `art` | ver17.js → ver18-art.js → ver19-art.js → sprite/spx.js |
 | `bbar` | ver17.js → v22.js → v25.js → rs/ui.js |
 | `end` | engine.js → v20-ui.js → v31/quests.js → rs/battle.js |
-| `enemy` | engine.js → v31/enemies.js → v32.js → v38/core.js |
 | `enterTown` | town.js → ch8.js → ver18-town.js → v22.js |
 | `equipMenu` | town.js → ver17.js → v22.js → rs/ui.js |
 | `exprFace` | ch9.js → ver18-art.js → ver19-art.js → sprite/spx.js |

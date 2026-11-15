@@ -1,6 +1,6 @@
 /* ===== 戦闘システムの画面 =====
  1. 戦闘のコマンド入力（RS 風）：行動するキャラの顔・HP/LP/BP の帯・技の一覧（通常攻撃＋セットした 4 つ＋奥義）。
-    下の段に「戻る（前のキャラ）・道具・交代」。技は 1 回のタップで決定、ⓘ で詳細
+    下の段に「戻る（前のキャラ）・道具・交代」。技はタップで指を動かし、もう 1 回タップで決定（ver0.40）。ⓘ で詳細
  2. 下のボタン：通常AUTO・全力AUTO・リピート（速度は画面上のボタンだけ）
  3. キャラ詳細：能力（7 能力値＋アビリティ）・技・術（技セット）・星臨（星臨アビリティと奥義）・星盤
  戦場の配置・スライド演出・上の帯は js/v38/battle-ui.js、編成画面は js/v38/party.js */
@@ -44,13 +44,13 @@ chooseRoot=function(u,ctx={}){const idx=ctx.idx||0,tot=ctx.n||1;
  return new Promise(res0=>{let sub=null,lock=false,R=[];const dev=DEV();
   const res=v=>{B.res=null;B.pick=null;try{bbar(true);}catch(e){}res0(v);};
   const fin=(sk,t)=>{LASTA[u.id]={sk};SFX.sel();
-   /* 選んだコマンドに指を動かしてから決定（どれを選んだか見えるように） */
-   if(!sub&&!lock){lock=true;mark(sk);setTimeout(()=>{lock=false;res(t?{sk,t}:{sk});},170);return;}
    res(t?{sk,t}:{sk});};
   /* 指の位置：この戦闘でそのキャラが最後に選んだコマンド（なければ先頭） */
   const same=(a,b)=>!!a&&!!b&&(a===b||(a.basic&&b.basic?a.bn===b.bn&&a.k===b.k:!!C.keyOf(a)&&C.keyOf(a)===C.keyOf(b)));
   const pkOf=()=>{if(sub)return-1;const la=LASTA[u.id]&&LASTA[u.id].sk;const i=R.findIndex(r=>!r.dis&&same(r.sk,la));return i>=0?i:R.findIndex(r=>!r.dis);};
-  const mark=sk=>{const l=$('#cmd .c38l');if(!l)return;const i=R.findIndex(r=>same(r.sk,sk));l.querySelectorAll('.r').forEach((b,j)=>b.classList.toggle('pk',j===i));};
+  /* 技・術は 2 段階：1 回目のタップで指を動かす → 指のある行をもう 1 回タップで決定（cur＝指の行） */
+  let cur=-1;
+  const mark=i=>{cur=i;const l=$('#cmd .c38l');if(!l)return;l.querySelectorAll('.r').forEach((b,j)=>b.classList.toggle('pk',j===i));};
   B.res=()=>res(autoPick(u));
   const use=sk=>{if(sk.t==='all'||sk.t==='self')return fin(sk);
    if(sk.t==='one'||sk.basic){if(!B.tgt||!B.tgt.alive)B.tgt=aliveE()[0];return fin(sk,B.tgt);}
@@ -69,7 +69,7 @@ chooseRoot=function(u,ctx={}){const idx=ctx.idx||0,tot=ctx.n||1;
     return{el:'道',ec:'#7dffa8',n:ITEMS[k].n,d:ITEMS[k].d,cost:'×'+(I[k]||0),ng:!I[k],dis:!I[k]||(rv&&!down),now:1,sk:{n:ITEMS[k].n,k:'item',id:k,t:'ally',d:ITEMS[k].d},f:()=>use({k:'item',id:k,t:'ally',revive:rv,n:ITEMS[k].n})};})};draw();};
   const swaps=()=>{const rs=G.members.filter(id=>!B.heroes.some(h=>h.id===id)&&G.h[id].hp!==0);
    sub={t:'交代',rows:rs.map(id=>({face:id,n:HB[id].name,d:`Lv${G.h[id].lv}　${D.HERO[id]?D.HERO[id].w:''}`,cost:'交代',now:1,f:()=>res({swap:id})}))};draw();};
-  const draw=()=>{const c=$('#cmd');c.className='c38';if(lock){c.innerHTML='<div class="c38w">…</div>';return;}R=rows();const pk=pkOf();
+  const draw=()=>{const c=$('#cmd');c.className='c38';if(lock){c.innerHTML='<div class="c38w">…</div>';return;}R=rows();if(!sub&&(cur<0||!R[cur]||R[cur].dis))cur=pkOf();const pk=sub?-1:cur;
    const rsN=G.members.filter(id=>!B.heroes.some(h=>h.id===id)&&G.h[id].hp!==0).length,ag=Math.floor(u.aw?100:u.ag),aw=canAw(u);
    c.innerHTML=`<div class="c38p">
     <div class="c38h" style="--ec:${elCol(u.id)}"><img class="fc" src="${face(u.id,u.aw)}" alt=""><div class="nm"><b>${esc(u.name)}</b><small>${idx+1}/${tot}${u.aw?`　${SEIRIN.n} 残り${X.awLeft(u)}`:''}</small></div>
@@ -80,7 +80,7 @@ chooseRoot=function(u,ctx={}){const idx=ctx.idx||0,tot=ctx.n||1;
     <div class="c38f"><button data-c38="back" ${idx>0&&!sub?'':'disabled'}>${GL.back}<small>戻る</small></button><button data-c38="it" ${sub?'disabled':''}>${GL.bag}<small>道具</small></button><button data-c38="sw" ${rsN&&!u.swapped&&!u.aw&&!sub?'':'disabled'}>${GL.swap}<small>交代</small></button></div></div>`;
    c.scrollTop=0;const l=c.querySelector('.c38l');if(l)l.scrollTop=0;try{bbar(true);}catch(e){}};
   B.pick={u,
-   row:i=>{const r=R[i];if(!r||r.dis||lock)return;r.f();},
+   row:i=>{const r=R[i];if(!r||r.dis||lock)return;if(!sub&&cur!==i){SFX.sel();mark(i);return;}r.f();},
    info:i=>{const r=R[i];if(r&&r.sk){SFX.sel();info(r.sk,u);}},
    cmd:k=>{if(lock)return;SFX.sel();if(k==='back')return res({back:1});if(k==='it')return items();if(k==='sw')return swaps();if(k==='sub'){sub=null;draw();}if(k==='aw')B.pick.aw();},
    rep:()=>{const s=repOK(u);if(s&&!lock)use(s);},retarget:()=>{draw();},
@@ -104,15 +104,33 @@ function stars(r){return`<span class="rsst">${[1,2,3,4,5].map(i=>`<i class="${i<
 function skLv(id,k){const l=C.profLv(id,k),n=C.profN(id,k),a=D.PROF[l-1]||0,b=D.PROF[l],r=l>=10||b==null?100:Math.round((n-a)/(b-a)*100);
  return`<span class="sklv"><b>技Lv ${l}</b><i style="--r:${r}%"></i></span>`;}
 function skCard(id,k,o={}){const s=SK[k];if(!s)return'';const[el,ec]=badge(s),on=o.set,pl=C.profLv(id,k),u={id,side:0},lp=C.lpCost(s),cs=s.ougi?'奥義':'BP '+C.costOf(u,s)+(lp?'・LP'+lp:'');
- return`<div class="sk22 x22 rs37${o.lock?' lock':''}${on?' on':''}" style="--ec:${ec}"><div class="h">${hx(el,ec,'sm')}<b>${esc(s.n)}</b><span class="tg ${tyCls(s)}">${tyOf(s)}</span>${s.rk?`<span class="tg rkx">${s.rk}</span>`:''}<span class="c">${cs}</span>${on?'<span class="tg set">SET</span>':''}</div>
+ return`<div class="sk22 x22 rs37${o.lock?' lock':''}${on?' on':''}${o.pend?' pend':''}" style="--ec:${ec}"${o.btn?` data-a="rsk" data-v="${k}"`:''}>${on?`<i class="sno">${o.i+1}</i>`:''}<div class="h">${hx(el,ec,'sm')}<b>${esc(s.n)}</b><span class="tg ${tyCls(s)}">${tyOf(s)}</span>${s.rk?`<span class="tg rkx">${s.rk}</span>`:''}<span class="c">${cs}</span></div>
   <div class="d">${esc(s.d||'')}</div>
   <div class="rsrow"><small>${o.lock?'習得：'+esc(o.how||''):`${skLv(id,k)}${o.how?'<span class="how">習得 '+esc(o.how)+'</span>':''}`}</small>
-   ${o.btn?`<span class="rsb">${on&&o.i>0?`<button class="tbtn" data-a="rsup" data-v="${k}">↑</button>`:''}<button class="tbtn${on?'':' gold'}" data-a="rsset" data-v="${k}">${on?'外す':'セット'}</button><button class="tbtn" data-a="rsinfo" data-v="${k}">詳細</button></span>`:''}</div></div>`;}
-function skillsHTML(id){const set=C.setOf(id),L=C.learned(id),all=(D.LEARN[id]||[]).map(x=>x[0]),lock=all.filter(k=>!L.includes(k));
- return`<div class="sh22">技・術セット <small>${set.length}/4</small></div>
-  <div class="rsset">${[0,1,2,3].map(i=>{const k=set[i],s=k&&SK[k];return s?`<div class="sl on" style="--ec:${badge(s)[1]}"><i>${i+1}</i><b>${esc(s.n)}</b><small>BP ${C.costOf({id,side:0},s)}</small></div>`:`<div class="sl"><i>${i+1}</i><small>空き</small></div>`;}).join('')}</div>
-  <div class="sh22">覚えている技・術 <small>${L.length}種</small></div>${L.map(k=>skCard(id,k,{set:set.includes(k),i:set.indexOf(k),btn:1,how:C.howTxt(id,k)})).join('')}
+   ${o.btn?`<button class="sinf" data-a="rsinfo" data-v="${k}" aria-label="詳細">i</button>`:''}</div></div>`;}
+/* 技・術セット（ver0.40）：枠をタップ → 技をタップで入れる／技をタップでセット・外す／枠どうしをタップで並べ替え。
+   選択中の枠・技は SPK に持つ（画面を描き直しても残る） */
+const SPK={id:null,slot:null,sk:null};
+function skillsHTML(id){if(SPK.id!==id){SPK.id=id;SPK.slot=SPK.sk=null;}
+ const set=C.setOf(id),L=C.learned(id),all=(D.LEARN[id]||[]).map(x=>x[0]),lock=all.filter(k=>!L.includes(k)),pend=SPK.slot!=null||SPK.sk!=null;
+ return`<div class="sh22">技・術セット <small>${set.length}/4　タップで付け外し</small></div>
+  <div class="rsset s40${pend?' pend':''}">${[0,1,2,3].map(i=>{const k=set[i],s=k&&SK[k],sel=SPK.slot===i?' sel':'';return s?`<button class="sl on${sel}" data-a="rsslot" data-v="${i}" style="--ec:${badge(s)[1]}"><i>${i+1}</i><b>${esc(s.n)}</b><small>BP ${C.costOf({id,side:0},s)}</small></button>`:`<button class="sl${sel}" data-a="rsslot" data-v="${i}"><i>${i+1}</i><small>＋</small></button>`;}).join('')}</div>
+  <div class="sh22">覚えている技・術 <small>${L.length}種</small></div><div class="skl40${pend?' pend':''}">${L.map(k=>skCard(id,k,{set:set.includes(k),i:set.indexOf(k),btn:1,pend:SPK.sk===k,how:C.howTxt(id,k)})).join('')}</div>
   ${lock.length?`<div class="sh22">まだ覚えていない</div>${lock.map(k=>skCard(id,k,{lock:1,how:C.howTxt(id,k)})).join('')}`:''}`;}
+/* 枠 i に技 k を入れる（k が別の枠にあれば入れ替え） */
+function putSet(id,i,k){const h=G.h[id],a=C.setOf(id).slice(),j=a.indexOf(k);
+ if(j>=0){if(i<a.length){[a[i],a[j]]=[a[j],a[i]];}else{a.splice(j,1);a.push(k);}}else if(i<a.length)a[i]=k;else a.push(k);h.sset=a.slice(0,4);}
+function tapSlot(id,i){const a=C.setOf(id);
+ if(SPK.sk){putSet(id,i,SPK.sk);SPK.sk=SPK.slot=null;return;}
+ if(SPK.slot===i){if(a[i])G.h[id].sset=a.filter((_,j)=>j!==i);SPK.slot=null;return;}
+ if(SPK.slot!=null&&a[SPK.slot]&&a[i]){const b=a.slice();[b[SPK.slot],b[i]]=[b[i],b[SPK.slot]];G.h[id].sset=b;SPK.slot=null;return;}
+ SPK.slot=i;}
+function tapSkill(id,k){const a=C.setOf(id);
+ if(SPK.slot!=null){putSet(id,SPK.slot,k);SPK.slot=SPK.sk=null;return;}
+ if(SPK.sk===k){SPK.sk=null;return;}
+ if(a.includes(k)){G.h[id].sset=a.filter(x=>x!==k);return;}
+ if(a.length<4){G.h[id].sset=a.concat(k);return;}
+ SPK.sk=k;}
 function abHTML(id){const h=G.h[id],ups=C.abUps(id);let wp=null,w=null;try{w=h.eq.w&&findItem(h.eq.w);wp=V20.wpOf(w);}catch(e){}
  return`<div class="sh22">アビリティ</div>${(D.AB[id]||[]).map((A,i)=>{const r=C.abRank(id,i),lv0=D.ABL[i],cur=r?C.abDesc(id,i,r):[],nx=C.abNext(id,i,r||0),full=C.abDesc(id,i,5);
    return`<div class="rsab x38${r?'':' lock'}"><div class="h"><i class="n">${i+1}</i><b>${esc(A.n)}</b>${stars(r)}<em>${r?'段階'+RK[r]:'Lv'+lv0+'で解放'}</em><i class="ar"></i></div>
@@ -136,12 +154,15 @@ function st7HTML(id){const s=stats(id),r=s.s7;if(!r)return'';const P=C.pf(id),H=
 const TABS=[['st','能力'],['sk','技・術'],['aw',SEIRIN.n]];
 {const _ch=charHTML;charHTML=function(id,tab,ed){if(tab==='ab'||tab==='eq'||tab==='bd')tab='st';const mine=tab==='sk'||tab==='aw';let s=_ch(id,mine?'__':tab,ed);
  try{if(mine)s=s.replace('<div class="cbody"></div>',`<div class="cbody c22 rs37">${tab==='sk'?skillsHTML(id):awHTML(id)}</div>`);
-  if(tab==='st'){const i=s.indexOf('<div class="cnote">');const pr=typeof PROF!=='undefined'&&PROF[id];const add=st7HTML(id)+abHTML(id)+(pr?`<div class="sh22">人物</div><div class="stx">${pr[0]}　${pr[1]}<br>${pr[2]}</div>`:'');s=i>=0?s.slice(0,i)+add+s.slice(i):s+add;}
+  if(tab==='st')s=s.replace(/<div class="cbody([^"]*)">/,(m)=>m+`<div class="ab40">${abHTML(id)}</div>`);
+  if(tab==='st'){const i=s.indexOf('<div class="cnote">');const pr=typeof PROF!=='undefined'&&PROF[id];const add=st7HTML(id)+(pr?`<div class="sh22">人物</div><div class="stx">${pr[0]}　${pr[1]}<br>${pr[2]}</div>`:'');s=i>=0?s.slice(0,i)+add+s.slice(i):s+add;}
   s=s.replace(/<div class="ctabs[^"]*">[\s\S]*?<\/div>/,`<div class="ctabs c22 rs37 t38">${TABS.map(([k,l])=>`<button class="${tab===k?'on':''}" data-a="tab" data-v="${k}">${l}</button>`).join('')}</div>`);
   s=s.replace(/パッシブ/g,'アビリティ');}catch(e){console.error(e);}
  return s;};}
-function acts(o,id,re){o.rsset=k=>{const r=C.toggleSet(id,k);save();re(`「${SK[k].n}」を${r}`);};o.rsup=k=>{C.moveSet(id,k,-1);save();re();};o.rsinfo=k=>info(SK[k],{id,side:0});}
-{const _em=equipMenu;equipMenu=function(id,m){if(CTAB==='ab'||CTAB==='eq')CTAB='st';_em(id,m);try{const cid=G.members.includes(id)?id:G.party[0];acts(ACT,cid,mm=>equipMenu(cid,mm));}catch(e){console.error(e);}};}
-{const _os=openSheet;openSheet=function(id,tab){_os(id,tab);try{const cid=G.members.includes(id)?id:G.party[0];acts(SACT,cid,()=>openSheet(cid));}catch(e){console.error(e);}};}
+function acts(o,id,re){o.rsslot=i=>{tapSlot(id,+i);save();re();};o.rsk=k=>{tapSkill(id,k);save();re();};o.rsinfo=k=>info(SK[k],{id,side:0});}
+/* 描き直しても、下の欄のスクロール位置を保つ */
+const keepScroll=(sel,f)=>{const el=$(sel),y=el?el.scrollTop:0;f();const e2=$(sel);if(e2)e2.scrollTop=y;};
+{const _em=equipMenu;equipMenu=function(id,m){if(CTAB==='ab'||CTAB==='eq')CTAB='st';_em(id,m);try{const cid=G.members.includes(id)?id:G.party[0];acts(ACT,cid,mm=>keepScroll('#cmd',()=>equipMenu(cid,mm)));}catch(e){console.error(e);}};}
+{const _os=openSheet;openSheet=function(id,tab){_os(id,tab);try{const cid=G.members.includes(id)?id:G.party[0];acts(SACT,cid,()=>keepScroll('#sheet .swin',()=>openSheet(cid)));}catch(e){console.error(e);}};}
 
 return{info,skillsHTML,abHTML,awHTML,st7HTML,canAw,basicName};})();

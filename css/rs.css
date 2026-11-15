@@ -52,3 +52,17 @@ ul.rsaw{margin:4px 0 8px;padding-left:18px;color:#ffe9b0;font-size:12px;line-hei
 .rs8 .r small{grid-column:1/-1;font-size:9px;color:#8890b8;line-height:1.3}
 
 .pi22t.stabs{grid-template-columns:repeat(4,1fr)!important}
+
+/* ===== ver0.40 技・術セット：枠をタップ → 技をタップ（js/rs/ui.js の skillsHTML・tapSlot・tapSkill） ===== */
+.rsset.s40 .sl{font:inherit;color:inherit;cursor:pointer;transition:transform .12s,box-shadow .12s}
+.rsset.s40 .sl:not(.on) small{font-size:18px;color:#6a74b0;line-height:1}
+.rsset.s40 .sl.sel{border:2px solid #ffe27a;box-shadow:0 0 10px rgba(255,214,90,.7);transform:translateY(-2px)}
+.rsset.s40.pend .sl:not(.sel){animation:sl40 .8s ease-in-out infinite alternate}
+@keyframes sl40{from{box-shadow:0 0 0 rgba(255,214,90,0)}to{box-shadow:0 0 8px rgba(255,214,90,.55)}}
+.sk22.rs37[data-a="rsk"]{position:relative;cursor:pointer;transition:transform .1s,filter .1s}
+.sk22.rs37[data-a="rsk"]:active{transform:scale(.985);filter:brightness(1.2)}
+.sk22.rs37.on{box-shadow:inset 3px 0 0 #ffe27a}
+.sk22.rs37 .sno{position:absolute;right:-4px;top:-6px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font:900 11px/1 var(--num,inherit);font-style:normal;color:#2a1600;background:#ffe27a;box-shadow:0 0 6px rgba(255,214,90,.8);z-index:1}
+.sk22.rs37.pend{outline:2px solid #ffe27a;outline-offset:1px}
+.skl40.pend .sk22.rs37:not(.pend){opacity:.92}
+.sk22.rs37 .sinf{flex:none;margin-left:auto;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font:italic 900 14px/1 Georgia,serif;color:#fff;background:radial-gradient(circle at 35% 30%,#7af0b0,#1a9a5a);border:1px solid #c8ffe0;cursor:pointer}

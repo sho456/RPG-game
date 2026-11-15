@@ -1,6 +1,6 @@
 /* ===== ver0.38 編成画面 =====
  ・縦長のカードを 4 枚並べる：位階の紋章・キャラの絵・武器種と名前・戦闘力・装備 6 枠・星臨のオーブ・陣形の立ち位置と補正
- ・下の帯に陣形名と「陣形変更」。陣形を選ぶと、カードの立ち位置の図と補正がすぐ変わる（戦闘の配置もこのとおり）
+ ・下の帯に陣形名と「陣形・配置」。開くと戦場の図で陣形の切り替えと、キャラごとの立ち位置の入れ替えができる（formOpen）
  ・操作：カードをタップで選ぶ → 別のカード（控えも）をタップで入れ替え／同じカードをもう一度で詳細（装備・能力・技） */
 'use strict';
 const V38P=(()=>{
@@ -32,7 +32,7 @@ partyScreen=function(m){const P=G.party,f=C.formOf(),bench=G.members.filter(id=>
  panel(`<div class="ps38">
   <div class="hd"><b>編成</b><span><small>パーティ戦闘力</small><strong>${fmt(tot)}</strong></span></div>
   <div class="cs">${P.map(card).join('')}${Array.from({length:4-P.length},()=>`<div class="pc38 emp" data-a="e"><b>＋</b><small>空き</small></div>`).join('')}</div>
-  <div class="fb"><button class="fn" data-a="form"><small>陣形</small><b>${esc(D.FORM[f].n)}</b></button><button class="fc" data-a="form">陣形変更</button></div>
+  <div class="fb"><button class="fn" data-a="form"><small>陣形</small><b>${esc(D.FORM[f].n)}</b></button><button class="fc" data-a="form">陣形・配置</button></div>
   ${sel?`<div class="pa"><button class="tbtn gold" data-a="det">詳細・装備</button><button class="tbtn" data-a="bd" data-v="${sel}">星盤</button><button class="tbtn" data-a="rm" ${P.includes(sel)&&P.length>1?'':'disabled'}>控えへ</button><button class="tbtn" data-a="x">選択解除</button></div>`:''}
   <div class="bh">控え <small>${bench.length}人</small></div>
   <div class="bn">${bench.map(id=>`<div class="pb38${sel===id?' sel':''}" data-a="c" data-v="${id}" style="--ec:${elCol(id)}"><img src="${art(id)}" alt=""><b>${esc(HB[id].name)}</b><small>Lv${G.h[id].lv}　${fmt(power(id))}</small></div>`).join('')}</div>
@@ -46,10 +46,20 @@ partyScreen=function(m){const P=G.party,f=C.formOf(),bench=G.members.filter(id=>
   form:()=>formOpen(),inv:()=>invMenu(),back:()=>{SEL=null;townMenu();}});
  try{tip('party');}catch(e){}};
 formation=function(){partyScreen();};
-/* 陣形の選択：立ち位置の図と、並び順ごとの補正 */
-function formOpen(){const cur=C.formOf(),P=G.party;
- ovOpen(`<div class="fm38"><div class="hd"><b>陣形変更</b><small>立ち位置がそのまま戦闘の配置になる</small></div>
-  ${Object.entries(D.FORM).map(([k,F])=>`<button class="f${k===cur?' on':''}" data-a="pick" data-v="${k}">${posMap(k,-1,'big')}<div class="tx"><b>${esc(F.n)}${k===cur?'<em>使用中</em>':''}</b><small>${esc(F.d)}</small>
-   <ol>${[0,1,2,3].map(i=>`<li><i>${i+1}</i><span>${P[i]?esc(HB[P[i]].name):'―'}</span><small>${esc(slotTxt(k,i))}</small></li>`).join('')}</ol></div></button>`).join('')}</div>
-  <button class="tbtn back wide" data-a="close">閉じる</button>`,{pick:k=>{G.form=k;save();SFX.sel();ovClose();partyScreen(`陣形を<b>${esc(D.FORM[k].n)}</b>にした`);},close:()=>{ovClose();partyScreen();}});}
+/* 陣形と立ち位置（ver0.40）：戦場の図にキャラを並べ、2 人をタップで立ち位置を入れ替える。下の帯で陣形を切り替える。
+   x=0 が前（敵に近い・左）、x=1 が後ろ。並び順 G.party[i] が陣形の i 番目の位置になる（戦闘の配置もこのとおり） */
+let FPK=null;
+function formOpen(m){const f=C.formOf(),F=D.FORM[f],P=G.party;if(FPK!=null&&!P[FPK])FPK=null;
+ const tok=(id,i)=>{const[x,y]=F.p[i]||[.5,.5],t=slotTxt(f,i);return`<button class="tk${FPK===i?' sel':''}${FPK!=null&&FPK!==i?' tgt':''}" data-a="fs" data-v="${i}" style="left:${20+x*62}%;top:${12+y*74}%;--ec:${elCol(id)}">
+   <span class="sp"><img src="${art(id)}" alt=""></span><b>${esc(HB[id].name)}</b>${t?`<small>${esc(t)}</small>`:''}</button>`;};
+ ovOpen(`<div class="fe40">
+  <div class="hd"><b>${esc(F.n)}</b><small>${esc(F.d)}</small></div>
+  <div class="fld"><i class="foe">敵</i>${P.map(tok).join('')}</div>
+  <div class="fl">${Object.entries(D.FORM).map(([k,X])=>`<button class="${k===f?'on':''}" data-a="pick" data-v="${k}">${posMap(k,-1)}<b>${esc(X.n)}</b></button>`).join('')}</div>
+  ${m?`<p class="ms">${m}</p>`:''}</div>
+  <button class="tbtn back wide" data-a="close">閉じる</button>`,
+ {fs:v=>{const i=+v;if(FPK==null){FPK=i;return formOpen();}if(FPK===i){FPK=null;return formOpen();}
+   const a=FPK;FPK=null;[P[a],P[i]]=[P[i],P[a]];save();SFX.sel();formOpen(`<b>${esc(HB[P[i]].name)}</b>と<b>${esc(HB[P[a]].name)}</b>の位置を入れ替えた`);},
+  pick:k=>{G.form=k;FPK=null;save();formOpen();},
+  close:()=>{FPK=null;ovClose();partyScreen();}});}
 return{formOpen,posMap,wIcon};})();
