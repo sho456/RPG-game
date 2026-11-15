@@ -64,3 +64,18 @@
 .ab44 .sp45 .t small{margin-left:auto;font-size:11px;color:#9cb8a8}
 .ab44 .sp45 p{margin:4px 0 0;font-size:13px;line-height:1.6;color:#eafff0}
 .sk41.tapi{cursor:pointer}.sk41.tapi:active{filter:brightness(1.2)}
+
+/* ver0.45 属性の六角の印を 1 つの質感に：技・術の印（.hx43）・戦闘の帯・属性耐性の印（.elh）で、
+   暗い金属の枠＋濃い紺の中＋毛筆の属性文字（文字は属性の色＝ELN43）。弱点は赤・耐性は青に光る（中の色を変え、文字は白） */
+.hx43{--ring:linear-gradient(160deg,#c9ced8,#5a6070 45%,#2b2f3b 55%,#9aa0ae);--in:radial-gradient(circle at 50% 30%,#3a3f52,#10121c 70%);
+ font:400 15px/1 "Yuji Boku","Yuji Syuku","Hiragino Mincho ProN","Yu Mincho",serif;color:var(--c,#e8ecf6);text-shadow:0 0 4px color-mix(in srgb,var(--c,#fff) 55%,transparent),0 1px 0 #000}
+.hx43.wk,.hx43.rs{color:#fff;text-shadow:0 1px 0 #000,0 0 3px rgba(0,0,0,.8)}
+.sk41 .hx43,.ski43 .hx43{font-size:13px}
+.els43.two .hx43{font-size:12px}
+.elh b{color:var(--c,#e8ecf6)!important;text-shadow:0 0 4px color-mix(in srgb,var(--c,#fff) 55%,transparent),0 1px 0 #000}
+/* 戦闘の上の帯：古い帯の六角（css/v22・v25・v38 の .wk span i）を、同じ質感の .hx43 に置き換える */
+#app .b22tg .wk span i.hx43{width:19px;height:21px;background:none!important;clip-path:none!important;font-size:11px;font-weight:400;color:var(--c);opacity:1}
+#app .b22tg .wk span i.hx43.wk,#app .b22tg .wk span i.hx43.rs{color:#fff}
+.elh.e0 b{--c:#ff7e9a}.elh.e1 b{--c:#ffb450}.elh.e2 b{--c:#7cf0a8}.elh.e3 b{--c:#ff6a32}.elh.e4 b{--c:#6fd8ff}.elh.e5 b{--c:#ffe14a}.elh.e6 b{--c:#fff2b8}.elh.e7 b{--c:#c08cff}
+#app .b22tg .wk{gap:2px}#app .b22tg .wk span:not(.q){width:20px}
+#app .b22tg .wk span i.hx43{filter:none!important;animation:none!important}

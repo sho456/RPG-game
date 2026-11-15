@@ -110,7 +110,7 @@ function stars(r){return`<span class="rsst">${[1,2,3].map(i=>`<i class="${i<=r?'
 /* 技・術の行（ver0.41：ロマサガRS の技一覧のように「アイコン＋名前＋Rank＋属性」だけ。説明は ⓘ で出す）
    アイコン：js/ui/skill-icons.js（SKICON）の白いシルエット（技の内容ごと）。色は種類（技＝赤・術＝青・回復＝緑・補助＝金・奥義＝虹）
    Rank＝技Lv（使うほど上がる。旧「熟練」） */
-const ELN={'斬':'#c8ccd8','打':'#d8b890','突':'#c0d0e0','熱':'#ff8a5a','冷':'#8ad4ff','雷':'#ffe066','陽':'#fff0a0','陰':'#c09cff'};
+const ELN=ELN43;/* 属性の文字の色は js/data/resist.js（耐性の印と共通） */
 /* 属性の六角マーク（ver0.43：ロマサガRS のコマンド欄のように暗い金属の六角形に銀の文字。2 属性は縦に重ねる）
    t（狙っている敵）が分かっている弱点なら赤く、耐性なら青く光る */
 function elStack(sk,t){let L=[...new Set([sk.el,sk.el2].filter(x=>x&&ELN[x]))];const nb=!L.length;if(nb)L=[badge(sk)[0]||'無'];

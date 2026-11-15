@@ -23,7 +23,7 @@ function html(it){const rc=RAR[it.rar].c,unid=it.unid,el=unid?{}:ELR.of(it),ab=a
  <div class="ei-hd"><span class="ei-tag">${TAG[it.slot]||'装備'}</span><span class="ei-nm">${iname(it)}</span></div>
  <div class="ei-ic"><img src="${itemIcon(it)}"><em>${RAR[it.rar].n}${unid?'':'　Lv'+it.ilv}</em></div>
  ${unid?'<div class="ei-note">未鑑定です。街の鑑定屋で鑑定すると効果が分かります</div>':`
- <div class="ei-sec">属性耐性</div><div class="ei-g4">${ELS.map(e=>ELR.chip(e,null,el[e]||0)).join('')}</div>
+ <div class="ei-sec">属性耐性</div><div class="ei-g4">${ELS.map(e=>{const v=el[e]||0;return`<div class="ei-e">${ELR.hx(e)}<b class="${sg(v)}">${fm(v)}</b></div>`;}).join('')}</div>
  <div class="ei-sec">能力影響</div><div class="ei-g2">${effects(it).map(x=>`<div class="ei-c${x.op?' op':''}"><span>${x.n}</span><b class="${x.c}">${x.t}</b></div>`).join('')}</div>
  <div class="ei-sec">アビリティ</div>${ab.length?`<div class="ei-abs">${ab.map(a=>{const m=AI[a.t];return`<div class="ei-ab"><i class="ei-ai" style="--c:${m[1]}">${m[0]}</i><div><b>${a.n}</b><small>${KW.markT(a.d)}</small></div></div>`;}).join('')}</div>`:'<div class="ei-none">なし</div>'}`}
  <button class="tbtn back wide" data-a="eqiClose">閉じる</button></div>`;}
