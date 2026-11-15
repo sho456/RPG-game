@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.45';
+const VER='ver0.46';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,11 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　アビリティ・装備・戦闘の見せ方を作り直しました<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　戦闘の表示の流れを整理しました<br><small>`+
+ `・<b>表示の枠</b>：キャラごとに固定の 3 段（Critical・Weak＋属性／強化・弱体を横並び／数字）。誰への効果か一目で分かる<br>`+
+ `・<b>連続ヒット</b>：ヒットごとの数字が 1 桁ずつ入れ替わる。<b>全体攻撃</b>は全員へ同時に当たる<br>`+
+ `・「戦闘開始」のあとに HP・BP。コマンドを決めた後に少しだけ出し、攻撃の前に消える。属性の印の質感と文字の色を統一</small></div>`+
+ `<div class="nt n38"><b>ver0.45</b>　アビリティ・装備・戦闘の見せ方を作り直しました<br><small>`+
  `・<b>アビリティ</b>：3 段階に。段階Ⅲで【固有名の特殊効果】（かばう・マヒ・暗闇・名前付きの追撃など）が付く<br>`+
  `・<b>用語</b>：スタン・挑発・追撃などは緑の文字。タップで説明。奥義もタップで詳細<br>`+
  `・<b>装備</b>：上がるのは基礎ステータス（HP・腕力・体力・器用さ・素早さ・知力・精神・魅力）だけに。属性の印と耐性を 1 つに<br>`+

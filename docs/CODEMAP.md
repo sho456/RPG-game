@@ -7,7 +7,7 @@
 | 1 | `js/core.js` | 1 |  |  |
 | 2 | `js/art.js` | 2 | ドット絵（1文字＝1ドット） |  |
 | 3 | `js/sprite/legacy/dot.js` | 10 | ver0.19 ピクセルアート・レンダラ（dot.js） | PX |
-| 4 | `js/engine.js` | 42 | 背景（ディザリング生成） |  |
+| 4 | `js/engine.js` | 43 | 背景（ディザリング生成） |  |
 | 5 | `js/items.js` | 17 | 装備（ハクスラ） | BSTAR |
 | 6 | `js/ch1.js` | 7 | 第1章データ |  |
 | 7 | `js/ch2.js` | 7 | 第2章データ |  |
@@ -92,18 +92,19 @@
 | 86 | `js/rs/core.js` | 22 | 戦闘システム（能力値・習得・技セット・アビリティ・陣形・セーブ） | RSC |
 | 87 | `js/data/equip7.js` | 4 | 装備の能力影響（EQ7：装備が上げるのは基礎ステータスだけ。ver0.45 新規の正本） | EQ7 |
 | 88 | `js/rs/battle.js` | 29 | 戦闘の進行（ターン制・BP・HP/LP） | RSB |
-| 89 | `js/rs/ui.js` | 23 | 戦闘システムの画面 | RSU |
+| 89 | `js/rs/ui.js` | 22 | 戦闘システムの画面 | RSU |
 | 90 | `js/v38/core.js` | 4 | ver0.38 土台：攻撃属性 8 種・武器種 8 種・セーブの移行・LP | V38 |
 | 91 | `js/v38/battle-ui.js` | 6 | ver0.38 戦闘画面 | V38B |
 | 92 | `js/v38/menu.js` | 10 | ver0.38 画面全体の整理 | V38M |
 | 93 | `js/v38/help.js` | 8 | ver0.38 タップで詳細（V38H） | V38H |
 | 94 | `js/ui/skill-icons.js` | 5 | 技・術のアイコン（SKICON：白いシルエットの絵柄 27 種＋技 → 絵柄の対応。js/rs/ui.js の skIcon が使う） |  |
 | 95 | `js/ui/board.js` | 5 | 星盤・天星盤の画面（ver0.39 で 1 ファイルにまとめた。画面の正本はここ） | BOARDUI |
-| 96 | `js/ui/equip-info.js` | 3 | 装備品の詳細（EQINFO：装備アイコンのタップで出るポップアップの正本。新規） | EQINFO |
+| 96 | `js/ui/equip-info.js` | 4 | 装備品の詳細（EQINFO：装備アイコンのタップで出るポップアップの正本。新規） | EQINFO |
 | 97 | `js/ui/party.js` | 8 | 編成画面と陣形（ver0.41 で 1 ファイルにまとめた。画面の正本はここ。旧 js/v38/party.js を置き換え） | V38P |
 | 98 | `js/ui/smith.js` | 4 | 鍛冶屋の画面（ver0.44。正本：town.js の smith・enhance と v31/items.js・ver18-town.js の包みを置き換え） | SMITH44 |
 | 99 | `js/ui/damage.js` | 3 | 戦闘のダメージ表示の書体（TX24 の書式の最終定義。ロマサガRS の録画に合わせた） |  |
 | 100 | `js/ui/keywords.js` | 6 | 用語のハイライト（KW：効果の説明文の用語を緑で示し、タップで詳しい説明を出す正本。ver0.45 新規） | KW |
+| 101 | `js/ui/battle-pop.js` | 8 | 戦闘中の表示（見出し・状態・数字）の正本（BPOP。ver0.46 新規。決まりは docs/BATTLE-FLOW.md） | BPOP |
 
 ## 上書きの連鎖（2 ファイル以上で定義・上書きされる関数）
 
@@ -111,10 +112,10 @@
 
 | 関数 | 定義 → 上書き（読み込み順） |
 |---|---|
+| `draw` | engine.js → ver16.js → ver17.js → sprite/legacy/dot-rig.js → motion/fx19.js → ver19.js → v21.js → v22.js → v23.js → v25.js → sprite/spx.js → zukan/viewer.js → v31/quests.js → battle/core.js → battle/flow.js → rs/ui.js → v38/battle-ui.js → ui/battle-pop.js |
 | `title` | town.js → ver16.js → ver17.js → ver18-town.js → ver19.js → v20-ui.js → v21.js → v22.js → v23.js → v24.js → v25.js → v30.js → v31/core.js → v31/quests.js → v32.js → v33.js → battle/version.js → v38/menu.js |
-| `draw` | engine.js → ver16.js → ver17.js → sprite/legacy/dot-rig.js → motion/fx19.js → ver19.js → v21.js → v22.js → v23.js → v25.js → sprite/spx.js → zukan/viewer.js → v31/quests.js → battle/core.js → battle/flow.js → rs/ui.js → v38/battle-ui.js |
+| `startBattle` | engine.js → ch8.js → ver18-battle.js → ver19.js → v20-battle.js → v21.js → v22.js → v23.js → v24.js → v25.js → battle/seq.js → battle/flow.js → rs/battle.js → v38/core.js → v38/battle-ui.js → ui/battle-pop.js |
 | `dvMenu` | dev.js → ch9.js → ver16.js → ver17.js → ver18-town.js → v20-ui.js → v21.js → v22.js → v23.js → v24.js → v25.js → v29.js → v30.js → v31/quests.js → battle/viewer.js |
-| `startBattle` | engine.js → ch8.js → ver18-battle.js → ver19.js → v20-battle.js → v21.js → v22.js → v23.js → v24.js → v25.js → battle/seq.js → battle/flow.js → rs/battle.js → v38/core.js → v38/battle-ui.js |
 | `migrate` | items.js → ch8.js → ch9.js → ver17.js → ver18-field.js → v31/items.js → data/resist.js → v31/quests.js → v32.js → rs/core.js → data/equip7.js → v38/core.js |
 | `show` | core.js → ver17.js → ver18-town.js → v20-ui.js → v22.js → v23.js → v24.js → v25.js → battle/flow.js → v38/battle-ui.js → v38/help.js → ui/keywords.js |
 | `townMenu` | town.js → ch9.js → ver17.js → ver18-town.js → v20-ui.js → v21.js → v22.js → v23.js → v31/quests.js → v38/menu.js |
@@ -123,13 +124,13 @@
 | `row` | ch3.js → ver17.js → ver18-town.js → v22.js → v24-text.js → zukan/zukan.js → data/resist.js → v31/quests.js |
 | `awaken` | engine.js → ch8.js → v22.js → v23.js → v25.js → battle/viewer.js → rs/battle.js |
 | `hero` | engine.js → ver18-battle.js → v20-battle.js → v31/items.js → v31/board.js → battle/viewer.js → rs/core.js |
+| `panel` | town.js → ver18-town.js → v20-ui.js → v22.js → battle/viewer.js → v38/help.js → ui/battle-pop.js |
 | `boardMenu` | items.js → ver17.js → v21.js → v31/board.js → rs/core.js → ui/board.js |
 | `charHTML` | ver17.js → v20-ui.js → v22.js → v31/core.js → v31/board.js → rs/ui.js |
 | `close` | ver17.js → battle/viewer.js → battle/flow.js → v38/help.js → ui/equip-info.js → ui/keywords.js |
 | `doAction` | engine.js → ch8.js → v20-battle.js → v20-ui.js → v22.js → battle/flow.js |
 | `enterField` | field.js → ch8.js → ver17.js → ver18-field.js → v23.js → v31/quests.js |
 | `keyOf` | sprite/legacy/dot-rig.js → ver19.js → v21-items.js → v31/items.js → battle/seq.js → rs/core.js |
-| `panel` | town.js → ver18-town.js → v20-ui.js → v22.js → battle/viewer.js → v38/help.js |
 | `rewards` | engine.js → ch8.js → ch9.js → v20-ui.js → v31/core.js → v31/quests.js |
 | `autoPick` | engine.js → ch8.js → ver17.js → v20-battle.js → rs/battle.js |
 | `enemy` | engine.js → v31/enemies.js → v32.js → battle/size.js → v38/core.js |
@@ -168,8 +169,8 @@
 | `burst` | motion/fx19.js → v24-text.js → battle/core.js |
 | `cap` | sprite/legacy/dot-rig.js → battle/seq.js → battle/viewer.js |
 | `card` | ver17.js → v22.js → ui/party.js |
-| `chip` | data/terms.js → data/resist.js → v31/quests.js |
 | `chooseRoot` | engine.js → ch8.js → rs/ui.js |
+| `clear` | motion/fx19.js → battle/core.js → ui/battle-pop.js |
 | `drawBoard` | items.js → ver17.js → v31/board.js |
 | `drawUnit` | engine.js → ver16.js → ver17.js |
 | `frame` | sprite/legacy/dot-rig.js → ver19-art.js → v21.js |
@@ -186,6 +187,7 @@
 | `open` | battle/viewer.js → v38/help.js → ui/equip-info.js |
 | `openBoard` | items.js → v21.js → v31/board.js |
 | `pick` | ver17.js → v31/items.js → battle/seq.js |
+| `place` | v24.js → battle/flow.js → ui/battle-pop.js |
 | `play` | motion/registry.js → battle/seq.js → battle/viewer.js |
 | `pop` | engine.js → ch5.js → ver19.js |
 | `portrait` | ver18-art.js → ver19-art.js → sprite/spx.js |
@@ -197,11 +199,13 @@
 | `spawnOne` | field.js → ch8.js → ver18-field.js |
 | `step` | ch7.js → v20-ui.js → v24.js |
 | `tavern` | town.js → ch9.js → ver18-town.js |
+| `tick` | motion/anim.js → v25.js → ui/battle-pop.js |
 | `tierOf` | v21-items.js → v24.js → v31/items.js |
 | `tint` | sprite/legacy/dot.js → v24-text.js → battle/core.js |
 | `ATK` | engine.js → v38/core.js |
 | `BCH` | items.js → v21.js |
 | `INF` | v31/core.js → rs/core.js |
+| `actEnd` | v24.js → ui/battle-pop.js |
 | `afterBattle` | field.js → ch8.js |
 | `appW` | v22.js → v23.js |
 | `appraise` | town.js → ver18-town.js |
@@ -217,10 +221,10 @@
 | `canAw` | v25.js → rs/ui.js |
 | `cfgOpen` | ver17.js → v38/menu.js |
 | `chain` | sprite/legacy/dot-rig.js → v21-art.js |
+| `chip` | data/terms.js → v31/quests.js |
 | `chips` | town.js → rs/ui.js |
 | `circle` | motion/fx19.js → battle/prim.js |
 | `claw` | motion/fx19.js → v21-art.js |
-| `clear` | motion/fx19.js → battle/core.js |
 | `comboAdd` | ch5.js → v24.js |
 | `cut` | sprite/spx.js → battle/prim.js |
 | `def` | v21-items.js → battle/seq.js |
@@ -262,6 +266,7 @@
 | `isBuff` | v20-battle.js → v24.js |
 | `items` | rs/ui.js → ui/smith.js |
 | `known` | v31/quests.js → rs/battle.js |
+| `layer` | v24.js → ui/battle-pop.js |
 | `list` | motion/registry.js → zukan/zukan.js |
 | `lit` | sprite/legacy/px-enemy.js → motion/fx19.js |
 | `look` | ver19-art.js → ui/keywords.js |
@@ -271,6 +276,7 @@
 | `newMember` | ch1.js → v31/items.js |
 | `next` | ch9.js → ver17.js |
 | `nextStage` | ch7.js → ver18-battle.js |
+| `now` | v24.js → ui/battle-pop.js |
 | `one` | v24.js → items/icons36.js |
 | `openChest` | field.js → v31/quests.js |
 | `opening` | v25.js → rs/battle.js |
@@ -279,7 +285,6 @@
 | `pauseMenu` | field.js → ver17.js |
 | `pickHero` | engine.js → rs/battle.js |
 | `pillar` | motion/fx19.js → battle/prim.js |
-| `place` | v24.js → battle/flow.js |
 | `power` | ver17.js → v31/board.js |
 | `pre` | ver19.js → battle/seq.js |
 | `preview` | engine.js → rs/battle.js |
@@ -303,6 +308,7 @@
 | `slot` | ver17.js → v38/help.js |
 | `slotTxt` | ver17.js → ui/party.js |
 | `sparks` | v21-items.js → battle/prim.js |
+| `spdK` | v24.js → ui/battle-pop.js |
 | `stTags` | ch5.js → v20-battle.js |
 | `stage` | v24.js → v25.js |
 | `start` | zukan/viewer.js → battle/viewer.js |
@@ -313,7 +319,6 @@
 | `sum` | data/resist.js → data/equip7.js |
 | `svg` | v20-ui.js → ui/skill-icons.js |
 | `talk` | ch9.js → ver17.js |
-| `tick` | motion/anim.js → v25.js |
 | `trialEnemy` | awaken.js → ver19-pre.js |
 | `uqItem` | ch9.js → v31/items.js |
 | `wbase` | items.js → ch8.js |

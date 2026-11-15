@@ -21,7 +21,7 @@ let BUB=null;
 function bubble(u,name){if(!inB()||!u||!name)return;const host=$('#pops');if(!host)return;close(true);
  const el=document.createElement('div');el.className='bub42'+(u.side?' e':'');el.innerHTML=`<b>${esc(name)}！</b>`;host.appendChild(el);
  BUB={el,u,t0:performance.now()};place();
- clearTimeout(bubble._t);bubble._t=setTimeout(()=>close(),Math.round(900*(ANIM.SP?ANIM.SP():1)));/* すぐ消す（ver0.43） */}
+ clearTimeout(bubble._t);bubble._t=setTimeout(()=>close(),Math.round(650*(ANIM.SP?ANIM.SP():1)));/* 読めたらすぐ消す（約 0.65 秒。数字が出たらその時点で消す） *//* すぐ消す（ver0.43） */}
 function place(){if(!BUB)return;const cv=$('#cv');if(!cv||!BUB.el.isConnected){BUB=null;return;}const k=cv.offsetWidth/W,[x,y]=BX.at(BUB.u,'head');
  BUB.el.style.left=Math.round(x*k)+'px';BUB.el.style.top=Math.round(y*k-6)+'px';}
 function close(now){if(!BUB)return;const el=BUB.el;BUB=null;if(now){el.remove();return;}el.classList.add('out');setTimeout(()=>el.remove(),220);}
@@ -32,7 +32,7 @@ let AID=0,BUSY=0;
 {const _da=doAction;doAction=async function(u,sk,t){const on=inB()&&!plain(sk)&&!(B.opts&&B.opts.viewer&&B.opts.noDim);const id=++AID;BUSY++;
   if(on){try{BX.dim(.42,200);}catch(e){}}
   try{return await _da.apply(this,arguments);}
-  finally{BUSY=Math.max(0,BUSY-1);if(on){try{BX.dim(0,280);}catch(e){}}close();try{V24.actEnd(id);}catch(e){}}};}
+  finally{BUSY=Math.max(0,BUSY-1);if(on){try{BX.dim(0,280);}catch(e){}}close();try{BPOP.actEnd(id);}catch(e){}}};}
 
 /* ---------- 3〜5. 技・術の共通の演出（専用の演出が無い技） ---------- */
 const EL=s=>s&&s.el||'斬';
@@ -63,11 +63,13 @@ function regAll(){try{for(const id in HB){if(!BXS.REG[id+':cat:phys_attack'])BXS
 regAll();
 
 /* ---------- 0. 戦闘開始の見出し（ロマサガRS：金の毛筆「戦闘開始」が横に流れて消える。ver0.45） ---------- */
+let BAN_END=0;/* 「戦闘開始」が消える時刻（HP・BP や開始時の効果はこのあとに出す） */
 function startBanner(){const st=$('#stage');if(!st||!inB()||(B.opts&&B.opts.viewer))return;const o=document.createElement('div');o.className='bs45';o.innerHTML='<b>戦闘開始</b>';st.appendChild(o);
- setTimeout(()=>o.remove(),Math.round(1300*(ANIM.SP?ANIM.SP():1)));}
-{const _sb=startBattle;startBattle=function(list,opts){const r=_sb.apply(this,arguments);try{if(!(opts&&opts.viewer)&&!(opts&&opts.noStartBanner))setTimeout(startBanner,120);}catch(e){}return r;};}
+ const ms=Math.round(1050*(ANIM.SP?ANIM.SP():1));o.style.animationDuration=ms+'ms';BAN_END=performance.now()+ms;setTimeout(()=>o.remove(),ms);}
+const bannerOn=()=>performance.now()<BAN_END;
+{const _sb=startBattle;startBattle=function(list,opts){const r=_sb.apply(this,arguments);try{if(!(opts&&opts.viewer)&&!(opts&&opts.noStartBanner)){BAN_END=performance.now()+1200;setTimeout(startBanner,80);}}catch(e){}return r;};}
 
 /* ---------- 毎フレーム：吹き出しをキャラに合わせる ---------- */
 {const _d=draw;draw=function(){_d();if(BUB){if(!inB())close(true);else place();}};}
 {const _sh=show;show=function(m){_sh(m);if(m!=='battle')close(true);};}
-return{bubble,close,PHYS,BOW,MAG,aid:()=>AID,busy:()=>BUSY>0};})();
+return{bubble,close,PHYS,BOW,MAG,aid:()=>AID,busy:()=>BUSY>0,bannerOn,bannerEnd:()=>BAN_END};})();

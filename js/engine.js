@@ -202,7 +202,14 @@ async function doAction(u,sk,t){
  u.sp-=sk.sp||0;u.tox=-10;B.combo={n:0,tot:0};
  if(sk.gauge){u.ag=Math.max(0,u.ag-(sk.gauge-(u.gaugeSave||0)-((u.awLv||1)-1)*3));if(u.lastEl&&sk.el!==u.lastEl){u.stk=Math.min(3,(u.stk||0)+1);pop(u,'対消滅'+u.stk,'#ffb030',true);}u.lastEl=sk.el;}if(sk.gaugeAll)u.ag=0;if(sk.hpCost){const c=Math.round(u.mhp*sk.hpCost);u.hp=Math.max(1,u.hp-c);pop(u,'-'+c,'#b07cff',true);}if(sk.req==='charged')u.charged=0;log(`${u.name}の${sk.n}！`);refresh();await wait(180);
  const ts=sk.t==='all'?aliveE():[t&&t.alive?t:aliveE()[0]];
- for(const e of ts){if(!e)continue;let s2=sk.auto?{...sk,el:sk.auto.find(x=>e.weak.includes(x))||sk.el}:sk;if(sk.basic&&u.legs&&u.legs.includes('tenkyuu'))s2={...s2,hits:2};for(let i=0;i<(s2.hits||1)&&e.alive;i++){const dd=await hit(u,e,s2);if(sk.drain&&dd){const v=Math.round(dd*sk.drain);u.hp=Math.min(u.mhp,u.hp+v);pop(u,'+'+v,'#7dffa8',true);}if(sk.hits)await wait(120);}if(sk.steal&&e.alive)doSteal(u,e,sk.steal);if(sk.delay&&e.alive){e.ct+=sk.delay*(e.boss?.4:1)/e.spd;pop(e,'DELAY','#7fd6ff',true);}await wait(140);}
+ /* ver0.46：全体攻撃は 1 ヒットごとに全員へ同時に当てる（演出は 1 回・命中と数字は全員同時。_sim の当たりは振りと止めを省く js/ver19.js） */
+ if(ts.length>1&&!sk.basic){const sOf=e=>{let s2=sk.auto?{...sk,el:sk.auto.find(x=>e.weak.includes(x))||sk.el}:sk;return s2;},n=Math.max(...ts.map(e=>sOf(e).hits||1));
+  for(let i=0;i<n;i++){let first=true;for(const e of ts){if(!e||!e.alive)continue;const s2=sOf(e);if(i>=(s2.hits||1))continue;const s3=Object.assign({},s2,first?{_simLead:1}:{_sim:1});first=false;
+    const dd=await hit(u,e,s3);if(sk.drain&&dd){const v=Math.round(dd*sk.drain);u.hp=Math.min(u.mhp,u.hp+v);pop(u,'+'+v,'#7dffa8',true);}}
+   await wait(sk.hits?160:120);}
+  for(const e of ts){if(!e||!e.alive)continue;if(sk.steal)doSteal(u,e,sk.steal);if(sk.delay){e.ct+=sk.delay*(e.boss?.4:1)/e.spd;pop(e,'DELAY','#7fd6ff',true);}}
+  await wait(140);}
+ else for(const e of ts){if(!e)continue;let s2=sk.auto?{...sk,el:sk.auto.find(x=>e.weak.includes(x))||sk.el}:sk;if(sk.basic&&u.legs&&u.legs.includes('tenkyuu'))s2={...s2,hits:2};for(let i=0;i<(s2.hits||1)&&e.alive;i++){const dd=await hit(u,e,s2);if(sk.drain&&dd){const v=Math.round(dd*sk.drain);u.hp=Math.min(u.mhp,u.hp+v);pop(u,'+'+v,'#7dffa8',true);}if(sk.hits)await wait(120);}if(sk.steal&&e.alive)doSteal(u,e,sk.steal);if(sk.delay&&e.alive){e.ct+=sk.delay*(e.boss?.4:1)/e.spd;pop(e,'DELAY','#7fd6ff',true);}await wait(140);}
  if(sk.basic)u.sp=Math.min(100,u.sp+10+(u.spGain||0));
  comboEnd();u.tox=0;setCT(u,sk.w||(sk.t==='all'?1.1:1));await wait(200);}
 
@@ -294,7 +301,9 @@ async function enemyTurn(e){
  if(sk.t==='all'){const g=gald();if(g&&g.alive&&g.aw){ts=[g];pop(g,'肩代わり','#ffe27a',true);log(`${e.name}の${sk.n}！ ――<b>ガルドが全てを受け止める</b>`);}else ts=aliveH();}
  else ts=[pickHero()];
  if(sk===EA.roar)B.shake=16;
- for(const t of ts){await hit(e,t,sk);await wait(130);}
+ /* ver0.46：敵の全体攻撃も全員へ同時に当てる */
+ if(ts.length>1){let first=true;for(const t of ts){await hit(e,t,Object.assign({},sk,first?{_simLead:1}:{_sim:1}));first=false;}await wait(260);}
+ else for(const t of ts){await hit(e,t,sk);await wait(130);}
  e.tox=0;setCT(e);await wait(250);}
 
 async function end(win){B.over=true;$('#cmd').innerHTML='';B.heroes.forEach(h=>{G.h[h.id].hp=Math.max(h.hp,Math.ceil(h.mhp*.2));});

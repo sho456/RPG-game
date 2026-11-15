@@ -191,7 +191,7 @@ async function inputPhase(myB){const cmds=new Map();let list=B.heroes.filter(h=>
    try{V20.STN&&(nh.sts=[]);}catch(e){}C.applyForm(nh,idx);nh.sp=bpStart(nh);log(`${u.name}と${nh.name}が入れ替わった！`);SFX.sel();list[i]=nh;refresh();await wait(250);continue;}
   cmds.set(u,ch);i++;}
  B.cur=null;B.rs.phase='act';refresh();return cmds;}
-async function opening(myB){await sleep(350);let n=0;while(B===myB&&!B.over&&(B.intro>0||document.querySelector('#stage .bossin'))&&n<240){await sleep(50);n++;}}
+async function opening(myB){await sleep(350);let n=0;while(B===myB&&!B.over&&(B.intro>0||document.querySelector('#stage .bossin')||BFLOW.bannerOn())&&n<240){await sleep(50);n++;}}
 
 /* 味方の行動 */
 async function heroExec(u,c){if(!c||!c.sk)return;
@@ -263,8 +263,8 @@ run=async function(){if(!B)return;if(B.opts&&B.opts.viewer)return oldRun();const
    B.rs.round++;B.turns=B.rs.round;roundStart();
    const cmds=await inputPhase(myB);if(!cmds||B!==myB||B.over)return;
    const q=buildOrder(cmds);B.rs.q=q;refresh();
-   /* コマンドを決め終えたら戦場を全面に（画面のスライドが終わるまで少し待つ） */
-   await wait(380);
+   /* コマンドを決め終えたら戦場を全面に。全員の HP・BP を少しだけ出し、最初の攻撃の前に全員分まとめて消す（ver0.46） */
+   try{V38B.hpFlash(560);}catch(e){}await wait(600);try{V38B.hpHide();}catch(e){}
    while(q.length){if(B!==myB||B.over)return;const it=q.shift(),u=it.u;
     if(!u.alive)continue;if(u.side===1&&!B.enemies.includes(u))continue;if(u.side===0&&!B.heroes.includes(u))continue;
     const snap=ctSnap();B.cur=u;refresh();

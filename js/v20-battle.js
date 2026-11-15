@@ -262,9 +262,11 @@ async function support(u,sk){u.sp-=sk.sp||0;log(`${u.name}の<b>${sk.n}</b>！`)
  /* 回復量アップ（武器パッシブ）：heal 系 */
  let hb=0;if(u.side===0&&sk&&(sk.k==='heal'||sk.k==='healAll'))hb=sumEv(u,'healB');if(hb)s2=Object.assign({},s2,{pow:s2.pow*(1+hb/100)});
  const hp0=u.side===0&&sk&&['heal','healAll','revive','reviveAll'].includes(sk.k)?B.heroes.map(h=>h.hp):null;
+ /* ver0.46：攻撃の前にかかる自己強化（selfPre の技）は、行動の前に掛けて表示する */
+ if(u.alive&&sk&&sk.self20&&sk.selfPre){for(const f of sk.self20)addSt(u,f.k,f.v,f.t);await wait(260);}
  const r=await _da(u,s2,t);
  try{if(hp0)B.heroes.forEach((h,i)=>{if(h.hp>hp0[i])each(u,'healed',h);});
-  if(u.alive&&sk&&sk.self20)for(const f of sk.self20)addSt(u,f.k,f.v,f.t);
+  if(u.alive&&sk&&sk.self20&&!sk.selfPre)for(const f of sk.self20)addSt(u,f.k,f.v,f.t);
   if(u.side===0&&u.alive&&sk)each(u,'acted',sk);}catch(e){console.error(e);}
  await drain(B.q20);await drain(B.cq20);refresh();return r;};}
 

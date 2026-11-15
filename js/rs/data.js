@@ -103,7 +103,7 @@ function S(id,o){const sk={n:o.n,ty:o.ty||'技',k:o.k||'phys',el:o.el===undefine
  if(o.fx)sk.fx20=o.fx.map(f=>Object.assign({on:'t'},f));
  if(o.self)sk.self20=o.self;
  if(o.sup)sk.fx20=o.sup;
- for(const k of['delay','cond20','pierce20','drain','steal','purge20','heal20','cleanse20','taunt20','auto','prio','post','crit','ct20','fixedK','glim','ougi','hits','role','w','revive'])if(o[k]!=null)sk[k]=o[k];
+ for(const k of['delay','cond20','pierce20','drain','steal','purge20','heal20','cleanse20','taunt20','auto','prio','post','crit','ct20','fixedK','glim','ougi','hits','role','w','revive','selfPre'])if(o[k]!=null)sk[k]=o[k];
  if(sk.k==='sup20'&&!sk.role)sk.role=o.heal20?'heal':'buff';
  sk.d=o.d||descOf(sk);NEW[id]=sk;return sk;}
 const CONDN={brk:'HP半分以下の敵に威力1.5倍',debuff:'弱体1つにつき威力+25%（最大+75%）',lowhp:'自分のHPが減るほど威力上昇（最大+80%）',spd:'敵より速いほど威力上昇（最大+40%）',poison:'毒の敵に威力1.8倍',full:'HP満タンの敵に威力1.5倍'};
@@ -115,7 +115,7 @@ function descOf(s){const L=[];
  if(s.delay)L.push('当てた敵の行動を遅らせる');if(s.pierce20)L.push(`防御・精神を${Math.round(s.pierce20*100)}%無視`);if(s.drain)L.push(`与ダメの${Math.round(s.drain*100)}%を吸収`);
  if(s.steal)L.push('攻撃しながら道具を盗む');if(s.purge20)L.push('当てた敵の強化をすべて消す');if(s.crit)L.push(`会心率+${s.crit}%`);if(s.cond20)L.push(CONDN[s.cond20]);
  if(s.auto)L.push('敵の弱点の属性に変化');if(s.taunt20)L.push(`${s.taunt20}ターン挑発する`);if(s.ct20)L.push('味方全体の行動を早める');
- for(const f of s.fx20||[])L.push(fxTxt(f));for(const f of s.self20||[])L.push(fxTxt(Object.assign({on:'self'},f)));for(const f of s.post||[])L.push(fxTxt(f));
+ for(const f of s.fx20||[])L.push(fxTxt(f));for(const f of s.self20||[])L.push((s.selfPre?'攻撃の前に':'')+fxTxt(Object.assign({on:'self'},f)));for(const f of s.post||[])L.push(fxTxt(f));
  return L.join('／');}
 
 /* --- リオ（剣・光） --- */
@@ -124,7 +124,7 @@ S('harai',{n:'斬り払い',el:'斬',rk:'C',t:'all',fx:[{k:'atk',v:-15,t:2,p:.3}
 S('kobu',{n:'鼓舞の灯',k:'sup20',t:'self',bp:6,heal20:.15,sup:[{on:'allies',k:'atk',v:15,t:3},{on:'allies',k:'mag',v:15,t:3}]});
 S('torirensan',{n:'灯火連斬',el:'陽',rk:'A',hits:3,cond20:'brk',crit:20,glim:{from:'koujin',lv:20,p:.1}});
 S('shiden',{n:'紫電一閃',el:'雷',rk:'S',prio:1,fx:[{k:'stun',v:1,t:1,p:.35}]});
-S('x_rio1',{n:'天灯星斬',el:'陽',rk:'SSS',fx:[{k:'def',v:-25,t:3}],self:[{k:'atk',v:20,t:3}]});
+S('x_rio1',{n:'天灯星斬',el:'陽',rk:'SSS',selfPre:1,fx:[{k:'def',v:-25,t:3}],self:[{k:'atk',v:20,t:3}]});
 S('seikou',{n:'星光終天斬',el:'陽',pow:6,bp:0,ougi:1,post:[{on:'allies',k:'atk',v:20,t:3},{on:'allies',k:'mag',v:20,t:3}]});
 /* --- ガルド（大剣と盾・地） --- */
 S('tateuchi',{n:'盾撃',el:'打',rk:'C',delay:35,fx:[{k:'stun',v:1,t:1,p:.3}]});
@@ -169,10 +169,10 @@ S('ou_erna',{n:'天穿・神鳴',el:'雷',t:'all',pow:3.6,bp:0,ougi:1,fx:[{k:'st
 /* --- バルザ（槌・炎） --- */
 S('tekkai',{n:'鉄塊落とし',el:'打',rk:'B',fx:[{k:'def',v:-15,t:2,p:.4}]});
 S('shuuri',{n:'鍛冶師の手入れ',k:'sup20',t:'self',bp:5,sup:[{on:'allies',k:'def',v:20,t:3},{on:'self',k:'atk',v:15,t:3}]});
-S('kaentanda',{n:'火炎鍛打',el:'熱',rk:'A',self:[{k:'atk',v:20,t:3}],fx:[{k:'poison',v:.04,t:3,p:.3}]});
+S('kaentanda',{n:'火炎鍛打',el:'熱',rk:'A',selfPre:1,self:[{k:'atk',v:20,t:3}],fx:[{k:'poison',v:.04,t:3,p:.3}]});
 S('daichiwari',{n:'大地割り',el:'打',rk:'B',t:'all',fx:[{k:'spd',v:-20,t:2,p:.5}],glim:{from:'tekkai',lv:20,p:.1}});
 S('gouen',{n:'業炎',el:'熱',rk:'A',t:'all'});
-S('x_balza1',{n:'灼熱の鉄槌',el:'熱',rk:'SSS',prio:-1,self:[{k:'atk',v:30,t:3}]});
+S('x_balza1',{n:'灼熱の鉄槌',el:'熱',rk:'SSS',prio:-1,selfPre:1,self:[{k:'atk',v:30,t:3}]});
 S('youtetsu',{n:'溶鉄爆砕',el:'熱',t:'all',pow:3.6,bp:0,ougi:1,fx:[{k:'def',v:-30,t:3}]});
 /* --- クロウ（大鎌・闇の術） --- */
 S('noroi',{n:'呪い',ty:'術',k:'mag',el:'陰',rk:'B',fx:[{k:'poison',v:.05,t:3,p:.5}]});

@@ -47,8 +47,10 @@ function setIn(v){if(v===IN){clearTimeout(offT);offT=0;return;}
 /* ==================== 4. 味方の HP・BP 表示（ターンの始めだけ・瀕死・気絶と LP） ==================== */
 try{const _el=TX24.el;TX24.el=function(t,...a){if(t==='SP'&&a[0]==='sp')t='BP';return _el.call(this,t,...a);};}catch(e){}
 let hlTurn=-1,hlUntil=0;
-function hlShow(){const now=performance.now();if(B.turns!==hlTurn){hlTurn=B.turns;hlUntil=now+1600;}/* ver0.44：ターンの始めの 1.6 秒だけ（入力中もずっとは出さない） */
- const on=!B.over&&now<hlUntil;if(app.classList.contains('hl39')!==on)app.classList.toggle('hl39',on);}
+/* ver0.46：1 ターン目は「戦闘開始」が消えてから 1.4 秒、2 ターン目からはターンの始めの 1.6 秒。コマンドを決めたあと少しだけ（hpFlash）、攻撃の前に消す（hpHide） */
+let hlFrom=0;
+function hlShow(){const now=performance.now();if(B.turns!==hlTurn){hlTurn=B.turns;let be=0;try{be=BFLOW.bannerEnd();}catch(e){}hlFrom=B.turns<=1?Math.max(now,be):now;hlUntil=hlFrom+(B.turns<=1?1400:1600);}
+ const on=!B.over&&now<hlUntil&&now>=hlFrom;if(app.classList.contains('hl39')!==on)app.classList.toggle('hl39',on);}
 function hlState(){hlShow();const L=$('#hl24');if(!L)return;B.heroes.forEach((h,i)=>{const c=L.children[i];if(!c)return;const dy=RSB.dying(h),lp=h.alive?'':`LP ${h.lp||0}`;
  if(c.classList.contains('dy38')!==dy)c.classList.toggle('dy38',dy);if(c.dataset.lp!==lp)c.dataset.lp=lp;
  const z=h.alive?'':(h.lp||0)<=0?'z':'';if((c.dataset.z||'')!==z)c.dataset.z=z;});}
@@ -68,4 +70,6 @@ function waveOut(o){return new Promise(res=>{let w=$('#wv38');if(!w){w=document.
  const k=SPD&&SPD[speed]?SPD[speed]:1;setTimeout(res,Math.round(900*Math.max(.5,k)));});}
 function waveIn(){const w=$('#wv38');if(!w)return;w.className='on out';setTimeout(()=>{if(w.className==='on out')w.className='';},700);}
 
-return{geo,waveOut,waveIn,heroK};})();
+function hpFlash(ms){hlFrom=performance.now();hlUntil=hlFrom+ms;}
+function hpHide(){hlUntil=0;}
+return{geo,waveOut,waveIn,heroK,hpFlash,hpHide};})();
