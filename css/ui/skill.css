@@ -1,0 +1,46 @@
+/* ===== 技・術の表示（ver0.43）：属性の六角マーク・消費（BP／LP）・技の詳細の窓（js/rs/ui.js の elStack・costHTML・info と対） ===== */
+/* 属性の六角マーク：暗い金属の六角形に銀の文字。弱点＝赤く光る、耐性＝青く光る（光が切り抜かれないよう、形は疑似要素で描く） */
+.els43{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+.els43.two{margin:-4px 0}
+.hx43{--ring:linear-gradient(180deg,#c8ccd8,#5a6070);--in:radial-gradient(circle at 50% 30%,#4a505e,#1a1d26 75%);
+ position:relative;isolation:isolate;display:inline-grid;place-items:center;width:28px;height:31px;font-style:normal;font:900 13px/1 var(--cmd,serif);color:#eef0f8;text-shadow:0 1px 0 #000,0 0 3px rgba(0,0,0,.9)}
+.hx43::before,.hx43::after{content:'';position:absolute;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
+.hx43::after{inset:0;background:var(--ring);z-index:-2}
+.hx43::before{inset:2px;background:var(--in);z-index:-1}
+.els43.two .hx43{width:24px;height:27px;font-size:11px}
+.hx43.wk{--ring:linear-gradient(180deg,#ffd0c8,#ff3040);--in:radial-gradient(circle at 50% 35%,#ff7a6a,#8a0c18 80%);color:#fff;filter:drop-shadow(0 0 3px #ff2a3a) drop-shadow(0 0 7px #ff2a3a);animation:hx43w .9s ease-in-out infinite alternate}
+.hx43.rs{--ring:linear-gradient(180deg,#d0e8ff,#3090ff);--in:radial-gradient(circle at 50% 35%,#7ac0ff,#0c2a8a 80%);color:#fff;filter:drop-shadow(0 0 3px #3090ff) drop-shadow(0 0 7px #3090ff)}
+@keyframes hx43w{from{filter:drop-shadow(0 0 2px #ff2a3a) drop-shadow(0 0 4px #ff2a3a)}to{filter:drop-shadow(0 0 4px #ff2a3a) drop-shadow(0 0 10px #ff6070)}}
+.sk41 .hx43,.ski43 .hx43{width:22px;height:25px;font-size:11px}
+/* 消費：「BP　6」を右寄せ。足りない数字は赤。LP は下の行 */
+.c43{flex:none;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:1px;min-width:56px;margin-left:auto}
+.c43>span{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.c43 em{font-style:normal;font:700 13px/1.1 var(--cmd,serif);color:#e8d8a0;letter-spacing:.04em}
+.c43 b{font:700 19px/1.1 var(--cmd,serif);color:#fff;text-shadow:0 1px 0 #000}
+.c43 b.ng{color:#ff4a4a}
+.c43 b.tx{font-size:13px;color:#cfd3f5}
+.c38l .r .c43{margin-right:4px}
+/* コマンド欄の行：属性マークの幅をそろえる */
+.c38l .r .els43{width:30px}
+/* 技の詳細の窓（参考：ロマサガRS の技の詳細） */
+.ski43{display:flex;flex-direction:column;gap:8px;padding:10px;border-radius:6px;border:1px solid #8a7a58;
+ background:linear-gradient(180deg,rgba(58,50,40,.96),rgba(30,26,22,.97));box-shadow:inset 0 0 0 1px #000}
+.ski43 .top{display:flex;gap:12px;align-items:stretch}
+.ski43 .top .ski{width:88px;height:88px;border-width:3px;border-radius:7px}
+.ski43 .top .ski svg{width:64px;height:64px}
+.ski43 .nm{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.ski43 .t{display:flex;align-items:center;gap:6px}
+.ski43 .t b{flex:1;min-width:0;font:700 21px/1.2 var(--cmd,serif);color:#fff;text-shadow:0 1px 0 #000}
+.ski43 .els{display:flex;gap:2px}
+.ski43 .g{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.ski43 .g>div{display:flex;align-items:center;justify-content:space-between;padding:4px 10px;border-radius:7px;border:1px solid #7a6a4a;background:linear-gradient(180deg,#2a2620,#1a1712)}
+.ski43 .g>div.two{grid-column:1/-1}
+.ski43 .g .two span{flex:1;display:flex;justify-content:space-between;align-items:center}
+.ski43 .g .two>i{width:1px;height:20px;margin:0 12px;background:#7a6a4a}
+.ski43 .g em{font-style:normal;font:700 15px/1.2 var(--cmd,serif);color:#f0dca0}
+.ski43 .g b{font:700 19px/1.2 var(--cmd,serif);color:#fff}
+.ski43 .dsc{padding:8px 10px;border-radius:6px;border:1px solid #6a5a40;background:rgba(10,8,6,.55);min-height:64px}
+.ski43 .dsc p{margin:0 0 4px;font-size:13px;line-height:1.55;color:#f4efe6}
+.ski43 .dsc p.tgs{font-weight:700}
+.ski43 .dsc p.sub{font-size:11px;color:#c8bfa8}
+.ski43 .dsc b.w{color:#ff7a7a}.ski43 .dsc b.r{color:#7ab8ff}

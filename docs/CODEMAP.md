@@ -89,7 +89,7 @@
 | 83 | `js/rs/data.js` | 30 | ver0.37 戦闘システム刷新（データ） | RSD |
 | 84 | `js/rs/core.js` | 20 | 戦闘システム（能力値・習得・技セット・アビリティ・陣形・セーブ） | RSC |
 | 85 | `js/rs/battle.js` | 26 | 戦闘の進行（ターン制・BP・HP/LP） | RSB |
-| 86 | `js/rs/ui.js` | 20 | 戦闘システムの画面 | RSU |
+| 86 | `js/rs/ui.js` | 21 | 戦闘システムの画面 | RSU |
 | 87 | `js/v38/core.js` | 4 | ver0.38 土台：攻撃属性 8 種・武器種 8 種・セーブの移行・LP | V38 |
 | 88 | `js/v38/battle-ui.js` | 6 | ver0.38 戦闘画面 | V38B |
 | 89 | `js/v38/menu.js` | 7 | ver0.38 画面全体の整理 | V38M |

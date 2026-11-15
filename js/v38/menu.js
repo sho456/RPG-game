@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.42';
+const VER='ver0.43';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,12 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　戦闘の演出と文字を作り直しました<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　技の表示とダメージの見せ方を磨きました<br><small>`+
+ `・<b>戦闘</b>：狙っている敵の弱点の属性は赤、耐性は青く光る。BP は「BP　6」の表示に。技名の吹き出しはすぐ消える<br>`+
+ `・<b>ダメージ</b>：Critical・Weak・属性を大きく、金属の質感と筆の書体で。数字の出方にも動きを<br>`+
+ `・<b>技・術の詳細</b>：威力・Rank・BP・LP と説明をまとめた窓に。<b>コマンドの文字</b>を筆の入った書体に<br>`+
+ `・<b>修正</b>：陣形の ⓘ で裏の画面が見える／クエストの章の名前が切れる。人物の紹介は図鑑へ</small></div>`+
+ `<div class="nt n38"><b>ver0.42</b>　戦闘の演出と文字を作り直しました<br><small>`+
  `・<b>戦闘</b>：技名はキャラの吹き出しに。技の間は戦場が暗くなり、振り抜き→衝撃→閃光。数字は 1 桁ずつ弾み、倒した敵は赤く崩れる<br>`+
  `・<b>文字</b>：全画面のフォントを読みやすい角ゴシックに統一<br>`+
  `・<b>技・術のアイコン</b>：技の内容ごとの絵柄に。<b>装備</b>：アイコンをタップで詳細（属性耐性・能力影響・アビリティ）<br>`+

@@ -43,7 +43,7 @@ partyScreen=function(m){const P=G.party,f=C.formOf(),F=D.FORM[f],bench=G.members
   s:id=>{SEL=SEL===id?null:id;partyScreen();},
   e:()=>{if(SEL&&!P.includes(SEL)){P.push(SEL);SEL=null;save();}partyScreen();},
   rm:()=>{const a=SEL;SEL=null;G.party=P.filter(x=>x!==a);save();partyScreen();},x:()=>{SEL=null;partyScreen();},
-  form:()=>{SEL=null;FPK=null;FLIST=false;formOpen();}/* 陣形はいつも戦場の図から開く */,inv:()=>invMenu(),back:()=>{SEL=null;townMenu();}});
+  form:()=>{SEL=null;FPK=null;FLIST=false;FINFO=false;formOpen();}/* 陣形はいつも戦場の図から開く */,inv:()=>invMenu(),back:()=>{SEL=null;townMenu();}});
  try{tip('party');}catch(e){}};
 formation=function(){partyScreen();};
 
@@ -51,7 +51,7 @@ formation=function(){partyScreen();};
    ・上：戦闘画面と同じ向きの戦場（左が前＝敵の側）。キャラは戦闘と同じ左向きの構えの絵で、キャラは方位の円の上に立ち、頭の上に補正の札（能力▲／▼）
    ・2 人をタップで立ち位置を入れ替え（並び順 G.party[i] が陣形の i 番目の位置＝戦闘の配置）
    ・下：配置の小図と「変更」（陣形の一覧へ）・陣形名・説明・ⓘ（並び順ごとの補正の一覧） */
-let FPK=null,FLIST=false;
+let FPK=null,FLIST=false,FINFO=false;/* FINFO：下の欄に並び順ごとの補正を出す（陣形画面のまま切り替える） */
 const fTags=(f,i)=>(D.FORM[f].s[i]||[]).filter(e=>e.t==='st7').map(e=>`<span class="${e.v>0?'up':'dn'}">${esc(D.ST7N[e.k])}<i></i></span>`).join('')
  +((D.FORM[f].s[i]||[]).some(e=>e.t!=='st7')?'<span class="ex">＋</span>':'');
 function fMini(f,cls=''){const F=D.FORM[f];return`<div class="fmi ${cls}">${F.p.map(([x,y])=>`<i style="left:${14+x*72}%;top:${14+y*72}%"></i>`).join('')}</div>`;}
@@ -67,13 +67,12 @@ function formOpen(m){const f=C.formOf(),F=D.FORM[f],P=G.party;if(FPK!=null&&!P[F
  ovOpen(`<div class="fe41">
   <div class="fld"><i class="foe">敵</i>${P.map(tok).join('')}${m?`<p class="ms">${m}</p>`:''}</div>
   <div class="inf"><div class="l">${fMini(f,'big')}<button class="chg" data-a="list">変 更</button></div>
-   <div class="r"><div class="h"><b>${esc(F.n)}</b><button class="i" data-a="info">i</button></div><p>${esc(F.d)}</p></div></div></div>
+   <div class="r"><div class="h"><b>${esc(F.n)}</b><button class="i${FINFO?' on':''}" data-a="info">i</button></div>${FINFO?`<ol class="fol">${F.p.map((_,i)=>`<li><b>${P[i]?esc(HB[P[i]].name):'―'}</b><small>${esc(slotTxt(f,i))||'―'}</small></li>`).join('')}</ol>`:`<p>${esc(F.d)}</p>`}</div></div></div>
   <button class="tbtn back wide" data-a="close">閉じる</button>`,
  {fs:v=>{const i=+v;if(FPK==null){FPK=i;return formOpen();}if(FPK===i){FPK=null;return formOpen();}
    const a=FPK;FPK=null;[P[a],P[i]]=[P[i],P[a]];save();SFX.sel();formOpen(`${esc(HB[P[i]].name)} ⇄ ${esc(HB[P[a]].name)}`);},
   list:()=>{FLIST=true;formOpen();},
-  info:()=>{const o=F.p.map((_,i)=>`<li><b>${P[i]?esc(HB[P[i]].name):'―'}</b><small>${esc(slotTxt(f,i))||'―'}</small></li>`).join('');formOpen.box=1;
-   ovOpen(`<div class="fe41 ls"><div class="lh">${esc(F.n)}</div><ol class="fol">${o}</ol></div><button class="tbtn back wide" data-a="lback">戻る</button>`,{lback:()=>formOpen()});},
+  info:()=>{FINFO=!FINFO;formOpen();},
   close:()=>{FPK=null;FLIST=false;ovClose();partyScreen();}});
  requestAnimationFrame(fitTags);}
 /* 補正の札が戦場の外にはみ出す・隣の札と重なるときは、横にずらす */

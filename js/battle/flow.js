@@ -1,6 +1,6 @@
 /* ===== 戦闘の行動演出：ロマサガRS の流れ（ver0.42。正本） =====
  参考動画（RS の技「地走連刃」1 回分）を 0.05 秒ごとに分解して決めた流れ：
-  1. 技名の吹き出し  ：行動するキャラの頭の上に白い吹き出し「技名！」がポンと出る（以前の画面上部の帯は廃止）
+  1. 技名の吹き出し  ：行動するキャラの頭の上に白い吹き出し「技名！」がポンと出て、約 0.9 秒で消える（以前の画面上部の帯は廃止）
   2. 暗転            ：技・術の間は戦場が少し暗くなり、エフェクトだけが明るく見える。行動が終わると戻る
   3. 予備動作        ：その場で一歩前へ。足元に属性の色の光の輪・立ち上る光
   4. 発動            ：振り抜き → 地を這う衝撃（属性の色の光の塊）が敵へ走る。連撃は 1 撃ごとに繰り返す
@@ -21,7 +21,7 @@ let BUB=null;
 function bubble(u,name){if(!inB()||!u||!name)return;const host=$('#pops');if(!host)return;close(true);
  const el=document.createElement('div');el.className='bub42'+(u.side?' e':'');el.innerHTML=`<b>${esc(name)}！</b>`;host.appendChild(el);
  BUB={el,u,t0:performance.now()};place();
- clearTimeout(bubble._t);bubble._t=setTimeout(()=>close(),Math.round(3200*(ANIM.SP?ANIM.SP():1)));}
+ clearTimeout(bubble._t);bubble._t=setTimeout(()=>close(),Math.round(900*(ANIM.SP?ANIM.SP():1)));/* すぐ消す（ver0.43） */}
 function place(){if(!BUB)return;const cv=$('#cv');if(!cv||!BUB.el.isConnected){BUB=null;return;}const k=cv.offsetWidth/W,[x,y]=BX.at(BUB.u,'head');
  BUB.el.style.left=Math.round(x*k)+'px';BUB.el.style.top=Math.round(y*k-6)+'px';}
 function close(now){if(!BUB)return;const el=BUB.el;BUB=null;if(now){el.remove();return;}el.classList.add('out');setTimeout(()=>el.remove(),220);}

@@ -1,7 +1,24 @@
 /* ===== 文字のフォントの統一（ver0.42。正本：ここで全画面の書体を 1 つにそろえる） =====
  ・ロマサガRS の画面の角ゴシック（太めで読みやすいゴシック）に近い「M PLUS 1p」を、画面のすべての文字に使う
  ・ほかの CSS の font-family は残っていても、ここで上書きする（ファイルごとに書体を決めない）
- ・戦闘の数字・「Critical」などキャンバスに描く文字は js/v24-text.js の FONT（数字＝Noto Serif の斜体、英字＝Jost の斜体） */
-:root{--font:"M PLUS 1p","Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP",sans-serif}
+ ・コマンド（ボタン・技名・キャラ名・見出し・タブ）は「Kaisei Tokumin」（筆の入りのある明朝系。ロマサガRS の字見本に合わせた ver0.43）
+ ・戦闘の数字・「Critical」などキャンバスに描く文字は js/v24-text.js の FONT */
+:root{--font:"M PLUS 1p","Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP",sans-serif;
+ --cmd:"Kaisei Tokumin","M PLUS 1p","Hiragino Mincho ProN",serif}
 html,body,#app,#app *,#sheet *,#ov *{font-family:var(--font) !important}
 #app,#sheet,#ov{font-feature-settings:"palt" 1}
+/* 新しい書体は文字の上下が大きいので、行の高さを固定している小さな文字の切れを直す（ver0.43） */
+.qch31{max-width:180px !important}
+.qch31 b{display:block;line-height:1.5 !important;padding:0 1px}
+.qch31 small,.qch31 i{line-height:1.3 !important}
+
+/* コマンドの書体（ver0.43）：押せるもの・名前・見出し */
+#app button,#app .tbtn,#sheet button,#sheet .tbtn,
+#app .c38l .r .n,#app .c38h .nm b,#app .c38f small,#app #bbar button,
+#app .sk41 .n,#sheet .sk41 .n,#app .rsset .sl b,#app .rsab .h b,
+#app .ps41 .hd>b,#app .pc41 .nm b,#app .pb41 b,#app .ps41 .fb b,#app .ps41 .bh,
+#app .sh22,#sheet .sh22,#app .ctabs button,#app .bdtab button,#app .bdh .bdn b,#app .bdi.b39>b,
+#sheet .fe41 .inf .h b,#sheet .fe41 .tk>b,#sheet .fe41 .lh,#sheet .fgrid b,
+#sheet .ski43 .nm .t b,#sheet .eqi .hd b,#app .chd .chn b,
+#app .b22tg .nm b,#app .bub42 b,
+#app .qrow31 b,#app .qch31 b,#app .wtabs button{font-family:var(--cmd) !important;font-weight:700}
