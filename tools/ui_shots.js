@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* 主要画面のスクリーンショット（UI 改修の確認用。少ないトークンで画面を見るための道具）
    使い方：python3 -m http.server 8765 &  →  node tools/ui_shots.js <出力dir> [画面名...]
-   画面名：party form form-sel detail sk-slot sk-put detail-sk detail-aw detail-bd board board-sel board-up board-up-lock battle-turn battle-cmd battle-pick battle-wk battle-act（省略時は全部） */
+   画面名：party party-sw form form-sel form-list detail detail-ab sk-slot sk-put detail-sk detail-aw detail-bd board board-sel board-up board-up-lock battle-turn battle-cmd battle-pick battle-wk battle-act（省略時は全部） */
 'use strict';
 const {chromium} = require('playwright');
 const [OUT = 'work/shots', ...only] = process.argv.slice(2);
@@ -19,15 +19,18 @@ const want = n => !only.length || only.includes(n);
     for (const id of Object.keys(HB)) if (!G.members.includes(id)) newMember(id);
     G.party = ['rio', 'gald', 'celes', 'mire'];for (const id of G.members) {G.h[id].lv = 40;G.h[id].hp = null;}
     document.querySelector('#ov').classList.add('hide');townMenu();});
-  const shot = async (n, fn, ms = 600) => {if (!want(n)) return;try {await p.evaluate(fn);} catch (e) {errs.push(n + ': ' + e.message.split('\n')[0]);}
+  const shot = async (n, fn, ms = 600) => {if (!want(n)) return;try {if (!/^form-/.test(n)) await p.evaluate(() => {try {ovClose();} catch (e) {}});await p.evaluate(fn);} catch (e) {errs.push(n + ': ' + e.message.split('\n')[0]);}
     await p.waitForTimeout(ms);
     /* SCROLL=1：#cmd（下の欄）を最後までスクロールした画面も撮る（_2.png） */
     if (process.env.SCROLL) {await p.evaluate(() => {const c = document.querySelector('#cmd');c.scrollTop = 0;});}
     await p.screenshot({path: `${OUT}/${n}.png`, fullPage: !!process.env.FULL});
     if (process.env.SCROLL) {await p.evaluate(() => {const c = document.querySelector('#cmd');c.scrollTop = c.scrollHeight;});await p.waitForTimeout(150);await p.screenshot({path: `${OUT}/${n}_2.png`});}};
   await shot('party', () => partyScreen());
-  await shot('detail', () => {partyScreen();const b = document.querySelector('[data-a="det"]');if (b) b.click();else equipMenu(G.party[0]);});
-  for (const t of ['sk', 'aw', 'bd']) await shot('detail-' + t, `(()=>{const b=[...document.querySelectorAll('#cmd button,#sheet button,#ov button')].find(x=>x.dataset.t==='${t}'||x.dataset.v==='${t}');if(b)b.click();})()`);
+  await shot('party-sw', () => {partyScreen();document.querySelector('.pc41 [data-a="s"]').click();});
+  await shot('form-list', () => {V38P.formOpen();document.querySelector('#sheet [data-a="list"]').click();});
+  await shot('detail', () => {try {ovClose();} catch (e) {}CTAB = 'st';equipMenu(G.party[0]);});
+  await shot('detail-ab', () => {CTAB = 'ab';equipMenu(G.party[0]);});
+  for (const t of ['sk', 'aw']) await shot('detail-' + t, `(()=>{const b=[...document.querySelectorAll('#cmd button,#sheet button,#ov button')].find(x=>x.dataset.t==='${t}'||x.dataset.v==='${t}');if(b)b.click();})()`);
   await shot('sk-slot', () => {CTAB = 'sk';equipMenu('rio');document.querySelector('[data-a="rsslot"][data-v="3"]').click();});
   await shot('sk-put', () => {const c = [...document.querySelectorAll('[data-a="rsk"]')];c[c.length - 1].click();});
   await shot('form', () => {partyScreen();V38P.formOpen();});

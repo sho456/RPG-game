@@ -110,65 +110,6 @@
 @keyframes wv38a{to{transform:translateX(0)}}@keyframes wv38b{from{transform:translateX(0)}to{transform:translateX(110%)}}
 @keyframes wv38t{from{opacity:0;transform:translate(30px,-50%)}to{opacity:1;transform:translate(0,-50%)}}@keyframes wv38o{to{opacity:0;transform:translate(-30px,-50%)}}
 
-/* ==================== 編成画面 ==================== */
-.ps38{display:flex;flex-direction:column;gap:8px;padding-bottom:6px}
-.ps38 .hd{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-radius:6px;border:1px solid rgba(233,196,106,.5);background:linear-gradient(180deg,rgba(40,32,14,.85),rgba(14,12,22,.9))}
-.ps38 .hd>b{font-size:17px;font-weight:900;letter-spacing:.1em;color:#fff1c2}
-.ps38 .hd span{display:flex;align-items:baseline;gap:6px}.ps38 .hd small{font-size:10px;color:#cdbf98}
-.ps38 .hd strong{font:italic 800 22px/1 var(--num,inherit);color:#ffe27a;text-shadow:0 0 8px rgba(255,200,80,.5)}
-.ps38 .cs{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
-.pc38{position:relative;display:flex;flex-direction:column;gap:3px;padding:20px 3px 4px;border-radius:5px;cursor:pointer;
- border:2px solid #c89a3a;background:linear-gradient(180deg,#3a2c10,#16120c 30%,#100e16);box-shadow:inset 0 0 0 1px #5a4418,0 3px 8px rgba(0,0,0,.5)}
-.pc38.sel{border-color:#fff1c2;box-shadow:0 0 0 2px #ffd34a,0 0 14px rgba(255,214,90,.7)}
-.pc38.emp{align-items:center;justify-content:center;min-height:300px;border-style:dashed;border-color:#6a5a3a;color:#a89a7a;background:rgba(20,18,26,.6)}
-.pc38.emp b{font-size:30px}
-.pc38 .cr{position:absolute;left:50%;top:-10px;transform:translateX(-50%);width:44px;height:26px;display:grid;place-items:center;clip-path:polygon(15% 0,85% 0,100% 50%,85% 100%,15% 100%,0 50%);background:linear-gradient(180deg,#fff3b0,#e0a830 50%,#8a5a10)}
-.pc38 .cr b{font:900 15px/1 Georgia,serif;color:#3a1c00;text-shadow:0 1px 0 rgba(255,255,255,.6)}
-.pc38 .ar{position:relative;height:118px;border-radius:3px;overflow:hidden;background:radial-gradient(ellipse at 50% 75%,color-mix(in srgb,var(--ec) 45%,transparent),transparent 70%),linear-gradient(180deg,#1a2040,#0a0c18)}
-.pc38 .ar svg{position:absolute;inset:0;width:100%;height:100%;opacity:.35}
-.pc38 .ar img{position:absolute;left:50%;bottom:2px;transform:translateX(-50%);height:104%;image-rendering:pixelated}
-.pc38 .ar .no{position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;display:grid;place-items:center;font:800 10px/1 inherit;font-style:normal;color:#2a1600;background:#ffe27a}
-.pc38 .nm{display:flex;align-items:center;gap:3px;padding:2px 3px;border-radius:3px;background:linear-gradient(90deg,#2a2440,#141228);border:1px solid #4a4068}
-.pc38 .nm img{width:16px;height:16px;image-rendering:pixelated;flex:none}
-.pc38 .nm span{font-size:12px;font-weight:900;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pc38 .pw{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;padding:2px 4px;border-radius:3px;background:#0c0a14;border:1px solid #3a3050}
-.pc38 .pw small{font-size:9px;color:#ffd34a;font-weight:800}.pc38 .pw em{font-style:normal;font-size:9px;color:#9aa4c8}
-.pc38 .pw b{flex-basis:100%;text-align:right;font:800 15px/1.1 var(--num,inherit);color:#fff}
-.pc38 .eq{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:3px;border-radius:3px;background:linear-gradient(180deg,#4a3410,#2a1c08);border:1px solid #8a6a2a}
-.pc38 .eq img,.pc38 .eq i{width:100%;aspect-ratio:1;image-rendering:pixelated;border-radius:2px;background:rgba(0,0,0,.35);display:block}
-.pc38 .eq img.r2{background:rgba(80,120,255,.25)}.pc38 .eq img.r3{background:rgba(255,190,60,.25)}.pc38 .eq img.r4{background:rgba(255,90,200,.28)}
-.pc38 .ob{align-self:center;position:relative;width:52px;height:52px;margin:2px 0;border-radius:50%;border:2px solid #c89a3a;background:radial-gradient(circle at 50% 40%,#3a2a12,#0e0a06);display:grid;place-items:center;cursor:pointer}
-.pc38 .ob i{position:absolute;inset:8px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff,var(--ec) 45%,#2a1040);box-shadow:0 0 10px var(--ec)}
-.pc38 .ob small{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:9px;font-weight:800;padding:0 4px;border-radius:2px;color:#fff;background:#2a2238}
-.pc38 .ob.rdy small{background:#d89a20;color:#2a1600}
-.pc38 .fp{display:flex;align-items:center;gap:3px;margin-top:3px}
-.pc38 .fp span{flex:1;font-size:10px;font-weight:800;color:#e8e2ff;text-align:center;line-height:1.2}.pc38 .fp span b{color:#5adcff;font-size:9px}
-.pm38{position:relative;width:34px;height:34px;flex:none;border-radius:3px;background:#05060c;border:1px solid #5a5070}
-.pm38 i{position:absolute;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:1px;background:#5a5470}
-.pm38 i.me{background:#ffd34a;box-shadow:0 0 5px #ffd34a}
-.pm38.big{width:64px;height:64px}.pm38.big i{width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:3px;background:#3a5aa8;color:#fff;font:800 10px/16px inherit;font-style:normal;text-align:center}
-.ps38 .fb{display:flex;align-items:stretch;gap:6px;padding:4px;border-radius:4px;border:1px solid #6a5a3a;background:linear-gradient(180deg,#1c1824,#0c0a12)}
-.ps38 .fb .fn{flex:1;display:flex;align-items:baseline;gap:8px;padding:6px 10px;border:0;background:none;color:#fff;text-align:left}
-.ps38 .fb .fn small{font-size:10px;color:#cdbf98}.ps38 .fb .fn b{font-size:15px;font-weight:900;letter-spacing:.05em}
-.ps38 .fb .fc{flex:none;padding:0 14px;border-radius:3px;border:2px solid #ffd0a0;background:linear-gradient(180deg,#f07a30,#b8401a);color:#fff;font-weight:900;font-size:13px;text-shadow:1px 1px 0 #5a1a00}
-.ps38 .pa{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
-.ps38 .bh{font-size:13px;font-weight:800;color:#ffe27a;border-left:3px solid #ffd34a;padding-left:6px}.ps38 .bh small{color:#9aa4c8}
-.ps38 .bn{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
-.pb38{display:flex;flex-direction:column;align-items:center;padding:4px 2px;border-radius:4px;border:1px solid #3a4068;background:linear-gradient(180deg,#1a2040,#0c0e1e);cursor:pointer}
-.pb38.sel{border-color:#ffd34a;box-shadow:0 0 8px rgba(255,214,90,.7)}
-.pb38 img{height:48px;image-rendering:pixelated}.pb38 b{font-size:12px;color:#fff}.pb38 small{font-size:9px;color:#9aa4c8}
-.ps38 .ft{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-/* 陣形の選択 */
-.fm38{display:flex;flex-direction:column;gap:6px}
-.fm38 .hd b{font-size:16px;color:#fff1c2}.fm38 .hd small{display:block;font-size:11px;color:#9aa4c8}
-.fm38 .f{display:flex;gap:10px;align-items:flex-start;padding:8px;border-radius:5px;border:1px solid #3a4068;background:linear-gradient(180deg,#151a34,#0a0c1a);color:#fff;text-align:left}
-.fm38 .f.on{border-color:#ffd34a;box-shadow:inset 0 0 0 1px #ffd34a}
-.fm38 .tx{flex:1;min-width:0}.fm38 .tx>b{font-size:14px}.fm38 .tx>b em{margin-left:6px;font-style:normal;font-size:10px;padding:0 5px;border-radius:2px;background:#ffd34a;color:#2a1600}
-.fm38 .tx>small{display:block;font-size:11px;color:#b8c0e0;margin:2px 0 4px}
-.fm38 ol{list-style:none;margin:0;padding:0;display:grid;gap:2px}
-.fm38 li{display:flex;align-items:baseline;gap:5px;font-size:11px}.fm38 li i{font-style:normal;width:14px;height:14px;border-radius:2px;background:#3a5aa8;text-align:center;font-size:9px;line-height:14px}
-.fm38 li span{width:4.2em;flex:none;color:#fff;font-weight:700}.fm38 li small{color:#8ff0a8}
-
 /* ==================== キャラ詳細：能力（7 能力値）。説明はタップで（#h38） ==================== */
 .ctabs.t38{display:grid !important;grid-template-columns:repeat(4,1fr) !important}
 .st38{display:flex;flex-direction:column;gap:6px;margin:6px 0}
@@ -203,12 +144,10 @@
 #h38 .hd em{margin-left:auto;font-style:normal;font-size:11px;padding:1px 8px;border-radius:10px;background:rgba(255,214,90,.18);color:#ffe27a}
 #h38 ul{margin:0;padding-left:16px;font-size:12.5px;line-height:1.6;color:#e6ecff}
 #h38 small{display:block;margin-top:6px;font-size:11px;color:#9aa4c8}
-.pc38 button.fp{background:none;border:0;padding:0;font:inherit;color:inherit;width:100%;cursor:pointer}
-.pc38 button.fp:active{filter:brightness(1.4)}
 
 /* ==================== スマホの小さい画面 ==================== */
-@media (max-height:700px){.c38l .r{min-height:38px}.c38h{min-height:34px}.c38h .fc{width:34px;height:34px}.pc38 .ar{height:96px}}
-@media (max-width:360px){.pc38 .nm span{font-size:11px}.pc38 .pw b{font-size:13px}.c38l .r .n{font-size:14px}}
+@media (max-height:700px){.c38l .r{min-height:38px}.c38h{min-height:34px}.c38h .fc{width:34px;height:34px}}
+@media (max-width:360px){.c38l .r .n{font-size:14px}}
 
 /* ===== ver0.39 対象の弱点・耐性：弱点は赤く、耐性は青く光る（見つけたものだけ） ===== */
 #app.v38 .b22tg .wk span:not(.q) u{display:none}
@@ -230,36 +169,17 @@
 .sklv i{display:inline-block;width:46px;height:5px;border-radius:3px;background:linear-gradient(90deg,#ffd34a var(--r),rgba(255,255,255,.14) var(--r))}
 .rsrow .how{margin-left:10px;color:#9aa2c4}
 
-/* ===== ver0.39 編成カード：並び番号と属性の球体を削除。残りの星ポイントがあるときだけ小さな札 ===== */
-.pc38 .ob39{align-self:center;margin:4px 0 2px;padding:2px 10px;border-radius:3px;border:1px solid #c89a3a;background:linear-gradient(180deg,#d8a430,#8a5a14);color:#2a1600;font-size:10px;font-weight:800;cursor:pointer}
-.pc38 .ob39 b{font-weight:900}
-.pc38 .ob39.none{visibility:hidden}
+/* ===== ver0.39 技Lv（熟練を統合）：数字＋次の Lv までのゲージ ===== */
+.sklv{display:inline-flex;align-items:center;gap:6px;vertical-align:middle}
+.sklv b{font-weight:800;color:#ffe27a}
+.sklv i{display:inline-block;width:46px;height:5px;border-radius:3px;background:linear-gradient(90deg,#ffd34a var(--r),rgba(255,255,255,.14) var(--r))}
+.rsrow .how{margin-left:10px;color:#9aa2c4}
 
-/* ===== ver0.40 陣形・配置（js/v38/party.js formOpen） ===== */
-.fe40{display:flex;flex-direction:column;gap:8px}
-.fe40 .hd b{display:block;font-size:18px;font-weight:900;color:#fff1c2;letter-spacing:.06em}
-.fe40 .hd small{font-size:11px;color:#9aa4c8}
-.fe40 .fld{position:relative;height:320px;border-radius:6px;border:1px solid #5a5070;overflow:hidden;
- background:radial-gradient(ellipse at 55% 60%,rgba(80,110,200,.22),transparent 65%),
-  repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,transparent 1px 42px),repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 42px),
-  linear-gradient(180deg,#141a30,#0a0c18)}
-.fe40 .fld::before{content:'';position:absolute;left:0;top:0;bottom:0;width:16px;background:linear-gradient(90deg,rgba(255,70,90,.35),transparent)}
-.fe40 .foe{position:absolute;left:4px;top:50%;transform:translateY(-50%);font-style:normal;font-size:10px;font-weight:900;color:#ff9aa8;writing-mode:vertical-rl;letter-spacing:.3em}
-.fe40 .tk{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:1px;width:92px;padding:0;border:0;background:none;color:#fff;cursor:pointer;transition:left .3s cubic-bezier(.2,.9,.3,1),top .3s cubic-bezier(.2,.9,.3,1)}
-.fe40 .tk .sp{position:relative;width:60px;height:66px;display:grid;place-items:end center}
-.fe40 .tk .sp::after{content:'';position:absolute;left:6px;right:6px;bottom:0;height:8px;border-radius:50%;background:radial-gradient(ellipse,color-mix(in srgb,var(--ec) 70%,transparent),transparent 70%)}
-.fe40 .tk img{position:relative;z-index:1;height:66px;image-rendering:pixelated;transform:scaleX(-1)}
-.fe40 .tk b{font-size:11px;font-weight:900;padding:0 6px;border-radius:2px;background:rgba(10,12,24,.8);white-space:nowrap}
-.fe40 .tk small{font-size:9px;font-weight:800;color:#8ff0a8;text-shadow:0 1px 0 #000;line-height:1.2;text-align:center}
-.fe40 .tk.sel .sp::before{content:'';position:absolute;inset:-4px 0 -4px;border-radius:8px;border:2px solid #ffe27a;box-shadow:0 0 12px rgba(255,214,90,.8);animation:sl40 .7s ease-in-out infinite alternate}
-.fe40 .tk.sel b{background:#ffe27a;color:#2a1600}
-.fe40 .tk.tgt .sp::before{content:'';position:absolute;inset:-4px 0 -4px;border-radius:8px;border:1px dashed rgba(255,226,122,.7)}
-.fe40 .fl{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
-.fe40 .fl::-webkit-scrollbar{display:none}
-.fe40 .fl button{flex:none;display:flex;flex-direction:column;align-items:center;gap:3px;width:74px;padding:6px 2px;border-radius:5px;border:1px solid #3a4068;background:linear-gradient(180deg,#151a34,#0a0c1a);color:#cfd3f5;cursor:pointer}
-.fe40 .fl button b{font-size:10px;white-space:nowrap}
-.fe40 .fl button.on{border-color:#ffd34a;color:#fff1c2;box-shadow:inset 0 0 0 1px #ffd34a,0 0 8px rgba(255,214,90,.35)}
-.fe40 .ms{margin:0;font-size:11px;color:#7dffa8;text-align:center}
+/* ===== ver0.39 編成カード：並び番号と属性の球体を削除。残りの星ポイントがあるときだけ小さな札 ===== */
+
 /* ver0.40 指のある行は「もう 1 回タップで決定」：枠がゆっくり明滅 */
 .c38l .r.pk{animation:pkr40 .9s ease-in-out infinite alternate}
 @keyframes pkr40{from{box-shadow:0 0 6px rgba(110,230,255,.25),inset 0 1px 0 rgba(255,255,255,.25)}to{box-shadow:0 0 14px rgba(110,230,255,.6),inset 0 1px 0 rgba(255,255,255,.25)}}
+
+/* ver0.41 キャラ詳細のタブ 4 つ（能力・アビリティ・技・術・星臨） */
+.ctabs.t38 button{font-size:13px !important;padding-left:2px !important;padding-right:2px !important;white-space:nowrap;letter-spacing:0 !important}

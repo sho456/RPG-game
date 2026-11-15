@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.40';
+const VER='ver0.41';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,12 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　操作をわかりやすくしました<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　編成・陣形・技の画面を作り直しました<br><small>`+
+ `・<b>編成</b>：カードをタップで詳細、「入替」か控えをタップで入れ替え。読みやすい太字のフォントに<br>`+
+ `・<b>陣形</b>：上から見た戦場に、方位の円と補正の札（▲▼）。下の「変更」で陣形を選ぶ<br>`+
+ `・<b>技・術</b>：アイコン・Rank・属性の一覧に。<b>アビリティ</b>は専用のタブへ<br>`+
+ `・<b>戦闘</b>：一部の味方が小さく描かれる不具合と、大型の敵が画面の端で切れる不具合を修正</small></div>`+
+ `<div class="nt n38"><b>ver0.40</b>　操作をわかりやすくしました<br><small>`+
  `・<b>技・術セット</b>：技をタップでセット／外す。枠をタップしてから技をタップで、その枠に入れる（枠どうしで並べ替え）<br>`+
  `・<b>陣形・配置</b>：戦場の図で、2 人をタップして立ち位置を入れ替えられる。陣形は下の帯で切り替え<br>`+
  `・<b>戦闘のコマンド</b>：タップで指を動かし、もう一度タップで決定<br>`+

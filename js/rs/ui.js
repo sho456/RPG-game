@@ -101,22 +101,31 @@ bbar=function(){const b=$('#bbar');if(!b||!G)return;const p=B&&B.pick,l=p&&repOK
 const RK=['','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ'];
 function stars(r){return`<span class="rsst">${[1,2,3,4,5].map(i=>`<i class="${i<=r?'on':''}"></i>`).join('')}</span>`;}
 /* 技Lv（使った回数＝熟練で上がる）を 1 つの表示に：「技Lv 3」と次の Lv までのゲージ */
-function skLv(id,k){const l=C.profLv(id,k),n=C.profN(id,k),a=D.PROF[l-1]||0,b=D.PROF[l],r=l>=10||b==null?100:Math.round((n-a)/(b-a)*100);
- return`<span class="sklv"><b>技Lv ${l}</b><i style="--r:${r}%"></i></span>`;}
-function skCard(id,k,o={}){const s=SK[k];if(!s)return'';const[el,ec]=badge(s),on=o.set,pl=C.profLv(id,k),u={id,side:0},lp=C.lpCost(s),cs=s.ougi?'奥義':'BP '+C.costOf(u,s)+(lp?'・LP'+lp:'');
- return`<div class="sk22 x22 rs37${o.lock?' lock':''}${on?' on':''}${o.pend?' pend':''}" style="--ec:${ec}"${o.btn?` data-a="rsk" data-v="${k}"`:''}>${on?`<i class="sno">${o.i+1}</i>`:''}<div class="h">${hx(el,ec,'sm')}<b>${esc(s.n)}</b><span class="tg ${tyCls(s)}">${tyOf(s)}</span>${s.rk?`<span class="tg rkx">${s.rk}</span>`:''}<span class="c">${cs}</span></div>
-  <div class="d">${esc(s.d||'')}</div>
-  <div class="rsrow"><small>${o.lock?'習得：'+esc(o.how||''):`${skLv(id,k)}${o.how?'<span class="how">習得 '+esc(o.how)+'</span>':''}`}</small>
-   ${o.btn?`<button class="sinf" data-a="rsinfo" data-v="${k}" aria-label="詳細">i</button>`:''}</div></div>`;}
+/* 技・術の行（ver0.41：ロマサガRS の技一覧のように「アイコン＋名前＋Rank＋属性」だけ。説明は ⓘ で出す）
+   アイコン：技は武器、術・補助・回復は属性の文字。色は種類（技＝赤・術＝青・回復＝緑・補助＝金・奥義＝虹）。下の ◆ は威力の段（E〜D・C〜B・A 以上）
+   Rank＝技Lv（使うほど上がる。旧「熟練」） */
+const ELN={'斬':'#c8ccd8','打':'#d8b890','突':'#c0d0e0','熱':'#ff8a5a','冷':'#8ad4ff','雷':'#ffe066','陽':'#fff0a0','陰':'#c09cff'};
+const tier=rk=>!rk?0:'ED'.includes(rk)?1:'CB'.includes(rk)?2:3;
+function skIcon(id,s,sm){const t=tyCls(s),[el]=badge(s),wt=(D.HERO[id]||{}).w,shp=(D.HERO[id]||{}).shape;let g='';
+ if(t==='ph'){try{g=`<img src="${shp==='大鎌'?IC21.render('scythe_鉄',0):V38P.wIcon(wt)}" alt="">`;}catch(e){}}
+ if(!g)g=`<b>${esc(el||'術')}</b>`;const n=tier(s.rk);
+ return`<span class="ski ${t}${sm?' sm':''}">${g}${n?`<i class="dm">${'◆'.repeat(n)}${'◇'.repeat(3-n)}</i>`:''}</span>`;}
+function elBadges(s){const L=[...new Set([s.el,s.el2].filter(x=>x&&ELN[x]))];return L.map(e=>`<i class="elb" style="--c:${ELN[e]}">${e}</i>`).join('');}
+function skCard(id,k,o={}){const s=SK[k];if(!s)return'';const on=o.set,pl=C.profLv(id,k),u={id,side:0},lp=C.lpCost(s);
+ return`<div class="sk41${o.lock?' lock':''}${on?' on':''}${o.pend?' pend':''}"${o.btn?` data-a="rsk" data-v="${k}"`:''}>
+  ${skIcon(id,s)}${on?`<i class="sno">${o.i+1}</i>`:''}
+  <div class="m"><b class="n">${esc(s.n)}</b><div class="r">${o.lock?`<small class="how">${esc(o.how||'')}</small>`:`<span class="rank"><small>Rank</small><b>${pl}</b></span>`}${elBadges(s)}</div></div>
+  <div class="c">${s.ougi?'<small>奥義</small>':`<small>BP</small><b>${C.costOf(u,s)}</b>`}${lp?`<em>LP${lp}</em>`:''}</div>
+  ${o.btn||o.lock?`<button class="sinf" data-a="rsinfo" data-v="${k}" aria-label="詳細">i</button>`:''}</div>`;}
 /* 技・術セット（ver0.40）：枠をタップ → 技をタップで入れる／技をタップでセット・外す／枠どうしをタップで並べ替え。
    選択中の枠・技は SPK に持つ（画面を描き直しても残る） */
 const SPK={id:null,slot:null,sk:null};
 function skillsHTML(id){if(SPK.id!==id){SPK.id=id;SPK.slot=SPK.sk=null;}
  const set=C.setOf(id),L=C.learned(id),all=(D.LEARN[id]||[]).map(x=>x[0]),lock=all.filter(k=>!L.includes(k)),pend=SPK.slot!=null||SPK.sk!=null;
  return`<div class="sh22">技・術セット <small>${set.length}/4　タップで付け外し</small></div>
-  <div class="rsset s40${pend?' pend':''}">${[0,1,2,3].map(i=>{const k=set[i],s=k&&SK[k],sel=SPK.slot===i?' sel':'';return s?`<button class="sl on${sel}" data-a="rsslot" data-v="${i}" style="--ec:${badge(s)[1]}"><i>${i+1}</i><b>${esc(s.n)}</b><small>BP ${C.costOf({id,side:0},s)}</small></button>`:`<button class="sl${sel}" data-a="rsslot" data-v="${i}"><i>${i+1}</i><small>＋</small></button>`;}).join('')}</div>
-  <div class="sh22">覚えている技・術 <small>${L.length}種</small></div><div class="skl40${pend?' pend':''}">${L.map(k=>skCard(id,k,{set:set.includes(k),i:set.indexOf(k),btn:1,pend:SPK.sk===k,how:C.howTxt(id,k)})).join('')}</div>
-  ${lock.length?`<div class="sh22">まだ覚えていない</div>${lock.map(k=>skCard(id,k,{lock:1,how:C.howTxt(id,k)})).join('')}`:''}`;}
+  <div class="rsset s41${pend?' pend':''}">${[0,1,2,3].map(i=>{const k=set[i],s=k&&SK[k],sel=SPK.slot===i?' sel':'';return s?`<button class="sl on${sel}" data-a="rsslot" data-v="${i}">${skIcon(id,s,1)}<b>${esc(s.n)}</b></button>`:`<button class="sl${sel}" data-a="rsslot" data-v="${i}"><span class="ski em">＋</span><b>&nbsp;</b></button>`;}).join('')}</div>
+  <div class="sh22">覚えている技・術 <small>${L.length}種</small></div><div class="skl40 skl41${pend?' pend':''}">${L.map(k=>skCard(id,k,{set:set.includes(k),i:set.indexOf(k),btn:1,pend:SPK.sk===k,how:C.howTxt(id,k)})).join('')}</div>
+  ${lock.length?`<div class="sh22">まだ覚えていない</div><div class="skl41">${lock.map(k=>skCard(id,k,{lock:1,how:C.howTxt(id,k)})).join('')}</div>`:''}`;}
 /* 枠 i に技 k を入れる（k が別の枠にあれば入れ替え） */
 function putSet(id,i,k){const h=G.h[id],a=C.setOf(id).slice(),j=a.indexOf(k);
  if(j>=0){if(i<a.length){[a[i],a[j]]=[a[j],a[i]];}else{a.splice(j,1);a.push(k);}}else if(i<a.length)a[i]=k;else a.push(k);h.sset=a.slice(0,4);}
@@ -132,7 +141,7 @@ function tapSkill(id,k){const a=C.setOf(id);
  if(a.length<4){G.h[id].sset=a.concat(k);return;}
  SPK.sk=k;}
 function abHTML(id){const h=G.h[id],ups=C.abUps(id);let wp=null,w=null;try{w=h.eq.w&&findItem(h.eq.w);wp=V20.wpOf(w);}catch(e){}
- return`<div class="sh22">アビリティ</div>${(D.AB[id]||[]).map((A,i)=>{const r=C.abRank(id,i),lv0=D.ABL[i],cur=r?C.abDesc(id,i,r):[],nx=C.abNext(id,i,r||0),full=C.abDesc(id,i,5);
+ return`${(D.AB[id]||[]).map((A,i)=>{const r=C.abRank(id,i),lv0=D.ABL[i],cur=r?C.abDesc(id,i,r):[],nx=C.abNext(id,i,r||0),full=C.abDesc(id,i,5);
    return`<div class="rsab x38${r?'':' lock'}"><div class="h"><i class="n">${i+1}</i><b>${esc(A.n)}</b>${stars(r)}<em>${r?'段階'+RK[r]:'Lv'+lv0+'で解放'}</em><i class="ar"></i></div>
     <ul>${(r?cur:full).map(t=>`<li>${esc(t)}</li>`).join('')}</ul>
     ${r&&nx.length?`<div class="nx"><small>次（${RK[r+1]}）：</small>${nx.map(esc).join('／')}</div>`:''}
@@ -150,11 +159,10 @@ function st7HTML(id){const s=stats(id),r=s.s7;if(!r)return'';const P=C.pf(id),H=
  return`<div class="st38"><button class="w" data-h38="wp:${id}"><b>${esc(P.wp)}${H.shape?`<small>（形：${esc(H.shape)}）</small>`:''}</b><small>武器種</small><i class="q"></i></button>
   <div class="lb"><button data-h38="lp:${id}"><em>LP</em><b>${s.lpMax}</b><i class="q"></i></button><button data-h38="bp:${id}"><em>BP</em><b>${s.bp0}<small>初期</small></b><b>${s.bpMax}<small>最大</small></b><b>+${s.bpReg+Math.min(2,Math.floor((s.spGain||0)/5))}<small>回復</small></b><i class="q"></i></button></div>
   <div class="g7">${D.ST7.map(k=>`<button class="r${P.w[k]?' wp':''}" data-h38="st:${id}:${k}"><span><i class="g${P.base[k][1]}">${P.base[k][1]}</i>${D.ST7N[k]}</span><b>${r[k]}</b></button>`).join('')}</div></div>`;}
-/* キャラ詳細のタブ：能力（能力値＋アビリティ＋人物）・技・術・星臨（装備は上の枠）。星盤は下の「星盤」ボタンで開く（ver0.39 でタブを統合） */
-const TABS=[['st','能力'],['sk','技・術'],['aw',SEIRIN.n]];
-{const _ch=charHTML;charHTML=function(id,tab,ed){if(tab==='ab'||tab==='eq'||tab==='bd')tab='st';const mine=tab==='sk'||tab==='aw';let s=_ch(id,mine?'__':tab,ed);
- try{if(mine)s=s.replace('<div class="cbody"></div>',`<div class="cbody c22 rs37">${tab==='sk'?skillsHTML(id):awHTML(id)}</div>`);
-  if(tab==='st')s=s.replace(/<div class="cbody([^"]*)">/,(m)=>m+`<div class="ab40">${abHTML(id)}</div>`);
+/* キャラ詳細のタブ：能力（能力値＋人物）・アビリティ（ver0.41 で別タブ）・技・術・星臨（装備は上の枠）。星盤は下の「星盤」ボタンで開く（ver0.39 でタブを統合） */
+const TABS=[['st','能力'],['ab','アビリティ'],['sk','技・術'],['aw',SEIRIN.n]];
+{const _ch=charHTML;charHTML=function(id,tab,ed){if(tab==='eq'||tab==='bd')tab='st';const mine=tab==='sk'||tab==='aw'||tab==='ab';let s=_ch(id,mine?'__':tab,ed);
+ try{if(mine)s=s.replace('<div class="cbody"></div>',`<div class="cbody c22 rs37">${tab==='sk'?skillsHTML(id):tab==='ab'?abHTML(id):awHTML(id)}</div>`);
   if(tab==='st'){const i=s.indexOf('<div class="cnote">');const pr=typeof PROF!=='undefined'&&PROF[id];const add=st7HTML(id)+(pr?`<div class="sh22">人物</div><div class="stx">${pr[0]}　${pr[1]}<br>${pr[2]}</div>`:'');s=i>=0?s.slice(0,i)+add+s.slice(i):s+add;}
   s=s.replace(/<div class="ctabs[^"]*">[\s\S]*?<\/div>/,`<div class="ctabs c22 rs37 t38">${TABS.map(([k,l])=>`<button class="${tab===k?'on':''}" data-a="tab" data-v="${k}">${l}</button>`).join('')}</div>`);
   s=s.replace(/パッシブ/g,'アビリティ');}catch(e){console.error(e);}
@@ -162,7 +170,7 @@ const TABS=[['st','能力'],['sk','技・術'],['aw',SEIRIN.n]];
 function acts(o,id,re){o.rsslot=i=>{tapSlot(id,+i);save();re();};o.rsk=k=>{tapSkill(id,k);save();re();};o.rsinfo=k=>info(SK[k],{id,side:0});}
 /* 描き直しても、下の欄のスクロール位置を保つ */
 const keepScroll=(sel,f)=>{const el=$(sel),y=el?el.scrollTop:0;f();const e2=$(sel);if(e2)e2.scrollTop=y;};
-{const _em=equipMenu;equipMenu=function(id,m){if(CTAB==='ab'||CTAB==='eq')CTAB='st';_em(id,m);try{const cid=G.members.includes(id)?id:G.party[0];acts(ACT,cid,mm=>keepScroll('#cmd',()=>equipMenu(cid,mm)));}catch(e){console.error(e);}};}
+{const _em=equipMenu;equipMenu=function(id,m){if(CTAB==='eq')CTAB='st';_em(id,m);try{const cid=G.members.includes(id)?id:G.party[0];acts(ACT,cid,mm=>keepScroll('#cmd',()=>equipMenu(cid,mm)));}catch(e){console.error(e);}};}
 {const _os=openSheet;openSheet=function(id,tab){_os(id,tab);try{const cid=G.members.includes(id)?id:G.party[0];acts(SACT,cid,()=>keepScroll('#sheet .swin',()=>openSheet(cid)));}catch(e){console.error(e);}};}
 
 return{info,skillsHTML,abHTML,awHTML,st7HTML,canAw,basicName};})();

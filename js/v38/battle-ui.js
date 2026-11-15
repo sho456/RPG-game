@@ -29,7 +29,7 @@ HK23.botPx=()=>{const g=GEO||geo();return Math.round(g.sh-g.bandBot-3);};
 function heroK(h,k){const A=ANIM.setup(h);if(!A||A.none)return;if(A._key25!==A.key||A._sc0==null){A._key25=A.key;A._sc0=A.sc;}h._k25=k;const s=A._sc0*k;if(Math.abs(A.sc-s)>1e-6)A.sc=s;}
 let SLOT=[],KH=1;
 HK23.placeHeroes=(hs,LY)=>{hs.forEach(h=>heroK(h,1));let ww=0,hh=0;hs.forEach(h=>{const Dm=V19.dims(h);ww=Math.max(ww,Dm.w);hh=Math.max(hh,Dm.h);});
- const band=LY.bot-LY.top,k=clamp(Math.min(V23.appW()*.115/(hh*SC),(band*.42)/hh),.66,1.05);KH=k;hs.forEach(h=>heroK(h,k));ww*=k;hh*=k;
+ const band=LY.bot-LY.top,k=clamp(Math.min(V23.appW()*.15/(hh*SC),(band*.46)/hh),.66,1.4)/* ver0.41：味方を一回り大きく（最小サイズの絵に張り付くと、背丈の補正が効かず一部のキャラが小さく見えた） */;KH=k;hs.forEach(h=>heroK(h,k));ww*=k;hh*=k;
  const xF=W*.6+ww*.5,xB=W-4-ww*.55,f=C.formOf();SLOT=[];
  hs.forEach((h,i)=>{const[px,py]=C.formPos(i,f),fx=xF+(xB-xF)*px,fy=LY.top+hh+(band-hh)*py;SLOT[i]=[fx,fy];h.x=fx-8*h.sc;h.y=Math.round(fy-16*h.sc+2);h._fx23=fx;});
  LY.heroL=Math.min(...hs.map(h=>h._fx23))-ww/2-10;};

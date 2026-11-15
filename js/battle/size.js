@@ -13,8 +13,8 @@ const CLS={spx_slime:1.25,spx_jelly:1.3,spx_shroom:1.3,
 const HUM=1.05,DEF=1.5,BOSS=1.45;
 const met=(name,A,sc)=>{const f=SPRX.frame(name,{},A.palKey,A.pal,true,sc);if(!f||!f.cv)return 0;const d=window.devicePixelRatio||1;return Math.sqrt(f.cv.width*f.cv.height)/d;};
 let REF=0;const C={};
-/* 基準：リオの絵を、味方の標準の倍率（ANIM の GS×戦闘での縮小 0.8）で描いたときの大きさ */
-function ref(){if(REF)return REF;const h={id:'rio',side:0,spr:'rio'},A=ANIM.setup(h);REF=A&&!A.none?met(A.name,A,1.2*.8):0;return REF;}
+/* 基準：リオの絵を、味方の標準の倍率（ANIM の GS。js/v38/battle-ui.js の placeHeroes）で描いたときの大きさ */
+function ref(){if(REF)return REF;const h={id:'rio',side:0,spr:'rio'},A=ANIM.setup(h);REF=A&&!A.none?met(A.name,A,1.2):0;return REF;}
 /* 敵 u の倍率（A.sc）。同じ絵・同じボス区分は 1 回だけ測る */
 function enemy(u,A,boss){const sc0=A.sc,k=A.name+'|'+(boss?1:0)+'|'+sc0.toFixed(3);if(C[k])return C[k];
  const r=ref();if(!r)return sc0;

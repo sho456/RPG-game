@@ -60,7 +60,8 @@ function placeHeroes(){const hs=B.heroes,n=hs.length;if(!n)return;LY.ebot=null;i
 /* 敵：演技エリアの中で、互いに重ならない位置を探す（ボスは中央寄り、手下は手前と上下へ） */
 const ANC={1:[[.5,.62]],2:[[.3,.4],[.68,.8]],3:[[.26,.3],[.7,.56],[.3,.88]],4:[[.26,.28],[.72,.4],[.26,.72],[.72,.9]],5:[[.2,.25],[.6,.3],[.25,.65],[.75,.7],[.45,.95]]};
 const BANC=[[.86,.22],[.86,.92],[.14,.18],[.14,.96]];
-function eDims(e){const D=V19.dims(e);return{w:D.w,h:D.h};}
+/* ver0.41：リグの寸法に加え、実際に描かれる絵の広がり（尻尾・腕など）も含める。大型の敵が画面の左端で切れないように */
+function eDims(e){const D=V19.dims(e),X=SPX.boxB(e);if(!X)return{w:D.w,h:D.h};return{w:Math.max(D.w,2*Math.max(X.l,X.r)+2),h:Math.max(D.h,X.t+1)};}
 function capScale(e,band,wid){const A=e.A;if(!A||A.none)return;if(A.sc23==null)A.sc23=A.sc;A.sc=A.sc23;e._cap23=0;const D=eDims(e),k=Math.min(1,band*.96/D.h,wid*.96/D.w);if(k<1){A.sc=A.sc23*k;e._cap23=A.sc;}}
 function placeEnemies(full){const x0=3,x1=Math.max(60,LY.heroL-10),EB=LY.ebot!=null?LY.ebot:LY.bot,band=EB-LY.top,es=B.enemies;
  const fixed=full?[]:es.filter(e=>e._p23&&e.alive),todo=full?es.filter(e=>e.alive||!e._p23):es.filter(e=>!e._p23);if(!todo.length)return;

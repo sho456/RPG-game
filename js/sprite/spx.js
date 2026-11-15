@@ -133,10 +133,14 @@ const DEF={rio:{base:'rio',wid:25,hgt:36},wolf:{base:'wolf',wid:72.5,hgt:43},bos
 /* 仲間：元のリグを土台にし、背丈は元のリグの比（データ側のサイズも同じ比で作ってある） */
 const HEROES=['gald','mire','shion','noah','erna','balza','crow','hakua','jin','celes','valk'];
 /* 味方の背丈は全員 36 にそろえる（ver0.40）。原画の大きさは SPX の dots（正面の背丈）で正規化済みなので、旧リグの身長の差を持ち込まない */
-function regRigs(){for(const id of HEROES)if(D[id]&&RIG[id]&&!DEF[id])DEF[id]={base:id,wid:25,hgt:36};
+/* ver0.41：原画によって正面の背丈（dots）に対する立ち絵の高さが小さいキャラ（ミレイユ・ノア・ハクア）がいるので、
+   立ち絵（stance）の高さを基準（リオ）と比べ、低いぶんだけ背丈を上げて大きいサイズの絵を選ばせる（帽子・武器で高いキャラは縮めない） */
+function heroHgt(id){try{const S=D[id].sizes,k=Object.keys(S).find(x=>x[0]==='b'),r=D.rio&&D.rio.sizes[k];const f=S[k].frames.stance||S[k].frames.front,fr=r&&(r.frames.stance||r.frames.front);
+ if(!f||!fr)return 36;return 36*Math.min(1.22,Math.max(1,fr[3]/f[3]));}catch(e){return 36;}}
+function regRigs(){for(const id of HEROES)if(D[id]&&RIG[id]&&!DEF[id])DEF[id]={base:id,wid:25,hgt:heroHgt(id)};
  /* ver0.30：素材パック（tools/spx_import.py）で足したキャラ。味方は同じ id の旧リグ、敵はデータの rig（{base,wid,hgt,nsc}）を土台にする */
  for(const id in D){if(DEF[id]||id.endsWith('_K'))continue;const c=D[id];
-  if(c.kind==='hum'&&RIG[id]){DEF[id]={base:id,wid:25,hgt:36};if(!HEROES.includes(id))HEROES.push(id);}
+  if(c.kind==='hum'&&RIG[id]){DEF[id]={base:id,wid:25,hgt:heroHgt(id)};if(!HEROES.includes(id))HEROES.push(id);}
   else if(c.kind==='mon'&&c.rig&&RIG[c.rig.base]){DEF[id]=Object.assign({wid:40,hgt:48},c.rig);ENEW.add(id);}}
  for(const id in D){const d=DEF[id];if(!d||!RIG[d.base])continue;const name='spx_'+id;
   const R=Object.assign(Object.create(RIG[d.base]),{spx:id,wid:d.wid,hgt:d.hgt,step:D[id].kind==='hum'?100:120,nsc:d.nsc||1});
@@ -263,6 +267,9 @@ function onReady(){
 }
 /* 向きを変えたら、一覧・立ち絵の控えを作り直す */
 FACING.onChange(k=>{try{zReg(k);for(const x in UIC)if(x.startsWith('a|'+k))delete UIC[x];}catch(e){}});
-return{get ready(){return ready;},FAM,parse,heroFrame,monShape,pickSize,D,cut,palOf,zReg,artCv,unitCv,AWS,FB,DEF,animFrame,phase};})();
+/* 戦闘で実際に描かれる絵の広がり（論理座標。足元からの左右・上）。配置で画面からはみ出さないように使う（v23.js eDims） */
+function boxB(u){const A=u&&u.A;if(!A||A.none||!ready)return null;const b=BAT;BAT=true;try{const f=SPRX.frame(A.name,{},A.palKey,A.pal,A.flip,A.sc*DS,A.extra);if(!f)return null;
+ return{l:f.ax*PXL,r:(f.w-f.ax)*PXL,t:f.ay*PXL};}catch(e){return null;}finally{BAT=b;}}
+return{boxB,get ready(){return ready;},FAM,parse,heroFrame,monShape,pickSize,D,cut,palOf,zReg,artCv,unitCv,AWS,FB,DEF,animFrame,phase};})();
 /* 履歴：ver0.26 敵のドット絵を提供原画へ／ver0.27 第2弾とリオ／ver0.28 ヴァルク・ジン・氷の女王・忍
    ver0.29 向きの窓口を FACING に一本化、原画の反転をデータへ焼き込み、図鑑の再生画面は js/zukan/ へ移した */

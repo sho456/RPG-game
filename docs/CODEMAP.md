@@ -60,7 +60,7 @@
 | 54 | `js/sprite/data/spx-data-enemy.js` | 1005 | （データ。読まない） |  |
 | 55 | `js/sprite/data/spx-data-heroes.js` | 1000 | （データ。読まない） |  |
 | 56 | `js/sprite/data/spx-data-chars.js` | 0 | 自動生成：tools/spx_import.py（素材パック assets_src/chars の各 character.json）。手で編集しない |  |
-| 57 | `js/sprite/spx.js` | 29 | ドット絵刷新：提供原画から作ったスプライト（SPX）を、既存の描画の入口で差し替える | SPX |
+| 57 | `js/sprite/spx.js` | 30 | ドット絵刷新：提供原画から作ったスプライト（SPX）を、既存の描画の入口で差し替える | SPX |
 | 58 | `js/zukan/viewer.js` | 11 | ver0.30 図鑑のキャラクタービューア（ZVIEW） | ZVIEW |
 | 59 | `js/zukan/zukan.js` | 16 | 図鑑（一覧・詳細） ver0.30 | ZUKAN |
 | 60 | `js/v29.js` | 3 | ver0.29 呼称・ドット絵・モーション管理・図鑑の全面整理 | V29 |
@@ -88,13 +88,13 @@
 | 82 | `js/rs/data.js` | 30 | ver0.37 戦闘システム刷新（データ） | RSD |
 | 83 | `js/rs/core.js` | 20 | 戦闘システム（能力値・習得・技セット・アビリティ・陣形・セーブ） | RSC |
 | 84 | `js/rs/battle.js` | 26 | 戦闘の進行（ターン制・BP・HP/LP） | RSB |
-| 85 | `js/rs/ui.js` | 19 | 戦闘システムの画面 | RSU |
+| 85 | `js/rs/ui.js` | 20 | 戦闘システムの画面 | RSU |
 | 86 | `js/v38/core.js` | 4 | ver0.38 土台：攻撃属性 8 種・武器種 8 種・セーブの移行・LP | V38 |
 | 87 | `js/v38/battle-ui.js` | 6 | ver0.38 戦闘画面 | V38B |
-| 88 | `js/v38/party.js` | 6 | ver0.38 編成画面 | V38P |
-| 89 | `js/v38/menu.js` | 5 | ver0.38 画面全体の整理 | V38M |
-| 90 | `js/v38/help.js` | 7 | ver0.38 タップで詳細（V38H） | V38H |
-| 91 | `js/ui/board.js` | 5 | 星盤・天星盤の画面（ver0.39 で 1 ファイルにまとめた。画面の正本はここ） | BOARDUI |
+| 88 | `js/v38/menu.js` | 6 | ver0.38 画面全体の整理 | V38M |
+| 89 | `js/v38/help.js` | 7 | ver0.38 タップで詳細（V38H） | V38H |
+| 90 | `js/ui/board.js` | 5 | 星盤・天星盤の画面（ver0.39 で 1 ファイルにまとめた。画面の正本はここ） | BOARDUI |
+| 91 | `js/ui/party.js` | 8 | 編成画面と陣形（ver0.41 で 1 ファイルにまとめた。画面の正本はここ。旧 js/v38/party.js を置き換え） | V38P |
 
 ## 上書きの連鎖（2 ファイル以上で定義・上書きされる関数）
 
@@ -138,13 +138,13 @@
 | `equipMenu` | town.js → ver17.js → v22.js → rs/ui.js |
 | `exprFace` | ch9.js → ver18-art.js → ver19-art.js → sprite/spx.js |
 | `fin` | ch7.js → ch9.js → ver17.js → rs/ui.js |
-| `formation` | town.js → ver17.js → v22.js → v38/party.js |
+| `formation` | town.js → ver17.js → v22.js → ui/party.js |
 | `has` | v24.js → sprite/facing.js → battle/rig.js → battle/viewer.js |
 | `hurt` | engine.js → ver19.js → v20-battle.js → rs/battle.js |
 | `kBoss` | ch8.js → ver19-pre.js → sprite/spx.js → v31/enemies.js |
 | `mix` | sprite/legacy/dot.js → v22.js → v24-text.js → battle/core.js |
 | `openSheet` | ch3.js → ver17.js → v22.js → rs/ui.js |
-| `partyScreen` | ver17.js → v21.js → v22.js → v38/party.js |
+| `partyScreen` | ver17.js → v21.js → v22.js → ui/party.js |
 | `put` | ver16.js → ver18-field.js → v31/quests.js → items/icons36.js |
 | `skillList` | items.js → v20-battle.js → v31/board.js → rs/core.js |
 | `stats` | engine.js → v31/core.js → v31/items.js → rs/core.js |
@@ -155,7 +155,7 @@
 | `build` | motion/skeleton.js → items/icons36.js → v38/help.js |
 | `burst` | motion/fx19.js → v24-text.js → battle/core.js |
 | `cap` | sprite/legacy/dot-rig.js → battle/seq.js → battle/viewer.js |
-| `card` | ver17.js → v22.js → v38/party.js |
+| `card` | ver17.js → v22.js → ui/party.js |
 | `chooseRoot` | engine.js → ch8.js → rs/ui.js |
 | `close` | ver17.js → battle/viewer.js → v38/help.js |
 | `drawBoard` | items.js → ver17.js → v31/board.js |
@@ -286,7 +286,7 @@
 | `skillsHTML` | v22.js → rs/ui.js |
 | `sleep` | v23.js → rs/battle.js |
 | `slot` | ver17.js → v38/help.js |
-| `slotTxt` | ver17.js → v38/party.js |
+| `slotTxt` | ver17.js → ui/party.js |
 | `sparks` | v21-items.js → battle/prim.js |
 | `stTags` | ch5.js → v20-battle.js |
 | `stage` | v24.js → v25.js |
