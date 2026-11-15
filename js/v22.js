@@ -86,12 +86,12 @@ function updHud(){if(!B||scene!=='battle')return;const h=ensureHud();h.classList
  h.querySelector('.tn').textContent=B.turns;h.querySelector('.ac').textContent=BL.act;const sp=h.querySelector('.rb.sp b');if(sp)sp.textContent='×'+speed;
  /* 対象 */
  const t=B.tgt&&B.tgt.alive?B.tgt:aliveE()[0],tg=h.querySelector('.b22tg');
- if(!t){tg.innerHTML='';HK='';}else{const kw=t.weak.filter(x=>t.known.has(x)),tmp=(t.sts||[]).filter(s=>s.k==='weak').map(s=>s.el),unk=t.weak.length-t.known.size,multi=aliveE().length>1;let tags='';try{tags=tagH(t);}catch(x){}
-  const k=[t.name,t.lv,t.boss,kw.join(''),tmp.join(''),unk,tags,multi].join('|');
+ if(!t){tg.innerHTML='';HK='';}else{const kw=t.weak.filter(x=>t.known.has(x)),kr=[...(t.kR||[])],tmp=(t.sts||[]).filter(s=>s.k==='weak').map(s=>s.el),unk=t.weak.length-t.known.size,multi=aliveE().length>1;let tags='';try{tags=tagH(t);}catch(x){}
+  const k=[t.name,t.lv,t.boss,kw.join(''),kr.join(''),tmp.join(''),unk,tags,multi].join('|');
   if(k!==HK||!tg.firstChild){HK=k;tg.className='b22tg'+(t.boss?' boss':'');
    tg.innerHTML=`<div class="nm">${t.boss?'<em class="bs">BOSS</em>':multi?'<em>TARGET</em>':''}<b>${t.name}</b><small>Lv${t.lv}</small></div>
     <div class="hp"><div class="bar"><s></s><u></u><i></i></div><em class="cnt"></em></div>
-    <div class="wk">${ELS10.map(e=>{const w=kw.includes(e),tm=tmp.includes(e);return`<span class="${w?'w':''}${tm?' tm':''}" style="--c:${ELC[e]}"><i>${e}</i><u>${w||tm?WEAKSYM.w:''}</u></span>`;}).join('')}${unk>0?`<span class="q"><i>?</i><u>×${unk}</u></span>`:''}</div>
+    <div class="wk">${ELS10.map(e=>{const w=kw.includes(e),tm=tmp.includes(e),r=!w&&!tm&&kr.includes(e);/* 弱点＝赤く光る・耐性＝青く光る（見つけたものだけ） */return`<span class="${w?'w':''}${tm?' tm':''}${r?' r':''}" style="--c:${ELC[e]}"><i>${e}</i></span>`;}).join('')}${unk>0?`<span class="q"><i>?</i><u>×${unk}</u></span>`:''}</div>
     ${tags?`<div class="st">${tags}</div>`:''}`;}
   hpBar(t,tg);}
  /* 星臨ボタン */

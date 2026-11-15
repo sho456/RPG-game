@@ -109,7 +109,7 @@ function charHTML(id,tab,ed){const s=stats(id),h=G.h[id],b=HB[id],A2=AW[id],lv=h
   <i class="tsb-anchor" hidden></i>
   ${PROF[id]?`<div class="sh2">人物</div><div class="stx">${PROF[id][0]}　${PROF[id][1]}<br>${PROF[id][2]}</div>`:''}`;
  return`<div class="chd" style="--ec:${elCol(id)}">${rankH(id)}<div class="chn"><small>［${A2.name}］${G.party.includes(id)?'前衛':'控え'}</small><b>${b.name}</b></div><div class="chc"><i class="elc">${elOf(id)||'無'}</i>${clsOf(id)}</div>${ed?'':'<button class="sx" data-a="close">✕</button>'}</div>
- <div class="cart" style="--ec:${elCol(id)}">${conSvg(id)}<div class="ceq l">${SLOTS6.slice(0,3).map(slot).join('')}</div><div class="ceq r">${SLOTS6.slice(3).map(slot).join('')}</div>
+ <div class="cart" style="--ec:${elCol(id)}"><div class="ceq l">${SLOTS6.slice(0,3).map(slot).join('')}</div><div class="ceq r">${SLOTS6.slice(3).map(slot).join('')}</div>
   <div class="cped"></div><img class="cspr" src="${art(id)}"><button class="cnav l" data-a="prev">◀</button><button class="cnav r" data-a="next">▶</button></div>
  <div class="ctabs">${[['st','能力値'],['eq','装備'],['sk','技・星臨'],['bd','星盤']].map(([k,l])=>`<button class="${tab===k?'on':''}" data-a="tab" data-v="${k}">${l}</button>`).join('')}</div><div class="cbody">${body}</div>`;}
 equipMenu=function(id,m){if(!G.members.includes(id))id=G.party[0];const ids=G.members,i=ids.indexOf(id),n=bondReadyN();log((m||`<b>${HB[id].name}</b>　装備の枠をタップで着替え`)+goldTxt());

@@ -25,7 +25,7 @@ function info(sk,u){const id=u&&(u.id||u),s=sk.basic?Object.assign({},sk,{n:basi
    <dt>威力</dt><dd>${s.rk?'ランク '+s.rk+(s.hits>1?' ×'+s.hits+'回':''):s.basic?'D':s.ougi?'奥義':'―'}</dd><dt>消費</dt><dd>BP ${cost}${lp?`・LP ${lp}`:''}</dd>
    ${lp?'<dt>復活</dt><dd>気絶した仲間（LP1以上）にも使える</dd>':''}
    ${s.prio?`<dt>行動順</dt><dd>${s.prio>0?'先制':'後発'}</dd>`:''}
-   ${pl?`<dt>技Lv</dt><dd>${pl}（熟練 ${C.profN(id,k)}回）　威力+${(pl-1)*2}%${pl>=4?'・消費-'+(pl>=8?2:1):''}</dd>`:''}
+   ${pl?`<dt>技Lv</dt><dd>${pl}${pl<10?`（あと ${D.PROF[pl]-C.profN(id,k)} 回使うと Lv${pl+1}）`:'（最大）'}　威力+${(pl-1)*2}%${pl>=4?'・消費-'+(pl>=8?2:1):''}</dd>`:''}
    ${id&&k&&HB[id]&&C.howTxt(id,k)?`<dt>習得</dt><dd>${C.howTxt(id,k)}</dd>`:''}</dl>
   ${u&&B&&B.tgt&&s.el&&scene==='battle'?`<div class="iw">${esc(B.tgt.name)}に対して：${B.tgt.weak.includes(s.el)&&B.tgt.known.has(s.el)?'<b class="w">弱点を突ける ▲</b>':TERMS.resists(B.tgt,s.el)?'<b>耐性がある</b>':'弱点は分かっていない'}</div>`:''}</div>
   <button class="tbtn back wide" data-a="close">閉じる</button>`,{close:ovClose});}
@@ -43,7 +43,14 @@ function chips(u){const hp=Math.max(0,u.hp),dy=X.dying(u);
 chooseRoot=function(u,ctx={}){const idx=ctx.idx||0,tot=ctx.n||1;
  return new Promise(res0=>{let sub=null,lock=false,R=[];const dev=DEV();
   const res=v=>{B.res=null;B.pick=null;try{bbar(true);}catch(e){}res0(v);};
-  const fin=(sk,t)=>{LASTA[u.id]={sk};SFX.sel();res(t?{sk,t}:{sk});};
+  const fin=(sk,t)=>{LASTA[u.id]={sk};SFX.sel();
+   /* 選んだコマンドに指を動かしてから決定（どれを選んだか見えるように） */
+   if(!sub&&!lock){lock=true;mark(sk);setTimeout(()=>{lock=false;res(t?{sk,t}:{sk});},170);return;}
+   res(t?{sk,t}:{sk});};
+  /* 指の位置：この戦闘でそのキャラが最後に選んだコマンド（なければ先頭） */
+  const same=(a,b)=>!!a&&!!b&&(a===b||(a.basic&&b.basic?a.bn===b.bn&&a.k===b.k:!!C.keyOf(a)&&C.keyOf(a)===C.keyOf(b)));
+  const pkOf=()=>{if(sub)return-1;const la=LASTA[u.id]&&LASTA[u.id].sk;const i=R.findIndex(r=>!r.dis&&same(r.sk,la));return i>=0?i:R.findIndex(r=>!r.dis);};
+  const mark=sk=>{const l=$('#cmd .c38l');if(!l)return;const i=R.findIndex(r=>same(r.sk,sk));l.querySelectorAll('.r').forEach((b,j)=>b.classList.toggle('pk',j===i));};
   B.res=()=>res(autoPick(u));
   const use=sk=>{if(sk.t==='all'||sk.t==='self')return fin(sk);
    if(sk.t==='one'||sk.basic){if(!B.tgt||!B.tgt.alive)B.tgt=aliveE()[0];return fin(sk,B.tgt);}
@@ -62,14 +69,14 @@ chooseRoot=function(u,ctx={}){const idx=ctx.idx||0,tot=ctx.n||1;
     return{el:'道',ec:'#7dffa8',n:ITEMS[k].n,d:ITEMS[k].d,cost:'×'+(I[k]||0),ng:!I[k],dis:!I[k]||(rv&&!down),now:1,sk:{n:ITEMS[k].n,k:'item',id:k,t:'ally',d:ITEMS[k].d},f:()=>use({k:'item',id:k,t:'ally',revive:rv,n:ITEMS[k].n})};})};draw();};
   const swaps=()=>{const rs=G.members.filter(id=>!B.heroes.some(h=>h.id===id)&&G.h[id].hp!==0);
    sub={t:'交代',rows:rs.map(id=>({face:id,n:HB[id].name,d:`Lv${G.h[id].lv}　${D.HERO[id]?D.HERO[id].w:''}`,cost:'交代',now:1,f:()=>res({swap:id})}))};draw();};
-  const draw=()=>{const c=$('#cmd');c.className='c38';if(lock){c.innerHTML='<div class="c38w">…</div>';return;}R=rows();
+  const draw=()=>{const c=$('#cmd');c.className='c38';if(lock){c.innerHTML='<div class="c38w">…</div>';return;}R=rows();const pk=pkOf();
    const rsN=G.members.filter(id=>!B.heroes.some(h=>h.id===id)&&G.h[id].hp!==0).length,ag=Math.floor(u.aw?100:u.ag),aw=canAw(u);
    c.innerHTML=`<div class="c38p">
     <div class="c38h" style="--ec:${elCol(u.id)}"><img class="fc" src="${face(u.id,u.aw)}" alt=""><div class="nm"><b>${esc(u.name)}</b><small>${idx+1}/${tot}${u.aw?`　${SEIRIN.n} 残り${X.awLeft(u)}`:''}</small></div>
      <button class="aw${aw?' rdy':''}${u.aw?' on':''}" data-c38="aw" ${aw?'':'aria-disabled="true"'} style="--g:${ag}%"><i></i><b>${u.aw?'星臨中':aw?'星臨':ag+'%'}</b></button></div>
     ${chips(u)}
     ${sub?`<div class="c38t"><button data-c38="sub">${GL.back}</button><b>${sub.t}</b></div>`:''}
-    <div class="c38l">${R.map((r,i)=>`<button class="r ${r.cls||''}${r.ng?' ng':''}" data-i38="${i}" ${r.dis?'disabled':''}>${r.face?`<img src="${face(r.face)}" alt="">`:hx(r.el,r.ec,'el')}<span class="n">${r.tag?`<em>${r.tag}</em>`:''}${esc(r.n).replace(/^(.*)$/,'$1')}${r.lv?`<small>Lv${r.lv}</small>`:''}${r.d&&(r.face||sub)?`<small class="d">${esc(r.d)}</small>`:''}</span><span class="c">${r.cost?String(r.cost).replace(/^BP /,'<small>BP</small>'):''}${r.lp?`<small class="lpc">LP${r.lp}</small>`:''}</span>${r.sk?`<span class="inf" data-inf38="${i}">i</span>`:''}</button>`).join('')}</div>
+    <div class="c38l">${R.map((r,i)=>`<button class="r ${r.cls||''}${r.ng?' ng':''}${i===pk?' pk':''}" data-i38="${i}" ${r.dis?'disabled':''}>${r.face?`<img src="${face(r.face)}" alt="">`:hx(r.el,r.ec,'el')}<span class="n">${r.tag?`<em>${r.tag}</em>`:''}${esc(r.n).replace(/^(.*)$/,'$1')}${r.lv?`<small>技Lv${r.lv}</small>`:''}${r.d&&(r.face||sub)?`<small class="d">${esc(r.d)}</small>`:''}</span><span class="c">${r.cost?String(r.cost).replace(/^BP /,'<small>BP</small>'):''}${r.lp?`<small class="lpc">LP${r.lp}</small>`:''}</span>${r.sk?`<span class="inf" data-inf38="${i}">i</span>`:''}</button>`).join('')}</div>
     <div class="c38f"><button data-c38="back" ${idx>0&&!sub?'':'disabled'}>${GL.back}<small>戻る</small></button><button data-c38="it" ${sub?'disabled':''}>${GL.bag}<small>道具</small></button><button data-c38="sw" ${rsN&&!u.swapped&&!u.aw&&!sub?'':'disabled'}>${GL.swap}<small>交代</small></button></div></div>`;
    c.scrollTop=0;const l=c.querySelector('.c38l');if(l)l.scrollTop=0;try{bbar(true);}catch(e){}};
   B.pick={u,
@@ -93,10 +100,13 @@ bbar=function(){const b=$('#bbar');if(!b||!G)return;const p=B&&B.pick,l=p&&repOK
 /* ==================== キャラ詳細 ==================== */
 const RK=['','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ'];
 function stars(r){return`<span class="rsst">${[1,2,3,4,5].map(i=>`<i class="${i<=r?'on':''}"></i>`).join('')}</span>`;}
+/* 技Lv（使った回数＝熟練で上がる）を 1 つの表示に：「技Lv 3」と次の Lv までのゲージ */
+function skLv(id,k){const l=C.profLv(id,k),n=C.profN(id,k),a=D.PROF[l-1]||0,b=D.PROF[l],r=l>=10||b==null?100:Math.round((n-a)/(b-a)*100);
+ return`<span class="sklv"><b>技Lv ${l}</b><i style="--r:${r}%"></i></span>`;}
 function skCard(id,k,o={}){const s=SK[k];if(!s)return'';const[el,ec]=badge(s),on=o.set,pl=C.profLv(id,k),u={id,side:0},lp=C.lpCost(s),cs=s.ougi?'奥義':'BP '+C.costOf(u,s)+(lp?'・LP'+lp:'');
  return`<div class="sk22 x22 rs37${o.lock?' lock':''}${on?' on':''}" style="--ec:${ec}"><div class="h">${hx(el,ec,'sm')}<b>${esc(s.n)}</b><span class="tg ${tyCls(s)}">${tyOf(s)}</span>${s.rk?`<span class="tg rkx">${s.rk}</span>`:''}<span class="c">${cs}</span>${on?'<span class="tg set">SET</span>':''}</div>
   <div class="d">${esc(s.d||'')}</div>
-  <div class="rsrow"><small>${o.lock?'習得：'+esc(o.how||''):`技Lv${pl}　熟練${C.profN(id,k)}回${o.how?'　'+esc(o.how):''}`}</small>
+  <div class="rsrow"><small>${o.lock?'習得：'+esc(o.how||''):`${skLv(id,k)}${o.how?'<span class="how">習得 '+esc(o.how)+'</span>':''}`}</small>
    ${o.btn?`<span class="rsb">${on&&o.i>0?`<button class="tbtn" data-a="rsup" data-v="${k}">↑</button>`:''}<button class="tbtn${on?'':' gold'}" data-a="rsset" data-v="${k}">${on?'外す':'セット'}</button><button class="tbtn" data-a="rsinfo" data-v="${k}">詳細</button></span>`:''}</div></div>`;}
 function skillsHTML(id){const set=C.setOf(id),L=C.learned(id),all=(D.LEARN[id]||[]).map(x=>x[0]),lock=all.filter(k=>!L.includes(k));
  return`<div class="sh22">技・術セット <small>${set.length}/4</small></div>
@@ -122,11 +132,11 @@ function st7HTML(id){const s=stats(id),r=s.s7;if(!r)return'';const P=C.pf(id),H=
  return`<div class="st38"><button class="w" data-h38="wp:${id}"><b>${esc(P.wp)}${H.shape?`<small>（形：${esc(H.shape)}）</small>`:''}</b><small>武器種</small><i class="q"></i></button>
   <div class="lb"><button data-h38="lp:${id}"><em>LP</em><b>${s.lpMax}</b><i class="q"></i></button><button data-h38="bp:${id}"><em>BP</em><b>${s.bp0}<small>初期</small></b><b>${s.bpMax}<small>最大</small></b><b>+${s.bpReg+Math.min(2,Math.floor((s.spGain||0)/5))}<small>回復</small></b><i class="q"></i></button></div>
   <div class="g7">${D.ST7.map(k=>`<button class="r${P.w[k]?' wp':''}" data-h38="st:${id}:${k}"><span><i class="g${P.base[k][1]}">${P.base[k][1]}</i>${D.ST7N[k]}</span><b>${r[k]}</b></button>`).join('')}</div></div>`;}
-/* キャラ詳細のタブ：能力（能力値＋アビリティ）・技・術・星臨・星盤（装備は上の枠） */
-const TABS=[['st','能力'],['sk','技・術'],['aw',SEIRIN.n],['bd','星盤']];
-{const _ch=charHTML;charHTML=function(id,tab,ed){if(tab==='ab'||tab==='eq')tab='st';const mine=tab==='sk'||tab==='aw';let s=_ch(id,mine?'__':tab,ed);
+/* キャラ詳細のタブ：能力（能力値＋アビリティ＋人物）・技・術・星臨（装備は上の枠）。星盤は下の「星盤」ボタンで開く（ver0.39 でタブを統合） */
+const TABS=[['st','能力'],['sk','技・術'],['aw',SEIRIN.n]];
+{const _ch=charHTML;charHTML=function(id,tab,ed){if(tab==='ab'||tab==='eq'||tab==='bd')tab='st';const mine=tab==='sk'||tab==='aw';let s=_ch(id,mine?'__':tab,ed);
  try{if(mine)s=s.replace('<div class="cbody"></div>',`<div class="cbody c22 rs37">${tab==='sk'?skillsHTML(id):awHTML(id)}</div>`);
-  if(tab==='st'){const i=s.indexOf('<div class="cnote">');const add=st7HTML(id)+abHTML(id);s=i>=0?s.slice(0,i)+add+s.slice(i):s+add;}
+  if(tab==='st'){const i=s.indexOf('<div class="cnote">');const pr=typeof PROF!=='undefined'&&PROF[id];const add=st7HTML(id)+abHTML(id)+(pr?`<div class="sh22">人物</div><div class="stx">${pr[0]}　${pr[1]}<br>${pr[2]}</div>`:'');s=i>=0?s.slice(0,i)+add+s.slice(i):s+add;}
   s=s.replace(/<div class="ctabs[^"]*">[\s\S]*?<\/div>/,`<div class="ctabs c22 rs37 t38">${TABS.map(([k,l])=>`<button class="${tab===k?'on':''}" data-a="tab" data-v="${k}">${l}</button>`).join('')}</div>`);
   s=s.replace(/パッシブ/g,'アビリティ');}catch(e){console.error(e);}
  return s;};}

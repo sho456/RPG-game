@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./js/sprite/data/**)",
+      "Read(./assets_src/originals/**)"
+    ]
+  }
+}

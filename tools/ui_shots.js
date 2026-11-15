@@ -1,0 +1,37 @@
+#!/usr/bin/env node
+/* 主要画面のスクリーンショット（UI 改修の確認用。少ないトークンで画面を見るための道具）
+   使い方：python3 -m http.server 8765 &  →  node tools/ui_shots.js <出力dir> [画面名...]
+   画面名：party detail detail-sk detail-aw detail-bd board board-sel board-up board-up-lock battle-turn battle-cmd battle-wk battle-act（省略時は全部） */
+'use strict';
+const {chromium} = require('playwright');
+const [OUT = 'work/shots', ...only] = process.argv.slice(2);
+require('fs').mkdirSync(OUT, {recursive: true});
+const want = n => !only.length || only.includes(n);
+(async () => {
+  const b = await chromium.launch();
+  const p = await b.newPage({viewport: {width: 420, height: 860}});
+  const errs = [];
+  p.on('pageerror', e => errs.push(String(e.message).slice(0, 200)));
+  p.on('console', m => {if (m.type() === 'error') errs.push(m.text().slice(0, 200));});
+  await p.goto(process.env.URL || 'http://localhost:8765/index.html');
+  await p.waitForFunction(() => typeof SPX !== 'undefined' && SPX.ready, {timeout: 60000});
+  await p.evaluate(() => {G = migrate(newGame());G.set = Object.assign(G.set || {}, {tut: false});
+    for (const id of Object.keys(HB)) if (!G.members.includes(id)) newMember(id);
+    G.party = ['rio', 'gald', 'celes', 'mire'];for (const id of G.members) {G.h[id].lv = 40;G.h[id].hp = null;}
+    document.querySelector('#ov').classList.add('hide');townMenu();});
+  const shot = async (n, fn, ms = 600) => {if (!want(n)) return;try {await p.evaluate(fn);} catch (e) {errs.push(n + ': ' + e.message.split('\n')[0]);}
+    await p.waitForTimeout(ms);await p.screenshot({path: `${OUT}/${n}.png`});};
+  await shot('party', () => partyScreen());
+  await shot('detail', () => {partyScreen();const b = document.querySelector('[data-a="det"]');if (b) b.click();else equipMenu(G.party[0]);});
+  for (const t of ['sk', 'aw', 'bd']) await shot('detail-' + t, `(()=>{const b=[...document.querySelectorAll('#cmd button,#sheet button,#ov button')].find(x=>x.dataset.t==='${t}'||x.dataset.v==='${t}');if(b)b.click();})()`);
+  await shot('board', () => {BS.up = false;openBoard('rio');});
+  await shot('board-sel', () => {openBoard('rio');BS.sel = '1,0';boardMenu();});
+  await shot('board-up', () => {G.h.rio.lv = 70;openBoard('rio');BS.up = true;BS.sel = '2,-2';boardMenu();});
+  await shot('board-up-lock', () => {G.h.rio.lv = 40;openBoard('rio');BS.up = true;BS.sel = null;boardMenu();});
+  await shot('battle-turn', () => {auto = false;startBattle([{kind: 'slime', lv: 5}, {kind: 'wolf', lv: 5}], {onEnd: () => {}});}, 2500);
+  await shot('battle-cmd', () => {}, 2500);
+  await shot('battle-wk', () => {const t = B.tgt || aliveE()[0];t.weak.forEach(e => t.known.add(e));t.kR = new Set(['斬', '打'].filter(e => !t.weak.includes(e)));refresh();}, 400);
+  await shot('battle-act', () => {auto = true;if (B.res) B.res();}, 2600);
+  await b.close();
+  if (errs.length) console.log('errors:\n' + errs.join('\n'));
+})();

@@ -109,4 +109,4 @@ try{for(const[k,c]of[['kaihou','mag_heal']])if(SK[k])SK[k].cat=c;}catch(e){}
 try{for(const[k,el]of[['iceslime','冷'],['snowwolf','冷'],['yukirei','冷'],['boss5','冷'],['lavaslime','熱'],['firedrake','熱'],['ember','熱'],['boss9','熱'],['raiwolf','雷']])
   if(ED[k]&&!(ED[k].weak||[]).includes(el))ED[k].resist=[el];}catch(e){}
 /* ダメージ計算：耐性を足す（弱点・会心の判定はそのまま。Resist は弱点でないときだけ） */
-{const _c=calc;calc=function(a,t,sk){const r=_c(a,t,sk);try{if(r&&!r.weak&&sk&&sk.el&&TERMS.resists(t,sk.el)){r.d=Math.max(1,Math.round(r.d*TERMS.RESIST_MUL));r.resist=true;}}catch(e){}return r;};}
+{const _c=calc;calc=function(a,t,sk){const r=_c(a,t,sk);try{if(r&&!r.weak&&sk&&sk.el&&TERMS.resists(t,sk.el)){r.d=Math.max(1,Math.round(r.d*TERMS.RESIST_MUL));r.resist=true;(t.kR||(t.kR=new Set())).add(sk.el);}}catch(e){}return r;};}

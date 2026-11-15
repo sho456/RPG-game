@@ -23,11 +23,11 @@ partyScreen=function(m){const P=G.party,f=C.formOf(),bench=G.members.filter(id=>
  const card=(id,i)=>{const h=G.h[id],lv=h.awLv||1,ec=elCol(id),wt=(D.HERO[id]||{}).w||'',shp=(D.HERO[id]||{}).shape,ag=ptsLeft(id);
   return`<div class="pc38${sel===id?' sel':''}" data-a="c" data-v="${id}" style="--ec:${ec}">
    <div class="cr"><b>${ROMAN[lv]}</b></div>
-   <div class="ar">${conSvg(id)}<img src="${art(id)}" alt=""><i class="no">${i+1}</i></div>
+   <div class="ar"><img src="${art(id)}" alt=""></div>
    <div class="nm"><img src="${shp==='大鎌'?wIconK('scythe'):wIcon(wt)}" alt="${esc(wt)}"><span>${esc(HB[id].name)}</span></div>
    <div class="pw"><small>戦闘力</small><b>${fmt(power(id))}</b><em>Lv${h.lv}</em></div>
    <div class="eq">${eq(id)}</div>
-   <button class="ob${ag>0?' rdy':''}" data-a="aw" data-v="${id}" aria-label="${SEIRIN.n}"><i style="--ec:${ec}"></i><small>${ag>0?'星盤 '+ag:SEIRIN.n}</small></button>
+   <button class="ob39${ag>0?'':' none'}" data-a="bd" data-v="${id}">星盤 <b>+${ag}</b></button>
    <button class="fp" data-h38="fs:${i}">${posMap(f,i)}<span>${slotTag(f,i)}</span></button></div>`;};
  panel(`<div class="ps38">
   <div class="hd"><b>編成</b><span><small>パーティ戦闘力</small><strong>${fmt(tot)}</strong></span></div>
@@ -42,7 +42,6 @@ partyScreen=function(m){const P=G.party,f=C.formOf(),bench=G.members.filter(id=>
    save();partyScreen(`<b>${HB[a].name}</b>と<b>${HB[id].name}</b>を入れ替えた`);},
   e:()=>{if(SEL&&!P.includes(SEL)){const a=SEL;SEL=null;P.push(a);save();partyScreen(`<b>${HB[a].name}</b>を編成に加えた`);}else partyScreen('空き枠：控えから仲間を選んで、もう一度ここをタップ');},
   det:()=>{const a=SEL;SEL=null;equipMenu(a);},bd:id=>{SEL=null;BFROM='party';BS.sel=null;openBoard(id);},
-  aw:id=>{SEL=null;CTAB='aw';equipMenu(id);},
   rm:()=>{const a=SEL;SEL=null;G.party=P.filter(x=>x!==a);save();partyScreen(`<b>${HB[a].name}</b>を控えに下げた`);},x:()=>{SEL=null;partyScreen();},
   form:()=>formOpen(),inv:()=>invMenu(),back:()=>{SEL=null;townMenu();}});
  try{tip('party');}catch(e){}};

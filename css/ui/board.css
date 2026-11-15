@@ -1,0 +1,34 @@
+/* ===== 星盤・天星盤の画面（js/ui/board.js と対） ===== */
+#app[data-sc="board"] #msg{display:none}
+#app[data-sc="board"] .bdl{display:none}
+/* 上：キャラと残りポイント */
+.bdh.b39{gap:10px}
+.bdh.b39 .bdn b{display:block;font-size:17px;font-weight:800;margin:0}
+.bdh.b39 .bdn small{display:block;font-size:11px;color:#ffe27a}
+.bdh.b39 .bdp{display:flex;align-items:baseline;gap:2px;min-width:0;padding:3px 10px}
+.bdh.b39 .bdp b{font-size:26px;line-height:1}
+.bdh.b39 .bdp small{display:inline;font-size:11px}
+/* 星盤／天星盤の切り替え */
+.bdtab{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:0 0 5px;border:1px solid #3a4688;border-radius:8px;overflow:hidden}
+.bdtab button{position:relative;height:34px;border:0;background:#0b1340;color:#9aa2c4;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.bdtab button.on{background:linear-gradient(180deg,#3a2c0e,#1a1606);color:#ffe27a;box-shadow:inset 0 -2px 0 var(--gold,#ffd34a)}
+.bdtab button+button{border-left:1px solid #3a4688}
+.bdtab button+button.on{background:linear-gradient(180deg,#5a340e,#28102c);color:#ffcf8a;box-shadow:inset 0 -2px 0 #ffb86b}
+.bdtab button.lk{opacity:.55}
+.bdtab em{font-style:normal;font-size:11px;padding:0 6px;border-radius:9px;background:#d89a20;color:#2a1600}
+.bdtab small{font-size:10px;font-weight:600}
+/* 選んだ星のカード／進み具合 */
+.bdi.b39{position:relative;min-height:0;padding:6px 10px 7px}
+.bdi.b39 .bdt i{font-weight:800}
+.bdi.b39 .bdt i small{margin-left:6px;font-size:10px;color:#cfd3f5;font-weight:600}
+.bdi.b39>b{padding-right:62px;font-size:14px;line-height:1.35}
+.bdi.b39 .cs{position:absolute;right:10px;bottom:7px;font:800 18px/1 var(--num,inherit);color:#fff}
+.bdi.b39 .cs small{font-size:10px;color:#aab0d8;margin:0 2px}
+.bdi.b39 p{margin:3px 0 0;font-size:11px;color:#7dffa8}
+.bdi.b39.pg{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-color:#3a4688}
+.bdi.b39.pg .bar{flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden}
+.bdi.b39.pg .bar i{display:block;height:100%;width:var(--r);background:linear-gradient(90deg,#ffd34a,#ffb030);box-shadow:0 0 6px #ffb030}
+.bdi.b39.pg>b{padding:0;margin:0;font:800 16px/1 var(--num,inherit)}
+.bdi.b39.pg>b small{font-size:11px;color:#aab0d8}
+.bdi.b39.pg p{flex-basis:100%;margin:0}
+.bdb.b39{grid-template-columns:1fr 1fr}

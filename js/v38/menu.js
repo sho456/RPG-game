@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.38';
+const VER='ver0.39';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,11 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　戦闘システムと画面を大きく作り直しました<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　画面を見やすく整理しました<br><small>`+
+ `・<b>星盤</b>：説明文と凡例をなくし、星をタップすると下のカードに効果が出る形に。星盤／天星盤は切り替えタブに<br>`+
+ `・<b>戦闘</b>：選んだコマンドに指のカーソル。弱点は赤・耐性は青く光る。HP・BPの表示はターンの始めだけ。行動順のアイコンは廃止<br>`+
+ `・<b>技Lv</b>：熟練と統合し「技Lv」とゲージで表示。<b>編成</b>：並び番号・属性の球体・詳細の星盤の絵を削除</small></div>`+
+ `<div class="nt n38"><b>ver0.38</b>　戦闘システムと画面を大きく作り直しました<br><small>`+
  `・<b>戦闘画面</b>：敵と味方が向き合う配置に。味方は<b>陣形どおりの立ち位置</b>に並ぶ。コマンドを選ぶ間は戦場ごと上へスライドし、決め終えると戦場が全面に戻って行動が始まる<br>`+
  `・<b>HP・LP・BP</b>：HP30%以下で瀕死、0で気絶（LP-1）。気絶中に攻撃を受けてもLP-1、LPを削る敵もいる。LPが残っていれば<b>回復術</b>で復活（回復術はLPを1使う）。BPはキャラごとに初期・最大・毎ターンの回復が違う<br>`+
  `・<b>能力値</b>：腕力・体力・器用さ・素早さ・知力・精神・魅力の7種。命中・回避・状態異常の成功率・回復量にも効く<br>`+

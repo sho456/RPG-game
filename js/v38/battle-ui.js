@@ -1,10 +1,11 @@
 /* ===== ver0.38 戦闘画面 =====
  1. 配置：敵は左・味方は右で向き合う。味方の立ち位置は編成の陣形（RSD.FORM の p）どおり。戦闘画面に陣形名は出さない
- 2. 画面を広く：戦場は画面の高さいっぱい。上は細い帯（ターン・対象・弱点・行動順・速度・メニュー）、下は AUTO の帯だけ
+ 2. 画面を広く：戦場は画面の高さいっぱい。上は細い帯（ターン・対象・弱点／耐性・速度・メニュー）、下は AUTO の帯だけ
+    （行動順のアイコンは ver0.39 で削除）
  3. コマンド入力中は「戦場ごと上へスライド」して、下半分にコマンド欄を出す（ロマサガRS の見せ方）。
     最後の 1 人のコマンドを決めると、コマンド欄が下へ抜け、戦場が元の位置へ滑らかに戻って行動が始まる
  4. 倍速ボタンは画面上の 1 つだけ（下の帯の倍速は削除）
- 5. 味方の HP・BP は常にキャラの横に。瀕死は赤、気絶は LP を表示 */
+ 5. 味方の HP・BP はターンの始め（コマンド入力中・AUTO はターン開始から少しの間）だけキャラの横に出す。瀕死は赤、気絶は LP を表示 */
 'use strict';
 const V38B=(()=>{
 const D=RSD,C=RSC,{HK23}=V23;
@@ -43,27 +44,24 @@ function setIn(v){if(v===IN){clearTimeout(offT);offT=0;return;}
  /* キャラの切り替えの一瞬（B.pick が空く）は閉じない */
  if(!offT)offT=setTimeout(()=>{offT=0;IN=false;app.classList.remove('in38');},140);}
 
-/* ==================== 4. 上の帯：行動順 ==================== */
-function qRow(){const hd=$('#bt22 .b22hd');if(!hd)return;let q=$('#q38');if(!q||!q.isConnected){q=document.createElement('div');q.id='q38';hd.appendChild(q);}
- const L=(B.rs&&B.rs.q&&B.rs.q.length&&B.rs.phase==='act'?[B.cur&&B.cur.alive?B.cur:null,...B.rs.q.map(x=>x.u)]:preview()).filter((u,i,a)=>u&&u.alive&&a.indexOf(u)===i).slice(0,9);
- const k=L.map(u=>(u.side?'e':'h')+(u.id||u.name)+(u===B.cur?'*':'')).join();if(q._k===k)return;q._k=k;
- q.innerHTML=L.map(u=>u.side===0?`<i class="h${u===B.cur?' c':''}"><img src="${face(u.id,u.aw)}" alt=""></i>`:`<i class="e${u===B.cur?' c':''}${u.boss?' b':''}"><b>${esc(u.name.slice(0,1))}</b></i>`).join('');}
-
-/* ==================== 5. 味方の HP 表示（常に出す・瀕死・気絶と LP） ==================== */
+/* ==================== 4. 味方の HP・BP 表示（ターンの始めだけ・瀕死・気絶と LP） ==================== */
 try{const _el=TX24.el;TX24.el=function(t,...a){if(t==='SP'&&a[0]==='sp')t='BP';return _el.call(this,t,...a);};}catch(e){}
-function hlState(){const L=$('#hl24');if(!L)return;B.heroes.forEach((h,i)=>{const c=L.children[i];if(!c)return;const dy=RSB.dying(h),lp=h.alive?'':`LP ${h.lp||0}`;
+let hlTurn=-1,hlUntil=0;
+function hlShow(){const now=performance.now();if(B.turns!==hlTurn){hlTurn=B.turns;const k=SPD&&SPD[speed]?SPD[speed]:1;hlUntil=now+Math.round(1400*Math.max(.4,k));}
+ const on=!B.over&&((B.rs&&B.rs.phase==='input'&&!auto)||now<hlUntil);if(app.classList.contains('hl39')!==on)app.classList.toggle('hl39',on);}
+function hlState(){hlShow();const L=$('#hl24');if(!L)return;B.heroes.forEach((h,i)=>{const c=L.children[i];if(!c)return;const dy=RSB.dying(h),lp=h.alive?'':`LP ${h.lp||0}`;
  if(c.classList.contains('dy38')!==dy)c.classList.toggle('dy38',dy);if(c.dataset.lp!==lp)c.dataset.lp=lp;
  const z=h.alive?'':(h.lp||0)<=0?'z':'';if((c.dataset.z||'')!==z)c.dataset.z=z;});}
 
-/* ==================== 6. 毎フレーム ==================== */
-{const _d=draw;draw=function(){_d();if(!inB())return;try{fitNew();setIn(inputOn());qRow();hlState();
+/* ==================== 5. 毎フレーム ==================== */
+{const _d=draw;draw=function(){_d();if(!inB())return;try{fitNew();setIn(inputOn());hlState();
   const ov=!!B.over;if(app.classList.contains('ov38')!==ov)app.classList.toggle('ov38',ov);}catch(e){if(!draw._e38){draw._e38=1;console.error(e);}}};}
-{const _sh=show;show=function(m){_sh(m);if(m!=='battle'){app.classList.remove('in38','ov38');IN=false;}};}
+{const _sh=show;show=function(m){_sh(m);if(m!=='battle'){app.classList.remove('in38','ov38','hl39');IN=false;}};}
 
-/* ==================== 7. 開始・寸法の変化 ==================== */
-{const _sb=startBattle;startBattle=function(list,opts){app.classList.remove('in38');IN=false;const r=_sb(list,opts);try{bbar(true);}catch(e){}return r;};}
+/* ==================== 6. 開始・寸法の変化 ==================== */
+{const _sb=startBattle;startBattle=function(list,opts){app.classList.remove('in38','hl39');IN=false;hlTurn=-1;const r=_sb(list,opts);try{bbar(true);}catch(e){}return r;};}
 
-/* ==================== 8. 連続戦闘：次の戦闘への移行演出 ==================== */
+/* ==================== 7. 連続戦闘：次の戦闘への移行演出 ==================== */
 function waveOut(o){return new Promise(res=>{let w=$('#wv38');if(!w){w=document.createElement('div');w.id='wv38';app.appendChild(w);}
  w.innerHTML=`<div class="bg"></div><div class="tx"><small>${esc(o.q||'')}</small><b>BATTLE <em>${o.i}</em><i>/${o.n}</i></b>${o.tag?`<span>${esc(o.tag)}</span>`:''}${o.sub?`<p>${o.sub}</p>`:''}</div>`;
  w.className='on';try{tone(660,.06,'triangle',.04);setTimeout(()=>tone(880,.08,'triangle',.04),90);}catch(e){}
