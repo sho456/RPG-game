@@ -127,7 +127,15 @@ const fxSz=()=>({t:Math.round(clamp(SC*6.6,13,15)),n:Math.round(clamp(SC*8.2,16,
 function fxLayer(){let L=$('#fx25');if(!L||!L.isConnected){L=document.createElement('div');L.id='fx25';stage().appendChild(L);}return L;}
 /* キャラごとの積み上げ枠（体の中央に固定） */
 function fxStack(u){const L=fxLayer();let S=u._fx25;if(!S||!S.isConnected){S=document.createElement('div');S.className='fs25';L.appendChild(S);u._fx25=S;}
- const b=V24.boxOf(u,true),st=stage(),cx=clamp(b.cx,30,st.offsetWidth-30),y=Math.max(b.b-b.h*.02,(LY.hudPx||60)+60);S.style.transform=`translate(${Math.round(cx)}px,${Math.round(y)}px)`;return S;}
+ const b=V24.boxOf(u,true),st=stage(),cx=clamp(b.cx,30,st.offsetWidth-30),y=Math.max(b.b-b.h*.02,(LY.hudPx||60)+60);S.style.transform=`translate(${Math.round(cx)}px,${Math.round(y)}px)`;S._b={cx,y};return S;}
+/* 状態・回復の表示が、同じ場所のダメージ表示に被るなら、体の下側・横へずらす（ver0.44） */
+function fxAvoid(S){const b=S._b;if(!b||!V24.PM)return;const st=$('#stage').getBoundingClientRect(),W0=$('#stage').offsetWidth,oy=fxLayer().getBoundingClientRect().top-st.top;let best=null;
+ for(const[dx,dy]of[[0,0],[0,22],[0,44],[-34,22],[34,22],[-50,0],[50,0],[0,-30],[-60,40],[60,40],[0,66],[-80,0],[80,0],[0,-55],[-70,-30],[70,-30]]){S.style.transform=`translate(${Math.round(clamp(b.cx+dx,30,W0-30))}px,${Math.round(b.y+dy)}px)`;
+  let c=Math.abs(dx)*.02+Math.abs(dy)*.05;const ks=[...S.children],rw=Math.max(20,...ks.map(e=>e.offsetWidth)),rh=(ks[0]?ks[0].offsetHeight:16)*Math.max(1,ks.length)+4*ks.length,X=clamp(b.cx+dx,30,W0-30),Y=b.y+dy+oy,R={l:X-rw/2-4,t:Y-rh-4,r:X+rw/2+4,b:Y+4};/* 出る動きの途中で測るとずれるので、置き場所と行の大きさから計算する */
+  {const bd=V24.bounds();if(R.t<bd.t)c+=60;if(R.b>bd.b+6)c+=120+(R.b-bd.b);}/* 画面の表示範囲の外（下の欄の裏）には出さない */
+  V24.PM.live.forEach(p=>{if(p.R&&!p.gone)c+=Math.max(0,Math.min(R.r,p.R.r)-Math.max(R.l,p.R.l))*Math.max(0,Math.min(R.b,p.R.b)-Math.max(R.t,p.R.t))/Math.max(1,(R.r-R.l)*(R.b-R.t))*100;});
+  if(!best||c<best.c)best={c,dx,dy};if(c<.8)break;}
+ S.style.transform=`translate(${Math.round(clamp(b.cx+best.dx,30,W0-30))}px,${Math.round(b.y+best.dy)}px)`;}
 function fxPop(u,s,col,kind){const k=fxKind(s,col,kind),z=fxSz(),S=fxStack(u),row=document.createElement('div');row.className='fl25 '+k;
  let txt=s.replace(/[↑▲]/g,'').replace(/[↓▼]/g,'').trim();
  const num=k==='heal'||(k==='res'&&!KJ.test(txt)),sk='fx25'+(k==='info'&&KJ.test(txt)?'infoJ':(k==='info'?'info':k));
@@ -135,7 +143,7 @@ function fxPop(u,s,col,kind){const k=fxKind(s,col,kind),z=fxSz(),S=fxStack(u),ro
  /* 強化・弱体は文字の前に▲▼の記号（形でも区別できるように） */
  if(k==='buff'||k==='debuff'){const ic=document.createElement('i');ic.className='ar25';row.appendChild(ic);}
  row.appendChild(num?TX24.row(txt,sk,sz):TX24.el(txt,KJ.test(txt)?sk:sk.replace('infoJ','info'),sz));
- S.appendChild(row);while(S.children.length>3)S.firstChild.remove();
+ S.appendChild(row);while(S.children.length>3)S.firstChild.remove();fxAvoid(S);
  const life=Math.round((k==='heal'?1250:1150)*(speed>=4?.7:speed>=2?.85:1));
  setTimeout(()=>{row.classList.add('out');setTimeout(()=>{row.remove();if(S.isConnected&&!S.children.length){S.remove();if(u._fx25===S)u._fx25=null;}},260);},life);}
 V24.HK24.pop=(u,s,col,small,kind)=>{if(!inB()||!u||u.x==null)return false;
@@ -168,27 +176,7 @@ async function gateWait(){while(inB()&&!B.over&&(OP.on||OP.ready>now25()))await 
 let hlT=0;
 function showHL(ms){if(!inB())return;app.classList.add('hl25');try{V24.renderHL0();}catch(e){}clearTimeout(hlT);hlT=setTimeout(()=>app.classList.remove('hl25'),Math.round(ms*(speed>=4?.6:speed>=2?.8:1)));}
 function hideHL(){clearTimeout(hlT);app.classList.remove('hl25');}
-/* ダメージ・回復の数字：必ず「その相手の体の上」に置く。同じ相手の数字は上へ積み、別の相手の数字とは重ならない側へ少しずらす
- （以前は空き場所を画面全体から探していたため、敵が複数いると誰の数字か分かりにくかった） */
-const ovA=(a,b)=>Math.max(0,Math.min(a.r,b.r)-Math.max(a.l,b.l))*Math.max(0,Math.min(a.b,b.b)-Math.max(a.t,b.t));
-V24.HK24.choose=(u,w,h,pri,self)=>{if(!inB())return null;const bd=V24.bounds(),b=V24.boxOf(u),hero=u.side===0;
- const live=V24.PM.live.filter(p=>p!==self&&!p.gone&&p.R&&p.el.isConnected);
- let x=hero?b.cx-w*.6:b.cx-w/2,y=hero?b.cy-h*.5:b.t+b.h*.5-h*.5;
- const fit=(X,Y)=>[clamp(X,bd.l,Math.max(bd.l,bd.r-w)),clamp(Y,bd.t,Math.max(bd.t,bd.b-h))];
- [x,y]=fit(x,y);
- /* 同じ相手の古い数字は上へ押し上げる（最新の数字が常に相手の体の上） */
- let top=y;live.filter(p=>p.u===u).sort((a,b2)=>(b2.t||0)-(a.t||0)).forEach(p=>{const ph=p.R.b-p.R.t+6,ny=Math.max(bd.t,top-ph+6);top=ny;
-  p.y=ny;p.R={l:p.R.l,t:ny+3,r:p.R.r,b:ny+ph-3};p.el.style.transition='transform .16s ease-out';p.el.style.transform=`translate(${Math.round(p.x)}px,${Math.round(ny)}px)`;
-  /* 押し上げた古い数字が別の相手の数字に掛かるなら、早めに消す（最新の数字を読みやすく） */
-  if(live.some(q=>q.u!==u&&q.R&&ovA(p.R,q.R)>(p.R.r-p.R.l)*(p.R.b-p.R.t)*.12)){p.gone=1;p.el.style.setProperty('--out','140ms');p.el.classList.add('out');setTimeout(()=>p.el.remove(),170);}});
- /* 別の相手の数字と重なるなら、体の範囲内で上下にずらして最も重ならない位置へ */
- const others=V24.PM.live.filter(p=>p!==self&&!p.gone&&p.R&&p.u!==u),cost=(X,Y)=>others.reduce((c,p)=>c+ovA({l:X,t:Y,r:X+w,b:Y+h},p.R),0);
- if(cost(x,y)>0){let best=[x,y,cost(x,y)];for(const dy of[-.35,.35,-.7,.7])for(const dx of[0,-.3,.3]){const[X,Y]=fit(x+dx*w,y+dy*Math.max(h,b.h*.5));const c=cost(X,Y);if(c<best[2])best=[X,Y,c];}[x,y]=best;}
- /* 数字と重なるキャラ横のHP表示は、数字が出ている間だけ薄くする */
- try{const L=$('#hl24'),R0={l:x,t:y,r:x+w,b:y+h};(V24.HL.rects||[]).forEach((r,i)=>{const c=L&&L.children[i];if(!c||ovA(R0,r)<=0)return;c.classList.add('dim');clearTimeout(c._dt);c._dt=setTimeout(()=>c.classList.remove('dim'),1300);});}catch(e){}
- return{x,y,R:{l:x+3,t:y+3,r:x+w-3,b:y+h-3},c:0,hard:0};};
-/* 他の相手の数字は消さない（重なりは上の位置選びで避ける） */
-V24.HK24.bump=()=>{};
+/* ダメージ・回復の数字の置き場所は js/v24.js の choose（ver0.44 で置き換え。以前ここにあった簡易版は廃止） */
 /* Critical：数字は通常と同じ色・大きさ。見出しの「Critical」だけ金色で目立たせる */
 V24.FS24.cr=1;
 

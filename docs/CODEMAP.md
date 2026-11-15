@@ -50,7 +50,7 @@
 | 44 | `js/v23.js` | 20 | ver0.23 戦闘画面・ダメージ演出・ホーム・図鑑・画面倍率・探索・星臨演出の改良 | V23 |
 | 45 | `js/v24-text.js` | 12 | ver0.24 演出文字レンダラー（TX24） | TX24 |
 | 46 | `js/v24.js` | 27 | ver0.24 戦闘演出の品質向上（大規模ドット絵アップデートの下準備） | V24 RM |
-| 47 | `js/v25.js` | 25 | ver0.25 戦闘画面の全面リデザイン | V25 |
+| 47 | `js/v25.js` | 24 | ver0.25 戦闘画面の全面リデザイン | V25 |
 | 48 | `js/data/terms.js` | 9 | ver0.29 呼称・分類の共通規格（TERMS） | TERMS |
 | 49 | `js/motion/registry.js` | 4 | ver0.29 モーション台帳（MOTION） | MOTION |
 | 50 | `js/sprite/facing.js` | 4 | ver0.29 キャラクターの向き（FACING）：向きを決める唯一の窓口 | FACING |
@@ -124,7 +124,6 @@
 | `charHTML` | ver17.js → v20-ui.js → v22.js → v31/core.js → v31/board.js → rs/ui.js |
 | `doAction` | engine.js → ch8.js → v20-battle.js → v20-ui.js → v22.js → battle/flow.js |
 | `enterField` | field.js → ch8.js → ver17.js → ver18-field.js → v23.js → v31/quests.js |
-| `fit` | core.js → v20-ui.js → v21.js → v22.js → v23.js → v25.js |
 | `keyOf` | sprite/legacy/dot-rig.js → ver19.js → v21-items.js → v31/items.js → battle/seq.js → rs/core.js |
 | `panel` | town.js → ver18-town.js → v20-ui.js → v22.js → battle/viewer.js → v38/help.js |
 | `rewards` | engine.js → ch8.js → ch9.js → v20-ui.js → v31/core.js → v31/quests.js |
@@ -133,6 +132,7 @@
 | `enemy` | engine.js → v31/enemies.js → v32.js → battle/size.js → v38/core.js |
 | `enemyTurn` | engine.js → v20-battle.js → v20-ui.js → v25.js → battle/viewer.js |
 | `face` | ui-assets.js → ver18-art.js → sprite/legacy/dot-rig.js → ver19-art.js → sprite/spx.js |
+| `fit` | core.js → v20-ui.js → v21.js → v22.js → v23.js |
 | `frameOf` | sprite/legacy/px.js → sprite/legacy/px-enemy.js → ver19-art.js → sprite/spx.js → zukan/viewer.js |
 | `heroTurn` | engine.js → v20-battle.js → v22.js → v25.js → battle/viewer.js |
 | `worldMap` | town.js → ver17.js → ver18-town.js → v22.js → v31/quests.js |

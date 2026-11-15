@@ -27,7 +27,10 @@ const ov=(a,b)=>Math.max(0,Math.min(a.r,b.r)-Math.max(a.l,b.l))*Math.max(0,Math.
 const rect=(x,y,w,h,ins=0)=>({l:x+ins,t:y+ins,r:x+w-ins,b:y+h-ins});
 const relRect=el=>{if(!el||!el.isConnected||!el.offsetParent||+getComputedStyle(el).opacity<.05)return null;const s=stage().getBoundingClientRect(),r=el.getBoundingClientRect();if(!r.width||!r.height)return null;return{l:r.left-s.left,t:r.top-s.top,r:r.right-s.left,b:r.bottom-s.top};};
 /* 表示してよい範囲：上の固定帯（敵の名前・HP）と下の帯（星臨ボタン）の間 */
-function bounds(){const st=stage(),SW=st.offsetWidth,SH=st.offsetHeight;return{l:3,t:(LY.hudPx||58)+2,r:SW-3,b:SH-(LY.botPx||46)-2,SW,SH};}
+function bounds(){const st=stage(),SW=st.offsetWidth,SH=st.offsetHeight;let b=SH-(LY.botPx||46)-2;
+ /* ver0.44：下のコマンド欄が戦場に重なっているときは、その上端までを表示範囲にする（数字が欄の下に隠れないように） */
+ try{const c=$('#cmd'),sr=st.getBoundingClientRect();if(c&&c.offsetParent){const k=sr.height/Math.max(1,SH),ct=(c.getBoundingClientRect().top-sr.top)/k;if(ct>(LY.hudPx||58)+80&&ct<b)b=ct-2;}}catch(e){}
+ return{l:3,t:(LY.hudPx||58)+2,r:SW-3,b,SW,SH};}
 
 /* ==================== 1. 配置マネージャ ==================== */
 const PRI={brk:5,crit:4,dmg:3,word:3,heal:2,tag:1};
@@ -45,32 +48,29 @@ function obstacles(u){const o=[];if(!B)return o;
  /* 連撃数：多段攻撃の間は、まだ出ていなくても場所を予約しておく（後から出て数字に被らないように） */
  
  return o;}
-/* 候補の位置を順に評価して、重なりの最も少ない場所を選ぶ。
- 費用：優先度の高い表示との重なり（200）≫ HP表示・味方の絵（40〜50）≫ 同じ優先度の古い表示（20：新しい方を優先して古い方を下げる）≫ 低い優先度（4）＋候補の順番 */
-function choose(u,w,h,pri,self){if(HK24.choose){const r=HK24.choose(u,w,h,pri,self);if(r)return r;}const bd=bounds(),b=boxOf(u),hero=u.side===0,obs=obstacles(u),live=alive().filter(q=>q!==self),cand=[];
- const xmax=hero?bd.r-w:Math.max(bd.l,Math.min(bd.r,(LY.heroL||W*.62)*SC-4)-w);
- if(hero){const x0=b.l-4-w,y0=b.cy-h*.5,sy=h*.55+3,sx=w*.55;
-  for(const dy of[0,-1,1,-2,2,-3,3,-4,4])for(const dx of[0,-1,-2,-3,-4])cand.push([x0+dx*sx,y0+dy*sy]);}
- else{const x0=b.cx-w/2,y0=b.t+Math.min(b.h*.3,h*.45)-h,sy=h*.55+3,sx=w*.6;
-  for(const dy of[0,-1,1,-2,2,-3,3,-4,4,-5])for(const dx of[0,-1,1,-2,2,-3,3])cand.push([x0+dx*sx,y0+dy*sy]);}
- let best=null;cand.forEach(([x,y],i)=>{x=clamp(x,bd.l,Math.max(bd.l,xmax));y=clamp(y,bd.t,Math.max(bd.t,bd.b-h));const R=rect(x,y,w,h,3);let c=0,hard=0;
-  for(const p of live){if(p.R===undefined)continue;const a=ov(R,p.R);if(a>0){if(p.pri>pri){c+=a*200;hard+=a;}else c+=a*(p.pri===pri?20:4);}}
-  for(const q of obs){const a=ov(R,q.r);c+=a*q.w;if(q.w>=40)hard+=a;}c+=i*6;
-  if(!best||c<best.c)best={x,y,R,c,hard};});
- /* 近くに空きがなければ、表示してよい範囲全体を格子状に調べて、最寄りの空いた位置を使う */
- if(best.hard>0){const[ax,ay]=cand[0],xm=Math.max(bd.l,xmax),ym=Math.max(bd.t,bd.b-h);let g=null;
-  for(let y=bd.t;y<=ym+.1;y+=8)for(let x=bd.l;x<=xm+.1;x+=8){const R=rect(x,y,w,h,3);let hard=0,c=0;
-   for(const q of obs){const a=ov(R,q.r);if(q.w>=40){hard+=a;if(hard)break;}else c+=a*q.w;}if(hard)continue;
-   for(const p of live){const a=ov(R,p.R);if(a>0){if(p.pri>pri){hard=1;break;}c+=a*(p.pri===pri?20:4);}}if(hard)continue;
-   c+=Math.hypot(x-ax,(y-ay)*1.3)*8;if(!g||c<g.c)g={x,y,R,c,hard:0};}
-  if(g)best=g;}
+/* 置き場所の決め方（ver0.44：v25.js の簡易版を置き換え。表示は被らないことを最優先する）
+ ・基準：敵は体の上寄り、味方は体の左。続けて出る表示（同じ相手のまとまりの再配置は、今の上端を保って下へ伸ばす）
+ ・候補：基準から上下左右へ段階的にずらした位置。表示してよい範囲（bounds）の中に必ず収める（画面端からはみ出さない）
+ ・費用：ほかの表示（キャラ横の状態表示 #fx25 も含む）との重なり（面積比 ×300）≫ 味方の体・HP 表示 ≫ 他の敵の体（わずか）＋基準からの遠さ。
+   対象ごとに基準が違うので、近くの敵どうしでも別々の場所に出る。HP 表示に掛かるときは数字が出ている間だけ薄くする */
+function choose(u,w,h,pri,self){const bd=bounds(),b=boxOf(u),hero=u.side===0,obs=obstacles(u),live=alive().filter(q=>q!==self&&q.R),A=Math.max(1,w*h),fxr=[];
+ try{document.querySelectorAll('#fx25 .fl25').forEach(el=>{const r=relRect(el);if(r)fxr.push(r);});}catch(e){}
+ const own=self&&self.x!=null;
+ let ax=own?self.x-(w-self.w)/2:hero?b.cx-w*.6:b.cx-w/2,ay=own?self.y:hero?b.cy-h*.5:b.t+Math.min(b.h*.45,h)-h*.5;
+ const sx=Math.max(w*.55,16),sy=Math.max(h*.62,14),DX=[0,-1,1,-2,2,-3,3],DY=[0,-1,1,-2,2,-3,3,-4,4,-5];
+ let best=null;
+ for(const dy of DY)for(const dx of DX){const x=clamp(ax+dx*sx,bd.l,Math.max(bd.l,bd.r-w)),y=clamp(ay+dy*sy,bd.t,Math.max(bd.t,bd.b-h)),R=rect(x,y,w,h,-3);let c=Math.abs(dx)*5+Math.abs(dy)*7+(dy>0?3:0),hl=0;
+  for(const p of live)c+=ov(R,p.R)/A*(p.pri>=pri?1200:600);
+  for(const r of fxr)c+=ov(R,r)/A*900;
+  for(const q of obs){const a=ov(R,q.r);if(a>0){c+=a/A*q.w*(q.w>=40?3:1);if(q.w>=50)hl+=a;}}
+  if(!best||c<best.c)best={x,y,R,c,hard:0,hl};}
  return best;}
 /* 要素を測って置く。優先度の低い表示とぶつかるなら低い方を早めに消す。状態表示は少し待って空きを探す */
 function place(p,tries=0){const el=p.el,w=el.offsetWidth,h=el.offsetHeight,best=choose(p.u,w,h,p.pri);
  /* 優先度の高い表示が空くまで少し待つ（状態表示は長め、ダメージは短め） */
  if(best.hard>0&&tries<(p.pri<=PRI.tag?6:3)){el.style.visibility='hidden';setTimeout(()=>{if(!el.isConnected||!inBattle()){el.remove();return;}place(p,tries+1);},120);return false;}
  /* 待っても空かないとき：状態表示は見送る（内容はメッセージ欄に残る）。ダメージなどは重なるHP表示を一時的に薄くする */
- if(best.hard>0){if(p.pri<=PRI.tag){el.remove();return false;}dimHL(best.R,p.life);}
+ if(best.hl>0)dimHL(best.R,p.life);
  /* 重なる表示は下げる（新しい表示を優先。待っても空かなかった場合は高い優先度のものも） */
  bump(p,best.R);
  p.x=best.x;p.y=best.y;p.R=best.R;p.w=w;p.h=h;el.style.transform=`translate(${Math.round(best.x)}px,${Math.round(best.y)}px)`;
@@ -79,8 +79,9 @@ function place(p,tries=0){const el=p.el,w=el.offsetWidth,h=el.offsetHeight,best=
  return true;}
 function arm(p){clearTimeout(p.to1);clearTimeout(p.to2);const left=Math.max(0,p.end-now());p.to1=setTimeout(()=>{if(!p.gone){p.gone=1;p.el.classList.add('out');}},Math.max(0,left-220));p.to2=setTimeout(()=>p.el.remove(),left+40);}
 /* 行が増えて大きくなった表示を置き直す */
-function reflow(p){const w=p.el.offsetWidth,h=p.el.offsetHeight,best=choose(p.u,w,h,p.pri,p);if(best.hard>0)dimHL(best.R,Math.max(200,p.end-now()));p.x=best.x;p.y=best.y;p.R=best.R;p.el.style.transform=`translate(${Math.round(best.x)}px,${Math.round(best.y)}px)`;bump(p,best.R);}
-function bump(p,R){if(HK24.bump)return HK24.bump(p,R);alive().forEach(q=>{if(q!==p&&q.R&&ov(R,q.R)>0)dismiss(q,140);});}
+function reflow(p){const w=p.el.offsetWidth,h=p.el.offsetHeight,best=choose(p.u,w,h,p.pri,p);if(best.hl>0)dimHL(best.R,Math.max(200,p.end-now()));p.x=best.x;p.y=best.y;p.R=best.R;p.w=w;p.h=h;p.el.style.transform=`translate(${Math.round(best.x)}px,${Math.round(best.y)}px)`;}
+/* ver0.44：重なる表示は消さず、置き場所の選び方（choose）で避ける */
+function bump(){}
 /* 同じ相手の表示が多すぎるとき（多段攻撃）は古いものから下げる */
 function capUnit(u,max=3){const L=alive().filter(p=>p.u===u&&p.num);if(L.length<max)return;
  /* 優先度の低いもの（Critical 以外）の古い順に下げる */
@@ -124,13 +125,18 @@ function dmgPop(u,s,kind,el){const v=parseInt(s,10),heal=s[0]==='+',crit=/crit/.
  const txt=(heal?'+':'')+fmt(v),fs0=Math.round(numFs(u)*TIER[t]*(crit?(FS24.cr||1.15):1)*(heal?.92:1)),fs=fitFs(txt,sk,fs0);
  const nm=document.createElement('div');nm.className='nm';
  /* ver0.42：ロマサガRS のように数字を 1 桁ずつ弾ませる（桁ごとの絵を並べ、出る時刻をずらす。css/ui/battle-flow.css） */
- if(!heal&&/^[\d,]+$/.test(txt)){nm.classList.add('dg42');[...txt].forEach((ch,i)=>{const c=TX24.el(ch,sk,fs);c.style.animationDelay=(i*55)+'ms';if(i)c.style.marginLeft=-Math.round(c._m.pad*2-fs*(ch===','?-.02:.04))+'px';/* 桁ごとの絵の余白（縁・発光）の分だけ詰める */nm.appendChild(c);});}
+ if(!heal&&/^[\d,]+$/.test(txt)){nm.classList.add('dg42');[...txt].forEach((ch,i)=>{const c=TX24.el(ch,sk,fs);c.style.animationDelay=((txt.length-1-i)*50)+'ms';if(i)c.style.marginLeft=-Math.round(c._m.pad*2-fs*(ch===','?-.02:.04))+'px';/* 桁ごとの絵の余白（縁・発光）の分だけ詰める */nm.appendChild(c);});}
  else nm.appendChild(TX24.row(txt,sk,fs,/万/));
  /* 直前のまとまりに追加 */
  const G=u._dg25,tn=now();
  if(!heal&&!psn&&G&&!G.gone&&G.el.isConnected&&tn-G.t1<GRP_MS){
-  addLabels(G,u,crit,weak,grd,el,fs0,res);G.in.appendChild(nm);
-  const rows=[...G.in.querySelectorAll(':scope>.nm')];if(rows.length>3)rows.slice(0,rows.length-3).forEach(r=>r.remove());
+  addLabels(G,u,crit,weak,grd,el,fs0,res);
+  /* ver0.44：連続ヒットは前の数字を消さず、次の数字を少し下・斜めにずらして被せていく（古い数字は少し小さく・薄く。最大 4 つ） */
+  const rows=[...G.in.querySelectorAll(':scope>.nm')],k=rows.length;
+  nm.classList.add('hit');nm.style.setProperty('--dx',((k%2?1:-1)*Math.round(fs*(.3+.14*(k%3))))+'px');nm.style.marginTop=-Math.round(fs*.3)+'px';
+  rows.forEach((r,i)=>{r.classList.add('old');r.style.setProperty('--sc',Math.max(.7,1-.06*(k-i)).toFixed(2));});
+  G.in.appendChild(nm);
+  if(rows.length>=4){rows.slice(0,rows.length-3).forEach(r=>r.remove());const f=G.in.querySelector(':scope>.nm');if(f)f.style.marginTop='';}
   if(crit&&!G.el.classList.contains('crit')){G.el.classList.add('crit');G.pri=Math.max(G.pri,PRI.crit);}
   G.t1=tn;G.end=Math.max(G.end,tn+Math.round((crit?1400:1150)*spdK()));arm(G);reflow(G);u._dm24=G;return G;}
  const pri=crit?PRI.crit:heal?PRI.heal:PRI.dmg;capUnit(u);
