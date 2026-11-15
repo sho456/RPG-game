@@ -109,20 +109,22 @@ function fitFs(text,sk,fs){const st=stage(),mw=Math.min(150,(st?st.offsetWidth:3
  見出し（Critical／Weak／Guard）はまとまりの上に1回だけ、数字は下へ1行ずつ追加（最大3行。古い行から消える）。
  以前は1ヒットごとに見出し付きの表示を作っていたため、連続ヒットで「Critical」が2つ重なって見えていた */
 const GRP_MS=900;
-function addLabels(p,u,crit,weak,grd,el,fs,res){const has=c=>!!p.in.querySelector(':scope>.lb.'+c),first=p.in.querySelector(':scope>.nm');
- const lf=Math.round(fs*(FS24.lb||.56)),put=r=>p.in.insertBefore(r,first);
- if(crit&&!has('cr'))p.in.insertBefore(lbRow('cr',TX24.el('Critical','crit',Math.round(fs*.64))),p.in.firstChild);
- if(weak&&!has('wk')){const r=lbRow('wk',TX24.el('Weak','weak',lf));if(el&&ELC[el])r.appendChild(TX24.el(el,'elm',Math.round(lf*1.08)));put(r);}
- if(grd&&!has('gd'))put(lbRow('gd',TX24.el('Guard','guard',Math.round(fs*.64))));
- /* ver0.29：Resist（耐性で軽減）。弱点・会心と同じ並びに、灰青の見出しで出す */
- if(res&&!weak&&!has('rs')){const r=lbRow('rs',TX24.el('Resist','resist',lf));if(el&&ELC[el])r.appendChild(TX24.el(el,'elm',Math.round(lf*1.08)));put(r);}}
+/* ver0.43：見出し（Critical／Weak／Resist／Guard）と属性の漢字は、数字より大きく出す（ロマサガRS の録画に合わせる。数字の大きさ fs に対する倍率） */
+const LBK={cr:1.45,wk:1.25,rs:1.25,gd:1.2,el:1.5};
+function addLabels(p,u,crit,weak,grd,el,fs,res){const has=c=>!!p.in.querySelector(':scope>.lb.'+c),first=p.in.querySelector(':scope>.nm'),put=r=>p.in.insertBefore(r,first);
+ const elc=()=>TX24.el(el,'elm',Math.round(fs*LBK.el));
+ if(crit&&!has('cr'))p.in.insertBefore(lbRow('cr',TX24.el('Critical','crit',Math.round(fs*LBK.cr))),p.in.firstChild);
+ if(weak&&!has('wk')){const r=lbRow('wk',TX24.el('Weak','weak',Math.round(fs*LBK.wk)));if(el&&ELC[el])r.appendChild(elc());put(r);}
+ if(grd&&!has('gd'))put(lbRow('gd',TX24.el('Guard','guard',Math.round(fs*LBK.gd))));
+ /* Resist（耐性で軽減）：青い鋼の見出し */
+ if(res&&!weak&&!has('rs')){const r=lbRow('rs',TX24.el('Resist','resist',Math.round(fs*LBK.rs)));if(el&&ELC[el])r.appendChild(elc());put(r);}}
 function dmgPop(u,s,kind,el){const v=parseInt(s,10),heal=s[0]==='+',crit=/crit/.test(kind),weak=/weak/.test(kind),res=/resist/.test(kind),psn=/psn/.test(kind),grd=u.side===0&&!heal&&!!u.guard;
  const t=heal?0:tierOf(u,Math.abs(v));
  const sk=heal?'heal':psn?'psn':weak?(t>=3?'dmgWT':'dmgW'):grd?'dmgG':u.side===0?'dmgH':t>=3?'dmgT':'dmg';
  const txt=(heal?'+':'')+fmt(v),fs0=Math.round(numFs(u)*TIER[t]*(crit?(FS24.cr||1.15):1)*(heal?.92:1)),fs=fitFs(txt,sk,fs0);
  const nm=document.createElement('div');nm.className='nm';
  /* ver0.42：ロマサガRS のように数字を 1 桁ずつ弾ませる（桁ごとの絵を並べ、出る時刻をずらす。css/ui/battle-flow.css） */
- if(!heal&&/^[\d,]+$/.test(txt)){nm.classList.add('dg42');[...txt].forEach((ch,i)=>{const c=TX24.el(ch,sk,fs);c.style.animationDelay=(i*55)+'ms';if(i)c.style.marginLeft=-Math.round(fs*(ch===','?.32:.26))+'px';nm.appendChild(c);});}
+ if(!heal&&/^[\d,]+$/.test(txt)){nm.classList.add('dg42');[...txt].forEach((ch,i)=>{const c=TX24.el(ch,sk,fs);c.style.animationDelay=(i*55)+'ms';if(i)c.style.marginLeft=-Math.round(c._m.pad*2-fs*(ch===','?-.02:.04))+'px';/* 桁ごとの絵の余白（縁・発光）の分だけ詰める */nm.appendChild(c);});}
  else nm.appendChild(TX24.row(txt,sk,fs,/万/));
  /* 直前のまとまりに追加 */
  const G=u._dg25,tn=now();

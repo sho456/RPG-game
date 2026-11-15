@@ -11,6 +11,7 @@ const TX24=(()=>{
 const FONT={/* ver0.42：ロマサガRS の戦闘の数字（斜体のセリフ体）・英字（斜体）・日本語（角ゴシック）に合わせる */
  num:{f:'"Noto Serif","Times New Roman",Georgia,serif',w:900,it:'italic',cap:.72,skew:0},
  lat:{f:'"Jost","Helvetica Neue",Arial,sans-serif',w:700,it:'italic',cap:.72,skew:0},
+ brush:{f:'"Yuji Boku","Yuji Syuku","Hiragino Mincho ProN","Yu Mincho",serif',w:400,it:'normal',cap:.84,skew:0},/* 属性の漢字（毛筆）。Yuji Boku は太く迫力のある書体 */
  jp:{f:'"M PLUS 1p","Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP","Yu Gothic",sans-serif',w:800,it:'normal',cap:.86,skew:.2}};
 /* 書式：fill=上→下のグラデーション（位置は文字の高さに対する割合）、ow=外側の縁の太さ（文字サイズ比）、oc=外側の縁の色、
  rw/rc=内側の明るい縁、sh=落ち影、gl=上半分の光沢の強さ、glow=外側の発光 */
@@ -66,6 +67,8 @@ function master(text,sk,size){const dpr=DPR(),key=sk+'|'+size+'|'+dpr+'|'+text;l
  const gr=fg.createLinearGradient(0,top,0,bot);S.fill.forEach(([p,col])=>gr.addColorStop(p,col));fg.fillStyle=gr;fg.fillText(text,x0,base);
  if(S.gl){fg.setTransform(1,0,0,1,0,0);fg.globalCompositeOperation='source-atop';const gg=fg.createLinearGradient(0,top,0,top+(bot-top)*.5);
   gg.addColorStop(0,`rgba(255,255,255,${S.gl})`);gg.addColorStop(1,'rgba(255,255,255,0)');fg.fillStyle=gg;fg.fillRect(0,top-2,W,(bot-top)*.5+2);}
+ /* 5b. 金属のハイライトの線（ln=[上からの位置,濃さ]）。塗りの形の中だけに細い白線を引く */
+ if(S.ln){fg.setTransform(1,0,0,1,0,0);fg.globalCompositeOperation='source-atop';fg.fillStyle=`rgba(255,255,255,${S.ln[1]})`;fg.fillRect(0,Math.round(top+(bot-top)*S.ln[0]),W,Math.max(1,Math.round(px*.045)));}
  g.setTransform(1,0,0,1,0,0);g.drawImage(f,0,0);
  m={c,w:W/dpr,h:Hh/dpr,pad:pad/dpr,adv:tw/dpr,base:base/dpr,dpr,key};
  if(ready(F,px)){if(++CN>600){CACHE.clear();CN=0;}CACHE.set(key,m);}
@@ -97,6 +100,6 @@ function burst(size){const dpr=DPR(),k=Math.round(size)+'|'+dpr;let m=BURST[k];
   m=BURST[k]=c;}
  const c=document.createElement('canvas');c.width=m.width;c.height=m.height;c.getContext('2d').drawImage(m,0,0);c.style.width=c.style.height=Math.round(size)+'px';c.className='fx';return c;}
 /* 書体を先に読み込む（読み込み後は自動的に正しい書体で描かれる） */
-function preload(){try{if(!document.fonts)return;for(const k in FONT){const F=FONT[k];document.fonts.load(fontStr(F,32),k==='jp'?'スタン斬打突炎氷雷風地光闇毒':'0123456789CriticalWeakGuardMissBREAK!+').catch(()=>{});}}catch(e){}}
+function preload(){try{if(!document.fonts)return;for(const k in FONT){const F=FONT[k];document.fonts.load(fontStr(F,32),(k==='jp'||k==='brush')?'スタン斬打突炎氷雷風地光闇毒熱冷電聖魔':'0123456789CriticalWeakResistGuardMissBREAK!+').catch(()=>{});}}catch(e){}}
 preload();
 return{el,row,master,burst,tint,STYLE,FONT,preload,clear:()=>{CACHE.clear();ROWC.clear();CN=RN=0;}};})();

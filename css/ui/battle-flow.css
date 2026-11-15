@@ -10,7 +10,4 @@
 .bub42.out{animation:bub42o .2s ease-in forwards}
 @keyframes bub42{0%{opacity:0;transform:translate(-50%,-100%) scale(.3)}100%{opacity:1;transform:translate(-50%,-100%) scale(1)}}
 @keyframes bub42o{to{opacity:0;transform:translate(-50%,-100%) scale(.85)}}
-/* ダメージの数字：1 桁ずつ弾む */
-.dg42{display:inline-flex;align-items:flex-end}
-.dg42 canvas{display:block;animation:dg42 .42s cubic-bezier(.2,1.7,.35,1) both}
-@keyframes dg42{0%{opacity:0;transform:translateY(-55%) scale(1.25)}55%{opacity:1}100%{opacity:1;transform:none}}
+/* ダメージの数字の弾みは css/ui/damage.css */
