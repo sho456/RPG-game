@@ -1,0 +1,16 @@
+/* ===== 戦闘の行動演出（js/battle/flow.js と対） ===== */
+/* 技名の吹き出し：白い角丸に下向きのしっぽ。キャラの頭の上にポンと出る */
+.bub42{position:absolute;z-index:6;transform:translate(-50%,-100%);pointer-events:none;padding:5px 14px 6px;border-radius:12px;white-space:nowrap;
+ background:linear-gradient(180deg,#fffdf4,#ece4d0);border:1.5px solid #6a5a44;box-shadow:0 2px 0 rgba(0,0,0,.35),inset 0 -2px 0 rgba(120,100,70,.18);
+ animation:bub42 .26s cubic-bezier(.2,1.6,.4,1) both}
+.bub42::after{content:'';position:absolute;left:58%;bottom:-8px;width:12px;height:9px;background:#ece4d0;border-right:1.5px solid #6a5a44;border-bottom:1.5px solid #6a5a44;
+ transform:skewX(-35deg) rotate(10deg);clip-path:polygon(0 0,100% 0,100% 100%)}
+.bub42 b{font-weight:800;font-size:14px;letter-spacing:.06em;color:#2a2018}
+.bub42.e{border-color:#8a2a2a}.bub42.e b{color:#4a0c0c}
+.bub42.out{animation:bub42o .2s ease-in forwards}
+@keyframes bub42{0%{opacity:0;transform:translate(-50%,-100%) scale(.3)}100%{opacity:1;transform:translate(-50%,-100%) scale(1)}}
+@keyframes bub42o{to{opacity:0;transform:translate(-50%,-100%) scale(.85)}}
+/* ダメージの数字：1 桁ずつ弾む */
+.dg42{display:inline-flex;align-items:flex-end}
+.dg42 canvas{display:block;animation:dg42 .42s cubic-bezier(.2,1.7,.35,1) both}
+@keyframes dg42{0%{opacity:0;transform:translateY(-55%) scale(1.25)}55%{opacity:1}100%{opacity:1;transform:none}}

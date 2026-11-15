@@ -99,3 +99,7 @@
 .pb41.tgt{border:1px dashed #ffe27a}
 .ps41 .ft{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 @media (max-width:360px){.pc41 .nm b{font-size:12px}.pc41 .ar{height:112px}.pc41 .ar img{height:106px}}
+
+/* ver0.42 陣形：戦闘画面と同じ向き（左が敵側）。左端に「敵」の目印 */
+.fe41 .fld::before{content:'';position:absolute;left:0;top:0;bottom:0;width:18px;background:linear-gradient(90deg,rgba(255,60,40,.35),transparent);z-index:1}
+.fe41 .foe{position:absolute;left:5px;top:50%;transform:translateY(-50%);z-index:2;font-style:normal;font-size:11px;font-weight:900;color:#ffc8b8;writing-mode:vertical-rl;letter-spacing:.4em;text-shadow:0 1px 2px #000}

@@ -24,10 +24,6 @@
 #app.v23 .b22ord{bottom:4px}
 #app.v23 .b22aw{bottom:4px}
 /* 技名・連撃数は固定帯のすぐ下 */
-#app.v23 #skn20{top:calc(var(--hud23,80px) + 2px);border-radius:3px;border:1.5px solid rgba(160,240,220,.85);background:linear-gradient(180deg,rgba(14,70,74,.96),rgba(6,34,44,.96));box-shadow:0 0 0 1px #021014,0 3px 8px rgba(0,0,0,.6);padding:4px 14px}
-#app.v23 #skn20.e{border-color:rgba(255,120,120,.9);background:linear-gradient(180deg,rgba(90,16,26,.96),rgba(44,6,14,.96))}
-#app.v23 #skn20 b{font-size:14px;letter-spacing:1px}
-#app.v23 #combo{left:auto;right:calc(100% - var(--hl23,62%));top:calc(var(--hud23,80px) + 34px);z-index:3}
 /* キャラの横に出ていた HP・SP・ゲージは廃止（下のパーティ情報欄へ統合） */
 #app.v23[data-sc="battle"] #labels .hpl{display:none !important}
 #app.v23[data-sc="battle"] #party{display:none !important}

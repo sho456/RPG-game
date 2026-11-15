@@ -102,12 +102,12 @@ const RK=['','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ'];
 function stars(r){return`<span class="rsst">${[1,2,3,4,5].map(i=>`<i class="${i<=r?'on':''}"></i>`).join('')}</span>`;}
 /* 技Lv（使った回数＝熟練で上がる）を 1 つの表示に：「技Lv 3」と次の Lv までのゲージ */
 /* 技・術の行（ver0.41：ロマサガRS の技一覧のように「アイコン＋名前＋Rank＋属性」だけ。説明は ⓘ で出す）
-   アイコン：技は武器、術・補助・回復は属性の文字。色は種類（技＝赤・術＝青・回復＝緑・補助＝金・奥義＝虹）。下の ◆ は威力の段（E〜D・C〜B・A 以上）
+   アイコン：js/ui/skill-icons.js（SKICON）の白いシルエット（技の内容ごと）。色は種類（技＝赤・術＝青・回復＝緑・補助＝金・奥義＝虹）。下の ◆ は威力の段（E〜D・C〜B・A 以上）
    Rank＝技Lv（使うほど上がる。旧「熟練」） */
 const ELN={'斬':'#c8ccd8','打':'#d8b890','突':'#c0d0e0','熱':'#ff8a5a','冷':'#8ad4ff','雷':'#ffe066','陽':'#fff0a0','陰':'#c09cff'};
 const tier=rk=>!rk?0:'ED'.includes(rk)?1:'CB'.includes(rk)?2:3;
-function skIcon(id,s,sm){const t=tyCls(s),[el]=badge(s),wt=(D.HERO[id]||{}).w,shp=(D.HERO[id]||{}).shape;let g='';
- if(t==='ph'){try{g=`<img src="${shp==='大鎌'?IC21.render('scythe_鉄',0):V38P.wIcon(wt)}" alt="">`;}catch(e){}}
+function skIcon(id,s,sm){const t=tyCls(s),[el]=badge(s);let g='';
+ try{g=SKICON.html(s);}catch(e){}
  if(!g)g=`<b>${esc(el||'術')}</b>`;const n=tier(s.rk);
  return`<span class="ski ${t}${sm?' sm':''}">${g}${n?`<i class="dm">${'◆'.repeat(n)}${'◇'.repeat(3-n)}</i>`:''}</span>`;}
 function elBadges(s){const L=[...new Set([s.el,s.el2].filter(x=>x&&ELN[x]))];return L.map(e=>`<i class="elb" style="--c:${ELN[e]}">${e}</i>`).join('');}

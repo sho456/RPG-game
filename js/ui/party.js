@@ -43,25 +43,29 @@ partyScreen=function(m){const P=G.party,f=C.formOf(),F=D.FORM[f],bench=G.members
   s:id=>{SEL=SEL===id?null:id;partyScreen();},
   e:()=>{if(SEL&&!P.includes(SEL)){P.push(SEL);SEL=null;save();}partyScreen();},
   rm:()=>{const a=SEL;SEL=null;G.party=P.filter(x=>x!==a);save();partyScreen();},x:()=>{SEL=null;partyScreen();},
-  form:()=>{SEL=null;formOpen();},inv:()=>invMenu(),back:()=>{SEL=null;townMenu();}});
+  form:()=>{SEL=null;FPK=null;FLIST=false;formOpen();}/* 陣形はいつも戦場の図から開く */,inv:()=>invMenu(),back:()=>{SEL=null;townMenu();}});
  try{tip('party');}catch(e){}};
 formation=function(){partyScreen();};
 
 /* 陣形と立ち位置（ver0.41：ロマサガRS の陣形画面のように）
-   ・上：戦場を上から見た図。上が前（敵の側）。キャラは方位の円の上に立ち、頭の上に補正の札（能力▲／▼）
+   ・上：戦闘画面と同じ向きの戦場（左が前＝敵の側）。キャラは戦闘と同じ左向きの構えの絵で、キャラは方位の円の上に立ち、頭の上に補正の札（能力▲／▼）
    ・2 人をタップで立ち位置を入れ替え（並び順 G.party[i] が陣形の i 番目の位置＝戦闘の配置）
    ・下：配置の小図と「変更」（陣形の一覧へ）・陣形名・説明・ⓘ（並び順ごとの補正の一覧） */
 let FPK=null,FLIST=false;
 const fTags=(f,i)=>(D.FORM[f].s[i]||[]).filter(e=>e.t==='st7').map(e=>`<span class="${e.v>0?'up':'dn'}">${esc(D.ST7N[e.k])}<i></i></span>`).join('')
  +((D.FORM[f].s[i]||[]).some(e=>e.t!=='st7')?'<span class="ex">＋</span>':'');
-function fMini(f,cls=''){const F=D.FORM[f];return`<div class="fmi ${cls}">${F.p.map(([x,y])=>`<i style="left:${14+y*72}%;top:${14+x*72}%"></i>`).join('')}</div>`;}
+function fMini(f,cls=''){const F=D.FORM[f];return`<div class="fmi ${cls}">${F.p.map(([x,y])=>`<i style="left:${14+x*72}%;top:${14+y*72}%"></i>`).join('')}</div>`;}
+/* 戦闘と同じ「左向きの構え」の絵（SPX の stance を左向きにして切り出す。キャッシュ） */
+const STC={};
+function stanceL(id){if(STC[id])return STC[id];try{const c=SPX.D[id],sk=SPX.pickSize(id,62,'b',true),f=SPX.cut(id,sk,'','stance',FACING.mirror(c.face,'L'),0,0)||SPX.cut(id,sk,'','front',false,0,0);
+ if(f&&f.cv)return STC[id]=f.cv.toDataURL();}catch(e){}return art(id);}
 function formOpen(m){const f=C.formOf(),F=D.FORM[f],P=G.party;if(FPK!=null&&!P[FPK])FPK=null;
  if(FLIST)return ovOpen(`<div class="fe41 ls"><div class="lh">陣形を選ぶ</div><div class="fgrid">${Object.entries(D.FORM).map(([k,X])=>`<button class="${k===f?'on':''}" data-a="pick" data-v="${k}">${fMini(k)}<b>${esc(X.n)}</b><small>${esc(X.d)}</small></button>`).join('')}</div></div>
   <button class="tbtn back wide" data-a="lback">戻る</button>`,{pick:k=>{G.form=k;FPK=null;FLIST=false;save();formOpen();},lback:()=>{FLIST=false;formOpen();}});
- const tok=(id,i)=>{const[x,y]=F.p[i]||[.5,.5];return`<button class="tk${FPK===i?' sel':''}${FPK!=null&&FPK!==i?' tgt':''}" data-a="fs" data-v="${i}" style="left:${18+y*64}%;top:${13+x*72}%">
-   <span class="tg">${fTags(f,i)||'<span>―</span>'}</span><span class="ring"></span><img src="${art(id)}" alt=""><b>${esc(HB[id].name)}</b></button>`;};
+ const tok=(id,i)=>{const[x,y]=F.p[i]||[.5,.5];return`<button class="tk${FPK===i?' sel':''}${FPK!=null&&FPK!==i?' tgt':''}" data-a="fs" data-v="${i}" style="left:${16+x*66}%;top:${14+y*70}%">
+   <span class="tg">${fTags(f,i)||'<span>―</span>'}</span><span class="ring"></span><img src="${stanceL(id)}" alt=""><b>${esc(HB[id].name)}</b></button>`;};
  ovOpen(`<div class="fe41">
-  <div class="fld">${P.map(tok).join('')}${m?`<p class="ms">${m}</p>`:''}</div>
+  <div class="fld"><i class="foe">敵</i>${P.map(tok).join('')}${m?`<p class="ms">${m}</p>`:''}</div>
   <div class="inf"><div class="l">${fMini(f,'big')}<button class="chg" data-a="list">変 更</button></div>
    <div class="r"><div class="h"><b>${esc(F.n)}</b><button class="i" data-a="info">i</button></div><p>${esc(F.d)}</p></div></div></div>
   <button class="tbtn back wide" data-a="close">閉じる</button>`,

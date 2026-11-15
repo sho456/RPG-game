@@ -6,3 +6,6 @@ work/
 # pixelfx の書き出し・pixel-art-studio の試作
 tools/pixelfx/records/
 assets_src/pixel-art/**/out/
+
+# エージェントの作業用ワークツリー
+.claude/worktrees/

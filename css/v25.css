@@ -70,13 +70,7 @@
 #app.v25 .b22btn .rb.sp b{font-family:var(--nm25)}
 
 /* 技名・連撃数は上の帯のすぐ下 */
-#app.v25 #skn20{border-radius:0;border:0;padding:5px 26px;background:linear-gradient(90deg,transparent,rgba(4,9,20,.92) 18%,rgba(10,23,48,.95) 50%,rgba(4,9,20,.92) 82%,transparent);
  box-shadow:none}
-#app.v25 #skn20::before,#app.v25 #skn20::after{content:'';position:absolute;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,var(--au25) 25%,var(--au25l) 50%,var(--au25) 75%,transparent)}
-#app.v25 #skn20::before{top:0}#app.v25 #skn20::after{bottom:0}
-#app.v25 #skn20 b{font-family:var(--jp25);font-weight:800;font-size:16px;letter-spacing:.06em;color:#fff;text-shadow:var(--ol25),0 0 8px rgba(143,230,214,.45)}
-#app.v25 #skn20.e{background:linear-gradient(90deg,transparent,rgba(30,4,10,.92) 18%,rgba(70,10,22,.95) 50%,rgba(30,4,10,.92) 82%,transparent);border:0}
-#app.v25 #skn20.e::before,#app.v25 #skn20.e::after{background:linear-gradient(90deg,transparent,#ff7a8a 30%,#ffd0d6 50%,#ff7a8a 70%,transparent)}
 
 /* ==================== 戦場：足元の HP／SP・行動中の印 ==================== */
 #app.v25 #hl24 .hl.cur .v{animation:none}

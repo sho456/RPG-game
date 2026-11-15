@@ -95,14 +95,14 @@ formation=function(){partyScreen();};
 
 /* ==================== キャラ詳細（装備・能力・技・星盤） ==================== */
 function charHTML(id,tab,ed){const s=stats(id),h=G.h[id],b=HB[id],A2=AW[id],lv=h.awLv||1,hp=h.hp??s.mhp;
- const slot=sl=>{const it=h.eq[sl]&&findItem(h.eq[sl]);return`<div class="cslot ${it?'r'+it.rar:'emp'}" data-a="pick" data-v="${sl}">${it?`<img src="${itemIcon(it)}">${it.plus?`<b>+${it.plus}</b>`:''}`:'<i>＋</i>'}<small>${SLOTN[sl]}</small></div>`;};
+ const slot=sl=>{const it=h.eq[sl]&&findItem(h.eq[sl]);return`<div class="cslot ${it?'r'+it.rar:'emp'}" data-a="pick" data-v="${sl}">${it?`<img src="${itemIcon(it)}" data-eqi="${it.uid}"><u class="eqi-b" data-eqi="${it.uid}">ⓘ</u>${it.plus?`<b>+${it.plus}</b>`:''}`:'<i>＋</i>'}<small>${SLOTN[sl]}</small></div>`;};
  const row=(k,v,g)=>`<div class="sr"><span>${g?`<i class="g${g}">${g}</i>`:'<i class="gn">◆</i>'}${k}</span><b>${v}</b></div>`;let body='';
  if(tab==='st')body=`<div class="cst"><div class="cl"><div class="cpw"><small>戦闘力</small><b>${fmt(power(id))}</b></div>
    <div class="cbx">${row('Lv',h.lv)}${row('次のLvまで',nextXP(h.lv)-h.xp)}${row('星臨位階','<span style="color:#ffe27a">'+'★'.repeat(lv)+'☆'.repeat(3-lv)+'</span>')}</div>
    <div class="cbx">${row('HP',hp+' / '+s.mhp)}${row('LP',(h.lp??s.lpMax)+' / '+s.lpMax)}${row('開始時AG',s.startAG)}</div></div>
   <div class="cr cbx">${row('最大HP',s.mhp,b.g.mhp)}${row('技の威力',s.atk,b.g.atk)}${row('術の威力',s.mag,b.g.mag)}${row('会心率',(6+s.crit)+'%')}${row('弱点ダメ','+'+s.weakDmg+'%')}${row('星臨中与ダメ','+'+s.awDmg+'%')}${row('ドロップ率','+'+s.drop+'%')}</div></div>
   <div class="cnote">S〜D は成長のしやすさ${s.atkEl?'　通常攻撃：'+s.atkEl+'属性（装備）':''}</div>`;
- if(tab==='eq')body=`<div class="slots">${SLOTS6.map(sl=>{const it=h.eq[sl]&&findItem(h.eq[sl]);return`<div class="slot ${it?'r'+it.rar:''}" data-a="pick" data-v="${sl}"><div class="sln">${SLOTN[sl]}</div>${it?`<img class="iic" src="${itemIcon(it)}"><div class="sit">${iname(it)}<br><small>${mainTxt(it)}</small></div>`:'<div class="sit emp">― なし ―</div>'}</div>`;}).join('')}</div>`;
+ if(tab==='eq')body=`<div class="slots">${SLOTS6.map(sl=>{const it=h.eq[sl]&&findItem(h.eq[sl]);return`<div class="slot ${it?'r'+it.rar:''}" data-a="pick" data-v="${sl}"><div class="sln">${SLOTN[sl]}</div>${it?`<img class="iic" src="${itemIcon(it)}" data-eqi="${it.uid}"><div class="sit">${iname(it)}<br><small>${mainTxt(it)}</small></div>`:'<div class="sit emp">― なし ―</div>'}</div>`;}).join('')}</div>`;
  if(tab==='sk')body=`<div class="sh2">星臨「${A2.name}」<small>（${A2.type}・位階${ROMAN[lv]}）</small></div><div class="stx">${AWD[id]||''}<br>${[...A2.cmds,...(lv>=3?['goku'+id]:[])].map(k=>`<b>${SK[k].n}</b>：${SK[k].d||''}`).join('<br>')}</div>
   <div class="sh2">技</div><div class="stx">${skillList(id).map(k=>`<b>${SK[k].n}</b> <small>SP${SK[k].sp||0}</small>：${SK[k].d||''}`).join('<br>')}</div>`;
  if(tab==='bd')body=`<div class="sh2">星盤「${BDEF[id].star}」</div><div class="stx">解放した星 ${h.board.length-1}／${Object.keys(BOARD[id]).length-1}　残りポイント <b>${ptsLeft(id)}</b></div>
@@ -142,7 +142,7 @@ drawBoard=function(){const c=bctx,cw=W*SC,ch=BCH(),id=BS.id,N=BOARD[id],U=G.h[id
   else{c.fillStyle='#0b0e22';c.fill();c.strokeStyle='#283060';c.lineWidth=1.5;c.stroke();}
   if(BS.sel===k){hexPath(c,x,y,r+5);c.strokeStyle='#fff';c.lineWidth=2;c.stroke();hexPath(c,x,y,r+9+2*Math.sin(tick/8));c.strokeStyle='rgba(255,255,255,.35)';c.lineWidth=1;c.stroke();}
   const lab=n.t==='core'?'★':n.t==='skill'?'技':n.t==='aw'?'醒':n.t==='fork'?'分':SHORT[Object.keys(n.v)[0]];
-  c.fillStyle=on?'#10142e':av?nc:'#4a5288';c.font=`bold ${Math.round(s*.42)}px -apple-system,"Hiragino Sans",sans-serif`;c.fillText(lab,x,y+1);}
+  c.fillStyle=on?'#10142e':av?nc:'#4a5288';c.font=`bold ${Math.round(s*.42)}px "M PLUS 1p","Hiragino Sans",sans-serif`;c.fillText(lab,x,y+1);}
  c.textAlign='left';c.textBaseline='alphabetic';};
 const NTN={core:'星片',stat:'能力',skill:'技',aw:'星臨強化',fork:'分岐'};
 boardMenu=function(m){const id=BS.id,n=BS.sel&&BOARD[id][BS.sel],U=G.h[id].board,pl=ptsLeft(id),tot=Object.keys(BOARD[id]).length-1,can=n&&canUnlock(id,n.k)&&n.cost<=pl;

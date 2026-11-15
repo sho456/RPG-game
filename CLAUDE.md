@@ -11,7 +11,8 @@
 - **行が長い**（1 行 300〜900 文字のファイルが多い）。grep は `| cut -c1-200`、読むときは `sed -n 'a,bp' | cut -c1-400` で範囲を絞る。
 - **関数の正本を探す**：`python3 tools/codemap.py 関数名` → 定義と上書きの場所（行番号つき・読み込み順）。最後の行を直す。
   `docs/CODEMAP.md` は全体の索引（大きいので丸ごと読まない。`grep` で引く）。
-- **画面を見る**：`python3 -m http.server 8765 &` → `node tools/ui_shots.js <出力dir> [画面名…]`。
+- **画面を見る**：`python3 -m http.server 8765 &` → `node tools/ui_shots.js <出力dir> [画面名…]`（別のポートなら `URL=http://localhost:ポート/index.html`）。
+  エージェントを並行で動かすときは、ポートを分ける（例：メイン 8790、エージェントごとに 8791〜）。同じポートだと別のフォルダの画面を見てしまう。
   画面名：`party party-sw form form-sel form-list detail detail-ab sk-slot sk-put detail-sk detail-aw board board-sel board-up board-up-lock battle-turn battle-cmd battle-pick battle-wk battle-act`。
   `SCROLL=1` で下の欄を最後までスクロールした画面（`_2.png`）も撮る。
   画像は scratchpad に出し、必要な部分だけ切り抜いて見る（PIL で crop / 横並び）。スクショは 1 枚ずつより、まとめて 1 枚に並べると安い。
@@ -23,14 +24,17 @@
 | 画面・機能 | JS（正本） | CSS |
 |---|---|---|
 | 星盤・天星盤の画面 | `js/ui/board.js`（`BOARDUI`）。盤面の描画は `ver17.js drawBoard`、天星盤のデータは `v31/board.js`（`V31B`）、ノードの置き換えは `rs/core.js` | `css/ui/board.css` |
+| 装備品の詳細（装備アイコンのタップ） | `js/ui/equip-info.js`（`EQINFO`。アイコンに `data-eqi=uid` を付けると開く） | `css/ui/equip-info.css` |
 | 編成画面・陣形と立ち位置（`formOpen`） | `js/ui/party.js`（`V38P`） | `css/ui/party.css`（`.ps41` `.pc41` `.fe41`） |
-| キャラ詳細（能力・技・術・星臨） | 骨組み `ver17.js charHTML / equipMenu` → 中身 `js/rs/ui.js`（`RSU`：`skCard` `skillsHTML`＋`tapSlot/tapSkill`（技・術セット） `abHTML`（アビリティのタブ） `skIcon`（技のアイコン） `awHTML` `st7HTML`） | `css/rs.css` `css/v38.css` |
+| キャラ詳細（能力・技・術・星臨） | 骨組み `ver17.js charHTML / equipMenu` → 技・術のアイコン `js/ui/skill-icons.js`（`SKICON`）／中身 `js/rs/ui.js`（`RSU`：`skCard` `skillsHTML`＋`tapSlot/tapSkill`（技・術セット） `abHTML`（アビリティのタブ） `skIcon`（技のアイコン） `awHTML` `st7HTML`） | `css/rs.css` `css/v38.css` |
 | 戦闘：コマンド欄（2 段階の決定・指のカーソル） | `js/rs/ui.js`（`chooseRoot`） | `css/v38.css`（`.c38*`） |
 | 戦闘：キャラ・敵の表示サイズ | 敵 `js/battle/size.js`（`BSIZE`：種類ごとの倍率 `CLS`）・味方の背丈 `js/sprite/spx.js heroHgt / regRigs`・味方の倍率 `js/v38/battle-ui.js placeHeroes`・敵の配置（はみ出し防止）`js/v23.js eDims / placeEnemies` | — |
 | 戦闘：配置・スライド・HP/BP 表示 | `js/v38/battle-ui.js`（`V38B`） | `css/v38.css` |
 | 戦闘：上の帯（対象・弱点/耐性） | `js/v22.js`（`updHud`） | `css/v22.css` `v25.css` `v38.css` |
 | 戦闘の決まり（ターン・BP・LP・熟練） | `js/rs/battle.js`（`RSB`）・`js/rs/core.js`（`RSC`）・データ `js/rs/data.js`（`RSD`） | — |
-| 演出・モーション | `js/battle/*`（`BX*`）→ スキル `rpg-hero-motion` | — |
+| 戦闘の行動演出の流れ（技名の吹き出し・暗転・共通の技の演出・数字・撃破） | `js/battle/flow.js`（`BFLOW`）。数字は `js/v24.js dmgPop`、撃破の赤い崩れは `js/ver19.js dissolve` | `css/ui/battle-flow.css` |
+| 演出・モーション（技ごとの専用演出） | `js/battle/*`（`BX*`）・`js/battle/data/fx-heroes-*.js` → スキル `rpg-hero-motion` | — |
+| 文字のフォント（全画面で統一） | 画面の文字＝`css/ui/font.css`（M PLUS 1p）。キャンバスの数字・英字＝`js/v24-text.js FONT` | `css/ui/font.css` |
 | 用語・耐性 | `js/data/terms.js`（`TERMS`） | — |
 | 版表示・お知らせ | `js/v38/menu.js`（`VER` `NEWS`） | — |
 

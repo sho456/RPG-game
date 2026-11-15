@@ -8,10 +8,10 @@
  ・今後のドット絵・演出の追加でも STYLE に書式を足すだけで同じ質感の文字を使える */
 'use strict';
 const TX24=(()=>{
-const FONT={
- num:{f:'"Barlow Condensed","Arial Narrow","Helvetica Neue",Arial,sans-serif',w:700,it:'italic',cap:.72,skew:0},
- lat:{f:'"Nunito","Arial Rounded MT Bold","Helvetica Neue",Arial,sans-serif',w:900,it:'italic',cap:.72,skew:0},
- jp:{f:'"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Hiragino Sans","Noto Sans JP","Yu Gothic",sans-serif',w:800,it:'normal',cap:.86,skew:.2}};
+const FONT={/* ver0.42：ロマサガRS の戦闘の数字（斜体のセリフ体）・英字（斜体）・日本語（角ゴシック）に合わせる */
+ num:{f:'"Noto Serif","Times New Roman",Georgia,serif',w:900,it:'italic',cap:.72,skew:0},
+ lat:{f:'"Jost","Helvetica Neue",Arial,sans-serif',w:700,it:'italic',cap:.72,skew:0},
+ jp:{f:'"M PLUS 1p","Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP","Yu Gothic",sans-serif',w:800,it:'normal',cap:.86,skew:.2}};
 /* 書式：fill=上→下のグラデーション（位置は文字の高さに対する割合）、ow=外側の縁の太さ（文字サイズ比）、oc=外側の縁の色、
  rw/rc=内側の明るい縁、sh=落ち影、gl=上半分の光沢の強さ、glow=外側の発光 */
 const STYLE={

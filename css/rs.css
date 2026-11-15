@@ -82,6 +82,8 @@ ul.rsaw{margin:4px 0 8px;padding-left:18px;color:#ffe9b0;font-size:12px;line-hei
  background:radial-gradient(circle at 50% 38%,var(--g1),var(--g2) 78%)}
 .ski.mg{--g1:#5a9cff;--g2:#141c6a}.ski.hl{--g1:#5ae08a;--g2:#0c4a2a}.ski.sp{--g1:#ffc84a;--g2:#6a3a08}
 .ski.aw{--g1:#ff7ad8;--g2:#3a0c6a;border-color:#fff1c2}.ski.it{--g1:#9aa2c4;--g2:#2a2e48}
+.ski svg{width:36px;height:36px;filter:drop-shadow(0 0 2px rgba(255,255,255,.6)) drop-shadow(0 1px 0 rgba(0,0,0,.4))}
+.ski.sm svg{width:28px;height:28px}
 .ski img{width:40px;height:40px;image-rendering:pixelated;filter:drop-shadow(0 0 2px rgba(255,255,255,.8)) brightness(1.15)}
 .ski b{font:900 26px/1 "M PLUS Rounded 1c",sans-serif;color:#fff;text-shadow:0 0 6px rgba(255,255,255,.9),0 2px 0 rgba(0,0,0,.5)}
 .ski .dm{position:absolute;left:0;right:0;bottom:1px;font-style:normal;font-size:8px;line-height:1;letter-spacing:1px;text-align:center;color:#ffe27a;text-shadow:0 0 2px #000,0 0 2px #000}

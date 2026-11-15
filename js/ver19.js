@@ -161,7 +161,7 @@ function onHurt(t,d){const A=t.A;if(!A||A.none)return;const c=CUR&&CUR.a._act,sk
 {const _da=V17F.doAction;doAction=async function(u,sk,t){try{await pre(u,sk,t);}catch(e){console.error(e);}try{return await _da(u,sk,t);}finally{try{await finish(u);}catch(e){console.error(e);}}};}
 {const _et=V17F.enemyTurn;enemyTurn=async function(e){setup(e);e._act={n:0};const ch0=e.charging;try{const pr=_et(e);if(!ch0&&e.charging&&e.A&&!e.A.none){const[x,y]=mid(e);FX19.gather(x,y,'#ffb030',20,500);FX19.ring(x,y,'#ffb030',{r0:20,r1:3,dur:420});}return await pr;}finally{try{await finish(e);}catch(x){console.error(x);}}};}
 {const _k=V17F.kill;kill=async function(t){const boss=t.side===1&&t.boss,pr=_k(t),A=t.A;if(!t.alive&&A&&!A.none){
-   if(t.side===1){A.dead={t0:ANIM.now,dur:(boss?1700:680)*ANIM.SP()};A.dcv=null;const[x,y]=mid(t),D=dims(t);FX19.burst(x,y,'#ffffff',{size:1.6,rays:10});FX19.ring(x,y,'#d8c8ff',{r1:20});
+   if(t.side===1){A.dead={t0:ANIM.now,dur:(boss?1700:900)*ANIM.SP()};A.dcv=null;const[x,y]=mid(t),D=dims(t);FX19.burst(x,y,'#ffb0a0',{size:1.6,rays:10});FX19.ring(x,y,'#ff5a4a',{r1:20});
     if(boss){/* ボス撃破：連鎖する爆発と長い崩壊（ver0.18 の演出を引き継ぐ） */B.shake=30;B.flashBg=30;B.flashCol='#ffffff';try{SFX.brk();}catch(e){}setTimeout(()=>{try{SFX.brk();}catch(e){}},260*SPD[speed]);
      for(let k=0;k<7;k++){const ex=x+(Math.random()-.5)*D.w*.7,ey=y+(Math.random()-.5)*D.h*.6;FX19.burst(ex,ey,k%2?'#ffb070':'#ffffff',{size:1.7,rays:10,delay:k*150});FX19.ring(ex,ey,'#ff9a40',{r1:17,delay:k*150});}await pr;await wait(900);return;}}
    else{A.hitT=(A.hitT||0)+1;to(t,ANIM.HST.dead(A.rig),420,'in');}}return pr;};}
@@ -179,16 +179,18 @@ pop=function(u,txt,col,small,kind,el){V17F.pop(u,txt,col,small,kind,el);if(!B||!
 const hash=(x,y,s)=>{let h=(x*374761393+y*668265263+s*1274126177)|0;h=(h^(h>>>13))*1274126177|0;return((h^(h>>>16))>>>0)/4294967296;};
 const BY4=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
 /* 撃破：白く光ったあと、網点のパターンで下から上へ溶けていく */
-function dissolve(f,A,k){const st=Math.floor(k*12);if(A.dcv&&A.dst===st)return A.dcv;const c=A.dcv||(A.dcv=document.createElement('canvas'));c.width=f.w;c.height=f.h;const g=c.getContext('2d');g.drawImage(k<.22?SPRX.white(f):f.cv,0,0);
- if(k>=.22){const id=g.getImageData(0,0,f.w,f.h),p=id.data,kk=(k-.22)/.78;for(let y=0;y<f.h;y++){const yy=1-y/f.h;for(let x=0;x<f.w;x++){const i=(y*f.w+x)*4;if(!p[i+3])continue;if(BY4[(y&3)*4+(x&3)]/16<kk*1.7-yy*.7)p[i+3]=0;else{p[i]=Math.min(255,p[i]+kk*90);p[i+1]=Math.min(255,p[i+1]+kk*70);p[i+2]=Math.min(255,p[i+2]+kk*120);}}}g.putImageData(id,0,0);}A.dst=st;return c;}
+/* 赤く染めた絵（元の陰影は少し残す） */
+const RED=new WeakMap();function redOf(cv){let r=RED.get(cv);if(r)return r;r=document.createElement('canvas');r.width=cv.width;r.height=cv.height;const g=r.getContext('2d');g.drawImage(cv,0,0);g.globalCompositeOperation='source-atop';g.fillStyle='rgba(225,36,36,.82)';g.fillRect(0,0,r.width,r.height);g.globalCompositeOperation='lighter';g.globalAlpha=.25;g.drawImage(cv,0,0);RED.set(cv,r);return r;}
+function dissolve(f,A,k){const st=Math.floor(k*12);if(A.dcv&&A.dst===st)return A.dcv;const c=A.dcv||(A.dcv=document.createElement('canvas'));c.width=f.w;c.height=f.h;const g=c.getContext('2d');g.drawImage(redOf(f.cv),0,0);/* ver0.42：倒した敵は赤く染まって崩れる（ロマサガRS） */
+ if(k>=.34){const id=g.getImageData(0,0,f.w,f.h),p=id.data,kk=(k-.34)/.66;for(let y=0;y<f.h;y++){const yy=1-y/f.h;for(let x=0;x<f.w;x++){const i=(y*f.w+x)*4;if(!p[i+3])continue;if(BY4[(y&3)*4+(x&3)]/16<kk*1.7-yy*.7)p[i+3]=0;else{p[i]=Math.min(255,p[i]+kk*70);p[i+1]=Math.min(255,p[i+1]+kk*14);p[i+2]=Math.min(255,p[i+2]+kk*14);}}}g.putImageData(id,0,0);}A.dst=st;return c;}
 function drawU(u,k,p,sx,sy){const A=setup(u);if(A.none)return;
- if(u.side===1&&!u.alive){if(A.gone)return;if(!A.dead){A.dead={t0:ANIM.now,dur:680*ANIM.SP()};A.dcv=null;}}else if(A.dead||A.gone){A.dead=null;A.gone=0;A.dcv=null;}
+ if(u.side===1&&!u.alive){if(A.gone)return;if(!A.dead){A.dead={t0:ANIM.now,dur:900*ANIM.SP()};A.dcv=null;}}else if(A.dead||A.gone){A.dead=null;A.gone=0;A.dcv=null;}
  const[wx,wy,hop]=ANIM.world(u),pose=ANIM.poseOf(u);const S=A.sc*DS;let f=SPRX.frame(A.name,pose,A.palKey,A.pal,A.flip,S,A.extra);if(!f)return;
  const[fx,fy]=foot(u),ix=B.intro>0&&u.side===1&&u.boss?-(B.intro/90)*(B.intro/90)*70:0,X0=Math.round((fx+wx+ix)*k/p)*p+sx,Y0=Math.round((fy+wy)*k/p)*p+sy,X=X0-f.ax*p,Y=Y0+Math.round(hop*k/p)*p-f.ay*p,R=A.rig;
  /* 足元の影 */
  if(!A.dead){const sw=Math.round(R.wid*S*.42*(1+hop*.02)),al=u.side===0&&!u.alive?.2:.32;ctx.fillStyle=`rgba(0,0,0,${al})`;ctx.fillRect(X0-(sw-2)*p,Y0-p,(sw*2-4)*p,p);ctx.fillRect(X0-sw*p,Y0,sw*2*p,p*2);ctx.fillRect(X0-(sw-2)*p,Y0+2*p,(sw*2-4)*p,p);}
  if(u.flash>0){u.flash=0;if(!A.flash)A.flash=4;}
- let img=f.cv;if(A.dead){const kk=(ANIM.now-A.dead.t0)/A.dead.dur;if(kk>=1){A.gone=1;A.dead=null;A.dcv=null;return;}img=dissolve(f,A,kk);if(kk>.25&&Math.random()<.5){const D=dims(u);FX19.part(fx+wx+(Math.random()-.5)*D.w,fy-Math.random()*D.h,(Math.random()-.5)*.4,-.5-Math.random()*.7,Math.random()<.5?'#ffffff':'#c8b0ff',22,0);}}
+ let img=f.cv;if(A.dead){const kk=(ANIM.now-A.dead.t0)/A.dead.dur;if(kk>=1){A.gone=1;A.dead=null;A.dcv=null;return;}img=dissolve(f,A,kk);if(kk>.25&&Math.random()<.5){const D=dims(u);FX19.part(fx+wx+(Math.random()-.5)*D.w,fy-Math.random()*D.h,(Math.random()-.5)*.4,-.5-Math.random()*.7,Math.random()<.5?'#ff6a5a':'#c81e24',26,0,Math.random()<.4?2:1);}}
  else if(A.flash>0){if(A.flash>2)img=SPRX.white(f);A.flash--;}
  if(u.side===0&&!u.alive)ctx.globalAlpha=.78;ctx.drawImage(img,X,Y,f.w*p,f.h*p);ctx.globalAlpha=1;
  /* 状態の表示：星臨のオーラ／溜め／狙いの枠／行動中の矢印 */

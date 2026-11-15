@@ -7,6 +7,7 @@
 
 > **ver0.37 から戦闘の進行は RS 式のターン制**（`js/rs/battle.js` が `run` を置き換える）。仕組み・数値・データの場所は [RS-SYSTEM.md](RS-SYSTEM.md)。
 > `run` → ターンの始め（BP 回復）→ `inputPhase`（全員の `chooseRoot`／`autoPick`）→ `buildOrder`（素早さ順）→ `heroExec`（BP・LP・ひらめき → `doAction`）／`enemyExec`（`enemyTurn`）→ ターンの終わり（星臨の残り）。
+> **ver0.42**：行動の見せ方の流れ（技名の吹き出し・暗転・共通の技の演出・数字・撃破）は `js/battle/flow.js`（ロマサガRS の動画を分解して設計。流れはファイル先頭のコメント）。
 > **ver0.38**：戦場の配置（陣形の立ち位置 `HK23.placeHeroes`）・コマンド入力中のスライド・行動順・連続戦闘の移行演出は `js/v38/battle-ui.js`。HP/LP・命中は `js/rs/battle.js` と `js/rs/core.js`。
 > 下の図の `nextActor`・`heroTurn` は、演出ビューア（`B.opts.viewer`）の戦闘だけで使う。`chooseRoot`・`autoPick`・`pickHero`・`preview`・`repOK`・`skillList` は js/rs/ で丸ごと置き換えている（包みではないので下の表には出ない）。
 

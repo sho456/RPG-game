@@ -63,7 +63,7 @@ function panel(html,acts){const c=$('#cmd');if(scene==='town')$('#stage').style.
 $('#cmd').addEventListener('click',e=>{if(!$('#cmd').classList.contains('panel'))return;const t=e.target.closest('[data-a]');if(!t||t.classList.contains('off'))return;const f=ACT[t.dataset.a];if(f){SFX.sel();f(t.dataset.v);}});
 const chips=(arr,cls='')=>arr.map(x=>`<span class="chp ${cls}">${x}</span>`).join('');
 function icard(it,o={}){const w=eqBy(it.uid),c=RAR[it.rar];
- return`<div class="icard r${it.rar}${o.off?' off':''}" data-a="${o.a||''}" data-v="${it.uid}"><img class="iic" src="${itemIcon(it)}"><div class="ibody"><div class="inm">${it.lock?'🔒':''}${iname(it)}</div>
+ return`<div class="icard r${it.rar}${o.off?' off':''}" data-a="${o.a||''}" data-v="${it.uid}"><img class="iic" src="${itemIcon(it)}" data-eqi="${it.uid}"><div class="ibody"><div class="inm">${it.lock?'🔒':''}${iname(it)}</div>
  <div class="isub"><span class="rb">${c.n}</span> Lv${it.ilv}${it.who?'　'+HB[it.who].name+'専用':''}${w&&!o.noeq?`　<span class="eqt">${HB[w].name}装備中</span>`:''}</div>
  <div>${o.diff||chips(it.unid?['未鑑定']:Object.entries(itemBase(it)).map(([k,v])=>BN[k]+' '+v))}${it.unid?'':chips(it.ops.map(opTxt),'op')}${it.leg&&!it.unid?chips(['★'+LEG[it.leg].d],'lg'):''}${it.set&&!it.unid?chips([`${SETS[it.set].n}　2部位：${SETS[it.set].d2}／4部位：${SETS[it.set].d4}`],'lg'):''}${!it.unid&&it.sock&&it.sock.length?chips(it.sock.map(k=>k?'◆'+STONES[k].n:'◇空き'),'sk'):''}</div></div>${o.right?`<div class="iright">${o.right}</div>`:''}</div>`;}
 function ehead(id){const s=stats(id),h=G.h[id];return`<div class="ehd"><img class="efc" src="${face(id)}"><div><div class="enm">${HB[id].name} <small>Lv${h.lv}</small></div>
@@ -86,7 +86,7 @@ let INVF='all';const INVT={all:['全部',()=>1],w:['武器',i=>i.slot==='w'],arm
 function invMenu(m){const list=G.inv.filter(INVT[INVF][1]).sort((a,b)=>b.rar-a.rar||b.ilv-a.ilv),junk=G.inv.filter(i=>i.rar<=1&&!i.lock&&!i.unid&&!eqBy(i.uid));
  log((m||'<b>持ち物</b>　アイコンをタップで詳細')+goldTxt()+`<br><small>${G.inv.length}/200個</small>`);
  panel(`<div class="ftabs">${Object.entries(INVT).map(([k,[n]])=>`<button class="${INVF===k?'on':''}" data-a="tab" data-v="${k}">${n}</button>`).join('')}</div>
- <div class="igrid">${list.map(it=>{const w=eqBy(it.uid);return`<div class="itile r${it.rar}" data-a="item" data-v="${it.uid}"><img src="${itemIcon(it)}">${it.plus?`<b class="pl">+${it.plus}</b>`:''}${w?`<b class="eb">E</b>`:''}${it.lock?'<b class="lk">🔒</b>':''}${it.unid?'<b class="un">?</b>':''}</div>`;}).join('')||'<div class="emp">なし</div>'}</div>
+ <div class="igrid">${list.map(it=>{const w=eqBy(it.uid);return`<div class="itile r${it.rar}" data-a="item" data-v="${it.uid}"><img src="${itemIcon(it)}"><u class="eqi-b" data-eqi="${it.uid}">ⓘ</u>${it.plus?`<b class="pl">+${it.plus}</b>`:''}${w?`<b class="eb">E</b>`:''}${it.lock?'<b class="lk">🔒</b>':''}${it.unid?'<b class="un">?</b>':''}</div>`;}).join('')||'<div class="emp">なし</div>'}</div>
  <div class="tbar2"><button class="tbtn" data-a="junk" ${junk.length?'':'disabled'}>一括売却 <small>${junk.length}</small></button><button class="tbtn ${G.set.autoSell?'gold':''}" data-a="auto">自動売却 ${G.set.autoSell?'ON':'OFF'}</button></div>
  <button class="tbtn back wide" data-a="back">戻る</button>`,
  {tab:k=>{INVF=k;invMenu();},item:u=>itemMenu2(findItem(+u)),junk:()=>{const g=junk.reduce((a,i)=>a+price(i),0);G.inv=G.inv.filter(i=>!junk.includes(i));G.gold+=g;SFX.heal();save();invMenu(`コモン・アンコモン${junk.length}個を売却して${g}G`);},

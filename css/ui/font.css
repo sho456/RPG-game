@@ -1,0 +1,7 @@
+/* ===== 文字のフォントの統一（ver0.42。正本：ここで全画面の書体を 1 つにそろえる） =====
+ ・ロマサガRS の画面の角ゴシック（太めで読みやすいゴシック）に近い「M PLUS 1p」を、画面のすべての文字に使う
+ ・ほかの CSS の font-family は残っていても、ここで上書きする（ファイルごとに書体を決めない）
+ ・戦闘の数字・「Critical」などキャンバスに描く文字は js/v24-text.js の FONT（数字＝Noto Serif の斜体、英字＝Jost の斜体） */
+:root{--font:"M PLUS 1p","Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP",sans-serif}
+html,body,#app,#app *,#sheet *,#ov *{font-family:var(--font) !important}
+#app,#sheet,#ov{font-feature-settings:"palt" 1}

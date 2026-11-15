@@ -144,11 +144,6 @@
 #order,.b22ord{display:none !important}
 
 /* ---------- 連撃数：上の帯の直下・左端に固定 ---------- */
-#app.v24 #combo{left:4px;right:auto;top:calc(var(--hud23,80px) + 2px);z-index:4;filter:none;letter-spacing:0;text-align:left}
-#combo .c1{display:flex;align-items:flex-end}
-#combo .c1>canvas+canvas{margin-left:-6px;margin-bottom:2px}
-#combo .c2{margin-top:-8px;margin-left:6px}
-#combo.bump .c1 .tr24{animation:dg24 .26s cubic-bezier(.18,1.55,.4,1) both}
 
 /* ---------- 上の固定帯：敵のHPゲージ（参考：暗い枠＋明るい縁＋上半分の光沢） ---------- */
 #app.v24 .b22tg .bar{border:1px solid #000;border-radius:2px;box-shadow:0 0 0 1px rgba(214,232,236,.55),0 2px 4px rgba(0,0,0,.6)}

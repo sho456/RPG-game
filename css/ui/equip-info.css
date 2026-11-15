@@ -1,0 +1,29 @@
+/* ===== 装備品の詳細（EQINFO）===== */
+.eqi{font-family:"M PLUS 1p",sans-serif;font-weight:700;color:#e8e6f4;background:linear-gradient(180deg,#0e1230,#05060f);border:1.5px solid #c9a24a;border-radius:6px;box-shadow:inset 0 0 0 1px #3a2f12,0 0 14px rgba(201,162,74,.25);padding:10px 10px 8px}
+.eqi .ei-hd{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.eqi .ei-tag{font-size:11px;font-weight:800;color:#1a1204;background:linear-gradient(#f3d98a,#c9a24a);border-radius:3px;padding:1px 7px;white-space:nowrap}
+.eqi .ei-nm{font-size:17px;font-weight:900;color:#fff;text-shadow:0 1px 0 #000}
+.eqi .ei-ic{display:flex;flex-direction:column;align-items:center;gap:3px;margin:4px auto 8px;width:120px}
+.eqi .ei-ic img{width:84px;height:84px;image-rendering:pixelated;padding:8px;border-radius:12px;border:2px solid var(--rc);background:radial-gradient(circle,rgba(255,255,255,.12),#05081a 80%);box-shadow:0 0 14px var(--rc)}
+.eqi.r4 .ei-ic img{animation:eqglow 1.6s infinite alternate}@keyframes eqglow{from{box-shadow:0 0 6px var(--rc)}to{box-shadow:0 0 20px var(--rc)}}
+.eqi .ei-ic em{font-style:normal;font-size:11px;color:var(--rc)}
+.eqi .ei-sec{margin:9px 0 5px;padding:2px 8px;font-size:12px;font-weight:800;color:#f3d98a;background:linear-gradient(90deg,#3a2f12,rgba(58,47,18,0) 90%);border-top:1px solid #c9a24a;border-bottom:1px solid #6b5420;letter-spacing:.08em}
+.eqi .ei-g2{display:grid;grid-template-columns:1fr 1fr;gap:3px 14px}
+.eqi .ei-c{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;padding:2px 4px;border-bottom:1px solid rgba(255,255,255,.07)}
+.eqi .ei-c b{font-weight:800;font-size:14px;color:#fff}
+.eqi b.p{color:#6fb8ff!important}.eqi b.n{color:#ff6a6a!important}.eqi b.z{color:#777c90!important}
+.eqi .ei-g2 .ei-c b.p{color:#d8ecff!important}
+.eqi .ei-g4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px 2px}
+.eqi .ei-e{display:flex;align-items:center;justify-content:center;gap:4px}
+.eqi .ei-e b{font-size:13px;font-weight:800}
+.eqi .hx{display:inline-flex;align-items:center;justify-content:center;width:22px;height:24px;font-style:normal;font-size:11px;font-weight:900;color:#101226;background:var(--c);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
+.eqi .ei-ops{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}.eqi .ei-ops span{font-size:11px;background:#1b2250;border:1px solid #4a5490;border-radius:10px;padding:1px 8px;color:#bfe0ff}
+.eqi .ei-ab{display:flex;gap:8px;align-items:flex-start;padding:5px 2px;border-bottom:1px solid rgba(255,255,255,.07)}
+.eqi .ei-ai{flex:none;min-width:48px;text-align:center;font-size:10px;font-weight:800;color:#101226;background:linear-gradient(#f3d98a,#c9a24a);border-radius:50%/40%;padding:6px 4px}
+.eqi .ei-ab b{display:block;font-size:13px;font-weight:800;color:#ffe9a8}.eqi .ei-ab small{display:block;font-size:11.5px;font-weight:500;color:#cfd3f5;line-height:1.45}
+.eqi .ei-none,.eqi .ei-note{font-size:12px;color:#8a8fae;text-align:center;padding:6px}
+.eqi .tbtn.back{margin-top:10px}
+/* アイコンのタップ印（ⓘ） */
+.eqi-b{position:absolute;right:1px;top:1px;width:16px;height:16px;line-height:15px;text-align:center;font-style:normal;text-decoration:none;font-size:12px;font-weight:800;color:#f3d98a;background:rgba(5,8,26,.85);border:1px solid #c9a24a;border-radius:50%;z-index:2}
+.itile,.cslot{position:relative}
+.icard .iic,.slot .iic{cursor:pointer}

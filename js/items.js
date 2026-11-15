@@ -140,9 +140,9 @@ function drawBoard(){const c=bctx,cw=W*SC,ch=BCH(),id=BS.id,N=BOARD[id],U=G.h[id
   else{c.fillStyle='#0b0e22';c.fill();c.strokeStyle='#283060';c.lineWidth=1.5;c.stroke();}
   if(BS.sel===k){hexPath(c,x,y,r+5);c.strokeStyle='#fff';c.lineWidth=2;c.stroke();}
   const lab=n.t==='core'?'★':n.t==='skill'?'技':n.t==='aw'?'醒':n.t==='fork'?'分':SHORT[Object.keys(n.v)[0]];
-  c.fillStyle=on?'#10142e':av?col:'#4a5288';c.font=`bold ${Math.round(s*.42)}px -apple-system,"Hiragino Sans",sans-serif`;c.fillText(lab,x,y+1);}
- c.textAlign='left';c.textBaseline='alphabetic';c.fillStyle='#ffe27a';c.font='bold 15px -apple-system,"Hiragino Sans",sans-serif';c.fillText(`${HB[id].name}の星盤「${BDEF[id].star}」`,12,24);
- c.fillStyle='#cfd3f5';c.font='13px -apple-system,"Hiragino Sans",sans-serif';c.fillText(`星ポイント 残り ${ptsLeft(id)}　Lv${G.h[id].lv}`,12,44);}
+  c.fillStyle=on?'#10142e':av?col:'#4a5288';c.font=`bold ${Math.round(s*.42)}px "M PLUS 1p","Hiragino Sans",sans-serif`;c.fillText(lab,x,y+1);}
+ c.textAlign='left';c.textBaseline='alphabetic';c.fillStyle='#ffe27a';c.font='bold 15px "M PLUS 1p","Hiragino Sans",sans-serif';c.fillText(`${HB[id].name}の星盤「${BDEF[id].star}」`,12,24);
+ c.fillStyle='#cfd3f5';c.font='13px "M PLUS 1p","Hiragino Sans",sans-serif';c.fillText(`星ポイント 残り ${ptsLeft(id)}　Lv${G.h[id].lv}`,12,44);}
 function openBoard(id,m){show('board');setH(224);sizeBoard();BS.id=id;if(!BOARD[id][BS.sel])BS.sel=null;boardMenu(m);}
 function boardMenu(m){const id=BS.id,n=BS.sel&&BOARD[id][BS.sel],U=G.h[id].board;
  const info=n?`<b style="color:${NCOL[n.t]}">${{core:'星片',stat:'能力',skill:'技',aw:'星臨',fork:'分岐（どちらか1つ）'}[n.t]}</b>　${n.d}　<small>必要ポイント${n.cost}・${U.includes(n.k)?'解放済み':canUnlock(id,n.k)?'解放できる':'未接続'}</small>`:'星をタップで詳細。光る輪の星が解放できる。<br><small>青：能力　緑：技　赤：星臨強化　紫：分岐（どちらか一方）</small>';

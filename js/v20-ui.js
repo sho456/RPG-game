@@ -25,7 +25,7 @@ addEventListener('resize',()=>{if(scene==='town'&&TSC==='home'&&G&&H!==(innerHei
 
 /* ==================== 戦闘画面 ==================== */
 {const _sh=show;show=function(m){_sh(m);$('#app').classList.toggle('v20',true);let r=$('#rnd20');if(!r){r=document.createElement('div');r.id='rnd20';$('#top').insertBefore(r,$('#order'));}
- if(m!=='battle'){const k=$('#skn20');if(k)k.remove();}};}
+ };}
 /* 行動中キャラのパネル */
 function partyPanel(){const P=$('#party'),a=B.cur&&B.cur.side===0?B.cur:(B.lastH&&B.heroes.includes(B.lastH)?B.lastH:B.heroes[0]);if(!a)return;
  const my=B.cur===a,rdy=my&&!!B.pick&&a.ag>=100&&!a.aw&&B.heroes.filter(h=>h.aw).length<2,low=a.hp<a.mhp*.3,el=elOf(a.id),ec=ELC[el]||'#c8b0ff';
@@ -59,9 +59,7 @@ function decorate(){const c=$('#cmd');if(!c.classList.contains('bcmd'))return;c.
   if(!b.querySelector('.inf20')&&c.querySelector('.btabs')){const i=document.createElement('span');i.className='inf20';i.textContent='i';b.appendChild(i);}});}
 new MutationObserver(()=>{try{decorate();}catch(e){}}).observe($('#cmd'),{childList:true,subtree:false});
 /* 技名の表示と、強力な技の演出 */
-function skillBanner(u,sk){if(!B||scene!=='battle')return;let k=$('#skn20');if(!k){k=document.createElement('div');k.id='skn20';$('#stage').appendChild(k);}
- const el=sk.el||(sk.k==='sup20'||sk.k==='heal'||sk.k==='healAll'?'補':'無'),col=ELC[sk.el]||(sk.role==='heal'||/heal/.test(sk.k)?'#7dffa8':'#ffe27a');
- k.className=u.side?'e':'';k.innerHTML=`${hexEl(el,col,'sm')}<b>${sk.n}</b>`;k.classList.remove('show');void k.offsetWidth;k.classList.add('show');}
+function skillBanner(u,sk){if(!B||scene!=='battle'||typeof BFLOW==='undefined')return;BFLOW.bubble(u,sk.n);}/* ver0.42：技名は行動するキャラの吹き出し（js/battle/flow.js） */
 const BIG=sk=>sk&&((sk.pow||0)*(sk.hits||1)>=2.4||(sk.t==='all'&&(sk.pow||0)*(sk.hits||1)>=1.2)||/^goku/.test(Object.keys(SK).find(x=>SK[x]===sk)||''));
 {const _da=doAction;doAction=async function(u,sk,t){try{if(B&&u&&sk&&sk.n&&!sk.basic&&!['guard','item'].includes(sk.k)&&u.side===0){skillBanner(u,sk);
   if(BIG(sk)){const st=$('#stage');st.classList.remove('imp20');void st.offsetWidth;st.classList.add('imp20');B.flashBg=Math.max(B.flashBg||0,12);B.flashCol=ELC[sk.el]||'#ffffff';}}}catch(e){}

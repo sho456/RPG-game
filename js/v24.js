@@ -42,9 +42,8 @@ function obstacles(u){const o=[];if(!B)return o;
  HL.rects.forEach(r=>o.push({r,w:50}));
  /* 敵の体：自分はわずかに、他の敵はやや強く避ける（頭上や脇に空きがあればそちらへ） */
  if(u.side===1)B.enemies.forEach(e=>{if(e.alive){const b=boxOf(e,true);o.push({r:{l:b.l+b.w*.2,t:b.t+b.h*.25,r:b.r-b.w*.2,b:b.b-b.h*.1},w:e===u?.12:1});}});
- const sk=relRect($('#skn20'));if(sk)o.push({r:sk,w:40});
  /* 連撃数：多段攻撃の間は、まだ出ていなくても場所を予約しておく（後から出て数字に被らないように） */
- if(B.combo||relRect($('#combo')))o.push({r:comboRect(),w:60});
+ 
  return o;}
 /* 候補の位置を順に評価して、重なりの最も少ない場所を選ぶ。
  費用：優先度の高い表示との重なり（200）≫ HP表示・味方の絵（40〜50）≫ 同じ優先度の古い表示（20：新しい方を優先して古い方を下げる）≫ 低い優先度（4）＋候補の順番 */
@@ -121,7 +120,10 @@ function dmgPop(u,s,kind,el){const v=parseInt(s,10),heal=s[0]==='+',crit=/crit/.
  const t=heal?0:tierOf(u,Math.abs(v));
  const sk=heal?'heal':psn?'psn':weak?(t>=3?'dmgWT':'dmgW'):grd?'dmgG':u.side===0?'dmgH':t>=3?'dmgT':'dmg';
  const txt=(heal?'+':'')+fmt(v),fs0=Math.round(numFs(u)*TIER[t]*(crit?(FS24.cr||1.15):1)*(heal?.92:1)),fs=fitFs(txt,sk,fs0);
- const nm=document.createElement('div');nm.className='nm';nm.appendChild(TX24.row(txt,sk,fs,/万/));
+ const nm=document.createElement('div');nm.className='nm';
+ /* ver0.42：ロマサガRS のように数字を 1 桁ずつ弾ませる（桁ごとの絵を並べ、出る時刻をずらす。css/ui/battle-flow.css） */
+ if(!heal&&/^[\d,]+$/.test(txt)){nm.classList.add('dg42');[...txt].forEach((ch,i)=>{const c=TX24.el(ch,sk,fs);c.style.animationDelay=(i*55)+'ms';if(i)c.style.marginLeft=-Math.round(fs*(ch===','?.32:.26))+'px';nm.appendChild(c);});}
+ else nm.appendChild(TX24.row(txt,sk,fs,/万/));
  /* 直前のまとまりに追加 */
  const G=u._dg25,tn=now();
  if(!heal&&!psn&&G&&!G.gone&&G.el.isConnected&&tn-G.t1<GRP_MS){
@@ -152,20 +154,14 @@ function tagPop(u,s,col,kind){const t=now(),jp=KANJI.test(s),fs=Math.round(jp?cl
 const _pop0=V17F.pop;
 function pop24(u,txt,col,small,kind,el){kind=kind||'';if(!inBattle()||!u||u.x==null)return _pop0(u,txt,col,small,kind,el);
  try{const s=String(txt);
-  if(/fu/.test(kind)&&small){skBanner(s,u.side);return;}
+  if(/fu/.test(kind)&&small){if(typeof BFLOW!=='undefined')BFLOW.bubble(u,s);else skBanner(s,u.side);return;}/* ver0.42：技名は吹き出し（js/battle/flow.js） */
   if(HK24.pop&&HK24.pop(u,s,col,small,kind,el))return;
   if(!small&&/^[+\-]?\d+$/.test(s))return void dmgPop(u,s,kind,el);
   if(s==='MISS')return void wordPop(u,s,kind);
   tagPop(u,s,col,kind);}catch(e){console.error(e);}}
 V17F.pop=pop24;
-/* 連撃数（○HITS と合計）：上の固定帯のすぐ下・左端に固定。参考資料の数字と同じ質感で */
-function comboRect(){const c=$('#combo'),bd=bounds(),r=relRect(c);return r?{l:r.l-4,t:r.t-2,r:Math.max(r.r,bd.l+118)+4,b:Math.max(r.b,bd.t+60)+2}:{l:0,t:bd.t-2,r:bd.l+122,b:bd.t+62};}
-comboAdd=function(d){if(!B||!B.combo)return;B.combo.n++;B.combo.tot+=d;if(B.combo.n<2)return;let c=$('#combo');if(!c){c=document.createElement('div');c.id='combo';stage().appendChild(c);}
- const fs=Math.round(fsOf('cb')*fitK());c.innerHTML='';const r1=document.createElement('div');r1.className='c1';r1.appendChild(TX24.row(String(B.combo.n),'dmgC',fs));r1.appendChild(TX24.el('HITS','crit',Math.round(fs*.5)));
- const r2=document.createElement('div');r2.className='c2';r2.appendChild(TX24.el(fmt(B.combo.tot),'dmg',Math.round(fs*.56)));c.appendChild(r1);c.appendChild(r2);
- c.style.display='block';c.classList.remove('bump');void c.offsetWidth;c.classList.add('bump');};
-/* 技名：上の固定帯のすぐ下、中央に出す（キャラに被らない） */
-function skBanner(n,side){let k=$('#skn20');if(!k){k=document.createElement('div');k.id='skn20';stage().appendChild(k);}k.className=side?'e':'';k.innerHTML=`<b>${esc(n)}</b>`;k.classList.remove('show');void k.offsetWidth;k.classList.add('show');}
+comboAdd=function(d){if(!B||!B.combo)return;B.combo.n++;B.combo.tot+=d;};/* ver0.42：連撃数の表示はやめた（ロマサガRS に無い）。数だけ数える */
+function skBanner(n,side){/* ver0.42：技名は js/battle/flow.js の吹き出し。旧い帯は廃止 */}
 
 /* ==================== 2. 戦場のHP表示（参考：キャラの横に大きなHPと小さなSP） ==================== */
 const HL={rects:[],sig:''};

@@ -179,9 +179,6 @@ button,textarea{font-family:inherit}
 .pop.dg.crit span{background:linear-gradient(180deg,#fff 10%,#ffe14a 45%,#ff8a1a);-webkit-background-clip:text;background-clip:text}
 .pop .pe{display:inline-block;font-style:normal;font-size:11px;color:#101020;border-radius:3px;padding:1px 3px;margin-right:2px;vertical-align:6px;letter-spacing:0}
 .pop.crit.dg{font-size:36px}
-#combo{position:absolute;right:8px;top:34%;z-index:3;text-align:right;color:#fff;font-size:12px;letter-spacing:2px;pointer-events:none;display:none;filter:drop-shadow(2px 2px 0 #000)}
-#combo b{font-size:32px;font-weight:400;color:#ffe14a;letter-spacing:0;margin-right:3px}#combo span{display:block;font-size:15px;color:#ffb030;letter-spacing:1px}
-#combo.bump{animation:cb .22s}@keyframes cb{50%{transform:scale(1.25)}}
 #party.bt .bar i{position:absolute;left:0;top:0;bottom:0}
 #party.bt .bar .fg{transition:width .18s}#party.bt .bar .gh{transition:width .6s ease .35s;background:#ff4050}
 #party.bt .bar.hp .fg{background:linear-gradient(#5fd38a,#2f9a5a)}#party.bt .bar.hp.low .fg{background:linear-gradient(#ffb030,#c05010);animation:pulse .6s infinite alternate}
@@ -387,7 +384,6 @@ button,textarea{font-family:inherit}
 #bbar button{height:44px;border-radius:22px;border:2px solid #d4dbff;background:linear-gradient(180deg,#24378a,#101a4c);box-shadow:inset 0 0 0 2px var(--ink);color:#fff;font-family:inherit;font-size:13px;text-shadow:1px 1px 0 #000;padding:0 6px;min-width:0}
 #bbar button small{display:block;font-size:9px;color:#aab0d8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #bbar button.on{border-color:var(--gold);background:linear-gradient(180deg,#8a6412,#3a2806);color:#fff0c0;box-shadow:inset 0 0 0 2px var(--ink),0 0 8px rgba(255,214,90,.7)}#bbar button:disabled{opacity:.4}
-#combo{right:auto;left:40%;top:6%}
 /* --- 設定・チュートリアル・スロット --- */
 .cfh{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}.cfh b{font-weight:400;font-size:17px;color:#fff0c0;letter-spacing:2px}
 .cfr{padding:6px 0;border-bottom:1px dotted #3a4688}.cfr label{display:block;font-size:13px;margin-bottom:4px}.cfr label small{font-size:10px;color:#8890c0;margin-left:8px}
