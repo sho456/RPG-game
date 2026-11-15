@@ -11,3 +11,4 @@ One line per study card. Newest last. Format:
 | 004 | 004-tactical-chibi-layered-cloth.md | user-provided tactical RPG reference | 3/4 tactical chibi, layered cloth, warm seam trim, oversized near hand/boot, painterly clusters | — |
 | 005 | 005-tall-tactical-job-sprites.md | user-provided fantasy job lineup | 4–5 heads tall, 48–64px heroic field sprites, layered armor/robes, readable 3/4 anatomy | — |
 | 006 | 006-rs-battle-chibi.md | user-provided RS-style battle sheets (48×48 cells) | ~30px 3/4-left battle chibi, head 40%, near-black outline incl. internal part lines, 4-step hair, 21-pose vocabulary, no dither | — |
+| 007 | 007-rs-pixel-anatomy.md | user-provided RS-style 32×32 grids (stand + kick) | pixel-exact RS anatomy: 14×31 boy / 15×27 girl, 1-px eyes with 2-px black lids + sclera, 2-tone cloth with fold lines, #202020 everywhere | — |
