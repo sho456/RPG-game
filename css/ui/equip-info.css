@@ -15,15 +15,29 @@
 .eqi .ei-g2 .ei-c b.p{color:#d8ecff!important}
 .eqi .ei-g4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px 2px}
 .eqi .ei-e{display:flex;align-items:center;justify-content:center;gap:4px}
-.eqi .ei-e b{font-size:13px;font-weight:800}
-.eqi .hx{display:inline-flex;align-items:center;justify-content:center;width:22px;height:24px;font-style:normal;font-size:11px;font-weight:900;color:#101226;background:var(--c);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
-.eqi .ei-ops{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}.eqi .ei-ops span{font-size:11px;background:#1b2250;border:1px solid #4a5490;border-radius:10px;padding:1px 8px;color:#bfe0ff}
-.eqi .ei-ab{display:flex;gap:8px;align-items:flex-start;padding:5px 2px;border-bottom:1px solid rgba(255,255,255,.07)}
-.eqi .ei-ai{flex:none;min-width:48px;text-align:center;font-size:10px;font-weight:800;color:#101226;background:linear-gradient(#f3d98a,#c9a24a);border-radius:50%/40%;padding:6px 4px}
-.eqi .ei-ab b{display:block;font-size:13px;font-weight:800;color:#ffe9a8}.eqi .ei-ab small{display:block;font-size:11.5px;font-weight:500;color:#cfd3f5;line-height:1.45}
+.eqi .ei-e>b{font-size:13px;font-weight:800}
 .eqi .ei-none,.eqi .ei-note{font-size:12px;color:#8a8fae;text-align:center;padding:6px}
 .eqi .tbtn.back{margin-top:10px}
 /* アイコンのタップ印（ⓘ） */
 .eqi-b{position:absolute;right:1px;top:1px;width:16px;height:16px;line-height:15px;text-align:center;font-style:normal;text-decoration:none;font-size:12px;font-weight:800;color:#f3d98a;background:rgba(5,8,26,.85);border:1px solid #c9a24a;border-radius:50%;z-index:2}
 .itile,.cslot{position:relative}
 .icard .iic,.slot .iic{cursor:pointer}
+.eqi .ei-g2 .ei-c.op span{color:#bfe0ff}
+/* アビリティ：1 つの枠に、印＋名前＋効果の行 */
+.eqi .ei-abs{border:1px solid #4a3f1c;border-radius:5px;background:rgba(12,14,36,.6)}
+.eqi .ei-ab{display:flex;gap:8px;align-items:center;padding:5px 7px;border-bottom:1px solid rgba(255,255,255,.08)}.eqi .ei-ab:last-child{border-bottom:0}
+.eqi .ei-ai{flex:none;width:24px;height:24px;display:grid;place-items:center;border-radius:50%;font-style:normal;font-size:12px;font-weight:900;color:var(--c);background:radial-gradient(circle at 35% 30%,#3a3f55,#0d0f1a);border:1.5px solid var(--c);box-shadow:0 0 5px color-mix(in srgb,var(--c) 45%,transparent)}
+.eqi .ei-ab b{display:block;font-size:13px;font-weight:800;color:#ffe9a8}.eqi .ei-ab small{display:block;font-size:11px;font-weight:500;color:#cfd3f5;line-height:1.35}
+/* 属性耐性の六角マーク（暗い金属の枠＋毛筆の属性文字。キャラ詳細の能力タブでも使う） */
+.elh{display:inline-block;position:relative;flex:none;width:28px;height:31px;font-style:normal;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);background:linear-gradient(160deg,#c9ced8,#5a6070 45%,#2b2f3b 55%,#9aa0ae)}
+.elh b{position:absolute;inset:2px;display:grid;place-items:center;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);background:radial-gradient(circle at 50% 30%,#3a3f52,#10121c 70%);font:400 17px/1 "Yuji Boku","Yuji Syuku","Hiragino Mincho ProN","Yu Mincho",serif;color:var(--c,#d9deea);text-shadow:0 1px 0 #000,0 0 6px var(--g,transparent);padding-bottom:1px}
+.elh.e0 b,.elh.e1 b,.elh.e2 b{--c:#dfe5f2;--g:rgba(200,215,240,.45)}
+.elh.e3 b{--c:#ff8a3c;--g:rgba(255,110,40,.7)}.elh.e4 b{--c:#6fd8ff;--g:rgba(80,200,255,.7)}.elh.e5 b{--c:#ffe14a;--g:rgba(255,220,40,.7)}
+.elh.e6 b{--c:#fff0b0;--g:rgba(255,230,150,.8)}.elh.e7 b{--c:#b98aff;--g:rgba(170,110,255,.75)}
+/* キャラ詳細の耐性欄 */
+.elr{margin-top:6px;padding:5px 6px;border-radius:4px;background:rgba(16,20,48,.6);border:1px solid #3a4068}
+.elr-t{font-size:11px;color:#9fb0e0;margin-bottom:3px}
+.elr-g{display:grid;grid-template-columns:repeat(4,1fr);gap:4px 2px}
+.elr-g span{display:flex;align-items:center;justify-content:center;gap:3px}.elr-g .elh{width:22px;height:25px}.elr-g .elh b{font-size:13px}
+.elr-g b.p,.eqi b.p{color:#6fb8ff}.elr-g b.n,.eqi b.n{color:#ff6a6a}.elr-g b.z,.eqi b.z{color:#777c90}
+.elr-g span>b{font-size:12px;font-weight:800}

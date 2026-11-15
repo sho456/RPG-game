@@ -70,6 +70,8 @@ function lpGuard(){if(!B)return;for(const h of B.heroes)if(h.alive&&(h.lp||0)<=0
    const cur=B.rs.cur;if(cur&&cur.u===a)m*=cur.mul;
    if(sk.ougi)m*=(1+(a.ougiUp||0)/100)*(a.legs&&a.legs.includes('futago')?1.3:1);}
   if(t.side===0){const cut=sumE(t,'cut',e=>cnd(e.c,t,a,sk));m*=Math.max(.2,1-cut/100);}
+  /* 属性耐性（装備の合計。js/data/resist.js）：耐性 1 で 1% 軽減、弱点（マイナス）は増加。味方が受けるときだけ */
+  if(t.side===0&&a&&a.side===1&&sk.el)m*=ELR.mul(t.id,sk.el);
   if(m!==1)r.d=Math.max(1,Math.round(r.d*m));}catch(e){console.error(e);}
  B.rs.lastR=r;return r;};}
 {const _hit=hit;hit=async function(a,t,sk){if(!B||!B.rs||!a||!t)return _hit(a,t,sk);const was=t.alive,myB=B;B.rs.lastR=null;

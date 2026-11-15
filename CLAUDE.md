@@ -25,6 +25,7 @@
 |---|---|---|
 | 星盤・天星盤の画面 | `js/ui/board.js`（`BOARDUI`）。盤面の描画は `ver17.js drawBoard`、天星盤のデータは `v31/board.js`（`V31B`）、ノードの置き換えは `rs/core.js` | `css/ui/board.css` |
 | 装備品の詳細（装備アイコンのタップ） | `js/ui/equip-info.js`（`EQINFO`。アイコンに `data-eqi=uid` を付けると開く） | `css/ui/equip-info.css` |
+| 属性耐性（防具の種類ごとの表・キャラの合計・被ダメージの倍率） | `js/data/resist.js`（`ELR`）。計算は `js/rs/battle.js calc` の最後で `ELR.mul` | `css/ui/equip-info.css`（`.elh`） |
 | 編成画面・陣形と立ち位置（`formOpen`） | `js/ui/party.js`（`V38P`） | `css/ui/party.css`（`.ps41` `.pc41` `.fe41`） |
 | キャラ詳細（能力・技・術・星臨） | 骨組み `ver17.js charHTML / equipMenu` → 技・術のアイコン `js/ui/skill-icons.js`（`SKICON`）／中身 `js/rs/ui.js`（`RSU`：`skCard` `skillsHTML`＋`tapSlot/tapSkill`（技・術セット） `abHTML`（アビリティのタブ） `skIcon`（技のアイコン） `awHTML` `st7HTML`） | `css/rs.css` `css/v38.css` |
 | 戦闘：コマンド欄（2 段階の決定・指のカーソル） | `js/rs/ui.js`（`chooseRoot`）。属性の六角マーク（弱点＝赤・耐性＝青）`elStack`、消費の表示 `costHTML` | `css/v38.css`（`.c38*`）・`css/ui/skill.css`（`.hx43` `.c43`） |

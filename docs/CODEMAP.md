@@ -67,39 +67,40 @@
 | 61 | `js/v30.js` | 5 | ver0.30 図鑑の基準画像・星臨の縮尺統一・素材制作パイプライン | V30 |
 | 62 | `js/v31/core.js` | 8 | ver0.31 共通：能力のインフレ・レベル上限120・限界突破・新しい能力値 | V31 |
 | 63 | `js/v31/items.js` | 18 | ver0.31 装備：枠の再編・各レアリティの新装備・新レジェンド | V31I |
-| 64 | `js/v31/board.js` | 20 | ver0.31 天星盤（星盤の上位版）・極技・新しいパッシブ | V31B |
-| 65 | `js/v31/enemies.js` | 13 | ver0.31 敵：インフレに合わせた強さの曲線・各章の中ボス・エンドコンテンツの敵 | V31E |
-| 66 | `js/v31/quest-data.js` | 23 | ver0.31 クエストのデータ（章・クエスト・会話） | QD |
-| 67 | `js/v31/quests.js` | 36 | ver0.31 クエスト制（マップ探索の廃止） | V31Q |
-| 68 | `js/v32.js` | 3 | ver0.32 図鑑の絞り込み・敵の大きさ・向き・クエスト情報 | V32 |
-| 69 | `js/v33.js` | 2 | ver0.33 不具合の修正・戦闘の仕組みの整理・狼と狐の原画 | V33 |
-| 70 | `js/items/icons36.js` | 31 | ver0.36 武器・防具・装飾品のアイコンを作り直す（IC36） | IC36 |
-| 71 | `js/battle/size.js` | 2 | 戦闘の表示サイズ：敵の大きさを種類ごとにそろえる（ver0.40。正本） | BSIZE |
-| 72 | `js/battle/core.js` | 13 | ver0.34 戦闘演出の基盤（BX） | BX |
-| 73 | `js/battle/prim.js` | 17 | ver0.34 戦闘エフェクトの部品（BXP） | BXP |
-| 74 | `js/battle/rig.js` | 6 | ver0.35 1 枚絵を曲げて動かす（BXR） | BXR |
-| 75 | `js/battle/seq.js` | 8 | ver0.34 技の演出の台帳と再生（BXS） | BXS |
-| 76 | `js/battle/data/fx-heroes-rio.js` | 7 | 技の演出：リオ（灯守見習い・片手剣・光） |  |
-| 77 | `js/battle/data/fx-heroes-gald.js` | 4 | 技の演出：ガルド（元騎士団長・大剣と盾・地） |  |
-| 78 | `js/battle/data/fx-heroes-mire.js` | 6 | 技の演出：ミレイユ（魔導書・炎と氷） |  |
-| 79 | `js/battle/data/motion-heroes.js` | 13 | ver0.35 味方のモーション（12 人） | BXM |
-| 80 | `js/battle/viewer.js` | 10 | ver0.34 演出の設定・星臨演出の長さ・演出ビューア | BXV |
-| 81 | `js/battle/version.js` | 2 | 戦闘演出の全面刷新（ver0.34〜）：版表示・お知らせ | V34 |
-| 82 | `js/battle/flow.js` | 5 | 戦闘の行動演出：ロマサガRS の流れ（ver0.42。正本） | BFLOW |
-| 83 | `js/rs/data.js` | 30 | ver0.37 戦闘システム刷新（データ） | RSD |
-| 84 | `js/rs/core.js` | 20 | 戦闘システム（能力値・習得・技セット・アビリティ・陣形・セーブ） | RSC |
-| 85 | `js/rs/battle.js` | 26 | 戦闘の進行（ターン制・BP・HP/LP） | RSB |
-| 86 | `js/rs/ui.js` | 22 | 戦闘システムの画面 | RSU |
-| 87 | `js/v38/core.js` | 4 | ver0.38 土台：攻撃属性 8 種・武器種 8 種・セーブの移行・LP | V38 |
-| 88 | `js/v38/battle-ui.js` | 6 | ver0.38 戦闘画面 | V38B |
-| 89 | `js/v38/menu.js` | 9 | ver0.38 画面全体の整理 | V38M |
-| 90 | `js/v38/help.js` | 7 | ver0.38 タップで詳細（V38H） | V38H |
-| 91 | `js/ui/skill-icons.js` | 5 | 技・術のアイコン（SKICON：白いシルエットの絵柄 27 種＋技 → 絵柄の対応。js/rs/ui.js の skIcon が使う） |  |
-| 92 | `js/ui/board.js` | 5 | 星盤・天星盤の画面（ver0.39 で 1 ファイルにまとめた。画面の正本はここ） | BOARDUI |
-| 93 | `js/ui/equip-info.js` | 4 | 装備品の詳細（EQINFO：装備アイコンのタップで出るポップアップの正本。新規） | EQINFO |
-| 94 | `js/ui/party.js` | 8 | 編成画面と陣形（ver0.41 で 1 ファイルにまとめた。画面の正本はここ。旧 js/v38/party.js を置き換え） | V38P |
-| 95 | `js/ui/smith.js` | 4 | 鍛冶屋の画面（ver0.44。正本：town.js の smith・enhance と v31/items.js・ver18-town.js の包みを置き換え） | SMITH44 |
-| 96 | `js/ui/damage.js` | 3 | 戦闘のダメージ表示の書体（TX24 の書式の最終定義。ロマサガRS の録画に合わせた） |  |
+| 64 | `js/data/resist.js` | 3 | 属性耐性（ELR：防具の耐性値・キャラの合計・被ダメージの倍率の正本。新規） | ELR |
+| 65 | `js/v31/board.js` | 20 | ver0.31 天星盤（星盤の上位版）・極技・新しいパッシブ | V31B |
+| 66 | `js/v31/enemies.js` | 13 | ver0.31 敵：インフレに合わせた強さの曲線・各章の中ボス・エンドコンテンツの敵 | V31E |
+| 67 | `js/v31/quest-data.js` | 23 | ver0.31 クエストのデータ（章・クエスト・会話） | QD |
+| 68 | `js/v31/quests.js` | 36 | ver0.31 クエスト制（マップ探索の廃止） | V31Q |
+| 69 | `js/v32.js` | 3 | ver0.32 図鑑の絞り込み・敵の大きさ・向き・クエスト情報 | V32 |
+| 70 | `js/v33.js` | 2 | ver0.33 不具合の修正・戦闘の仕組みの整理・狼と狐の原画 | V33 |
+| 71 | `js/items/icons36.js` | 31 | ver0.36 武器・防具・装飾品のアイコンを作り直す（IC36） | IC36 |
+| 72 | `js/battle/size.js` | 2 | 戦闘の表示サイズ：敵の大きさを種類ごとにそろえる（ver0.40。正本） | BSIZE |
+| 73 | `js/battle/core.js` | 13 | ver0.34 戦闘演出の基盤（BX） | BX |
+| 74 | `js/battle/prim.js` | 17 | ver0.34 戦闘エフェクトの部品（BXP） | BXP |
+| 75 | `js/battle/rig.js` | 6 | ver0.35 1 枚絵を曲げて動かす（BXR） | BXR |
+| 76 | `js/battle/seq.js` | 8 | ver0.34 技の演出の台帳と再生（BXS） | BXS |
+| 77 | `js/battle/data/fx-heroes-rio.js` | 7 | 技の演出：リオ（灯守見習い・片手剣・光） |  |
+| 78 | `js/battle/data/fx-heroes-gald.js` | 4 | 技の演出：ガルド（元騎士団長・大剣と盾・地） |  |
+| 79 | `js/battle/data/fx-heroes-mire.js` | 6 | 技の演出：ミレイユ（魔導書・炎と氷） |  |
+| 80 | `js/battle/data/motion-heroes.js` | 13 | ver0.35 味方のモーション（12 人） | BXM |
+| 81 | `js/battle/viewer.js` | 10 | ver0.34 演出の設定・星臨演出の長さ・演出ビューア | BXV |
+| 82 | `js/battle/version.js` | 2 | 戦闘演出の全面刷新（ver0.34〜）：版表示・お知らせ | V34 |
+| 83 | `js/battle/flow.js` | 5 | 戦闘の行動演出：ロマサガRS の流れ（ver0.42。正本） | BFLOW |
+| 84 | `js/rs/data.js` | 30 | ver0.37 戦闘システム刷新（データ） | RSD |
+| 85 | `js/rs/core.js` | 20 | 戦闘システム（能力値・習得・技セット・アビリティ・陣形・セーブ） | RSC |
+| 86 | `js/rs/battle.js` | 26 | 戦闘の進行（ターン制・BP・HP/LP） | RSB |
+| 87 | `js/rs/ui.js` | 22 | 戦闘システムの画面 | RSU |
+| 88 | `js/v38/core.js` | 4 | ver0.38 土台：攻撃属性 8 種・武器種 8 種・セーブの移行・LP | V38 |
+| 89 | `js/v38/battle-ui.js` | 6 | ver0.38 戦闘画面 | V38B |
+| 90 | `js/v38/menu.js` | 9 | ver0.38 画面全体の整理 | V38M |
+| 91 | `js/v38/help.js` | 7 | ver0.38 タップで詳細（V38H） | V38H |
+| 92 | `js/ui/skill-icons.js` | 5 | 技・術のアイコン（SKICON：白いシルエットの絵柄 27 種＋技 → 絵柄の対応。js/rs/ui.js の skIcon が使う） |  |
+| 93 | `js/ui/board.js` | 5 | 星盤・天星盤の画面（ver0.39 で 1 ファイルにまとめた。画面の正本はここ） | BOARDUI |
+| 94 | `js/ui/equip-info.js` | 4 | 装備品の詳細（EQINFO：装備アイコンのタップで出るポップアップの正本。新規） | EQINFO |
+| 95 | `js/ui/party.js` | 8 | 編成画面と陣形（ver0.41 で 1 ファイルにまとめた。画面の正本はここ。旧 js/v38/party.js を置き換え） | V38P |
+| 96 | `js/ui/smith.js` | 4 | 鍛冶屋の画面（ver0.44。正本：town.js の smith・enhance と v31/items.js・ver18-town.js の包みを置き換え） | SMITH44 |
+| 97 | `js/ui/damage.js` | 3 | 戦闘のダメージ表示の書体（TX24 の書式の最終定義。ロマサガRS の録画に合わせた） |  |
 
 ## 上書きの連鎖（2 ファイル以上で定義・上書きされる関数）
 
@@ -111,14 +112,14 @@
 | `draw` | engine.js → ver16.js → ver17.js → sprite/legacy/dot-rig.js → motion/fx19.js → ver19.js → v21.js → v22.js → v23.js → v25.js → sprite/spx.js → zukan/viewer.js → v31/quests.js → battle/core.js → battle/flow.js → rs/ui.js → v38/battle-ui.js |
 | `dvMenu` | dev.js → ch9.js → ver16.js → ver17.js → ver18-town.js → v20-ui.js → v21.js → v22.js → v23.js → v24.js → v25.js → v29.js → v30.js → v31/quests.js → battle/viewer.js |
 | `startBattle` | engine.js → ch8.js → ver18-battle.js → ver19.js → v20-battle.js → v21.js → v22.js → v23.js → v24.js → v25.js → battle/seq.js → rs/battle.js → v38/core.js → v38/battle-ui.js |
+| `migrate` | items.js → ch8.js → ch9.js → ver17.js → ver18-field.js → v31/items.js → data/resist.js → v31/quests.js → v32.js → rs/core.js → v38/core.js |
 | `show` | core.js → ver17.js → ver18-town.js → v20-ui.js → v22.js → v23.js → v24.js → v25.js → battle/flow.js → v38/battle-ui.js → v38/help.js |
-| `migrate` | items.js → ch8.js → ch9.js → ver17.js → ver18-field.js → v31/items.js → v31/quests.js → v32.js → rs/core.js → v38/core.js |
 | `townMenu` | town.js → ch9.js → ver17.js → ver18-town.js → v20-ui.js → v21.js → v22.js → v23.js → v31/quests.js → v38/menu.js |
 | `calc` | engine.js → ch8.js → ch9.js → ver19.js → v20-battle.js → data/terms.js → v31/core.js → rs/battle.js |
 | `refresh` | engine.js → ch5.js → ver17.js → v20-ui.js → v22.js → v24.js → v25.js → v31/quests.js |
+| `row` | ch3.js → ver17.js → ver18-town.js → v22.js → v24-text.js → zukan/zukan.js → data/resist.js → v31/quests.js |
 | `awaken` | engine.js → ch8.js → v22.js → v23.js → v25.js → battle/viewer.js → rs/battle.js |
 | `hero` | engine.js → ver18-battle.js → v20-battle.js → v31/items.js → v31/board.js → battle/viewer.js → rs/core.js |
-| `row` | ch3.js → ver17.js → ver18-town.js → v22.js → v24-text.js → zukan/zukan.js → v31/quests.js |
 | `boardMenu` | items.js → ver17.js → v21.js → v31/board.js → rs/core.js → ui/board.js |
 | `charHTML` | ver17.js → v20-ui.js → v22.js → v31/core.js → v31/board.js → rs/ui.js |
 | `doAction` | engine.js → ch8.js → v20-battle.js → v20-ui.js → v22.js → battle/flow.js |
@@ -167,6 +168,7 @@
 | `drawBoard` | items.js → ver17.js → v31/board.js |
 | `drawUnit` | engine.js → ver16.js → ver17.js |
 | `frame` | sprite/legacy/dot-rig.js → ver19-art.js → v21.js |
+| `genItem` | items.js → v31/items.js → data/resist.js |
 | `hex` | v24-text.js → sprite/spx.js → items/icons36.js |
 | `hit` | engine.js → v20-battle.js → rs/battle.js |
 | `itemIcon` | ch3.js → v21-art.js → v31/items.js |
@@ -185,6 +187,7 @@
 | `ramp` | sprite/legacy/dot.js → sprite/legacy/px.js → battle/core.js |
 | `render` | v21-items.js → v31/quests.js → items/icons36.js |
 | `roomOpen` | ver18-town.js → v22.js → v23.js |
+| `royalItem` | ch5.js → v31/items.js → data/resist.js |
 | `score` | items.js → v20-battle.js → rs/battle.js |
 | `spawnOne` | field.js → ch8.js → ver18-field.js |
 | `tavern` | town.js → ch9.js → ver18-town.js |
@@ -242,7 +245,6 @@
 | `fuQ` | v20-battle.js → v31/board.js |
 | `gainXP` | engine.js → v31/core.js |
 | `gather` | motion/fx19.js → battle/prim.js |
-| `genItem` | items.js → v31/items.js |
 | `healAll` | field.js → v38/core.js |
 | `heroK` | v25.js → v38/battle-ui.js |
 | `hiImg` | ver16.js → ver19.js |
@@ -282,7 +284,6 @@
 | `rgb2hsl` | sprite/legacy/dot.js → v31/enemies.js |
 | `ring` | motion/fx19.js → v21-art.js |
 | `rows` | motion/skeleton.js → rs/ui.js |
-| `royalItem` | ch5.js → v31/items.js |
 | `royalRand` | ch5.js → v31/items.js |
 | `run` | engine.js → battle/prim.js |
 | `saveMenu` | town.js → ver17.js |

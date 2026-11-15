@@ -36,6 +36,9 @@ const want = n => !only.length || only.includes(n);
   await shot('form', () => {partyScreen();V38P.formOpen();});
   await shot('form-sel', () => {document.querySelector('#sheet [data-a="fs"][data-v="0"]').click();});
   await shot('equip-info', () => {const id = 'rio';for (let i = 0; i < 6; i++) G.inv.push(genItem(40, 3, 0, null, 3));const w = genItem(40, 4, 0, 'w', 4);w.who = 'rio';w.unid = false;G.inv.push(w);bestEquip(id);G.h[id].eq.w = w.uid;CTAB = 'st';equipMenu(id);document.querySelector('.cslot [data-eqi="' + w.uid + '"]').click();});
+  for (const [n, sl, rar, nm] of [['equip-info-main', 'main', 3, null], ['equip-info-robe', 'main', 2, 'ローブ'], ['equip-info-sub', 'sub', 2, null], ['equip-info-acc', 'acc', 4, null]])
+    await shot(n, `(()=>{let it;for(let i=0;i<80;i++){it=genItem(50,${rar},0,'${sl}',${rar});if(!${JSON.stringify(nm)}||it.name.includes(${JSON.stringify(nm)}))break;}it.unid=false;it.sock[0]='ruby';G.inv.push(it);G.h.rio.eq['${sl === 'acc' ? 'acc1' : sl}']=it.uid;CTAB='st';equipMenu('rio');document.querySelector('.cslot [data-eqi="'+it.uid+'"]').click();})()`);
+  await shot('detail-res', () => {try {ovClose();} catch (e) {}CTAB = 'st';equipMenu('rio');});
   await shot('equip-pick', () => {for (let i = 0; i < 3; i++) G.inv.push(genItem(40, 1, 0, 'main', 2));pickEq('rio', 'main');});
   await shot('equip-inv', () => {invMenu();});
   await shot('sk-info', () => {CTAB = 'sk';equipMenu('rio');document.querySelector('[data-a="rsinfo"]').click();});
