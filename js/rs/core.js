@@ -116,43 +116,51 @@ function abUps(id){const o={1:0,2:0,3:0,O:0};const h=G.h[id];if(!h)return o;
  try{const N=V31B.BOARD2[id];for(const k of h.board2||[]){const n=N&&N[k];if(n&&n.t==='ps'&&/^ab_up/.test(n.v.ps)){const x=n.v.ps.slice(5);o[x]=(o[x]||0)+1;}}}catch(e){}
  return o;}
 /* アビリティ i（0〜2）の段階：0＝未解放、1〜5 */
-function abRank(id,i){const h=G.h[id];if(!h)return 0;const l0=D.ABL[i];if(h.lv<l0)return 0;let r=1+(h.lv>=l0+30?1:0)+(h.lv>=l0+60?1:0);r+=abUps(id)[i+1]||0;return Math.min(5,r);}
+function abRank(id,i){const h=G.h[id];if(!h)return 0;const l0=D.ABL[i];if(h.lv<l0)return 0;let r=1+(h.lv>=l0+20?1:0)+(h.lv>=l0+40?1:0);r+=abUps(id)[i+1]||0;return Math.min(3,r);}
 const STATK=['atk','def','mag','res','spd','crit'];
 /* 段階に応じた効果（配列は段階で引く）。onhit の r は、能力の増減なら「値」、状態異常なら「確率」 */
-function resolve(f,rank){const o={};for(const k in f){const v=f[k];o[k]=Array.isArray(v)&&v.length===5&&k!=='c'?v[rank-1]:v;}
+function resolve(f,rank){const o={};for(const k in f){const v=f[k];o[k]=Array.isArray(v)&&v.length===3&&k!=='c'?v[Math.min(3,rank)-1]:v;}
  if(f.r!=null){const r=o.r;if(f.t==='onhit'){if(STATK.includes(f.k)){o.v=r;o.p=1;}else{o.p=r;o.v=f.v;}}else if(f.t==='fu'||f.t==='counter'||f.t==='delay'||f.t==='cleanse'){o.p=r;o.v=r;}else o.v=r;}
  if(o.t==='fu'||o.t==='counter'){o.p=o.p!=null?o.p:o.v;o.pow=o.pw!=null?o.pw:1;}
  if(o.t==='kill'){o.hp=o.v;}
  delete o.r;return o;}
 const active=e=>e&&(e.v||e.p||e.bp)&&!(e.t==='fu'&&!e.p);
-function abEffects(id){const o=[];(D.AB[id]||[]).forEach((A,i)=>{const r=abRank(id,i);if(!r)return;for(const f of A.fx){const e=resolve(f,r);if(active(e)){e.src=A.n;o.push(e);}}});return o;}
-const awEffects=id=>{const A=D.AWX[id];return A?A.fx.map(f=>Object.assign({src:A.n,p:f.t==='fu'?f.v:undefined,pow:f.pw},f)):[];};
+function abEffects(id){const o=[];(D.AB[id]||[]).forEach((A,i)=>{const r=abRank(id,i);if(!r)return;for(const f of A.fx){const e=resolve(f,r);if(active(e)){e.src=A.n;o.push(e);}}
+  /* 段階Ⅲ：固有名の特殊効果 */
+  if(r>=3&&A.sp)for(const f of A.sp.fx){const e=Object.assign({},f,{src:A.sp.n,sp:1});if((e.t==='fu'||e.t==='counter')&&e.p==null){e.p=e.v;e.pow=e.pw!=null?e.pw:1;}o.push(e);}});return o;}
+const awEffects=id=>{const A=D.AWX[id];return A?A.fx.map(f=>Object.assign({src:A.n,p:f.t==='fu'||f.t==='counter'?f.v:undefined,pow:f.pw},f)):[];};
 /* 効果の説明文 */
 const CN={phys:'技',mag:'術',basic:'通常攻撃',skill:'技・術',weak:'弱点を突くとき',weakmag:'弱点を突く術',single:'単体攻撃',aoe:'全体攻撃',multi:'連撃',hpfull:'HP満タンのとき',hplow:'HP50%以下のとき',hphigh:'HP50%以上のとき',
- tlow:'HP30%以下の敵',tfull:'HP満タンの敵',boss:'ボス',debuffed:'弱体のかかった敵',allyaw:'仲間が星臨中のとき',aw:'星臨中',altel:'直前と違う属性の術',crit:'会心が出たとき',any:'行動のあと',same:'同じ敵を続けて攻撃するたび',heat:'攻撃するたび'};
+ tlow:'HP30%以下の敵',tfull:'HP満タンの敵',boss:'ボス',debuffed:'弱体のかかった敵',allyaw:'仲間が星臨中のとき',aw:'星臨中',altel:'直前と違う属性の術',crit:'会心が出たとき',r1:'1ターン目',any:'行動のあと',same:'同じ敵を続けて攻撃するたび',heat:'攻撃するたび'};
 const cn=c=>!c||c==='any'&&false?'':c.startsWith&&c.startsWith('el:')?c.slice(3).replace('|','・')+'属性':CN[c]||'';
 const pc=x=>Math.round(x*100)+'%';
+const AILN={poison:'毒',stun:'スタン',para:'マヒ',blind:'暗闇'},STN7={atk:'攻撃',def:'防御',mag:'魔力',res:'精神',spd:'素早さ',crit:'会心率'};
 function effTxt(e){const c=e.c?cn(e.c):'',cc=c?`${c}、`:'',ON={self:'自分',allies:'味方全体',lowest:'最もHPの減った味方',enemies:'敵全体'};
  switch(e.t){
   case'dmg':return`${cc}与ダメ+${e.v}%`;case'cut':return e.v<0?`${cc}被ダメ+${-e.v}%`:`${cc}被ダメ-${e.v}%`;case'crit':return`${cc}会心率+${e.v}%`;case'critd':return`会心ダメ+${e.v}%`;
   case'stat':return`${{atk:'攻撃',def:'防御',mag:'魔力',res:'精神',spd:'素早さ',mhp:'最大HP'}[e.k]}+${e.v}%`;case'bp0':return`初期BP+${e.v}`;case'bpr':return`毎ターンのBP回復+${e.v}`;case'bpmax':return`BP上限+${e.v}`;
   case'bpcut':return`${cc}消費BP-${e.v}`;case'st7':return`${D.ST7N[e.k]}${e.v>=0?'+':''}${e.v}%`;case'ag':return`星臨ゲージ上昇+${e.v}%`;case'heal':return`回復量+${e.v}%`;
   case'regen':return`毎ターン、${ON[e.on]||'自分'}のHPを${e.v}%回復`;
-  case'start':return e.k==='shield'?`戦闘開始時、${ON[e.on]}に最大HP${e.v}%の障壁`:`戦闘開始時、${ON[e.on]}の${{atk:'攻撃',def:'防御',mag:'魔力',res:'精神',spd:'素早さ',prot:'被ダメ軽減'}[e.k]}${e.k==='prot'?e.v+'%':'+'+e.v+'%'}（${e.d}T）`;
+  case'start':if(e.on==='enemies')return`戦闘開始時、敵全体の${STN7[e.k]}${e.v}%（${e.d}T）`;return e.k==='shield'?`戦闘開始時、${ON[e.on]}に最大HP${e.v}%の障壁`:`戦闘開始時、${ON[e.on]}の${{atk:'攻撃',def:'防御',mag:'魔力',res:'精神',spd:'素早さ',prot:'被ダメ軽減'}[e.k]}${e.k==='prot'?e.v+'%':'+'+e.v+'%'}（${e.d}T）`;
   case'onaw':return`星臨した時、${ON[e.on]}の${{spd:'素早さ',def:'防御',atk:'攻撃'}[e.k]}${e.v>0?'+':''}${e.v}%（${e.d}T）`;
-  case'onhit':return STATK.includes(e.k)?`${cc}当てた敵の${{atk:'攻撃',def:'防御',mag:'魔力',res:'精神',spd:'素早さ'}[e.k]}${e.v}%（${e.d}T）`:`${cc}${pc(e.p)}で${e.k==='poison'?'毒':e.k==='stun'?'スタン':e.k}`;
-  case'fu':return`${c||'攻撃のあと'}、${pc(e.p)}で追撃（${e.el||''}・威力${e.pow}）`;case'counter':return`単体攻撃を受けると${pc(e.p)}で反撃（威力${e.pow}）`;
-  case'dodge':return`${cc}${e.v}%で攻撃を回避`;case'drain':return`与ダメの${e.v}%を吸収`;case'kill':return`敵を倒すと${e.hp?'HP'+e.hp+'%回復':''}${e.hp&&e.bp?'・':''}${e.bp?'BP+'+e.bp:''}`;
+  case'onhit':return STATK.includes(e.k)?`${cc}当てた敵の${{atk:'攻撃',def:'防御',mag:'魔力',res:'精神',spd:'素早さ'}[e.k]}${e.v}%（${e.d}T）`:`${cc}${pc(e.p)}で${AILN[e.k]||e.k}${e.k!=='stun'&&e.d?`（${e.d}T）`:''}`;
+  case'fu':return`${c||'攻撃のあと'}、${pc(e.p)}で${e.nm?`「${e.nm}」の`:''}追撃（${e.el||''}・威力${e.pow}）`;case'counter':return`単体攻撃を受けると${pc(e.p)}で反撃（威力${e.pow}）`;
+  case'dodge':return`${cc}${e.v}%で攻撃を回避`;case'drain':return`${cc}与ダメの${e.v}%を吸収`;case'kill':return`敵を倒すと${e.hp?'HP'+e.hp+'%回復':''}${e.hp&&e.bp?'・':''}${e.bp?'BP+'+e.bp:''}`;
   case'guts':return'倒れるダメージを1度だけHP1で耐える';case'prio':return`行動順+${e.v}%（先に動きやすい）`;case'cleanse':return`毎ターン${pc(e.p)}で弱体を1つ解除`;
   case'taunt':return'敵に狙われやすい';case'hits':return`連撃の技・術の回数+${e.v}`;case'pierce':return`敵の防御・精神を${e.v}%無視`;
   case'stack':return`${e.c==='same'?'同じ敵を続けて攻撃するたび':'攻撃するたび'}与ダメ+${e.v}%（最大${e.max||5}回）`;case'rage':return`攻撃を受けるたび与ダメ+${e.v}%（最大${e.max||5}回）`;
   case'healprot':return`回復した味方の被ダメ-${e.v}%（2T）`;case'delay':return`${cc}${pc(e.p)}で当てた敵の行動を遅らせる`;case'allybp0':return`味方全体の初期BP+${e.v}`;case'allybpr':return`味方全体の毎ターンのBP回復+${e.v}`;
-  case'allydmg':return`味方全体の与ダメ+${e.v}%`;case'awturn':return`星臨の持続+${e.v}ターン`;}
+  case'allydmg':return`${cc}味方全体の与ダメ+${e.v}%`;case'awturn':return`星臨の持続+${e.v}ターン`;
+  case'allycut':return`味方全体の被ダメ-${e.v}%`;case'tstart':return e.k==='shield'?`毎ターンの始めに、${ON[e.on]||'自分'}に最大HP${e.v}%の障壁`:`毎ターンの始めに、${ON[e.on]||'自分'}の${STN7[e.k]||e.k}+${e.v}%（1T）`;
+  case'cover':return`HPが半分以下の味方への単体攻撃を${pc(e.v)}でかばう`;case'actbp':return`${cc}行動のあとBP+${e.v}`;case'prio1':return'1ターン目は最初に行動';
+  case'evct':return`回避したら反撃（威力${e.v}）`;case'autorev':return`戦闘中1度、気絶した味方をHP${e.v}%で起こす`;case'healcl':return'回復した味方の弱体を1つ解除';
+  case'agshare':return`仲間が星臨すると星臨ゲージ+${e.v}%`;case'ctst':return`反撃が当たると${pc(e.v)}で${AILN[e.k]||e.k}`;case'gutsbuff':return`こらえたとき${STN7[e.k]}+${e.v}%（3T）`;
+  case'execute':return`${cc}${pc(e.v)}でとどめを刺す（ボス以外）`;case'hpbuff':return`HPが半分を切ると攻撃・防御+${e.v}%（3T・1度）`;case'ctpow':return`反撃の威力${e.v}`;}
  return e.t;}
 /* アビリティの各段階の説明（新しく付く効果と、伸びる数値） */
 function abDesc(id,i,rank){const A=D.AB[id][i];return A.fx.map(f=>{const e=resolve(f,Math.max(1,rank||1));return active(e)?effTxt(e):null;}).filter(Boolean);}
 /* 次の段階で変わること */
-function abNext(id,i,rank){if(rank>=5)return[];const A=D.AB[id][i],now=new Set(abDesc(id,i,rank));return abDesc(id,i,rank+1).filter(x=>!now.has(x));}
+function abNext(id,i,rank){if(rank>=3)return[];const A=D.AB[id][i],now=new Set(abDesc(id,i,rank));return abDesc(id,i,rank+1).filter(x=>!now.has(x));}
 /* 星盤・天星盤の強化ノード名 */
 const abName=(id,i)=>(D.AB[id]&&D.AB[id][i]&&D.AB[id][i].n)||'';
 

@@ -16,7 +16,7 @@ const fx=(f,...a)=>{try{if(typeof FX19!=='undefined'&&FX19[f])FX19[f](...a);}cat
 /* ==================== 1. 状態効果 ==================== */
 /* k: atk/def/mag/res/spd/crit（v=％）, regen/poison（v=最大HPに対する割合/ターン）, stun, mark（被ダメ+v%）, prot（被ダメ-v%）,
       weak（el を一時的に弱点にする）, shield（v=吸収量）, counter（v=反撃の威力）, evade（v=回避率％）, enrage（敵：攻撃・魔力+v%） */
-const STN={atk:['攻撃','攻'],def:['防御','防'],mag:['魔力','魔'],res:['精神','精'],spd:['素早さ','速'],crit:['会心','会'],regen:['継続回復','再'],poison:['毒','毒'],stun:['スタン','痺'],
+const STN={atk:['攻撃','攻'],def:['防御','防'],mag:['魔力','魔'],res:['精神','精'],spd:['素早さ','速'],crit:['会心','会'],regen:['継続回復','再'],poison:['毒','毒'],stun:['スタン','痺'],para:['マヒ','麻'],blind:['暗闇','暗'],
  mark:['被ダメ増加','標'],prot:['被ダメ軽減','護'],weak:['弱点付与','弱'],shield:['障壁','壁'],counter:['反撃態勢','返'],evade:['回避','避'],enrage:['激昂','怒']};
 const STAT5=['atk','def','mag','res','spd'];let LASTC=null;
 /* 一時的な弱点が切れたら、判明済みの弱点からも外す（図鑑には本来の弱点だけを残す） */
@@ -31,7 +31,7 @@ function recalc(u){const b=base0(u);for(const k of STAT5){let p=stSum(u,k)+(k===
  u.crit=b.crit+clamp(stSum(u,'crit'),-50,60);}
 /* 付与：同じ種類・同じ向き（強化／弱体）は重ねず、強い方・長い方を残す */
 function addSt(u,k,v,t,o={}){if(!u||!u.alive)return false;const L=stsOf(u);
- if(k==='stun'&&u.boss){u.ct+=60/Math.max(1,u.spd);popS(u,'DELAY','#7fd6ff');return true;}
+ if((k==='stun'||k==='para')&&u.boss){u.ct+=60/Math.max(1,u.spd);popS(u,'DELAY','#7fd6ff');return true;}
  if(k==='poison'&&u.boss)v*=.35;
  const same=L.find(s=>s.k===k&&(k==='weak'?s.el===o.el:Math.sign(s.v||1)===Math.sign(v||1)));
  if(same){same.v=Math.abs(v)>Math.abs(same.v)?v:same.v;same.t=Math.max(same.t,t);if(o.el)same.el=o.el;}
@@ -46,12 +46,13 @@ function popS(u,txt,col,kind){try{pop(u,txt,col,true,'st20 '+(kind||''));}catch(
 async function tickSts(u){const L=stsOf(u);if(!L.length||!u.alive)return false;let stun=false;
  for(const s of L){if(s.k==='regen'&&u.hp<u.mhp){const v=Math.max(1,Math.round(u.mhp*s.v));u.hp=Math.min(u.mhp,u.hp+v);pop(u,'+'+v,'#7dffa8');}
   if(s.k==='poison'){let v=Math.max(1,Math.round(u.mhp*s.v));if(u.side===0)v=Math.min(v,u.hp-1);if(v>0){u.hp=Math.max(0,u.hp-v);u.flash=6;pop(u,v,'#c07cff',false,'psn');}}
-  if(s.k==='stun'&&s.t>0){stun=true;}}
+  if(s.k==='stun'&&s.t>0){stun=true;}
+  if(s.k==='para'&&s.t>0){stun='para';}}
  for(const s of L)s.t--;const gone=L.filter(s=>s.t<=0&&s.k!=='shield');
  u.sts=L.filter(s=>s.t>0||(s.k==='shield'&&s.v>0&&s.t>-99));
  if(gone.length){fixWeak(u);recalc(u);}
  refresh();if(u.side===1&&u.hp<=0){await kill(u);return true;}
- if(stun){pop(u,'スタン','#ffe14a',true,'st20 dn');log(`${u.name}は<b>しびれて動けない</b>！`);await wait(450);}
+ if(stun){pop(u,stun==='para'?'マヒ':'スタン','#ffe14a',true,'st20 dn');log(`${u.name}は<b>${stun==='para'?'マヒして':'しびれて'}動けない</b>！`);await wait(450);}
  return stun;}
 
 /* ==================== 2. パッシブ ==================== */

@@ -91,7 +91,7 @@ function updHud(){if(!B||scene!=='battle')return;const h=ensureHud();h.classList
   if(k!==HK||!tg.firstChild){HK=k;tg.className='b22tg'+(t.boss?' boss':'');
    tg.innerHTML=`<div class="nm">${t.boss?'<em class="bs">BOSS</em>':multi?'<em>TARGET</em>':''}<b>${t.name}</b><small>Lv${t.lv}</small></div>
     <div class="hp"><div class="bar"><s></s><u></u><i></i></div><em class="cnt"></em></div>
-    <div class="wk">${ELS10.map(e=>{const w=kw.includes(e),tm=tmp.includes(e),r=!w&&!tm&&kr.includes(e);/* 弱点＝赤く光る・耐性＝青く光る（見つけたものだけ） */return`<span class="${w?'w':''}${tm?' tm':''}${r?' r':''}" style="--c:${ELC[e]}"><i>${e}</i></span>`;}).join('')}${unk>0?`<span class="q"><i>?</i><u>×${unk}</u></span>`:''}</div>
+    <div class="wk">${ELS10.map(e=>{const w=kw.includes(e),tm=tmp.includes(e),r=!w&&!tm&&kr.includes(e);/* ver0.45：属性マークと耐性を統合（ELR.chip。弱点＝赤い枠と︿・耐性＝青い枠と﹀。見つけたものだけ） */return ELR.chip(e,w||tm?'w':r?'r':'',null,tm?'tm':'');}).join('')}${unk>0?`<span class="q"><i>?</i><u>×${unk}</u></span>`:''}</div>
     ${tags?`<div class="st">${tags}</div>`:''}`;}
   hpBar(t,tg);}
  /* 星臨ボタン */

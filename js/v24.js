@@ -56,7 +56,7 @@ function obstacles(u){const o=[];if(!B)return o;
 function choose(u,w,h,pri,self){const bd=bounds(),b=boxOf(u),hero=u.side===0,obs=obstacles(u),live=alive().filter(q=>q!==self&&q.R),A=Math.max(1,w*h),fxr=[];
  try{document.querySelectorAll('#fx25 .fl25').forEach(el=>{const r=relRect(el);if(r)fxr.push(r);});}catch(e){}
  const own=self&&self.x!=null;
- let ax=own?self.x-(w-self.w)/2:hero?b.cx-w*.6:b.cx-w/2,ay=own?self.y:hero?b.cy-h*.5:b.t+Math.min(b.h*.45,h)-h*.5;
+ let ax=own?self.x-(w-self.w)/2:hero?b.cx-w*.6:b.l+b.w*.04,ay=own?self.y:hero?b.cy-h*.5:Math.max(b.t+b.h*.2,b.b-h-b.h*.04);/* ver0.45：敵は体の左下（手前）に重ねる（ロマサガRS） */
  const sx=Math.max(w*.55,16),sy=Math.max(h*.62,14),DX=[0,-1,1,-2,2,-3,3],DY=[0,-1,1,-2,2,-3,3,-4,4,-5];
  let best=null;
  for(const dy of DY)for(const dx of DX){const x=clamp(ax+dx*sx,bd.l,Math.max(bd.l,bd.r-w)),y=clamp(ay+dy*sy,bd.t,Math.max(bd.t,bd.b-h)),R=rect(x,y,w,h,-3);let c=Math.abs(dx)*5+Math.abs(dy)*7+(dy>0?3:0),hl=0;
@@ -93,7 +93,7 @@ function make(u,cls,pri,life){const L=layer(),el=document.createElement('div');e
 /* 演技エリアが低い画面（iPhone SE など）では、エリアの高さに合わせて全体を縮める */
 const fitK=()=>{const bd=bounds();return clamp((bd.b-bd.t)/230,.68,1);};
 /* 文字の大きさ（倍率・最小・最大）。ver0.25 で参考資料に合わせて調整できるよう外へ出す */
-const FS24={h:[9,19,25],e:[12,24,34],hl:[7.6,15,21],cb:[13,24,34],lb:.56};
+const FS24={h:[9,19,25],e:[14,28,40],hl:[7.6,15,21],cb:[13,24,34],lb:.56};
 const fsOf=k=>clamp(SC*FS24[k][0],FS24[k][1],FS24[k][2]);
 const numFs=u=>Math.round(fsOf(u.side===0?'h':'e')*fitK());
 const TIER=[1,1.12,1.28,1.45];
@@ -106,43 +106,50 @@ const MCX=document.createElement('canvas').getContext('2d');
 function txtW(text,sk,size){try{const S=TX24.STYLE[sk]||TX24.STYLE.dmg,F=TX24.FONT[S.font]||TX24.FONT.num;MCX.font=`${F.it} ${F.w} ${size}px ${F.f}`;return MCX.measureText(text).width+size*.02*text.length;}catch(e){return text.length*size*.56;}}
 /* 表示できる最大幅：画面幅の 34%（最大 150px）。超えるなら比例して縮める（最小 11px） */
 function fitFs(text,sk,fs){const st=stage(),mw=Math.min(150,(st?st.offsetWidth:390)*.34),w=txtW(text,sk,fs);return w>mw?Math.max(11,Math.floor(fs*mw/w)):fs;}
-/* ダメージ表示：同じ相手への連続ヒット（多段攻撃・連続行動）は1つのまとまりにする。
- 見出し（Critical／Weak／Guard）はまとまりの上に1回だけ、数字は下へ1行ずつ追加（最大3行。古い行から消える）。
- 以前は1ヒットごとに見出し付きの表示を作っていたため、連続ヒットで「Critical」が2つ重なって見えていた */
-const GRP_MS=900;
-/* ver0.43：見出し（Critical／Weak／Resist／Guard）と属性の漢字は、数字より大きく出す（ロマサガRS の録画に合わせる。数字の大きさ fs に対する倍率） */
-const LBK={cr:1.45,wk:1.25,rs:1.25,gd:1.2,el:1.5};
+/* ダメージ表示（ver0.45：ロマサガRS の録画を分析して作り直し）
+ ・同じ相手への連続ヒット（多段攻撃・追撃・続けての行動）は 1 つの表示にまとめ、数字は「合計」を数え上げる（前の数字は消える）
+ ・見出し（Critical／Weak／Resist／Guard）はまとまりの上に 1 回だけ。どれも同じ大きさ。Weak・Resist の右に属性の漢字（毛筆）
+ ・行動している間は消さず、行動が終わってから少しして消える（js/battle/flow.js が BFLOW.aid・actEnd で知らせる）
+ ・置き場所：敵は体の左下（手前）に重ねる。味方は体の左（choose） */
+const GRP_MS=1600;
+const LBK={cr:1.3,wk:1.3,rs:1.3,gd:1.3,el:1.55};
+const aidNow=()=>{try{return BFLOW.aid();}catch(e){return 0;}};
+const acting=()=>{try{return BFLOW.busy();}catch(e){return false;}};
 function addLabels(p,u,crit,weak,grd,el,fs,res){const has=c=>!!p.in.querySelector(':scope>.lb.'+c),first=p.in.querySelector(':scope>.nm'),put=r=>p.in.insertBefore(r,first);
- const elc=()=>TX24.el(el,'elm',Math.round(fs*LBK.el));
- if(crit&&!has('cr'))p.in.insertBefore(lbRow('cr',TX24.el('Critical','crit',Math.round(fs*LBK.cr))),p.in.firstChild);
- if(weak&&!has('wk')){const r=lbRow('wk',TX24.el('Weak','weak',Math.round(fs*LBK.wk)));if(el&&ELC[el])r.appendChild(elc());put(r);}
- if(grd&&!has('gd'))put(lbRow('gd',TX24.el('Guard','guard',Math.round(fs*LBK.gd))));
- /* Resist（耐性で軽減）：青い鋼の見出し */
- if(res&&!weak&&!has('rs')){const r=lbRow('rs',TX24.el('Resist','resist',Math.round(fs*LBK.rs)));if(el&&ELC[el])r.appendChild(elc());put(r);}}
+ const lf=Math.round(fs*LBK.wk),elc=()=>TX24.el(el,'elm',Math.round(fs*LBK.el));
+ if(crit&&!has('cr'))p.in.insertBefore(lbRow('cr',TX24.el('Critical','crit',lf)),p.in.firstChild);
+ if(weak&&!has('wk')){const r=lbRow('wk',TX24.el('Weak','weak',lf));if(el&&ELC[el])r.appendChild(elc());put(r);}
+ if(grd&&!has('gd'))put(lbRow('gd',TX24.el('Guard','guard',lf)));
+ if(res&&!weak&&!has('rs')){const r=lbRow('rs',TX24.el('Resist','resist',lf));if(el&&ELC[el])r.appendChild(elc());put(r);}}
+/* 数字の要素（first：1 桁ずつ落ちて弾む／それ以外：その場で書き換え） */
+function numFill(nm,txt,sk,fs,first){nm.innerHTML='';
+ if(/^[\d,]+$/.test(txt)){nm.classList.add('dg42');[...txt].forEach((ch,i)=>{const c=TX24.el(ch,sk,fs);if(first)c.style.animationDelay=((txt.length-1-i)*45)+'ms';else c.style.animation='none';if(i)c.style.marginLeft=-Math.round(c._m.pad*2-fs*(ch===','?-.02:.04))+'px';nm.appendChild(c);});}
+ else nm.appendChild(TX24.row(txt,sk,fs,/万/));}
+/* 合計の数え上げ（約 0.22 秒） */
+function rollTo(G,from,to){cancelAnimationFrame(G.raf);const t0=now(),dur=RM.matches?0:220*spdK();
+ G.nm.classList.remove('bump');void G.nm.offsetWidth;G.nm.classList.add('bump');
+ const step=()=>{if(!G.el.isConnected)return;const k=dur?Math.min(1,(now()-t0)/dur):1,v=Math.round(from+(to-from)*(1-Math.pow(1-k,2)));
+  if(v!==G.shown){G.shown=v;numFill(G.nm,fmt(v),G.sk,fitFs(fmt(to),G.sk,G.fs0),false);}if(k<1)G.raf=requestAnimationFrame(step);else reflow(G);};step();}
 function dmgPop(u,s,kind,el){const v=parseInt(s,10),heal=s[0]==='+',crit=/crit/.test(kind),weak=/weak/.test(kind),res=/resist/.test(kind),psn=/psn/.test(kind),grd=u.side===0&&!heal&&!!u.guard;
- const t=heal?0:tierOf(u,Math.abs(v));
- const sk=heal?'heal':psn?'psn':weak?(t>=3?'dmgWT':'dmgW'):grd?'dmgG':u.side===0?'dmgH':t>=3?'dmgT':'dmg';
- const txt=(heal?'+':'')+fmt(v),fs0=Math.round(numFs(u)*TIER[t]*(crit?(FS24.cr||1.15):1)*(heal?.92:1)),fs=fitFs(txt,sk,fs0);
- const nm=document.createElement('div');nm.className='nm';
- /* ver0.42：ロマサガRS のように数字を 1 桁ずつ弾ませる（桁ごとの絵を並べ、出る時刻をずらす。css/ui/battle-flow.css） */
- if(!heal&&/^[\d,]+$/.test(txt)){nm.classList.add('dg42');[...txt].forEach((ch,i)=>{const c=TX24.el(ch,sk,fs);c.style.animationDelay=((txt.length-1-i)*50)+'ms';if(i)c.style.marginLeft=-Math.round(c._m.pad*2-fs*(ch===','?-.02:.04))+'px';/* 桁ごとの絵の余白（縁・発光）の分だけ詰める */nm.appendChild(c);});}
- else nm.appendChild(TX24.row(txt,sk,fs,/万/));
- /* 直前のまとまりに追加 */
- const G=u._dg25,tn=now();
- if(!heal&&!psn&&G&&!G.gone&&G.el.isConnected&&tn-G.t1<GRP_MS){
-  addLabels(G,u,crit,weak,grd,el,fs0,res);
-  /* ver0.44：連続ヒットは前の数字を消さず、次の数字を少し下・斜めにずらして被せていく（古い数字は少し小さく・薄く。最大 4 つ） */
-  const rows=[...G.in.querySelectorAll(':scope>.nm')],k=rows.length;
-  nm.classList.add('hit');nm.style.setProperty('--dx',((k%2?1:-1)*Math.round(fs*(.3+.14*(k%3))))+'px');nm.style.marginTop=-Math.round(fs*.3)+'px';
-  rows.forEach((r,i)=>{r.classList.add('old');r.style.setProperty('--sc',Math.max(.7,1-.06*(k-i)).toFixed(2));});
-  G.in.appendChild(nm);
-  if(rows.length>=4){rows.slice(0,rows.length-3).forEach(r=>r.remove());const f=G.in.querySelector(':scope>.nm');if(f)f.style.marginTop='';}
+ const sk0=t=>heal?'heal':psn?'psn':weak?(t>=3?'dmgWT':'dmgW'):grd?'dmgG':u.side===0?'dmgH':t>=3?'dmgT':'dmg';
+ const G=u._dg25,tn=now(),aid=aidNow();
+ /* 続きのヒット：合計に足して数え上げる */
+ if(!heal&&!psn&&G&&G.el.isConnected&&(!G.gone||tn-G.t1<GRP_MS||(aid&&G.aid===aid))){
+  if(G.gone){G.gone=0;G.el.classList.remove('out');if(!PM.live.includes(G))PM.live.push(G);}/* 消えかけていても、続けて当たれば合計を続ける（続けての行動・追撃） */
+  const t=tierOf(u,G.total+Math.abs(v)),fs0=Math.round(numFs(u)*TIER[t]);G.fs0=Math.max(G.fs0,fs0);G.sk=sk0(t);
+  addLabels(G,u,crit,weak,grd,el,G.fs0,res);
+  const from=G.total;G.total+=Math.abs(v);G.hits++;rollTo(G,from,G.total);
   if(crit&&!G.el.classList.contains('crit')){G.el.classList.add('crit');G.pri=Math.max(G.pri,PRI.crit);}
-  G.t1=tn;G.end=Math.max(G.end,tn+Math.round((crit?1400:1150)*spdK()));arm(G);reflow(G);u._dm24=G;return G;}
+  G.t1=tn;G.aid=aid;G.end=Math.max(G.end,tn+Math.round((acting()?6000:1300)*spdK()));arm(G);reflow(G);u._dm24=G;return G;}
+ const t=heal?0:tierOf(u,Math.abs(v)),sk=sk0(t);
+ const txt=(heal?'+':'')+fmt(v),fs0=Math.round(numFs(u)*TIER[t]*(heal?.92:1)),fs=fitFs(txt,sk,fs0);
+ const nm=document.createElement('div');nm.className='nm';numFill(nm,txt,sk,fs,!heal);
  const pri=crit?PRI.crit:heal?PRI.heal:PRI.dmg;capUnit(u);
- const p=make(u,`dmg t${t}${crit?' crit':''}${weak?' weak':''}${heal?' heal':''}${grd?' grd':''}`,pri,(crit||t>=2?1400:1150));
+ const p=make(u,`dmg t${t}${crit?' crit':''}${weak?' weak':''}${heal?' heal':''}${grd?' grd':''}`,pri,(heal?1150:acting()?6000:1300));
  p.in.appendChild(nm);addLabels(p,u,crit,weak,grd,el,fs0,res);
- p.num=1;p.t1=tn;place(p);u._dm24=p;if(!heal&&!psn)u._dg25=p;return p;}
+ Object.assign(p,{num:1,t1:tn,nm,total:Math.abs(v),shown:Math.abs(v),hits:1,sk,fs0,aid});place(p);u._dm24=p;if(!heal&&!psn)u._dg25=p;return p;}
+/* 行動の終わり：その行動のまとまりを少しして消す（数字は行動のあいだ残す） */
+function actEnd(aid){const t=now();for(const p of PM.live){if(p.aid===aid&&p.total!=null&&!p.gone){p.end=Math.min(p.end,t+Math.round(1500*spdK()));arm(p);}}}
 function wordPop(u,s,kind){const miss=s==='MISS',fs=numFs(u);
  const p=make(u,'word miss',PRI.word,950);
  p.in.appendChild(TX24.el('Miss','miss',Math.round(fs*.82)));place(p);return p;}
@@ -255,4 +262,4 @@ function dev24(m){log(m||`<b>${VER24}</b>　ダメージ表示・HP表示・照�
 /* 版表示 */
 {const _t=title;title=function(){_t();const v=$('#verL');if(v)v.textContent=VER24;};const v=$('#verL');if(v)v.textContent=VER24;}
 try{document.title='アストラル・ブレイカー '+VER24;}catch(e){}
-return{TIER,HK24,FS24,placeHL,renderHL0:()=>renderHL(),pop24,dmgPop,wordPop,tagPop,PM,PRI,clearPops,renderHL,renderBP,heroSheet,boxOf,bounds,stress,dev24,HL};})();
+return{actEnd,TIER,HK24,FS24,placeHL,renderHL0:()=>renderHL(),pop24,dmgPop,wordPop,tagPop,PM,PRI,clearPops,renderHL,renderBP,heroSheet,boxOf,bounds,stress,dev24,HL};})();

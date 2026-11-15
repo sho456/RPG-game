@@ -34,10 +34,26 @@
 .elh.e0 b,.elh.e1 b,.elh.e2 b{--c:#dfe5f2;--g:rgba(200,215,240,.45)}
 .elh.e3 b{--c:#ff8a3c;--g:rgba(255,110,40,.7)}.elh.e4 b{--c:#6fd8ff;--g:rgba(80,200,255,.7)}.elh.e5 b{--c:#ffe14a;--g:rgba(255,220,40,.7)}
 .elh.e6 b{--c:#fff0b0;--g:rgba(255,230,150,.8)}.elh.e7 b{--c:#b98aff;--g:rgba(170,110,255,.75)}
-/* キャラ詳細の耐性欄 */
+/* ver0.45 属性マーク＋耐性（ELR.chip）：六角の枠の色と下の山形で弱点（赤︿）・耐性（青﹀）を示す。数値は山形の横 */
+.elx{display:inline-flex;flex-direction:column;align-items:center;font-style:normal;line-height:1;gap:1px}
+.elx>u{display:flex;align-items:center;gap:1px;min-height:9px;text-decoration:none;font:900 10px/1 sans-serif}
+.elx>u s{text-decoration:none;font:800 12px/1 "M PLUS 1p",sans-serif;color:#9aa0b8}
+.elx.sw .elh{background:linear-gradient(160deg,#ffb4a8,#e0302a 45%,#7a0c0c 55%,#ff7a62);filter:drop-shadow(0 0 3px rgba(255,60,40,.65))}
+.elx.sr .elh{background:linear-gradient(160deg,#c8e4ff,#2f78e0 45%,#0c2a7a 55%,#7ab4ff);filter:drop-shadow(0 0 3px rgba(60,140,255,.65))}
+.elx.sw>u{color:#ff5040;text-shadow:0 0 3px rgba(255,60,40,.8)}.elx.sr>u{color:#4aa0ff;text-shadow:0 0 3px rgba(60,140,255,.8)}
+.elx.sw>u s{color:#ff7a6a}.elx.sr>u s{color:#8cc4ff}
+.elx.tm .elh{opacity:.8}
+/* 装備の詳細・キャラ詳細の並び */
+.eqi .ei-g4{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;justify-items:center}
+.eqi .ei-g4 .elh{width:30px;height:33px}.eqi .ei-g4 .elh b{font-size:17px}
 .elr{margin-top:6px;padding:5px 6px;border-radius:4px;background:rgba(16,20,48,.6);border:1px solid #3a4068}
-.elr-t{font-size:11px;color:#9fb0e0;margin-bottom:3px}
-.elr-g{display:grid;grid-template-columns:repeat(4,1fr);gap:4px 2px}
-.elr-g span{display:flex;align-items:center;justify-content:center;gap:3px}.elr-g .elh{width:22px;height:25px}.elr-g .elh b{font-size:13px}
-.elr-g b.p,.eqi b.p{color:#6fb8ff}.elr-g b.n,.eqi b.n{color:#ff6a6a}.elr-g b.z,.eqi b.z{color:#777c90}
-.elr-g span>b{font-size:12px;font-weight:800}
+.elr-t{font-size:11px;color:#9fb0e0;margin-bottom:4px}.elr-t small{font-size:10px;color:#6f7aa6;margin-left:6px}
+.elr-g{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;justify-items:center}
+.elr-g .elh{width:26px;height:29px}.elr-g .elh b{font-size:15px}
+/* 戦闘の上の帯：小さな六角＋山形（数値なし） */
+.b22tg .wk .elx .elh{width:19px;height:21px}.b22tg .wk .elx .elh b{font-size:11px;inset:1.5px}
+.b22tg .wk .elx>u{min-height:7px;font-size:9px;margin-top:-1px}
+.b22tg .wk .elx{margin-right:1px}
+.b22tg .wk .elx.sw{animation:wk45 1.1s ease-in-out infinite alternate}
+@keyframes wk45{from{filter:brightness(1)}to{filter:brightness(1.35)}}
+.eqi .ei-ab small b.kw{display:inline;font-size:inherit;color:#6dff9a}

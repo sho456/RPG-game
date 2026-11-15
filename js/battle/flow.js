@@ -27,10 +27,12 @@ function place(){if(!BUB)return;const cv=$('#cv');if(!cv||!BUB.el.isConnected){B
 function close(now){if(!BUB)return;const el=BUB.el;BUB=null;if(now){el.remove();return;}el.classList.add('out');setTimeout(()=>el.remove(),220);}
 
 /* ---------- 2. 暗転・吹き出しを行動の間だけ ---------- */
-{const _da=doAction;doAction=async function(u,sk,t){const on=inB()&&!plain(sk)&&!(B.opts&&B.opts.viewer&&B.opts.noDim);
+/* 行動の番号（AID）：ダメージ表示（js/v24.js dmgPop）は同じ行動のヒットを 1 つにまとめ、行動の間は数字を残す */
+let AID=0,BUSY=0;
+{const _da=doAction;doAction=async function(u,sk,t){const on=inB()&&!plain(sk)&&!(B.opts&&B.opts.viewer&&B.opts.noDim);const id=++AID;BUSY++;
   if(on){try{BX.dim(.42,200);}catch(e){}}
   try{return await _da.apply(this,arguments);}
-  finally{if(on){try{BX.dim(0,280);}catch(e){}}close();}};}
+  finally{BUSY=Math.max(0,BUSY-1);if(on){try{BX.dim(0,280);}catch(e){}}close();try{V24.actEnd(id);}catch(e){}}};}
 
 /* ---------- 3〜5. 技・術の共通の演出（専用の演出が無い技） ---------- */
 const EL=s=>s&&s.el||'斬';
@@ -60,7 +62,12 @@ const MAG={kind:'cast',big:1,pre:{ms:460,do:[[0,'pose',{f:'cast'},180],[0,'fx','
 function regAll(){try{for(const id in HB){if(!BXS.REG[id+':cat:phys_attack'])BXS.def(id+':cat:phys_attack',ATK);if(!BXS.REG[id+':cat:mag_attack'])BXS.def(id+':cat:mag_attack',MAG);}}catch(e){console.error(e);}}
 regAll();
 
+/* ---------- 0. 戦闘開始の見出し（ロマサガRS：金の毛筆「戦闘開始」が横に流れて消える。ver0.45） ---------- */
+function startBanner(){const st=$('#stage');if(!st||!inB()||(B.opts&&B.opts.viewer))return;const o=document.createElement('div');o.className='bs45';o.innerHTML='<b>戦闘開始</b>';st.appendChild(o);
+ setTimeout(()=>o.remove(),Math.round(1300*(ANIM.SP?ANIM.SP():1)));}
+{const _sb=startBattle;startBattle=function(list,opts){const r=_sb.apply(this,arguments);try{if(!(opts&&opts.viewer)&&!(opts&&opts.noStartBanner))setTimeout(startBanner,120);}catch(e){}return r;};}
+
 /* ---------- 毎フレーム：吹き出しをキャラに合わせる ---------- */
 {const _d=draw;draw=function(){_d();if(BUB){if(!inB())close(true);else place();}};}
 {const _sh=show;show=function(m){_sh(m);if(m!=='battle')close(true);};}
-return{bubble,close,PHYS,BOW,MAG};})();
+return{bubble,close,PHYS,BOW,MAG,aid:()=>AID,busy:()=>BUSY>0};})();

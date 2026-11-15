@@ -105,9 +105,11 @@ document.addEventListener('click',e=>{const od=e.target.closest('#bp24 .od');if(
  ・大きさ：回復の数字＞効果の文字。端末の倍率に比例し、上限・下限つき
  ダメージ・Critical・Weak・Guard・Miss・BREAK は ver0.24 の配置（キャラを避ける）のまま */
 const FXS={
- buff:{font:'jp',fill:[[0,'#ffffff'],[.45,'#d4f0ff'],[.6,'#7cc8ff'],[1,'#2a86e8']],ow:.17,oc:'#04163a',sh:[.03,.06,'rgba(0,0,0,.55)']},
- debuff:{font:'jp',fill:[[0,'#ffffff'],[.45,'#ffd8de'],[.6,'#ff7a90'],[1,'#e01e44']],ow:.17,oc:'#3a0412',sh:[.03,.06,'rgba(0,0,0,.55)']},
- ail:{font:'jp',fill:[[0,'#ffffff'],[.45,'#f2deff'],[.6,'#cf96ff'],[1,'#9a48e8']],ow:.17,oc:'#20063a',sh:[.03,.06,'rgba(0,0,0,.55)']},
+ /* ver0.45：ロマサガRS のように、細い縁の小さな文字（強化＝水色・弱体＝桃・状態異常＝紫）。箱のように見えないよう縁を細く */
+ buff:{font:'jp',fill:[[0,'#f4fdff'],[.5,'#c6f2ff'],[1,'#6fd6ff']],ow:.11,oc:'#06223a',sh:[.02,.05,'rgba(0,0,0,.6)']},
+ debuff:{font:'jp',fill:[[0,'#fff4f6'],[.5,'#ffc4cf'],[1,'#ff6e88']],ow:.11,oc:'#3a0412',sh:[.02,.05,'rgba(0,0,0,.6)']},
+ ail:{font:'jp',fill:[[0,'#fbf2ff'],[.5,'#e6c8ff'],[1,'#c08cff']],ow:.11,oc:'#20063a',sh:[.02,.05,'rgba(0,0,0,.6)']},
+ ab:{font:'jp',fill:[[0,'#ffffff'],[1,'#e8ecf6']],ow:.12,oc:'#05070e',sh:[.02,.05,'rgba(0,0,0,.7)']},
  heal:{font:'num',fill:[[0,'#f4fff6'],[.44,'#c8ffd4'],[.56,'#5ee888'],[1,'#14a84a']],ow:.15,oc:'#03260f',sh:[.04,.07,'rgba(0,0,0,.55)']},
  res:{font:'num',fill:[[0,'#fffbe6'],[.45,'#ffeea0'],[.56,'#ffd040'],[1,'#e09410']],ow:.15,oc:'#2a1600',sh:[.04,.07,'rgba(0,0,0,.55)']},
  info:{font:'num',fill:[[0,'#ffffff'],[.5,'#f0f4ff'],[1,'#b8c6e6']],ow:.16,oc:'#0a1228',sh:[.04,.07,'rgba(0,0,0,.55)']},
@@ -115,6 +117,7 @@ const FXS={
 for(const k in FXS)TX24.STYLE['fx25'+k]=FXS[k];
 const KJ=/[぀-ヿ一-鿿]/;
 function fxKind(s,col,kind){const c=String(col||'').toLowerCase(),k=kind||'';
+ if(/\bab\b/.test(k))return 'ab';
  if(/^\+\d+$/.test(s))return c==='#ffe27a'?'res':'heal';
  if(/^(SP|AG|BP|HP)\s*[+＋]/.test(s)||/ゲージ/.test(s))return 'res';
  if(/[↑▲]|UP\b/.test(s))return 'buff';
@@ -123,7 +126,7 @@ function fxKind(s,col,kind){const c=String(col||'').toLowerCase(),k=kind||'';
  if(/\bdn\b/.test(k))return 'ail';
  if(/毒|スタン|麻痺|眠|混乱|沈黙|暗闇|石化|挑発/.test(s))return 'ail';
  return 'info';}
-const fxSz=()=>({t:Math.round(clamp(SC*6.6,13,15)),n:Math.round(clamp(SC*8.2,16,19))});
+const fxSz=()=>({t:Math.round(clamp(SC*5.8,12,14)),n:Math.round(clamp(SC*8.2,16,19))});
 function fxLayer(){let L=$('#fx25');if(!L||!L.isConnected){L=document.createElement('div');L.id='fx25';stage().appendChild(L);}return L;}
 /* キャラごとの積み上げ枠（体の中央に固定） */
 function fxStack(u){const L=fxLayer();let S=u._fx25;if(!S||!S.isConnected){S=document.createElement('div');S.className='fs25';L.appendChild(S);u._fx25=S;}
@@ -136,13 +139,17 @@ function fxAvoid(S){const b=S._b;if(!b||!V24.PM)return;const st=$('#stage').getB
   V24.PM.live.forEach(p=>{if(p.R&&!p.gone)c+=Math.max(0,Math.min(R.r,p.R.r)-Math.max(R.l,p.R.l))*Math.max(0,Math.min(R.b,p.R.b)-Math.max(R.t,p.R.t))/Math.max(1,(R.r-R.l)*(R.b-R.t))*100;});
   if(!best||c<best.c)best={c,dx,dy};if(c<.8)break;}
  S.style.transform=`translate(${Math.round(clamp(b.cx+best.dx,30,W0-30))}px,${Math.round(b.y+best.dy)}px)`;}
-function fxPop(u,s,col,kind){const k=fxKind(s,col,kind),z=fxSz(),S=fxStack(u),row=document.createElement('div');row.className='fl25 '+k;
- let txt=s.replace(/[↑▲]/g,'').replace(/[↓▼]/g,'').trim();
+/* ver0.45：強化・弱体・状態異常は「攻撃↑ 魔力↑」のように 1 行に横並び（同じ種類がほぼ同時に出たら同じ行に足す。1 行に 3 つまで）。
+   アビリティの発動（kind に ab）は白い小さな名前。回復・BP は緑・金の数字 */
+function fxPop(u,s,col,kind){const k=fxKind(s,col,kind),z=fxSz(),S=fxStack(u),t=performance.now();
+ let txt=s.replace(/▲/g,'↑').replace(/▼/g,'↓').trim();
+ if((k==='buff'||k==='debuff')&&!/[↑↓]/.test(txt)&&/^[^\d]+$/.test(txt)&&!/解除|弱点/.test(txt))txt+=k==='buff'?'↑':'↓';
  const num=k==='heal'||(k==='res'&&!KJ.test(txt)),sk='fx25'+(k==='info'&&KJ.test(txt)?'infoJ':(k==='info'?'info':k));
- const sz=k==='heal'?z.n:num?Math.round(z.n*.86):z.t;
- /* 強化・弱体は文字の前に▲▼の記号（形でも区別できるように） */
- if(k==='buff'||k==='debuff'){const ic=document.createElement('i');ic.className='ar25';row.appendChild(ic);}
- row.appendChild(num?TX24.row(txt,sk,sz):TX24.el(txt,KJ.test(txt)?sk:sk.replace('infoJ','info'),sz));
+ const sz=k==='heal'?z.n:num?Math.round(z.n*.86):k==='ab'?Math.round(z.t*.95):z.t;
+ const el=num?TX24.row(txt,sk,sz):TX24.el(txt,KJ.test(txt)?sk:sk.replace('infoJ','info'),sz);
+ const last=S.lastElementChild;
+ if(last&&last._k===k&&['buff','debuff','ail'].includes(k)&&t-last._t<450&&last._n<3){last._n++;el.style.marginLeft=Math.round(sz*.35)+'px';last.appendChild(el);fxAvoid(S);return;}
+ const row=document.createElement('div');row.className='fl25 '+k;row._k=k;row._t=t;row._n=1;row.appendChild(el);
  S.appendChild(row);while(S.children.length>3)S.firstChild.remove();fxAvoid(S);
  const life=Math.round((k==='heal'?1250:1150)*(speed>=4?.7:speed>=2?.85:1));
  setTimeout(()=>{row.classList.add('out');setTimeout(()=>{row.remove();if(S.isConnected&&!S.children.length){S.remove();if(u._fx25===S)u._fx25=null;}},260);},life);}

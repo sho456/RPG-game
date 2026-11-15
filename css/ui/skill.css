@@ -52,3 +52,15 @@
 .ab44 .abh b{flex:1;font:700 20px/1.3 var(--cmd,serif);color:#fff}
 .ab44 .abh em{font-style:normal;font-size:13px;color:#ffb86b}
 .ab44 .dsc ul{margin:0;padding-left:1.2em;color:#f4efe6;font-size:13px;line-height:1.7}
+
+/* ver0.45 アビリティの詳細：次の段階・段階Ⅲの固有名の特殊効果【…】 */
+.ab44 .nx45{margin-top:8px;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,.04);border:1px dashed rgba(255,184,107,.35)}
+.ab44 .nx45 em{font-style:normal;font-size:11px;color:#ffb86b;letter-spacing:.1em}
+.ab44 .nx45 ul{color:#cfc8bc;font-size:12px}
+.ab44 .sp45{margin-top:10px;padding:8px 10px 9px;border-radius:10px;background:linear-gradient(90deg,rgba(40,120,70,.28),rgba(20,60,40,.12));border:1px solid rgba(110,240,160,.45);opacity:.6}
+.ab44 .sp45.on{opacity:1;box-shadow:0 0 12px rgba(80,255,150,.18) inset}
+.ab44 .sp45 .t{display:flex;align-items:center;gap:8px;font-size:15px}
+.ab44 .sp45 .t em{font-style:normal;font-size:10px;padding:1px 6px;border-radius:4px;background:#2c8a52;color:#eafff0;letter-spacing:.08em}
+.ab44 .sp45 .t small{margin-left:auto;font-size:11px;color:#9cb8a8}
+.ab44 .sp45 p{margin:4px 0 0;font-size:13px;line-height:1.6;color:#eafff0}
+.sk41.tapi{cursor:pointer}.sk41.tapi:active{filter:brightness(1.2)}

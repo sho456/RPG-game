@@ -39,7 +39,7 @@ function cnd(c,a,t,sk,r){if(!c||c==='any')return true;
   case'debuffed':return!!t&&hasDebuff(t);
   case'allyaw':return!!B&&B.heroes.some(h=>h!==a&&h.aw&&h.alive);case'aw':return!!a.aw;
   case'altel':return!!(sk&&sk.k==='mag'&&sk.el&&a._rsLe&&a._rsLe!==sk.el);
-  case'crit':return!!(r&&r.crit);}
+  case'crit':return!!(r&&r.crit);case'r1':return!!(B&&B.rs&&B.rs.round===1);}
  return false;}
 /* 旧来のパッシブ（武器・レジェンド装備）のイベントを呼ぶ（V20 の each と同じ） */
 function psEach(u,ev,...a){for(const p of(u.ps20||[])){const P=V20.PS[p.id];if(P&&P[ev]){try{P[ev](u,...a,p.v);}catch(e){console.error(e);}}}}
@@ -65,11 +65,11 @@ function lpGuard(){if(!B)return;for(const h of B.heroes)if(h.alive&&(h.lp||0)<=0
   if(a.side===0){m*=1+sumE(a,'dmg',e=>cnd(e.c,a,t,sk,r))/100;
    for(const e of effs(a))if(e.t==='stack'){const n=e.c==='same'?(a._rsSameT===t?a._rsSameN||0:0):(a._rsHeat||0);m*=1+Math.min(e.max||5,n)*e.v/100;}
    const rg=effs(a).find(e=>e.t==='rage');if(rg)m*=1+Math.min(rg.max||5,a._rsRage||0)*rg.v/100;
-   for(const h of B.heroes)if(h!==a&&h.alive)m*=1+sumE(h,'allydmg')/100;
+   for(const h of B.heroes)if(h!==a&&h.alive)m*=1+sumE(h,'allydmg',e=>cnd(e.c,h,t,sk))/100;
    if(r.crit){const cd=sumE(a,'critd');if(cd)m*=1+cd/150;}
    const cur=B.rs.cur;if(cur&&cur.u===a)m*=cur.mul;
    if(sk.ougi)m*=(1+(a.ougiUp||0)/100)*(a.legs&&a.legs.includes('futago')?1.3:1);}
-  if(t.side===0){const cut=sumE(t,'cut',e=>cnd(e.c,t,a,sk));m*=Math.max(.2,1-cut/100);}
+  if(t.side===0){const cut=sumE(t,'cut',e=>cnd(e.c,t,a,sk))+B.heroes.reduce((x,h)=>x+(h.alive?sumE(h,'allycut'):0),0);m*=Math.max(.2,1-cut/100);}
   /* 属性耐性（装備の合計。js/data/resist.js）：耐性 1 で 1% 軽減、弱点（マイナス）は増加。味方が受けるときだけ */
   if(t.side===0&&a&&a.side===1&&sk.el)m*=ELR.mul(t.id,sk.el);
   if(m!==1)r.d=Math.max(1,Math.round(r.d*m));}catch(e){console.error(e);}
@@ -79,9 +79,9 @@ function lpGuard(){if(!B)return;for(const h of B.heroes)if(h.alive&&(h.lp||0)<=0
  const d=await _hit(a,t,sk);if(B!==myB||!B.rs)return d;
  try{const r=B.rs.lastR||{};
   if(a.side===0&&t.side===1){const cur=B.rs.cur;
-   if(r.weak&&cur)cur.weak=true;
+   if(r.weak&&cur)cur.weak=true;if(r.crit&&cur)cur.crit=true;
    if(!sk._fu&&cur&&cur.u===a&&!cur.hitSet.has(t)){cur.hitSet.add(t);onHit(a,t,sk,r);}
-   if(d>0){const dr=sumE(a,'drain');if(dr&&a.alive&&a.hp<a.mhp){const v=Math.max(1,Math.round(d*dr/100));a.hp=Math.min(a.mhp,a.hp+v);}}
+   if(d>0){const dr=sumE(a,'drain',e=>cnd(e.c,a,t,sk));if(dr&&a.alive&&a.hp<a.mhp){const v=Math.max(1,Math.round(d*dr/100));a.hp=Math.min(a.mhp,a.hp+v);}}
    if(was&&!t.alive)onKill(a,t);}
   /* LP を直接削る敵の攻撃 */
   if(a.side===1&&t.side===0&&sk&&sk.lp&&!B.rs.missed)lpLose(t,sk.lp,`「${sk.n}」で命が削られた`);
@@ -94,13 +94,14 @@ function onHit(a,t,sk,r){if(!t.alive)return;
 function onKill(a,t){for(const e of effs(a))if(e.t==='kill'){if(e.bp)a._rsBpGain=(a._rsBpGain||0)+e.bp;if(e.hp&&a.alive){const v=Math.round(a.mhp*e.hp/100);a.hp=Math.min(a.mhp,a.hp+v);pop(a,'+'+v,'#7dffa8',true);}}}
 {const _h=hurt;hurt=function(t,d){if(!B||!B.rs||!t)return _h(t,d);const a=B._atk20,sk=B._sk20;
  /* 命中判定（技は器用さ・素早さ、術は知力 対 精神） */
- if(t.alive&&d>0&&a&&a.side!==t.side&&sk&&isDmg(sk)&&!sk._fu&&!sk.fixedK&&sk.k!=='pct'){const p=C.hitRate(a,t,sk);if(Math.random()>p){B.rs.missed=true;setTimeout(()=>pop(t,'MISS','#ffffff',true),50);return 0;}}
- if(t.side===0&&t.alive&&d>0&&a&&a.side===1){const dg=sumE(t,'dodge',e=>cnd(e.c,t,a,sk));if(dg>0&&Math.random()*100<dg){B.rs.missed=true;setTimeout(()=>pop(t,'MISS','#ffffff',true),50);return 0;}}
+ if(t.alive&&d>0&&a&&a.side!==t.side&&sk&&isDmg(sk)&&!sk._fu&&!sk.fixedK&&sk.k!=='pct'){const p=C.hitRate(a,t,sk)*((a.sts||[]).some(s=>s.k==='blind')?.7:1);if(Math.random()>p){B.rs.missed=true;setTimeout(()=>pop(t,'MISS','#ffffff',true),50);return 0;}}
+ if(t.side===0&&t.alive&&d>0&&a&&a.side===1){const dg=sumE(t,'dodge',e=>cnd(e.c,t,a,sk));if(dg>0&&Math.random()*100<dg){B.rs.missed=true;const ev=effs(t).find(e=>e.t==='evct');if(ev&&a.alive&&sk&&!sk._fu)B.rs.cq.push({a:t,t:a,pow:ev.v||.8,nm:ev.src});setTimeout(()=>pop(t,'MISS','#ffffff',true),50);return 0;}}
  const r=_h(t,d);
  try{if(t.side===0&&r>0){
-   if(t.hp<=0&&!t._rsGuts&&sumE(t,'guts')>0&&t.alive){t._rsGuts=1;t.hp=1;setTimeout(()=>pop(t,'こらえた！','#ffe27a',true),80);}
+   if(t.hp<=0&&!t._rsGuts&&sumE(t,'guts')>0&&t.alive){t._rsGuts=1;t.hp=1;setTimeout(()=>pop(t,'こらえた！','#ffe27a',true),80);for(const e of effs(t))if(e.t==='gutsbuff')V20.addSt(t,e.k,e.v,3);}
+   if(t.alive&&t.hp>0&&t.hp<=t.mhp*.5&&!t._rsHB){const hb=effs(t).find(e=>e.t==='hpbuff');if(hb){t._rsHB=1;setTimeout(()=>{try{abPop(t,hb.src);V20.addSt(t,'atk',hb.v,3);V20.addSt(t,'def',hb.v,3);}catch(x){}},120);}}
    const rg=effs(t).find(e=>e.t==='rage');if(rg&&t.alive)t._rsRage=Math.min(rg.max||5,(t._rsRage||0)+1);
-   if(a&&a.side===1&&a.alive&&t.hp>0&&sk&&sk.t==='one'&&!sk._fu)for(const e of effs(t))if(e.t==='counter'&&Math.random()<(e.p||0)){B.rs.cq.push({a:t,t:a,pow:e.pow||1});break;}}}catch(e){console.error(e);}
+   if(a&&a.side===1&&a.alive&&t.hp>0&&sk&&sk.t==='one'&&!sk._fu)for(const e of effs(t))if(e.t==='counter'&&Math.random()<(e.p||0)){B.rs.cq.push({a:t,t:a,pow:Math.max(e.pow||1,...effs(t).filter(x=>x.t==='ctpow').map(x=>x.v))});break;}}}catch(e){console.error(e);}
  return r;};}
 /* 気絶：LP-1（気絶中にさらに攻撃を受けたときも） */
 {const _k=kill;kill=async function(t){const was=t&&t.alive;await _k(t);try{if(B&&B.rs&&t&&t.side===0&&!t.alive){
@@ -109,13 +110,19 @@ function onKill(a,t){for(const e of effs(a))if(e.t==='kill'){if(e.bp)a._rsBpGain
 async function strikeBack(a,t,nm,pow,el){if(!a.alive||!B)return;let tg=t&&t.alive?t:aliveE().sort((x,y)=>x.hp-y.hp)[0];if(!tg)return;
  pop(a,nm,'#ffe27a',true,'st20 fu');await wait(140);try{const[x,y]=V19.mid(tg);FX19.slash(x,y,ELC[el]||'#ffffff',{size:1});}catch(e){}
  await hit(a,tg,{n:nm,el:el||a.atkEl||a.elem||'斬',k:MAG(a.id)?'mag':'phys',pow,t:'one',_fu:1});await wait(160);}
-async function drainCounters(){const q=B&&B.rs?B.rs.cq:[];let n=0;while(q.length&&n<4&&B&&!B.over&&aliveE().length){const c=q.shift();n++;if(!c.a.alive||!c.t.alive)continue;await strikeBack(c.a,c.t,'反撃',c.pow);}if(B&&B.rs)B.rs.cq=[];}
+async function drainCounters(){const q=B&&B.rs?B.rs.cq:[];let n=0;while(q.length&&n<4&&B&&!B.over&&aliveE().length){const c=q.shift();n++;if(!c.a.alive||!c.t.alive)continue;await strikeBack(c.a,c.t,c.nm||'反撃',c.pow);
+  for(const e of effs(c.a))if(e.t==='ctst'&&c.t.alive&&Math.random()<C.ailP(c.a,c.t,{k:e.k,p:e.v})){abPop(c.a,e.src);V20.addSt(c.t,e.k,1,1);}}if(B&&B.rs)B.rs.cq=[];}
 
 /* ==================== 敵の狙い ==================== */
 pickHero=function(){const hs=aliveH();const g=hs.find(h=>h.id==='gald'&&h.aw);if(g)return g;
  /* 追い打ち：まれに、倒れている味方（LP が残っている）を狙う */
  const down=B&&B.rs?B.heroes.filter(h=>!h.alive&&(h.lp||0)>0):[];if(down.length&&hs.length&&Math.random()<.1)return down[Math.random()*down.length|0];
- const w=hs.map(h=>1+(h.taunt>0?6:0)+sumE(h,'taunt')*1.5);let r=Math.random()*w.reduce((a,b)=>a+b,0);for(let i=0;i<hs.length;i++){if((r-=w[i])<0)return hs[i];}return hs[0];};
+ const w=hs.map(h=>1+(h.taunt>0?6:0)+sumE(h,'taunt')*1.5);let r=Math.random()*w.reduce((a,b)=>a+b,0),pk=hs[0];for(let i=0;i<hs.length;i++){if((r-=w[i])<0){pk=hs[i];break;}}
+ return cover(pk);};
+/* かばう：HPが半分以下の味方への単体攻撃を、かばうアビリティを持つ仲間が受ける */
+function cover(pk){try{if(!pk||pk.hp>pk.mhp*.5)return pk;for(const h of aliveH()){if(h===pk||h.hp<h.mhp*.3)continue;const c=sumE(h,'cover');if(c>0&&Math.random()<c){abPop(h,(effs(h).find(e=>e.t==='cover')||{}).src||'かばう');return h;}}}catch(e){console.error(e);}return pk;}
+/* アビリティの発動：キャラの足元に名前を小さく出す（ロマサガRS の「アビリティ名」の出方） */
+function abPop(u,n){try{pop(u,n,'#ffffff',true,'st20 ab');}catch(e){}}
 
 /* ==================== 星臨 ==================== */
 {const _aw=awaken;awaken=async function(u){const res=B&&B.res;if(B)B.res=null;/* ヴァルクの旧仕様（自動行動）を止める */
@@ -124,6 +131,7 @@ pickHero=function(){const hs=aliveH();const g=hs.find(h=>h.id==='gald'&&h.aw);if
  const X=D.AWX[u.id];
  try{for(const e of C.awEffects(u.id))if(e.t==='onaw'){const tg=e.on==='enemies'?aliveE():e.on==='allies'?aliveH():[u];tg.forEach(x=>V20.addSt(x,e.k,e.v,e.d));}
   if(u.id==='shion')aliveE().forEach(e=>{e._rsLate=1;});
+  for(const h of aliveH())if(h!==u&&!h.aw){const v=sumE(h,'agshare');if(v){h.ag=Math.min(100,(h.ag||0)+v);abPop(h,(effs(h).find(e=>e.t==='agshare')||{}).src);}}
   if(X)log(`<b>${u.name}、星臨――「${AW[u.id].name}」</b>　奥義「${SK[X.ou].n}」が使える`);}catch(e){console.error(e);}
  refresh();};}
 const awLeft=u=>Math.max(0,awN(u)-(u.awT||0));
@@ -148,6 +156,9 @@ function roundStart(){const R=B.rs.round;
  for(const h of aliveH()){h.bpMax=(h.bpMax0||h.bpMax)+0;
   if(R>1)h.sp=clamp(h.sp+bpReg(h),0,h.bpMax);
   if(DEV())h.sp=h.bpMax;}
+ for(const h of aliveH())for(const e of effs(h)){
+  if(e.t==='tstart'){const tg=e.on==='allies'?aliveH():[h];for(const x of tg)V20.addSt(x,e.k,e.k==='shield'?Math.round(x.mhp*e.v/100):e.v,e.k==='shield'?99:2);}
+  if(e.t==='autorev'&&!h._rsAR){const d=B.heroes.find(x=>!x.alive&&(x.lp||0)>0);if(d){h._rsAR=1;d.alive=true;d.hp=Math.max(1,Math.round(d.mhp*e.v/100));abPop(h,e.src);setTimeout(()=>{try{pop(d,'REVIVE','#7dffa8',true);setCT(d);}catch(x){}},200);log(`${h.name}の「${e.src}」――${d.name}が立ち上がった`);}}}
  if(R>1)for(const h of aliveH()){for(const e of effs(h)){
    if(e.t==='regen'){const tg=e.on==='allies'?aliveH():e.on==='lowest'?[aliveH().filter(x=>x.hp<x.mhp).sort((a,b)=>a.hp/a.mhp-b.hp/b.mhp)[0]].filter(Boolean):[h];
     /* 回復アビリティ：持ち主の魅力と、受ける側の魅力で量が変わる */
@@ -159,7 +170,7 @@ function roundEnd(){for(const h of B.heroes){if(h.taunt>0)h.taunt--;
  refresh();}
 /* 行動順 */
 function buildOrder(cmds){const L=[],hs=aliveH(),avg=hs.reduce((a,h)=>a+spdOf(h),0)/Math.max(1,hs.length);
- for(const[u,c]of cmds){if(!u.alive)continue;const pr=sumE(u,'prio'),sp=c&&c.sk&&c.sk.prio?c.sk.prio*1000:0;
+ for(const[u,c]of cmds){if(!u.alive)continue;const pr=sumE(u,'prio'),sp=(c&&c.sk&&c.sk.prio?c.sk.prio*1000:0)+(B.rs.round===1&&sumE(u,'prio1')>0?5000:0);
   L.push({u,c,v:spdOf(u)*(.9+Math.random()*.2)*(1+pr/100)+sp-(u._rsLate?3000:0)});u._rsLate=0;}
  for(const e of aliveE()){const n=e.boss&&e.spd>avg*1.35?2:1;for(let k=0;k<n;k++){L.push({u:e,v:e.spd*(.9+Math.random()*.2)*(k?.55:1)-(e._rsLate?3000:0)});}e._rsLate=0;}
  return L.sort((a,b)=>b.v-a.v);}
@@ -213,6 +224,9 @@ async function heroExec(u,c){if(!c||!c.sk)return;
  lpGuard();
  if(sk.fixedK==='store')u.store=0;
  u.sp=clamp(u.sp+(u._rsBpGain||0),0,u.bpMax||D.BP.max);u._rsBpGain=0;
+ try{if(cur)for(const e of effs(u)){
+   if(e.t==='actbp'&&(e.c==='crit'?cur.crit:e.c==='weak'?cur.weak:cnd(e.c,u,t,sk))&&isDmg(sk)){u.sp=clamp(u.sp+e.v,0,u.bpMax||D.BP.max);abPop(u,e.src);setTimeout(()=>{try{pop(u,'BP+'+e.v,'#7fe0ff',true,'st20 up');}catch(x){}},160);}
+   if(e.t==='healcl')B.heroes.forEach((h,i)=>{if(h.alive&&h.hp>hp0[i]){const d=(h.sts||[]).find(s=>!V20.isBuff(s));if(d)V20.clearSt(h,x=>x===d);}});}}catch(e){console.error(e);}
  if(sk.k==='mag'&&sk.el)u._rsLe=sk.el;
  if(t&&t.side===1){if(u._rsSameT===t)u._rsSameN=(u._rsSameN||0)+1;else{u._rsSameT=t;u._rsSameN=0;}}
  /* 攻撃後の範囲効果 */
@@ -221,6 +235,8 @@ async function heroExec(u,c){if(!c||!c.sk)return;
  const hp=sumE(u,'healprot');if(hp)B.heroes.forEach((h,i)=>{if(h.alive&&h.hp>hp0[i])V20.addSt(h,'prot',hp,2);});
  /* 追撃 */
  if(isDmg(sk)&&u.alive&&aliveE().length)for(const e of effs(u))if(e.t==='fu'&&(e.c==='weak'?cur&&cur.weak:cnd(e.c,u,t,sk))&&Math.random()<(e.p||0)){await strikeBack(u,t,e.nm||e.src||'追撃',e.pow||.6,e.el);break;}
+ /* とどめ（死神の鎌など） */
+ if(isDmg(sk)&&u.alive&&t&&t.side===1&&t.alive&&!t.boss)for(const e of effs(u))if(e.t==='execute'&&cnd(e.c,u,t,sk)&&Math.random()<e.v){await strikeBack(u,t,e.src||'とどめ',99);break;}
  addProf(u,sk);refresh();}
 /* 技を実行用に整える（回復量・追加効果の成功率・連撃数・蓄積） */
 const BUFFK=new Set(['regen','prot','shield','counter','evade']);
@@ -264,7 +280,7 @@ preview=function(){if(!B||!B.rs)return[...aliveH(),...aliveE()];if(B.rs.q&&B.rs.
 /* 開始：BP・LP・陣形 */
 {const _sb=startBattle;startBattle=function(list,opts={}){const r=_sb(list,opts);try{if(B){
   B.rs={round:0,cur:null,cq:[],q:[],phase:'input',eSk:null,missed:false};
-  B.heroes.forEach((h,i)=>{C.applyForm(h,i);h.bpMax0=h.bpMax=(h.bpMax||D.BP.max)+sumE(h,'bpmax');h._rsGuts=0;h._rsRage=0;h._rsHeat=0;});
+  B.heroes.forEach((h,i)=>{C.applyForm(h,i);h.bpMax0=h.bpMax=(h.bpMax||D.BP.max)+sumE(h,'bpmax');h._rsGuts=0;h._rsRage=0;h._rsHeat=0;h._rsAR=0;h._rsHB=0;});
   B.heroes.forEach(h=>{h.sp=bpStart(h);if((h.lp||0)<=0){h.alive=false;h.hp=0;}});
   setTimeout(()=>{try{if(!B||!B.rs)return;for(const h of B.heroes){if(!h.alive)continue;for(const e of effs(h))if(e.t==='start'){const tg=e.on==='allies'?aliveH():e.on==='enemies'?aliveE():[h];
     for(const x of tg)V20.addSt(x,e.k,e.k==='shield'?Math.round(x.mhp*e.v/100):e.v,e.d||3);}h.sp=clamp(h.sp,0,h.bpMax);}refresh();}catch(e){console.error(e);}},420);}}catch(e){console.error(e);}return r;};}

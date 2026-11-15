@@ -25,7 +25,10 @@
 |---|---|---|
 | 星盤・天星盤の画面 | `js/ui/board.js`（`BOARDUI`）。盤面の描画は `ver17.js drawBoard`、天星盤のデータは `v31/board.js`（`V31B`）、ノードの置き換えは `rs/core.js` | `css/ui/board.css` |
 | 装備品の詳細（装備アイコンのタップ） | `js/ui/equip-info.js`（`EQINFO`。アイコンに `data-eqi=uid` を付けると開く） | `css/ui/equip-info.css` |
-| 属性耐性（防具の種類ごとの表・キャラの合計・被ダメージの倍率） | `js/data/resist.js`（`ELR`）。計算は `js/rs/battle.js calc` の最後で `ELR.mul` | `css/ui/equip-info.css`（`.elh`） |
+| 属性耐性（防具の種類ごとの表・キャラの合計・被ダメージの倍率）と属性の六角の印（弱点＝赤︿・耐性＝青﹀。戦闘の帯・装備・キャラ詳細で共通 `ELR.chip`） | `js/data/resist.js`（`ELR`）。計算は `js/rs/battle.js calc` の最後で `ELR.mul` | `css/ui/equip-info.css`（`.elh` `.elx`） |
+| 装備の能力影響（基礎ステータスだけ） | `js/data/equip7.js`（`EQ7`） | — |
+| アビリティ（3 段階・段階Ⅲの【固有名の特殊効果】） | データ `js/rs/abilities.js`、処理 `js/rs/battle.js`、説明文 `js/rs/core.js effTxt` | — |
+| 用語の緑のハイライト＋タップで説明 | `js/ui/keywords.js`（`KW.mark`） | `css/ui/keywords.css` |
 | 編成画面・陣形と立ち位置（`formOpen`） | `js/ui/party.js`（`V38P`） | `css/ui/party.css`（`.ps41` `.pc41` `.fe41`） |
 | キャラ詳細（能力・技・術・星臨） | 骨組み `ver17.js charHTML / equipMenu` → 技・術のアイコン `js/ui/skill-icons.js`（`SKICON`）／中身 `js/rs/ui.js`（`RSU`：`skCard` `skillsHTML`＋`tapSlot/tapSkill`（技・術セット） `abHTML`（アビリティのタブ） `skIcon`（技のアイコン） `awHTML` `st7HTML`） | `css/rs.css` `css/v38.css` |
 | 戦闘：コマンド欄（2 段階の決定・指のカーソル） | `js/rs/ui.js`（`chooseRoot`）。属性の六角マーク（弱点＝赤・耐性＝青）`elStack`、消費の表示 `costHTML` | `css/v38.css`（`.c38*`）・`css/ui/skill.css`（`.hx43` `.c43`） |
@@ -36,7 +39,7 @@
 | 戦闘：配置・スライド・HP/BP 表示 | `js/v38/battle-ui.js`（`V38B`） | `css/v38.css` |
 | 戦闘：上の帯（対象・弱点/耐性） | `js/v22.js`（`updHud`） | `css/v22.css` `v25.css` `v38.css` |
 | 戦闘の決まり（ターン・BP・LP（全員 7＝`RSD.LP_FIX`）・熟練） | `js/rs/battle.js`（`RSB`）・`js/rs/core.js`（`RSC`）・データ `js/rs/data.js`（`RSD`） | — |
-| 戦闘の行動演出の流れ（技名の吹き出し・暗転・共通の技の演出・数字・撃破） | `js/battle/flow.js`（`BFLOW`）。数字・見出しの配置は `js/v24.js dmgPop / addLabels`、書式（金属の見出し・筆の属性）は `js/ui/damage.js`、撃破の赤い崩れは `js/ver19.js dissolve` | `css/ui/battle-flow.css`・`css/ui/damage.css`（数字と見出しの動き） |
+| 戦闘の行動演出の流れ（戦闘開始・技名の吹き出し・暗転・共通の技の演出・数字・撃破） | `js/battle/flow.js`（`BFLOW`）。数字・見出しの配置は `js/v24.js dmgPop / addLabels`（連続ヒットは合計を数え上げる）、状態・アビリティ名の小さな文字は `js/v25.js fxPop`、書式（金属の見出し・筆の属性）は `js/ui/damage.js`、撃破の赤い崩れは `js/ver19.js dissolve` | `css/ui/battle-flow.css`・`css/ui/damage.css`（数字と見出しの動き） |
 | 演出・モーション（技ごとの専用演出） | `js/battle/*`（`BX*`）・`js/battle/data/fx-heroes-*.js` → スキル `rpg-hero-motion` | — |
 | 文字のフォント（全画面で統一） | 本文＝M PLUS 1p、コマンド（ボタン・技名・名前・見出し・タブ）＝Kaisei Tokumin（`css/ui/font.css` の `--cmd`）。キャンバスの数字・英字＝`js/v24-text.js FONT` | `css/ui/font.css` |
 | 用語・耐性 | `js/data/terms.js`（`TERMS`） | — |

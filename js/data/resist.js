@@ -33,10 +33,15 @@ function sum(id){const o={};ELS.forEach(e=>o[e]=0);try{const eq=(G.h[id]||{}).eq
 /* 被ダメージの倍率（属性が無い攻撃は 1） */
 function mul(id,el){if(!el||!ELS.includes(el))return 1;return Math.min(1.5,Math.max(.3,1-sum(id)[el]/100));}
 const hx=e=>`<i class="elh e${ELS.indexOf(e)}"><b>${e}</b></i>`;
-/* キャラ詳細の能力タブに出す小さな耐性欄 */
-function row(id){const s=sum(id);return`<div class="elr"><div class="elr-t">属性耐性</div><div class="elr-g">${ELS.map(e=>{const v=s[e];return`<span>${hx(e)}<b class="${v>0?'p':v<0?'n':'z'}">${v>0?'+'+v:v}</b></span>`;}).join('')}</div></div>`;}
+/* 属性の六角マーク（ver0.45：属性アイコンと耐性を 1 つに統合）。
+   st：'w'＝弱点（赤い枠・下に赤い︿）／'r'＝耐性（青い枠・下に青い﹀）／''＝ふつう。v を渡すと印の横に数値（装備・キャラの耐性値）
+   ロマサガRS の上の帯の属性マーク（弱点は赤、耐性は青の山形）と同じ見方を、戦闘の帯・装備の詳細・キャラ詳細で共通にする */
+function chip(e,st,v,cls=''){const has=v!=null;st=st!=null?st:has?(v>0?'r':v<0?'w':''):'';
+ return`<i class="elx${st?' s'+st:''}${has?' v':''}${cls?' '+cls:''}">${hx(e)}<u>${st==='w'?'︿':st==='r'?'﹀':''}${has?`<s>${v>0?'+'+v:v||'0'}</s>`:''}</u></i>`;}
+/* キャラ詳細の能力タブに出す耐性欄（8 属性の六角マーク） */
+function row(id){const s=sum(id);return`<div class="elr"><div class="elr-t">属性耐性 <small>青＝強い・赤＝弱い</small></div><div class="elr-g">${ELS.map(e=>chip(e,null,s[e])).join('')}</div></div>`;}
 /* 生成・読み込みに付ける */
 {const _g=genItem;genItem=function(){return stamp(_g.apply(this,arguments));};}
 try{const _r=royalItem;royalItem=function(){return stamp(_r.apply(this,arguments));};}catch(e){}
 {const _m=migrate;migrate=function(g){const r=_m(g);try{(G.inv||[]).concat(G.stock||[]).forEach(it=>{if(it.slot!=='w'&&!it.elres)stamp(it);});}catch(e){console.error(e);}return r;};}
-return{ELS,PROF,kind,calcOf,stamp,of,sum,mul,hx,row};})();
+return{ELS,PROF,kind,calcOf,stamp,of,sum,mul,hx,chip,row};})();

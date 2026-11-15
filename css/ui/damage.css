@@ -37,3 +37,14 @@
 .p24 .nm.old{transform:translateX(var(--odx,0)) scale(var(--sc,.9));transform-origin:50% 100%;filter:brightness(.82);opacity:.9;z-index:1;transition:transform .14s ease-out,filter .14s,opacity .14s}
 .p24 .nm.hit.old{transform:translateX(var(--dx,0)) scale(var(--sc,.9))}
 .p24 .nm.hit>canvas,.p24 .nm.hit .dg42>canvas{animation-duration:.4s}
+
+/* ver0.45 連続ヒット：数字は合計を数え上げる（1 つの数字）。数え上げのたびに少し跳ねる */
+.p24 .nm.bump{animation:bm45 .2s cubic-bezier(.2,1.6,.4,1)}
+@keyframes bm45{0%{transform:scale(1.18,1.12)}100%{transform:none}}
+.p24 .nm{transform-origin:20% 100%}
+/* 見出し（Critical・Weak・Resist・Guard）は同じ大きさ。左寄せで数字の上に積む */
+.p24.e .in{align-items:flex-start}
+.p24.e .lb{align-self:flex-start}
+/* 状態の文字（css/v25.css .fl25）：▲▼の箱をやめ、細い縁の文字を横に並べる */
+.fl25 .ar25{display:none}
+.fl25.ab{margin-top:0}

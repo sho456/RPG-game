@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.44';
+const VER='ver0.45';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,12 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　耐性・鍛冶屋・ダメージ表示を作り直しました<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　アビリティ・装備・戦闘の見せ方を作り直しました<br><small>`+
+ `・<b>アビリティ</b>：3 段階に。段階Ⅲで【固有名の特殊効果】（かばう・マヒ・暗闇・名前付きの追撃など）が付く<br>`+
+ `・<b>用語</b>：スタン・挑発・追撃などは緑の文字。タップで説明。奥義もタップで詳細<br>`+
+ `・<b>装備</b>：上がるのは基礎ステータス（HP・腕力・体力・器用さ・素早さ・知力・精神・魅力）だけに。属性の印と耐性を 1 つに<br>`+
+ `・<b>BP</b>：初期BP・毎ターンの回復を見直し。<b>戦闘</b>：連続ヒットは合計を数え上げる・Weak と Critical は同じ大きさ・「戦闘開始」</small></div>`+
+ `<div class="nt n38"><b>ver0.44</b>　耐性・鍛冶屋・ダメージ表示を作り直しました<br><small>`+
  `・<b>属性耐性</b>：防具に属性耐性が付き、種類で傾向が変わる。受けるダメージに反映。装備の詳細に耐性の欄<br>`+
  `・<b>鍛冶屋</b>：アイコンの一覧に整理。タップで選び、もう一度タップで詳細<br>`+
  `・<b>戦闘</b>：連続ヒットの数字が重ねて出る。表示どうしが被らない配置に。行動中の三角を廃止、HP・BP はターンの始めだけ<br>`+
