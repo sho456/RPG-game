@@ -5,6 +5,7 @@
  ・LP：クエストの間は引き継ぎ、灯都に戻る（全回復）と最大値に戻る
  ・オーバードライブ・連携・共鳴技・ジョブは ver0.38 で廃止（関連する処理・画面・データは削除済み） */
 'use strict';
+let ALTATK=()=>null,basicsOf=u=>[ATK(u)];
 const V38=(()=>{
 const D=RSD;
 const NORM={'炎':'熱','氷':'冷','光':'陽','闇':'陰','風':'斬','地':'打'};
@@ -33,15 +34,19 @@ if(EA.spore)EA.spore.el='陰';if(EA.mirror)EA.mirror.el='打';
 elOf=id=>(D.HERO[id]&&D.HERO[id].el)||null;
 const _ATK=ATK;
 ATK=u=>{if(!u||u.side!==0)return _ATK(u);const W=D.WPN[u.wpn]||D.WPN['剣'];
- if(W.mag||MAG(u.id))return{n:'魔弾',el:nel(u.atkEl)||elOf(u.id)||'打',k:'mag',pow:.8,t:'one',basic:true};
- return{n:'攻撃',el:u.aw&&u.id==='rio'?'陽':(nel(u.atkEl)||W.el),k:'phys',pow:1,t:'one',basic:true};};
+ if(W.mag||MAG(u.id))return{n:'魔弾',bn:u.wpn||'杖',el:nel(u.atkEl)||elOf(u.id)||'打',k:'mag',pow:.8,t:'one',basic:true};
+ return{n:'攻撃',bn:u.wpn,el:u.aw&&u.id==='rio'?'陽':(nel(u.atkEl)||W.el),k:'phys',pow:1,t:'one',basic:true};};
+/* 2 つ目の通常攻撃（クロウの鎌杖：杖の魔弾に加えて、大鎌の斬撃） */
+ALTATK=u=>{const X=u&&u.side===0&&D.HERO[u.id]&&D.HERO[u.id].alt;if(!X)return null;return{n:X.n,bn:X.bn,el:X.el,k:'phys',pow:1,t:'one',basic:true,drain:X.drain,d:X.d};};
+/* 通常攻撃の一覧 */
+basicsOf=u=>[ATK(u),ALTATK(u)].filter(Boolean);
 
 /* ---------- 属性の色（旧名の色をそのまま新しい名前へ） ---------- */
 try{for(const[o,n]of Object.entries(NORM))if(ELC[o]&&!ELC[n])ELC[n]=ELC[o];}catch(e){}
 
 /* ---------- セーブの移行 ---------- */
 const NOUN_OLD=/(竜剣|魔導書|大鎌|砂時計|双剣|大剣|手甲|爪|短剣|剣|杖|弓|斧)$/;
-function wNoun(who){const t=(D.HERO[who]||{}).w;return t==='体術'?'手甲':t;}
+function wNoun(who){const H=D.HERO[who]||{};if(H.shape)return H.shape;const t=H.w;return t==='体術'?'手甲':t;}
 function migItem(it){if(!it)return;
  if(it.slot==='w'&&it.who&&!it.leg&&!it.uq&&typeof it.name==='string'){const n=wNoun(it.who);if(n)it.name=it.name.replace(NOUN_OLD,n);}
  if(it.uq&&typeof it.name==='string'&&UQ&&UQ[it.who])it.name=UQ[it.who][0];

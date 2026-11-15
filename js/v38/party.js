@@ -9,7 +9,8 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;',
 const SL6=['w','sub','head','body','acc1','acc2'];
 const WIC={'剣':'sword','短剣':'dagger','大剣':'gsword','斧':'axe','体術':'fist','弓':'bow','杖':'staff','双剣':'dual'};
 /* 武器種のアイコン（装備アイコンの「鉄」の段を使う） */
-const wIcon=t=>{try{return IC21.render((WIC[t]||'sword')+'_鉄',0);}catch(e){return'';}};
+const wIconK=k=>{try{return IC21.render(k+'_鉄',0);}catch(e){return'';}};
+const wIcon=t=>wIconK(WIC[t]||'sword');
 /* 立ち位置の図（4 人ぶん。me＝このカードの位置） */
 function posMap(f,me,cls=''){const F=D.FORM[f];return`<div class="pm38 ${cls}">${F.p.map(([x,y],i)=>`<i class="${i===me?'me':''}" style="left:${12+x*76}%;top:${12+y*76}%">${cls?i+1:''}</i>`).join('')}</div>`;}
 /* 並び順 i の補正（主な能力値） */
@@ -19,11 +20,11 @@ let SEL=null;
 partyScreen=function(m){const P=G.party,f=C.formOf(),bench=G.members.filter(id=>!P.includes(id)),tot=P.reduce((a,id)=>a+power(id),0),sel=SEL&&G.members.includes(SEL)?SEL:(SEL=null);
  log(m||(sel?`<b>${HB[sel].name}</b>を選択中　入れ替える相手をタップ／もう一度タップで詳細`:'<b>編成</b>　カードをタップで選ぶ'));
  const eq=id=>SL6.map(sl=>{const it=G.h[id].eq[sl]&&findItem(G.h[id].eq[sl]);return it?`<img class="r${it.rar}" src="${itemIcon(it)}" alt="">`:'<i></i>';}).join('');
- const card=(id,i)=>{const h=G.h[id],lv=h.awLv||1,ec=elCol(id),wt=(D.HERO[id]||{}).w||'',ag=ptsLeft(id);
+ const card=(id,i)=>{const h=G.h[id],lv=h.awLv||1,ec=elCol(id),wt=(D.HERO[id]||{}).w||'',shp=(D.HERO[id]||{}).shape,ag=ptsLeft(id);
   return`<div class="pc38${sel===id?' sel':''}" data-a="c" data-v="${id}" style="--ec:${ec}">
    <div class="cr"><b>${ROMAN[lv]}</b></div>
    <div class="ar">${conSvg(id)}<img src="${art(id)}" alt=""><i class="no">${i+1}</i></div>
-   <div class="nm"><img src="${wIcon(wt)}" alt="${esc(wt)}"><span>${esc(HB[id].name)}</span></div>
+   <div class="nm"><img src="${shp==='大鎌'?wIconK('scythe'):wIcon(wt)}" alt="${esc(wt)}"><span>${esc(HB[id].name)}</span></div>
    <div class="pw"><small>戦闘力</small><b>${fmt(power(id))}</b><em>Lv${h.lv}</em></div>
    <div class="eq">${eq(id)}</div>
    <button class="ob${ag>0?' rdy':''}" data-a="aw" data-v="${id}" aria-label="${SEIRIN.n}"><i style="--ec:${ec}"></i><small>${ag>0?'星盤 '+ag:SEIRIN.n}</small></button>

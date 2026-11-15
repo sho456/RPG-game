@@ -37,8 +37,8 @@ const WN={
  斧:[[1,'鍛冶師の斧',{atkP:4}],[1,'戦士の斧',{mhpP:5}],[2,'溶岩の斧',{atkP:7}],[2,'巨人の斧',{defP:7}],[3,'炎帝の斧',{atkP:10}],[3,'山砕きの斧',{awDmg:16}]],
  体術:[[1,'拳士の手甲',{atkP:4}],[1,'氷の手甲',{spd:.6}],[2,'吹雪の手甲',{crit:6}],[2,'武神の手甲',{atkP:7}],[3,'氷帝の手甲',{atkP:10}],[3,'金剛の手甲',{defP:10}]],
  弓:[[1,'狩人の弓',{crit:4}],[1,'雷の弓',{weakDmg:10}],[2,'鷹目の弓',{crit:7}],[2,'迅雷の弓',{spd:.9}],[3,'天狼の弓',{weakDmg:20}],[3,'流星の弓',{atkP:9}]],
- 杖:[[1,'祈りの杖',{resP:5}],[1,'癒しの杖',{spGain:4}],[1,'熱の杖',{magP:4}],[1,'刻の杖',{spd:.6}],[1,'呪いの杖',{magP:4}],[2,'聖銀の杖',{magP:6}],[2,'天啓の杖',{startAG:14}],[2,'双極の杖',{weakDmg:14}],[2,'死神の杖',{weakDmg:14}],[2,'星の杖',{magP:7}],
-  [3,'大司教の杖',{resP:10}],[3,'星霊の杖',{magP:9}],[3,'原初の杖',{magP:10}],[3,'時の女王の杖',{spd:1.4}],[3,'葬送の杖',{magP:10}]],
+ 杖:[[1,'祈りの杖',{resP:5}],[1,'癒しの杖',{spGain:4}],[1,'熱の杖',{magP:4}],[1,'刻の杖',{spd:.6}],[2,'聖銀の杖',{magP:6}],[2,'天啓の杖',{startAG:14}],[2,'双極の杖',{weakDmg:14}],[2,'星の杖',{magP:7}],
+  [3,'大司教の杖',{resP:10}],[3,'星霊の杖',{magP:9}],[3,'原初の杖',{magP:10}],[3,'時の女王の杖',{spd:1.4}]],
  双剣:[[1,'獣の双剣',{atkP:4}],[1,'狩猟の双剣',{crit:4}],[2,'獣王の双剣',{atkP:7}],[2,'疾風の双剣',{spd:.9}],[3,'大地の双剣',{mhpP:10}],[3,'神獣の双剣',{atkP:10}]]};
 /* 終盤の系統（装備Lv60・90 から）：武器の名前は「系統＋の＋武器種」 */
 const LATEW=[[60,1,'星鉄',{dmgP:4}],[60,2,'星銀',{skDmg:10}],[90,3,'天極',{dmgP:8,critDmg:15}]];
@@ -99,9 +99,11 @@ function catPick(slot,rar,ilv){const L=CAT[slot].filter(e=>(e[4]||0)<=ilv);const
  if(rar>=1){const late=ex.filter(e=>e[4]);if(late.length&&Math.random()<.45)return pick(late);if(ex.length)return pick(ex.filter(e=>!e[4]).length?ex.filter(e=>!e[4]):ex);}
  return pick(L.filter(e=>e[0]===0));}
 function setBase(it,b,mul=1){it.base={};for(const k in b){const[a,c]=b[k];let v=(a+c*it.ilv)*mul;it.base[k]=k==='spd'?+v.toFixed(1):Math.round(v);}}
-function weaponName(it){const t=WT[it.who];if(!t||it.leg)return;const late=LATEW.filter(([lv,r])=>it.ilv>=lv&&r===it.rar);
- if(late.length&&Math.random()<.5){const[, ,nm,fx]=pick(late);it.name=nm+'の'+(t==='体術'?'手甲':t);addFx(it,fx);return;}
- const ns=(WN[t]||[]).filter(x=>x[0]===it.rar);if(!ns.length)return;const[,nm,fx]=pick(ns);it.name=nm;addFx(it,fx);for(const k in it.base)it.base[k]=Math.round(it.base[k]*(1+.04*it.rar));}
+const SHAPE={crow:'大鎌'};
+const WNS={crow:[[1,'呪いの大鎌',{magP:4}],[1,'闇夜の大鎌',{crit:4}],[2,'死神の大鎌',{weakDmg:14}],[2,'魂狩りの大鎌',{magP:7}],[3,'葬送の大鎌',{magP:10}],[3,'黄泉の大鎌',{awDmg:16}]]};/* 鎌杖の名前 *//* 武器種は杖、形は大鎌（名前の末尾） */
+function weaponName(it){const t=WT[it.who];if(!t||it.leg)return;const sh=SHAPE[it.who];const late=LATEW.filter(([lv,r])=>it.ilv>=lv&&r===it.rar);
+ if(late.length&&Math.random()<.5){const[, ,nm,fx]=pick(late);it.name=nm+'の'+(sh||(t==='体術'?'手甲':t));addFx(it,fx);return;}
+ const ns=(WNS[it.who]||WN[t]||[]).filter(x=>x[0]===it.rar);if(!ns.length)return;const[,nm,fx]=pick(ns);it.name=sh?nm.replace(/杖$/,sh):nm;addFx(it,fx);for(const k in it.base)it.base[k]=Math.round(it.base[k]*(1+.04*it.rar));}
 function inflate(it){const g=GINF(it.ilv);if(g===1)return;for(const k in it.base)it.base[k]=k==='spd'?+(it.base[k]*Math.sqrt(g)).toFixed(1):Math.round(it.base[k]*g);}
 genItem=function(ilv,minR=0,bonus=0,slot=null,rarFix=null){
  const rar=rarFix!=null?rarFix:rollRar(minR,bonus);ilv=Math.max(1,Math.round(ilv));

@@ -291,11 +291,14 @@ autoPick=function(u){if(!B||!B.rs)return{sk:ATK(u),t:aliveE()[0]};
  if(low.length&&heals.length){const s=low.length>=2?heals.find(x=>x.k!=='heal')||heals[0]:heals.find(x=>x.k==='heal')||heals[0];return{sk:s,t:low[0]};}
  const sup=sks.filter(s=>s.k==='sup20'&&!s.heal20&&!(s.fx20||[]).every(f=>f.on==='enemies'||(f.on==='self'?(u.sts||[]).some(x=>x.k===f.k):aliveH().every(h=>(h.sts||[]).some(x=>x.k===f.k)))));
  if(sup.length&&Math.random()<.3&&B.rs.round<=4)return{sk:sup[Math.random()*sup.length|0]};
- const atks=sks.filter(s=>s.k==='phys'||s.k==='mag');let best=ATK(u),bs=score(u,best,es,tgt)*.9;
+ const atks=sks.filter(s=>s.k==='phys'||s.k==='mag');
+ /* 通常攻撃が 2 つあるとき（鎌杖）：相手の防御・精神と弱点で、通る方を選ぶ */
+ const est=s=>(s.k==='mag'?st(u,'mag')*s.pow-st(tgt,'res')*.5:st(u,'atk')*s.pow-st(tgt,'def')*.5)*(known(tgt,s.el)?1.7:1);
+ let best=basicsOf(u).sort((a,b)=>est(b)-est(a))[0],bs=score(u,best,es,tgt)*.9;
  for(const s of atks){const v=score(u,s,es,tgt)-(C.costOf(u,s)>u.sp-2&&u.sp<10?.4:0);if(v>bs){bs=v;best=s;}}
  return{sk:best,t:tgt};};
 /* リピート：BP・LP が足りるときだけ */
-repOK=function(u){const L=LASTA[u.id];if(!L||!L.sk)return null;let s=L.sk;if(s.basic)return ATK(u);if(s.k==='item'||s.t==='ally'||s.ougi)return null;
+repOK=function(u){const L=LASTA[u.id];if(!L||!L.sk)return null;let s=L.sk;if(s.basic)return s.bn&&ALTATK(u)&&ALTATK(u).bn===s.bn?ALTATK(u):ATK(u);if(s.k==='item'||s.t==='ally'||s.ougi)return null;
  if(!(u.rsSet||[]).some(k=>SK[k]===s))return null;if(!usable(u,s)&&!DEV())return null;return s;};
 
 return{effs,sumE,cnd,isDmg,dying,banner,awLeft,bpStart,bpReg,buildOrder,heroExec,inputPhase,psEach,lpLose,usable};})();

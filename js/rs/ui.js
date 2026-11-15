@@ -13,10 +13,10 @@ const badge=s=>{try{return skBadge(s);}catch(e){return[s.el||'無','#c8c8e0'];}}
 const tyOf=s=>s.basic?(s.k==='mag'?'術':'技'):s.ougi?'奥義':s.k==='item'?'道具':s.ty||(s.k==='mag'?'術':'技');
 const tyCls=s=>s.ougi?'aw':s.k==='item'?'it':/heal|revive/i.test(s.k||'')||s.heal20||s.role==='heal'?'hl':s.k==='sup20'||s.k==='rewind'?'sp':tyOf(s)==='術'?'mg':'ph';
 const wpOf=u=>(u&&(u.wpn||(stats(u.id||u)||{}).rsW))||'剣';
-const basicName=u=>`通常攻撃（${wpOf(u)}）`;
+const basicName=(u,sk)=>`通常攻撃（${(sk&&sk.bn)||wpOf(u)}）`;
 
 /* ==================== 技の詳細 ==================== */
-function info(sk,u){const id=u&&(u.id||u),s=sk.basic?Object.assign({},sk,{n:basicName(u),d:D.WPN[wpOf(u)]&&D.WPN[wpOf(u)].mag?'BPを使わない基本の攻撃。杖は知力で魔弾を放つ':'BPを使わない基本の攻撃。武器の属性で攻撃する'}):sk,[el,ec]=badge(s),k=C.keyOf(sk);
+function info(sk,u){const id=u&&(u.id||u),s=sk.basic?Object.assign({},sk,{n:basicName(u,sk),d:sk.d||(sk.k==='mag'?'BPを使わない基本の攻撃。杖は知力で魔弾を放つ':'BPを使わない基本の攻撃。武器の属性で攻撃する')}):sk,[el,ec]=badge(s),k=C.keyOf(sk);
  const cost=s.basic?'0':s.ougi?'0（星臨中に1度だけ）':s.k==='item'?'―':u&&u.side===0?C.costOf(u,s):s.bp,pl=id&&k&&D.NEW[k]?C.profLv(id,k):null,lp=C.lpCost(s);
  const tgt=D.TGT[s.t]||(s.t==='ally'?'味方1人':'―');
  ovOpen(`<div class="inf22 rs37i" style="--ec:${ec}"><div class="ih">${hx(el,ec)}<b>${esc(s.n||'')}</b><span class="tg ${tyCls(s)}">${tyOf(s)}</span></div>
@@ -52,7 +52,7 @@ chooseRoot=function(u,ctx={}){const idx=ctx.idx||0,tot=ctx.n||1;
    sub={t:`${esc(sk.n||ITEMS[sk.id].n)}　誰に？`,rows:pool.map(t=>({face:t.id,n:t.name,d:t.alive?`HP ${t.hp}/${t.mhp}`:`気絶（LP ${t.lp}）`,cost:t.alive?'':'復活',now:1,f:()=>fin(sk,t)}))};draw();};
   const rows=()=>{if(sub)return sub.rows;const o=[];
    if(u.aw){const ok=SK[(D.AWX[u.id]||{}).ou];if(ok){const[e,c]=badge(ok),used=!!u._rsOugi,noSnap=ok.k==='rewind'&&!B.snap;o.push({el:e,ec:c,n:ok.n,tag:'奥義',sk:ok,cost:used?'使用済':'BP 0',cls:'ougi',dis:used||noSnap,f:()=>use(ok)});}}
-   const a=ATK(u),[ae,ac]=badge(a);o.push({el:ae,ec:ac,n:basicName(u),sk:a,cost:'BP 0',cls:'basic',f:()=>use(a)});
+   basicsOf(u).forEach(a=>{const[ae,ac]=badge(a);o.push({el:ae,ec:ac,n:basicName(u,a),sk:a,cost:'BP 0',cls:'basic',f:()=>use(a)});});
    (u.rsSet||[]).forEach(k=>{const s=SK[k];if(!s)return;const[e,c]=badge(s),cs=C.costOf(u,s),lp=C.lpCost(s),pl=C.profLv(u.id,k),ngB=!dev&&cs>u.sp,ngL=!dev&&lp&&(u.lp||0)<=lp;
     o.push({el:e,ec:c,n:s.n,lv:pl>1?pl:0,sk:s,cost:'BP '+cs,lp,ng:ngB||ngL,dis:ngB||ngL,f:()=>use(s)});});
    if(!(u.rsSet||[]).length)o.push({el:'？',ec:'#aab0d8',n:'技セットが空（キャラ詳細の「技・術」でセット）',dis:1,f:()=>{}});
@@ -118,7 +118,8 @@ function awHTML(id){const h=G.h[id],A=AW[id],Xw=D.AWX[id],lv=h.awLv||1,nx=lv+1,r
   <div class="sh22">奥義 <small>${SEIRIN.n}中に1度・BP 0</small></div>${ou?skCard(id,Xw.ou,{}):''}`;}
 /* 能力：7 能力値（役割つき）＋ HP・LP・BP ＋ アビリティ */
 function st7HTML(id){const s=stats(id),r=s.s7;if(!r)return'';const P=C.pf(id),W=D.WPN[P.wp]||{};
- return`<div class="st38"><div class="w"><i class="wi" data-w="${esc(P.wp)}"></i><b>${esc(P.wp)}</b><small>${esc(W.d||'')}・通常攻撃 ${W.mag?'術':''}${W.el||''}</small></div>
+ const H=D.HERO[id]||{},alt=H.alt;
+ return`<div class="st38"><div class="w"><i class="wi" data-w="${esc(P.wp)}"></i><b>${esc(P.wp)}${H.shape?`<small>（形：${esc(H.shape)}）</small>`:''}</b><small>${alt?`通常攻撃：杖の魔弾（術・${esc(H.el)}・知力）／${esc(alt.bn)}の斬撃（${esc(alt.el)}・腕力と器用さ・吸収${Math.round(alt.drain*100)}%）`:`${esc(W.d||'')}・通常攻撃 ${W.mag?'術':''}${W.el||''}`}</small></div>
   <div class="lb"><span><em>LP</em><b>${s.lpMax}</b></span><span><em>BP</em><b>${s.bp0}<small>初期</small></b><b>${s.bpMax}<small>最大</small></b><b>+${s.bpReg+Math.min(2,Math.floor((s.spGain||0)/5))}<small>回復</small></b></span></div>
   <div class="g7">${D.ST7.map(k=>`<div class="r${P.w[k]?' wp':''}"><span><i class="g${P.base[k][1]}">${P.base[k][1]}</i>${D.ST7N[k]}</span><b>${r[k]}</b><small>${esc(D.ST7D[k])}</small></div>`).join('')}</div></div>`;}
 /* キャラ詳細のタブ：能力（能力値＋アビリティ）・技・術・星臨・星盤（装備は上の枠） */

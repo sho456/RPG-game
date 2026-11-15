@@ -12,8 +12,8 @@ const grp=s=>s.startsWith('acc')?'acc':s;
 const WBASE={rio:[5,2.4],gald:[7,2.7],valk:[7,2.7],balza:[7,2.8],shion:[5,2.3],jin:[6,2.5],hakua:[6,2.6],erna:[5,2.4],mire:[5,2.6],noah:[4,2.4],crow:[4,2.5],celes:[4,2.5]};
 const WNOUN={'体術':'手甲'};
 const wtypeOf=who=>{try{return(RSD.HERO[who]||{}).w||'剣';}catch(e){return'剣';}};
-const wnounOf=who=>{const t=wtypeOf(who);return WNOUN[t]||t;};
-function wbase(it,ilv,m){const t=wtypeOf(it.who),[a,b]=WBASE[it.who]||[6,2.5],v=Math.round(a+ilv*b);it.base=t==='杖'?{mag:v}:{atk:v};it.name=m+'の'+wnounOf(it.who);}
+const wnounOf=who=>{try{const H=RSD.HERO[who];if(H&&H.shape)return H.shape;}catch(e){}const t=wtypeOf(who);return WNOUN[t]||t;};
+function wbase(it,ilv,m){const t=wtypeOf(it.who),[a,b]=WBASE[it.who]||[6,2.5],v=Math.round(a+ilv*b);it.base=t==='杖'?{mag:v}:{atk:v};if(it.who==='crow')it.base.atk=Math.round(v*.6);/* 鎌杖：魔力に加えて攻撃も上がる */it.name=m+'の'+wnounOf(it.who);}
 function rollRar(minR,bonus){const r=Math.random()*100/(1+bonus);return Math.max(minR,r<.5?4:r<5?3:r<17?2:r<45?1:0);}
 function genItem(ilv,minR=0,bonus=0,slot=null,rarFix=null){
  const rar=rarFix!=null?rarFix:rollRar(minR,bonus);
