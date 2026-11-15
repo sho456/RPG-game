@@ -22,3 +22,10 @@ html,body,#app,#app *,#sheet *,#ov *{font-family:var(--font) !important}
 #sheet .ski43 .nm .t b,#sheet .eqi .hd b,#app .chd .chn b,
 #app .b22tg .nm b,#app .bub42 b,
 #app .qrow31 b,#app .qch31 b,#app .wtabs button{font-family:var(--cmd) !important;font-weight:700}
+
+/* タイトル：タップするまでメニューを隠す（js/v38/menu.js titleTap） */
+#tm.hid44{visibility:hidden;opacity:0}
+#tm.in44{animation:tm44 .35s ease-out both}
+@keyframes tm44{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+#tap44{position:absolute;left:0;right:0;top:36%;text-align:center;font-family:var(--cmd) !important;font-weight:700;font-size:18px;letter-spacing:.3em;color:#ffe9a0;text-shadow:0 0 10px #000,0 0 4px #000;animation:tap44 1.3s ease-in-out infinite;pointer-events:none}
+@keyframes tap44{50%{opacity:.25}}

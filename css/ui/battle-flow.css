@@ -11,3 +11,5 @@
 @keyframes bub42{0%{opacity:0;transform:translate(-50%,-100%) scale(.3)}100%{opacity:1;transform:translate(-50%,-100%) scale(1)}}
 @keyframes bub42o{to{opacity:0;transform:translate(-50%,-100%) scale(.85)}}
 /* ダメージの数字の弾みは css/ui/damage.css */
+/* 行動中のキャラの上の三角（js/v25.js marker）は出さない（ver0.44） */
+#mk25{display:none !important}

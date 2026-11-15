@@ -28,11 +28,13 @@
 | 編成画面・陣形と立ち位置（`formOpen`） | `js/ui/party.js`（`V38P`） | `css/ui/party.css`（`.ps41` `.pc41` `.fe41`） |
 | キャラ詳細（能力・技・術・星臨） | 骨組み `ver17.js charHTML / equipMenu` → 技・術のアイコン `js/ui/skill-icons.js`（`SKICON`）／中身 `js/rs/ui.js`（`RSU`：`skCard` `skillsHTML`＋`tapSlot/tapSkill`（技・術セット） `abHTML`（アビリティのタブ） `skIcon`（技のアイコン） `awHTML` `st7HTML`） | `css/rs.css` `css/v38.css` |
 | 戦闘：コマンド欄（2 段階の決定・指のカーソル） | `js/rs/ui.js`（`chooseRoot`）。属性の六角マーク（弱点＝赤・耐性＝青）`elStack`、消費の表示 `costHTML` | `css/v38.css`（`.c38*`）・`css/ui/skill.css`（`.hx43` `.c43`） |
-| 技・術の詳細の窓（ⓘ） | `js/rs/ui.js`（`info`） | `css/ui/skill.css`（`.ski43`） |
+| 技・術の詳細の窓（ⓘ）・アビリティの詳細の窓 | `js/rs/ui.js`（`info`・`abInfo`） | `css/ui/skill.css`（`.ski43` `.ab44`） |
+| 鍛冶屋（品揃え・強化・OP付替・ソケット） | `js/ui/smith.js`（`smith`・`enhance` を置き換え。OP・ソケットの後半は `town.js opSwap / sockMenu`） | `css/ui/smith.css` |
+| タイトル（タップで開始） | `js/v38/menu.js`（`titleTap`） | `css/ui/font.css` |
 | 戦闘：キャラ・敵の表示サイズ | 敵 `js/battle/size.js`（`BSIZE`：種類ごとの倍率 `CLS`）・味方の背丈 `js/sprite/spx.js heroHgt / regRigs`・味方の倍率 `js/v38/battle-ui.js placeHeroes`・敵の配置（はみ出し防止）`js/v23.js eDims / placeEnemies` | — |
 | 戦闘：配置・スライド・HP/BP 表示 | `js/v38/battle-ui.js`（`V38B`） | `css/v38.css` |
 | 戦闘：上の帯（対象・弱点/耐性） | `js/v22.js`（`updHud`） | `css/v22.css` `v25.css` `v38.css` |
-| 戦闘の決まり（ターン・BP・LP・熟練） | `js/rs/battle.js`（`RSB`）・`js/rs/core.js`（`RSC`）・データ `js/rs/data.js`（`RSD`） | — |
+| 戦闘の決まり（ターン・BP・LP（全員 7＝`RSD.LP_FIX`）・熟練） | `js/rs/battle.js`（`RSB`）・`js/rs/core.js`（`RSC`）・データ `js/rs/data.js`（`RSD`） | — |
 | 戦闘の行動演出の流れ（技名の吹き出し・暗転・共通の技の演出・数字・撃破） | `js/battle/flow.js`（`BFLOW`）。数字・見出しの配置は `js/v24.js dmgPop / addLabels`、書式（金属の見出し・筆の属性）は `js/ui/damage.js`、撃破の赤い崩れは `js/ver19.js dissolve` | `css/ui/battle-flow.css`・`css/ui/damage.css`（数字と見出しの動き） |
 | 演出・モーション（技ごとの専用演出） | `js/battle/*`（`BX*`）・`js/battle/data/fx-heroes-*.js` → スキル `rpg-hero-motion` | — |
 | 文字のフォント（全画面で統一） | 本文＝M PLUS 1p、コマンド（ボタン・技名・名前・見出し・タブ）＝Kaisei Tokumin（`css/ui/font.css` の `--cmd`）。キャンバスの数字・英字＝`js/v24-text.js FONT` | `css/ui/font.css` |

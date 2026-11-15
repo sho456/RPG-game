@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.43';
+const VER='ver0.44';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,12 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　技の表示とダメージの見せ方を磨きました<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　耐性・鍛冶屋・ダメージ表示を作り直しました<br><small>`+
+ `・<b>属性耐性</b>：防具に属性耐性が付き、種類で傾向が変わる。受けるダメージに反映。装備の詳細に耐性の欄<br>`+
+ `・<b>鍛冶屋</b>：アイコンの一覧に整理。タップで選び、もう一度タップで詳細<br>`+
+ `・<b>戦闘</b>：連続ヒットの数字が重ねて出る。表示どうしが被らない配置に。行動中の三角を廃止、HP・BP はターンの始めだけ<br>`+
+ `・<b>LP</b> は全員 7。タイトルはタップしてから始める。アビリティはタップで詳細の窓</small></div>`+
+ `<div class="nt n38"><b>ver0.43</b>　技の表示とダメージの見せ方を磨きました<br><small>`+
  `・<b>戦闘</b>：狙っている敵の弱点の属性は赤、耐性は青く光る。BP は「BP　6」の表示に。技名の吹き出しはすぐ消える<br>`+
  `・<b>ダメージ</b>：Critical・Weak・属性を大きく、金属の質感と筆の書体で。数字の出方にも動きを<br>`+
  `・<b>技・術の詳細</b>：威力・Rank・BP・LP と説明をまとめた窓に。<b>コマンドの文字</b>を筆の入った書体に<br>`+
@@ -55,6 +60,12 @@ try{TIPS.how=['遊び方',['<b>灯都</b>で準備 → <b>出撃</b>でクエス
  '戦闘：ターンの始めに味方全員の行動を選ぶ。技・術は<b>BP</b>を使う。弱点の属性を突くと大ダメージ。'+SEIRIN.g+'100%で<b>'+SEIRIN.n+'</b>（行動を消費しない）。',
  '<b>HP</b>が0で気絶し<b>LP</b>が1減る。LPが残っていれば回復術で復活できる。LPが0になるとその戦闘では復活できない。',
  '育成：<b>編成</b>から装備・技・術セット・<b>陣形</b>。<b>星詠み</b>で星盤。']];}catch(e){}
-{const _t=title;title=function(){_t();const v=$('#verL');if(v)v.textContent=VER;};const v=$('#verL');if(v)v.textContent=VER;}
+/* タイトル（ver0.44）：遊び方は出さない。最初は「TAP TO START」だけで、画面をタップすると「はじめから／つづきから」が出る */
+function titleTap(){const ov=$('#ov');if(!ov)return;['#howto','#hw','#ttap'].forEach(q=>{const e=ov.querySelector(q);if(e)e.remove();});
+ const tm=ov.querySelector('#tm');if(!tm||ov.querySelector('#tap44'))return;tm.classList.add('hid44');
+ const t=document.createElement('div');t.id='tap44';t.textContent='TAP TO START';ov.appendChild(t);
+ const go=e=>{if(e.target.closest('.tfoot,button'))return;ov.removeEventListener('click',go,true);t.remove();tm.classList.remove('hid44');tm.classList.add('in44');try{SFX.sel();}catch(x){}e.stopPropagation();};
+ ov.addEventListener('click',go,true);}
+{const _t=title;title=function(){_t();const v=$('#verL');if(v)v.textContent=VER;try{titleTap();}catch(e){console.error(e);}};const v=$('#verL');if(v)v.textContent=VER;try{titleTap();}catch(e){}}
 try{document.title='アストラル・ブレイカー '+VER;}catch(e){}
 return{VER};})();

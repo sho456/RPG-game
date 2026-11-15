@@ -69,6 +69,7 @@ const RBP={E:1,D:2,C:3,B:4,A:6,S:8,SS:10,SSS:12};
 /* 技の熟練：使うほど技Lvが上がる（1〜10）。威力+2%/Lv、Lv4 と Lv8 で消費BP-1（最低1） */
 const PROF=[0,3,8,15,25,40,60,85,115,150];
 /* HP・LP の決まり */
+const LP_FIX=7;/* LP は全員 7 固定（ver0.44） */
 const HPLP={dying:.3/*最大HPのこの割合以下で瀕死*/,healLp:1/*回復術の LP 消費*/,reviveMin:.1};
 
 /* ==================== 技・術 ==================== */
@@ -329,4 +330,4 @@ const FORM={
   p:[[.15,.15],[.85,.35],[.15,.65],[.85,.88]],
   s:[[st7('vit',10)],[st7('cha',20),{t:'bpr',v:1}],[st7('cha',20),{t:'bpr',v:1}],[st7('wil',10)]]}};
 
-return{EL8,WPN,WPNS,ST7,ST7N,ST7S,ST7D,HERO,BP,RANK,RANKS,RBP,PROF,HPLP,TGT,NEW,LEARN,ABL,AB,AWX,AW_TURNS,FORM,fxTxt,descOf};})();
+return{LP_FIX,EL8,WPN,WPNS,ST7,ST7N,ST7S,ST7D,HERO,BP,RANK,RANKS,RBP,PROF,HPLP,TGT,NEW,LEARN,ABL,AB,AWX,AW_TURNS,FORM,fxTxt,descOf};})();

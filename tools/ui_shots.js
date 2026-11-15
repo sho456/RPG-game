@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* 主要画面のスクリーンショット（UI 改修の確認用。少ないトークンで画面を見るための道具）
    使い方：python3 -m http.server 8765 &  →  node tools/ui_shots.js <出力dir> [画面名...]
-   画面名：sk-info party party-sw form form-sel form-list detail detail-ab sk-slot sk-put detail-sk detail-aw detail-bd board board-sel board-up board-up-lock battle-turn battle-cmd battle-pick battle-wk battle-act equip-info equip-pick equip-inv（省略時は全部） */
+   画面名：ab-info sk-info party party-sw form form-sel form-list detail detail-ab sk-slot sk-put detail-sk detail-aw detail-bd board board-sel board-up board-up-lock battle-turn battle-cmd battle-pick battle-wk battle-act equip-info equip-pick equip-inv（省略時は全部） */
 'use strict';
 const {chromium} = require('playwright');
 const [OUT = 'work/shots', ...only] = process.argv.slice(2);
@@ -39,6 +39,7 @@ const want = n => !only.length || only.includes(n);
   await shot('equip-pick', () => {for (let i = 0; i < 3; i++) G.inv.push(genItem(40, 1, 0, 'main', 2));pickEq('rio', 'main');});
   await shot('equip-inv', () => {invMenu();});
   await shot('sk-info', () => {CTAB = 'sk';equipMenu('rio');document.querySelector('[data-a="rsinfo"]').click();});
+  await shot('ab-info', () => {CTAB = 'ab';equipMenu('rio');document.querySelector('[data-a="rsab"]').click();});
   await shot('board', () => {BS.up = false;openBoard('rio');});
   await shot('board-sel', () => {openBoard('rio');BS.sel = '1,0';boardMenu();});
   await shot('board-up', () => {G.h.rio.lv = 70;openBoard('rio');BS.up = true;BS.sel = '2,-2';boardMenu();});

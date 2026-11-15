@@ -34,8 +34,7 @@ function info(sk,u){const id=u&&(u.id||u),s=sk.basic?Object.assign({},sk,{n:basi
   <div class="top">${skIcon(id,s)}<div class="nm"><div class="t"><b>${esc(s.n||'')}</b><span class="els">${els.map(e=>`<i class="hx43" style="--c:${ELN[e]}">${e}</i>`).join('')}</span></div>
    <div class="g"><div><em>威力</em><b>${s.rk||(s.basic?'D':s.ougi?'奥':'-')}</b></div><div><em>Rank</em><b>${pl||'-'}</b></div><div class="two"><span><em>BP</em><b>${cost}</b></span><i></i><span><em>LP</em><b>${lp||'-'}</b></span></div></div></div></div>
   <div class="dsc"><p class="tgs">${esc(tags)}</p><p>${esc(s.d||'')}</p>
-   ${pl&&pl<10?`<p class="sub">あと ${D.PROF[pl]-C.profN(id,k)} 回使うと Rank ${pl+1}（威力+${pl*2}%${pl+1>=4?'・消費-'+(pl+1>=8?2:1):''}）</p>`:''}
-   ${how?`<p class="sub">習得：${esc(how)}</p>`:''}${hint?`<p class="sub">${hint}</p>`:''}</div></div>
+   ${hint?`<p class="sub">${hint}</p>`:''}</div></div>
   <button class="tbtn back wide" data-a="close">閉じる</button>`,{close:ovClose});}
 
 /* ==================== 戦闘のコマンド入力（RS 風） ==================== */
@@ -155,12 +154,17 @@ function tapSkill(id,k){const a=C.setOf(id);
  if(a.includes(k)){G.h[id].sset=a.filter(x=>x!==k);return;}
  if(a.length<4){G.h[id].sset=a.concat(k);return;}
  SPK.sk=k;}
-function abHTML(id){const h=G.h[id],ups=C.abUps(id);let wp=null,w=null;try{w=h.eq.w&&findItem(h.eq.w);wp=V20.wpOf(w);}catch(e){}
- return`${(D.AB[id]||[]).map((A,i)=>{const r=C.abRank(id,i),lv0=D.ABL[i],cur=r?C.abDesc(id,i,r):[],full=C.abDesc(id,i,5);
-   return`<div class="rsab x38${r?'':' lock'}"><div class="h"><i class="n">${i+1}</i><b>${esc(A.n)}</b>${stars(r)}<em>${r?'段階'+RK[r]:'Lv'+lv0+'で解放'}</em><i class="ar"></i></div>
-    <ul>${(r?cur:full).map(t=>`<li>${esc(t)}</li>`).join('')}</ul>
-    <div class="src"><small>Lv${lv0}でⅠ・Lv${lv0+30}でⅡ・Lv${lv0+60}でⅢ${ups[i+1]?`　星盤 +${ups[i+1]}`:''}</small></div></div>`;}).join('')}
-  <div class="rsab x38${wp?'':' lock'}"><div class="h"><i class="n">武</i><b>${wp?esc(wp.n):'武器アビリティなし'}</b><i class="ar"></i></div><ul><li>${wp?esc(wp.d):'アンコモン以上の武器に付く'}</li></ul></div>`;}
+/* アビリティのタブ（ver0.44）：名前と段階だけを並べ、タップで別の窓に詳細（abInfo） */
+function abHTML(id){const h=G.h[id];let wp=null,w=null;try{w=h.eq.w&&findItem(h.eq.w);wp=V20.wpOf(w);}catch(e){}
+ return`${(D.AB[id]||[]).map((A,i)=>{const r=C.abRank(id,i),lv0=D.ABL[i];
+   return`<div class="rsab a44${r?'':' lock'}" data-a="rsab" data-v="${i}"><div class="h"><i class="n">${i+1}</i><b>${esc(A.n)}</b>${stars(r)}<em>${r?'段階'+RK[r]:'Lv'+lv0+'で解放'}</em><i class="ar44">›</i></div></div>`;}).join('')}
+  <div class="rsab a44${wp?'':' lock'}" data-a="rsab" data-v="w"><div class="h"><i class="n">武</i><b>${wp?esc(wp.n):'武器アビリティなし'}</b><i class="ar44">›</i></div></div>`;}
+function abInfo(id,v,back){const h=G.h[id];let top,list,sub='';
+ if(v==='w'){let wp=null;try{wp=V20.wpOf(h.eq.w&&findItem(h.eq.w));}catch(e){}top=`<i class="n">武</i><b>${wp?esc(wp.n):'武器アビリティなし'}</b>`;list=[wp?wp.d:'アンコモン以上の武器に付く'];}
+ else{const i=+v,A=D.AB[id][i],r=C.abRank(id,i),lv0=D.ABL[i],ups=C.abUps(id);top=`<i class="n">${i+1}</i><b>${esc(A.n)}</b>${stars(r)}<em>${r?'段階'+RK[r]:'未解放'}</em>`;
+  list=r?C.abDesc(id,i,r):C.abDesc(id,i,5);sub=`Lv${lv0}でⅠ・Lv${lv0+30}でⅡ・Lv${lv0+60}でⅢ${ups[i+1]?`　星盤 +${ups[i+1]}`:''}`;}
+ ovOpen(`<div class="ski43 ab44"><div class="abh">${top}</div><div class="dsc"><ul>${list.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>${sub?`<p class="sub">${sub}</p>`:''}</div></div>
+  <button class="tbtn back wide" data-a="close">閉じる</button>`,{close:()=>{ovClose();if(back)back();}});}
 function awHTML(id){const h=G.h[id],A=AW[id],Xw=D.AWX[id],lv=h.awLv||1,nx=lv+1,req=nx===2?15:30,ok=lv<3&&h.lv>=req,ou=Xw&&SK[Xw.ou],ef=C.awEffects(id);
  return`<div class="aw22" style="--ec:${elCol(id)}"><div class="ah"><img src="${art(id,true)}" alt=""><div><small>${SEIRIN.n}</small><b>《${esc(A.name)}》</b><span class="rk">${'<i class="on"></i>'.repeat(lv)}${'<i></i>'.repeat(3-lv)}<em>位階${ROMAN[lv]}</em></span></div></div>
   <ul class="rsaw">${(Xw?Xw.note:[]).map(t=>`<li>${esc(t)}</li>`).join('')}${ef.map(e=>`<li>${esc(C.effTxt(e))}</li>`).join('')}</ul>
@@ -181,10 +185,10 @@ const TABS=[['st','能力'],['ab','アビリティ'],['sk','技・術'],['aw',SE
   s=s.replace(/<div class="ctabs[^"]*">[\s\S]*?<\/div>/,`<div class="ctabs c22 rs37 t38">${TABS.map(([k,l])=>`<button class="${tab===k?'on':''}" data-a="tab" data-v="${k}">${l}</button>`).join('')}</div>`);
   s=s.replace(/パッシブ/g,'アビリティ');}catch(e){console.error(e);}
  return s;};}
-function acts(o,id,re){o.rsslot=i=>{tapSlot(id,+i);save();re();};o.rsk=k=>{tapSkill(id,k);save();re();};o.rsinfo=k=>info(SK[k],{id,side:0});}
+function acts(o,id,re,back){o.rsab=v=>abInfo(id,v,back);o.rsslot=i=>{tapSlot(id,+i);save();re();};o.rsk=k=>{tapSkill(id,k);save();re();};o.rsinfo=k=>info(SK[k],{id,side:0});}
 /* 描き直しても、下の欄のスクロール位置を保つ */
 const keepScroll=(sel,f)=>{const el=$(sel),y=el?el.scrollTop:0;f();const e2=$(sel);if(e2)e2.scrollTop=y;};
 {const _em=equipMenu;equipMenu=function(id,m){if(CTAB==='eq')CTAB='st';_em(id,m);try{const cid=G.members.includes(id)?id:G.party[0];acts(ACT,cid,mm=>keepScroll('#cmd',()=>equipMenu(cid,mm)));}catch(e){console.error(e);}};}
-{const _os=openSheet;openSheet=function(id,tab){_os(id,tab);try{const cid=G.members.includes(id)?id:G.party[0];acts(SACT,cid,()=>keepScroll('#sheet .swin',()=>openSheet(cid)));}catch(e){console.error(e);}};}
+{const _os=openSheet;openSheet=function(id,tab){_os(id,tab);try{const cid=G.members.includes(id)?id:G.party[0];acts(SACT,cid,()=>keepScroll('#sheet .swin',()=>openSheet(cid)),()=>openSheet(cid));}catch(e){console.error(e);}};}
 
 return{info,skillsHTML,abHTML,awHTML,st7HTML,canAw,basicName};})();

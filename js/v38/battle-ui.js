@@ -5,7 +5,7 @@
  3. コマンド入力中は「戦場ごと上へスライド」して、下半分にコマンド欄を出す（ロマサガRS の見せ方）。
     最後の 1 人のコマンドを決めると、コマンド欄が下へ抜け、戦場が元の位置へ滑らかに戻って行動が始まる
  4. 倍速ボタンは画面上の 1 つだけ（下の帯の倍速は削除）
- 5. 味方の HP・BP はターンの始め（コマンド入力中・AUTO はターン開始から少しの間）だけキャラの横に出す。瀕死は赤、気絶は LP を表示 */
+ 5. 味方の HP・BP はターンの始めの 1.6 秒だけキャラの横に出す（ver0.44）。瀕死は赤、気絶は LP を表示 */
 'use strict';
 const V38B=(()=>{
 const D=RSD,C=RSC,{HK23}=V23;
@@ -47,8 +47,8 @@ function setIn(v){if(v===IN){clearTimeout(offT);offT=0;return;}
 /* ==================== 4. 味方の HP・BP 表示（ターンの始めだけ・瀕死・気絶と LP） ==================== */
 try{const _el=TX24.el;TX24.el=function(t,...a){if(t==='SP'&&a[0]==='sp')t='BP';return _el.call(this,t,...a);};}catch(e){}
 let hlTurn=-1,hlUntil=0;
-function hlShow(){const now=performance.now();if(B.turns!==hlTurn){hlTurn=B.turns;const k=SPD&&SPD[speed]?SPD[speed]:1;hlUntil=now+Math.round(1400*Math.max(.4,k));}
- const on=!B.over&&((B.rs&&B.rs.phase==='input'&&!auto)||now<hlUntil);if(app.classList.contains('hl39')!==on)app.classList.toggle('hl39',on);}
+function hlShow(){const now=performance.now();if(B.turns!==hlTurn){hlTurn=B.turns;hlUntil=now+1600;}/* ver0.44：ターンの始めの 1.6 秒だけ（入力中もずっとは出さない） */
+ const on=!B.over&&now<hlUntil;if(app.classList.contains('hl39')!==on)app.classList.toggle('hl39',on);}
 function hlState(){hlShow();const L=$('#hl24');if(!L)return;B.heroes.forEach((h,i)=>{const c=L.children[i];if(!c)return;const dy=RSB.dying(h),lp=h.alive?'':`LP ${h.lp||0}`;
  if(c.classList.contains('dy38')!==dy)c.classList.toggle('dy38',dy);if(c.dataset.lp!==lp)c.dataset.lp=lp;
  const z=h.alive?'':(h.lp||0)<=0?'z':'';if((c.dataset.z||'')!==z)c.dataset.z=z;});}

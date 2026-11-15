@@ -44,3 +44,11 @@
 .ski43 .dsc p.tgs{font-weight:700}
 .ski43 .dsc p.sub{font-size:11px;color:#c8bfa8}
 .ski43 .dsc b.w{color:#ff7a7a}.ski43 .dsc b.r{color:#7ab8ff}
+/* アビリティ（ver0.44）：一覧は名前と段階だけ、タップで別の窓（js/rs/ui.js abInfo） */
+.rsab.a44{cursor:pointer}.rsab.a44:active{filter:brightness(1.25)}
+.rsab.a44 .ar44{font-style:normal;font-size:20px;line-height:1;color:#ffb86b;margin-left:6px}
+.ab44 .abh{display:flex;align-items:center;gap:8px}
+.ab44 .abh .n{font-style:normal;width:24px;height:24px;border-radius:50%;background:#ffb86b;color:#2a1400;font-size:13px;font-weight:800;display:grid;place-items:center}
+.ab44 .abh b{flex:1;font:700 20px/1.3 var(--cmd,serif);color:#fff}
+.ab44 .abh em{font-style:normal;font-size:13px;color:#ffb86b}
+.ab44 .dsc ul{margin:0;padding-left:1.2em;color:#f4efe6;font-size:13px;line-height:1.7}

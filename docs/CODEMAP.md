@@ -89,16 +89,17 @@
 | 83 | `js/rs/data.js` | 30 | ver0.37 戦闘システム刷新（データ） | RSD |
 | 84 | `js/rs/core.js` | 20 | 戦闘システム（能力値・習得・技セット・アビリティ・陣形・セーブ） | RSC |
 | 85 | `js/rs/battle.js` | 26 | 戦闘の進行（ターン制・BP・HP/LP） | RSB |
-| 86 | `js/rs/ui.js` | 21 | 戦闘システムの画面 | RSU |
+| 86 | `js/rs/ui.js` | 22 | 戦闘システムの画面 | RSU |
 | 87 | `js/v38/core.js` | 4 | ver0.38 土台：攻撃属性 8 種・武器種 8 種・セーブの移行・LP | V38 |
 | 88 | `js/v38/battle-ui.js` | 6 | ver0.38 戦闘画面 | V38B |
-| 89 | `js/v38/menu.js` | 7 | ver0.38 画面全体の整理 | V38M |
+| 89 | `js/v38/menu.js` | 9 | ver0.38 画面全体の整理 | V38M |
 | 90 | `js/v38/help.js` | 7 | ver0.38 タップで詳細（V38H） | V38H |
 | 91 | `js/ui/skill-icons.js` | 5 | 技・術のアイコン（SKICON：白いシルエットの絵柄 27 種＋技 → 絵柄の対応。js/rs/ui.js の skIcon が使う） |  |
 | 92 | `js/ui/board.js` | 5 | 星盤・天星盤の画面（ver0.39 で 1 ファイルにまとめた。画面の正本はここ） | BOARDUI |
 | 93 | `js/ui/equip-info.js` | 4 | 装備品の詳細（EQINFO：装備アイコンのタップで出るポップアップの正本。新規） | EQINFO |
 | 94 | `js/ui/party.js` | 8 | 編成画面と陣形（ver0.41 で 1 ファイルにまとめた。画面の正本はここ。旧 js/v38/party.js を置き換え） | V38P |
-| 95 | `js/ui/damage.js` | 3 | 戦闘のダメージ表示の書体（TX24 の書式の最終定義。ロマサガRS の録画に合わせた） |  |
+| 95 | `js/ui/smith.js` | 4 | 鍛冶屋の画面（ver0.44。正本：town.js の smith・enhance と v31/items.js・ver18-town.js の包みを置き換え） | SMITH44 |
+| 96 | `js/ui/damage.js` | 3 | 戦闘のダメージ表示の書体（TX24 の書式の最終定義。ロマサガRS の録画に合わせた） |  |
 
 ## 上書きの連鎖（2 ファイル以上で定義・上書きされる関数）
 
@@ -152,6 +153,7 @@
 | `partyScreen` | ver17.js → v21.js → v22.js → ui/party.js |
 | `put` | ver16.js → ver18-field.js → v31/quests.js → items/icons36.js |
 | `skillList` | items.js → v20-battle.js → v31/board.js → rs/core.js |
+| `smith` | town.js → ver18-town.js → v31/items.js → ui/smith.js |
 | `stats` | engine.js → v31/core.js → v31/items.js → rs/core.js |
 | `voidKind` | ch8.js → ver19-pre.js → ver18-art.js → sprite/spx.js |
 | `arm` | sprite/legacy/px.js → sprite/legacy/dot-rig.js → v24.js |
@@ -168,6 +170,7 @@
 | `hex` | v24-text.js → sprite/spx.js → items/icons36.js |
 | `hit` | engine.js → v20-battle.js → rs/battle.js |
 | `itemIcon` | ch3.js → v21-art.js → v31/items.js |
+| `key` | ver18-field.js → sprite/facing.js → ui/smith.js |
 | `kill` | engine.js → battle/core.js → rs/battle.js |
 | `leg` | sprite/legacy/px.js → sprite/legacy/px-enemy.js → sprite/legacy/dot-rig.js |
 | `loop` | ch4.js → v21-art.js → zukan/viewer.js |
@@ -183,7 +186,6 @@
 | `render` | v21-items.js → v31/quests.js → items/icons36.js |
 | `roomOpen` | ver18-town.js → v22.js → v23.js |
 | `score` | items.js → v20-battle.js → rs/battle.js |
-| `smith` | town.js → ver18-town.js → v31/items.js |
 | `spawnOne` | field.js → ch8.js → ver18-field.js |
 | `tavern` | town.js → ch9.js → ver18-town.js |
 | `tierOf` | v21-items.js → v24.js → v31/items.js |
@@ -224,6 +226,7 @@
 | `drawTown` | field.js → ver18-town.js |
 | `drawWM` | ver17.js → ver18-town.js |
 | `elOf` | ver17.js → v38/core.js |
+| `enhance` | town.js → ui/smith.js |
 | `enterKairou` | ch8.js → v31/quests.js |
 | `enterTower` | ch6.js → v31/quests.js |
 | `eqs` | ver17.js → v22.js |
@@ -250,7 +253,7 @@
 | `info` | sprite/legacy/dot-rig.js → rs/ui.js |
 | `invMenu` | town.js → ver17.js |
 | `isBuff` | v20-battle.js → v24.js |
-| `key` | ver18-field.js → sprite/facing.js |
+| `items` | rs/ui.js → ui/smith.js |
 | `known` | v31/quests.js → rs/battle.js |
 | `list` | motion/registry.js → zukan/zukan.js |
 | `lit` | sprite/legacy/px-enemy.js → motion/fx19.js |

@@ -59,7 +59,7 @@ function unit7(u){if(u.s7)return u.s7;if(u.side===1){const a=u.atk||1,m=u.mag||1
   /* 装備・星盤込みの 7 能力（体力・精神・知力・素早さは内部値から） */
   const s7=Object.assign({},s,{vit:o.def,wil:o.res,int:o.mag,agi:Math.round(o.spd*3)});
   const X=HP0(id);
-  Object.assign(o,{s7,rsW:P.wp,healRecv:healRecv(s7),healAb:healAb(s7),lpMax:X.lp,bp0:X.bp[0],bpMax:X.bp[1],bpReg:X.bp[2],
+  Object.assign(o,{s7,rsW:P.wp,healRecv:healRecv(s7),healAb:healAb(s7),lpMax:D.LP_FIX/* ver0.44：全員 7 固定 */,bp0:X.bp[0],bpMax:X.bp[1],bpReg:X.bp[2],
    ougiUp:(bo.ougiUp||0)+abUps(id).O*30});
  }catch(e){console.error(e);}return o;};}
 /* 命中率（0〜1）。同じ尺度どうしを比べる：
@@ -190,7 +190,7 @@ try{for(const x of['1','2','3','O'])V20.PS['ab_up'+x]={n:x==='O'?'奥義強化':
   const W=D.WPN[u.rsW]||D.WPN['剣'];u.wpn=u.rsW;u.elem=W.el;
   u.s7=Object.assign({},u.s7||{});
   u.bpMax=u.bpMax||D.BP.max;u.sp=u.bp0!=null?u.bp0:D.BP.start;
-  const h=G.h[id];u.lpMax=u.lpMax||8;u.lp=h&&h.lp!=null?clamp(h.lp,0,u.lpMax):u.lpMax;
+  const h=G.h[id];u.lpMax=u.lpMax||D.LP_FIX;u.lp=h&&h.lp!=null?clamp(h.lp,0,u.lpMax):u.lpMax;
   if(u.lp<=0){u.alive=false;u.hp=0;}
  }catch(e){console.error(e);}return u;};}
 function applyStat(u,e){const k=e.k,m=1+e.v/100;if(k==='mhp'){const r=u.mhp?u.hp/u.mhp:1;u.mhp=Math.round(u.mhp*m);u.hp=Math.max(u.alive?1:0,Math.round(u.mhp*r));}else if(k==='spd')u.spd=+(u.spd*m).toFixed(2);else if(u[k]!=null)u[k]=Math.round(u[k]*m);
