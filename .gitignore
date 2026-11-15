@@ -2,3 +2,7 @@ __pycache__/
 # 素材制作の作業フォルダ（docs/PIPELINE.md）と Forge の記録
 work/
 .forge/
+
+# pixelfx の書き出し・pixel-art-studio の試作
+tools/pixelfx/records/
+assets_src/pixel-art/**/out/
