@@ -2,8 +2,9 @@
 """味方の原画 → js/spx-data-heroes.js（spx-data.js の同じキャラを上書きする）
 
 ・味方 12 人（2026-11 の新原画）：正面・待機・星臨を横に 3 体並べたシート（<id>_v2.jpg）。from_trio で切り出す。
-  向きの定義（ver0.37）：原画の待機・星臨の向きを「左向き」とする（assets_src/originals/celes_v2.jpg が基準）。
-  全プレイアブルキャラ（通常・星臨）の既定の向きなので、反転せず原画のまま使う。正面も原画のまま。
+  向き（ver0.38）：原画は反転せずにそのまま取り込み、「原画がどちらを向いているか」を face に書く（FACE_L の表）。
+  提供原画のうち左向き（顔・武器が左）なのはセレスだけで、ほかの 11 人は右向き。表示の向き（味方＝左向き）は
+  js/sprite/facing.js が face を見て鏡写しにする。ver0.37 は全員を左向きと決めつけていたため、戦闘で 11 人が敵に背を向けていた。
   戦闘不能は待機を寝かせて作り、他のポーズ（攻撃・詠唱・被弾…）は 1 枚絵（single）として spx.js が待機の絵を動かす
 ・jin：戦闘不能は体だけを寝かせ、相棒の柴犬は座らせたまま（lay_down_with_pet）
 ・rio の色違い last3（虚神ノクス）も作る
@@ -303,6 +304,10 @@ EYE0 = .745   # 規格：足元から目までの高さ＝dots × EYE0 × body�
 HERO_SCALE = json.load(open(os.path.join(ROOT, 'assets_src', 'character_scale.json'))).get('hero', {})
 
 
+# 原画（待機・星臨）が左を向いているキャラ。ここに無いキャラの原画は右向き
+FACE_L = {'celes'}
+
+
 def build_hero(hid, F, head_from='front', head_k=.37, ref_k=1.0, single=False, head_skip=0.0, head_at=None, head_atK=None):
     """F：ポーズ名→(rgb, alpha)。'awk' があれば <hid>_K も作る。
     大きさ：character_scale.json の hero[hid]（eye・body）があれば『足元から目までの高さ』で全員の規格をそろえる。
@@ -313,7 +318,7 @@ def build_hero(hid, F, head_from='front', head_k=.37, ref_k=1.0, single=False, h
     ref_of = lambda sk: fh if sk[0] == 'u' else ref_h
     names = [k for k in F if k != 'awk']
     pal = make_pal([F[k] for k in names], ref_h)
-    C = {'face': 'L', 'kind': 'hum', 'pal': [hexs(c) for c in pal], 'sizes': {}}
+    C = {'face': 'L' if hid in FACE_L else 'R', 'kind': 'hum', 'pal': [hexs(c) for c in pal], 'sizes': {}}
     if single:
         C['single'] = 1   # 1 枚絵：spx.js がポーズに合わせて絵を動かす
     prev = []
@@ -337,7 +342,7 @@ def build_hero(hid, F, head_from='front', head_k=.37, ref_k=1.0, single=False, h
     out = {hid: C}
     if 'awk' in F:
         palK = make_pal([F['awk']], ref_h)
-        K = {'face': 'L', 'kind': 'hum', 'pal': [hexs(c) for c in palK], 'sizes': {}}
+        K = {'face': 'L' if hid in FACE_L else 'R', 'kind': 'hum', 'pal': [hexs(c) for c in palK], 'sizes': {}}
         for sk, dots in SIZES:
             if sk[0] == 'f':
                 continue

@@ -168,11 +168,12 @@ SPRX.frame=function(name,pose,palKey,pal,flip,sc=1,extra=''){const R=RIG[name],f
   if(hum&&pk.v==='aw'&&D[id+'_K']&&D[id+'_K'].sizes[sk]){const n0=heroFrame(pose||{});
    if(n0!=='down'){const a=AWS[n0]||AWS.stance,kid=id+'_K';br=(a.br&&(pose.br||0)>.5)?1:0;
     const an=n0==='stance'?animFrame(kid,sk,'awk',phase(palKey)):null;
-    const f=an?cut(kid,sk,'',an,mirror,-a.l,0):cut(kid,sk,'','awk',mirror,-a.l,br);if(f){const dX=(pose.x||0)*(flip?-1:1)+(flip?1:-1)*a.f;
+    const ls=D[kid].face==='R'?1:-1;/* 前傾は「絵が向いている側」へ（ver0.38：素材の向きに合わせる） */
+    const f=an?cut(kid,sk,'',an,mirror,ls*a.l,0):cut(kid,sk,'','awk',mirror,ls*a.l,br);if(f){const dX=(pose.x||0)*(flip?-1:1)+(flip?1:-1)*a.f;
      const o=Object.create(f);o.ax=f.ax-Math.round(dX);o.ay=f.ay-Math.round(a.y);if(BAT)f.cv._spx={ax:o.ax,ay:o.ay};f.cv._o={ax:o.ax,ay:o.ay,fax:f.ax,fay:f.ay};return o;}}}
   if(hum){const fs=c.sizes[sk].frames,n0=heroFrame(pose||{});name2=n0;
    if(!fs[name2]&&c.single&&fs.stance){/* 1 枚絵の味方（ジン）：星臨と同じく 1 枚の絵を整数ドットで動かす */
-    const a=AWS[n0]||AWS.stance;name2='stance';sh=-a.l;br=(a.br&&(pose.br||0)>.5)?1:0;dx=(pose.x||0)*(flip?-1:1)+(flip?1:-1)*a.f;dy=-a.y;}
+    const a=AWS[n0]||AWS.stance;name2='stance';sh=(c.face==='R'?1:-1)*a.l;br=(a.br&&(pose.br||0)>.5)?1:0;dx=(pose.x||0)*(flip?-1:1)+(flip?1:-1)*a.f;dy=-a.y;}
    else{if(!fs[name2])name2=(FB[name2]||[]).find(n=>fs[n])||'stance';br=(name2==='stance'&&(pose.br||0)>.5)?1:0;dx=(pose.x||0)*(flip?-1:1);
     const an=animFrame(id,sk,name2,phase(palKey));if(an){name2=an;br=0;}}}
   else{name2='idle';const m=monShape(pose||{},R.type==='hum');sh=Math.max(-6,Math.min(6,m.shear))*(c.face==='R'?1:-1);br=m.breath;dx=m.dx*(flip?1:-1);dy=m.dy;sq=m.sq;

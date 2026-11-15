@@ -105,11 +105,11 @@ function skillsHTML(id){const set=C.setOf(id),L=C.learned(id),all=(D.LEARN[id]||
   ${lock.length?`<div class="sh22">まだ覚えていない</div>${lock.map(k=>skCard(id,k,{lock:1,how:C.howTxt(id,k)})).join('')}`:''}`;}
 function abHTML(id){const h=G.h[id],ups=C.abUps(id);let wp=null,w=null;try{w=h.eq.w&&findItem(h.eq.w);wp=V20.wpOf(w);}catch(e){}
  return`<div class="sh22">アビリティ</div>${(D.AB[id]||[]).map((A,i)=>{const r=C.abRank(id,i),lv0=D.ABL[i],cur=r?C.abDesc(id,i,r):[],nx=C.abNext(id,i,r||0),full=C.abDesc(id,i,5);
-   return`<div class="rsab${r?'':' lock'}"><div class="h"><i class="n">${i+1}</i><b>${esc(A.n)}</b>${stars(r)}<em>${r?'段階'+RK[r]:'Lv'+lv0+'で解放'}</em></div>
+   return`<div class="rsab x38${r?'':' lock'}"><div class="h"><i class="n">${i+1}</i><b>${esc(A.n)}</b>${stars(r)}<em>${r?'段階'+RK[r]:'Lv'+lv0+'で解放'}</em><i class="ar"></i></div>
     <ul>${(r?cur:full).map(t=>`<li>${esc(t)}</li>`).join('')}</ul>
     ${r&&nx.length?`<div class="nx"><small>次（${RK[r+1]}）：</small>${nx.map(esc).join('／')}</div>`:''}
     <div class="src"><small>Lv${lv0}でⅠ・Lv${lv0+30}でⅡ・Lv${lv0+60}でⅢ${ups[i+1]?`　星盤 +${ups[i+1]}`:''}</small></div></div>`;}).join('')}
-  <div class="rsab${wp?'':' lock'}"><div class="h"><i class="n">武</i><b>${wp?esc(wp.n):'武器アビリティなし'}</b></div><ul><li>${wp?esc(wp.d):'アンコモン以上の武器に付く'}</li></ul></div>`;}
+  <div class="rsab x38${wp?'':' lock'}"><div class="h"><i class="n">武</i><b>${wp?esc(wp.n):'武器アビリティなし'}</b><i class="ar"></i></div><ul><li>${wp?esc(wp.d):'アンコモン以上の武器に付く'}</li></ul></div>`;}
 function awHTML(id){const h=G.h[id],A=AW[id],Xw=D.AWX[id],lv=h.awLv||1,nx=lv+1,req=nx===2?15:30,ok=lv<3&&h.lv>=req,ou=Xw&&SK[Xw.ou],ef=C.awEffects(id);
  return`<div class="aw22" style="--ec:${elCol(id)}"><div class="ah"><img src="${art(id,true)}" alt=""><div><small>${SEIRIN.n}</small><b>《${esc(A.name)}》</b><span class="rk">${'<i class="on"></i>'.repeat(lv)}${'<i></i>'.repeat(3-lv)}<em>位階${ROMAN[lv]}</em></span></div></div>
   <ul class="rsaw">${(Xw?Xw.note:[]).map(t=>`<li>${esc(t)}</li>`).join('')}${ef.map(e=>`<li>${esc(C.effTxt(e))}</li>`).join('')}</ul>
@@ -117,11 +117,11 @@ function awHTML(id){const h=G.h[id],A=AW[id],Xw=D.AWX[id],lv=h.awLv||1,nx=lv+1,r
   ${lv<3?`<button class="tbtn${ok?' gold':''} wide" data-a="tr" ${ok?'':'disabled'}>${SEIRIN.n}の試練<small>${ok?'挑戦できる':`Lv${req}で挑戦できる`}</small></button>`:''}</div>
   <div class="sh22">奥義 <small>${SEIRIN.n}中に1度・BP 0</small></div>${ou?skCard(id,Xw.ou,{}):''}`;}
 /* 能力：7 能力値（役割つき）＋ HP・LP・BP ＋ アビリティ */
-function st7HTML(id){const s=stats(id),r=s.s7;if(!r)return'';const P=C.pf(id),W=D.WPN[P.wp]||{};
- const H=D.HERO[id]||{},alt=H.alt;
- return`<div class="st38"><div class="w"><i class="wi" data-w="${esc(P.wp)}"></i><b>${esc(P.wp)}${H.shape?`<small>（形：${esc(H.shape)}）</small>`:''}</b><small>${alt?`通常攻撃：杖の魔弾（術・${esc(H.el)}・知力）／${esc(alt.bn)}の斬撃（${esc(alt.el)}・腕力と器用さ・吸収${Math.round(alt.drain*100)}%）`:`${esc(W.d||'')}・通常攻撃 ${W.mag?'術':''}${W.el||''}`}</small></div>
-  <div class="lb"><span><em>LP</em><b>${s.lpMax}</b></span><span><em>BP</em><b>${s.bp0}<small>初期</small></b><b>${s.bpMax}<small>最大</small></b><b>+${s.bpReg+Math.min(2,Math.floor((s.spGain||0)/5))}<small>回復</small></b></span></div>
-  <div class="g7">${D.ST7.map(k=>`<div class="r${P.w[k]?' wp':''}"><span><i class="g${P.base[k][1]}">${P.base[k][1]}</i>${D.ST7N[k]}</span><b>${r[k]}</b><small>${esc(D.ST7D[k])}</small></div>`).join('')}</div></div>`;}
+/* 能力：7 能力値・武器種・LP・BP。説明は出さず、タップで詳細（V38H の吹き出し） */
+function st7HTML(id){const s=stats(id),r=s.s7;if(!r)return'';const P=C.pf(id),H=D.HERO[id]||{};
+ return`<div class="st38"><button class="w" data-h38="wp:${id}"><b>${esc(P.wp)}${H.shape?`<small>（形：${esc(H.shape)}）</small>`:''}</b><small>武器種</small><i class="q"></i></button>
+  <div class="lb"><button data-h38="lp:${id}"><em>LP</em><b>${s.lpMax}</b><i class="q"></i></button><button data-h38="bp:${id}"><em>BP</em><b>${s.bp0}<small>初期</small></b><b>${s.bpMax}<small>最大</small></b><b>+${s.bpReg+Math.min(2,Math.floor((s.spGain||0)/5))}<small>回復</small></b><i class="q"></i></button></div>
+  <div class="g7">${D.ST7.map(k=>`<button class="r${P.w[k]?' wp':''}" data-h38="st:${id}:${k}"><span><i class="g${P.base[k][1]}">${P.base[k][1]}</i>${D.ST7N[k]}</span><b>${r[k]}</b></button>`).join('')}</div></div>`;}
 /* キャラ詳細のタブ：能力（能力値＋アビリティ）・技・術・星臨・星盤（装備は上の枠） */
 const TABS=[['st','能力'],['sk','技・術'],['aw',SEIRIN.n],['bd','星盤']];
 {const _ch=charHTML;charHTML=function(id,tab,ed){if(tab==='ab'||tab==='eq')tab='st';const mine=tab==='sk'||tab==='aw';let s=_ch(id,mine?'__':tab,ed);

@@ -28,7 +28,7 @@ partyScreen=function(m){const P=G.party,f=C.formOf(),bench=G.members.filter(id=>
    <div class="pw"><small>戦闘力</small><b>${fmt(power(id))}</b><em>Lv${h.lv}</em></div>
    <div class="eq">${eq(id)}</div>
    <button class="ob${ag>0?' rdy':''}" data-a="aw" data-v="${id}" aria-label="${SEIRIN.n}"><i style="--ec:${ec}"></i><small>${ag>0?'星盤 '+ag:SEIRIN.n}</small></button>
-   <div class="fp">${posMap(f,i)}<span>${slotTag(f,i)}</span></div></div>`;};
+   <button class="fp" data-h38="fs:${i}">${posMap(f,i)}<span>${slotTag(f,i)}</span></button></div>`;};
  panel(`<div class="ps38">
   <div class="hd"><b>編成</b><span><small>パーティ戦闘力</small><strong>${fmt(tot)}</strong></span></div>
   <div class="cs">${P.map(card).join('')}${Array.from({length:4-P.length},()=>`<div class="pc38 emp" data-a="e"><b>＋</b><small>空き</small></div>`).join('')}</div>

@@ -175,19 +175,42 @@
 .fm38 li{display:flex;align-items:baseline;gap:5px;font-size:11px}.fm38 li i{font-style:normal;width:14px;height:14px;border-radius:2px;background:#3a5aa8;text-align:center;font-size:9px;line-height:14px}
 .fm38 li span{width:4.2em;flex:none;color:#fff;font-weight:700}.fm38 li small{color:#8ff0a8}
 
-/* ==================== キャラ詳細：能力（7 能力値） ==================== */
+/* ==================== キャラ詳細：能力（7 能力値）。説明はタップで（#h38） ==================== */
 .ctabs.t38{display:grid !important;grid-template-columns:repeat(4,1fr) !important}
 .st38{display:flex;flex-direction:column;gap:6px;margin:6px 0}
-.st38 .w{display:flex;align-items:baseline;gap:8px;padding:5px 8px;border-radius:4px;background:rgba(16,20,48,.6);border:1px solid #3a4068}
-.st38 .w b{font-size:14px;color:#fff1c2}.st38 .w small{font-size:11px;color:#9aa4c8}
+.st38 button{font:inherit;color:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.st38 button:active{filter:brightness(1.35)}
+.st38 .q{flex:none;margin-left:auto;width:15px;height:15px;border-radius:50%;border:1px solid rgba(160,200,255,.6);position:relative;opacity:.8}
+.st38 .q::after{content:'i';position:absolute;inset:0;display:grid;place-items:center;font:italic 800 10px/1 Georgia,serif;color:#bfe0ff}
+.st38 .w{display:flex;align-items:baseline;gap:8px;padding:6px 8px;border-radius:4px;background:rgba(16,20,48,.6);border:1px solid #3a4068}
+.st38 .w b{font-size:14px;color:#fff1c2}.st38 .w b small{font-size:11px;color:#cfd4f2;font-weight:600}.st38 .w>small{font-size:10px;color:#9aa4c8}
 .st38 .lb{display:grid;grid-template-columns:.7fr 2fr;gap:4px}
-.st38 .lb span{display:flex;align-items:baseline;gap:6px;padding:4px 8px;border-radius:4px;background:rgba(16,20,48,.6);border:1px solid #3a4068}
+.st38 .lb button{display:flex;align-items:baseline;gap:6px;padding:6px 8px;border-radius:4px;background:rgba(16,20,48,.6);border:1px solid #3a4068}
 .st38 .lb em{font:italic 800 11px/1 inherit;color:#9fe8d8}.st38 .lb b{font:800 15px/1 var(--num,inherit);color:#fff}.st38 .lb b small{font-size:9px;color:#9aa4c8;margin-left:2px}
-.st38 .g7{display:grid;grid-template-columns:1fr 1fr;gap:3px 6px}
-.st38 .g7 .r{display:grid;grid-template-columns:1fr auto;align-items:baseline;padding:4px 7px;border-radius:4px;background:rgba(16,20,48,.55);border:1px solid transparent}
-.st38 .g7 .r.wp{border-color:rgba(255,214,90,.45)}
-.st38 .g7 .r span{font-size:12px;color:#cfd4f2}.st38 .g7 .r span i{font-style:normal;display:inline-block;width:14px;margin-right:4px;text-align:center;font-size:10px;font-weight:800;border-radius:3px;background:rgba(255,255,255,.12)}
-.st38 .g7 .r b{font-size:15px;color:#fff}.st38 .g7 .r small{grid-column:1/-1;font-size:9px;color:#8890b8;line-height:1.35}
+.st38 .g7{display:grid;grid-template-columns:1fr 1fr;gap:4px 6px}
+.st38 .g7 .r{display:flex;align-items:baseline;justify-content:space-between;min-height:34px;padding:6px 8px;border-radius:4px;background:rgba(16,20,48,.55);border:1px solid #2c3260}
+.st38 .g7 .r.wp{border-color:rgba(255,214,90,.55)}
+.st38 .g7 .r span{font-size:13px;color:#cfd4f2}.st38 .g7 .r span i{font-style:normal;display:inline-block;width:15px;margin-right:5px;text-align:center;font-size:10px;font-weight:800;border-radius:3px;background:rgba(255,255,255,.12)}
+.st38 .g7 .r b{font:800 16px/1 var(--num,inherit);color:#fff}
+.cst .sr,.cst .cpw{cursor:pointer}
+/* アビリティ：名前と段階だけ。タップで効果を開く */
+.rsab.x38{cursor:pointer}
+.rsab.x38 ul,.rsab.x38 .nx,.rsab.x38 .src{display:none}
+.rsab.x38.open ul{display:block}.rsab.x38.open .nx,.rsab.x38.open .src{display:block}
+.rsab.x38 .h .ar{flex:none;width:7px;height:7px;margin-left:8px;border-right:2px solid #ffb86b;border-bottom:2px solid #ffb86b;transform:rotate(45deg);transition:transform .15s}
+.rsab.x38.open .h .ar{transform:rotate(225deg)}
+.rsab.x38 .h em{margin-left:auto}
+/* 吹き出し */
+#h38{position:absolute;inset:0;z-index:60}
+#h38 .c{position:absolute;left:12px;right:12px;top:40%;padding:10px 12px;border-radius:8px;border:1px solid #9fd0ff;background:linear-gradient(180deg,rgba(22,34,72,.98),rgba(8,12,30,.98));box-shadow:0 8px 24px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.18);animation:h38 .16s ease-out}
+@keyframes h38{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#h38 .hd{display:flex;align-items:baseline;gap:8px;padding-bottom:6px;margin-bottom:6px;border-bottom:1px solid rgba(160,200,255,.3)}
+#h38 .hd b{font-size:15px;color:#fff1c2}#h38 .hd strong{font:800 18px/1 var(--num,inherit);color:#fff}
+#h38 .hd em{margin-left:auto;font-style:normal;font-size:11px;padding:1px 8px;border-radius:10px;background:rgba(255,214,90,.18);color:#ffe27a}
+#h38 ul{margin:0;padding-left:16px;font-size:12.5px;line-height:1.6;color:#e6ecff}
+#h38 small{display:block;margin-top:6px;font-size:11px;color:#9aa4c8}
+.pc38 button.fp{background:none;border:0;padding:0;font:inherit;color:inherit;width:100%;cursor:pointer}
+.pc38 button.fp:active{filter:brightness(1.4)}
 
 /* ==================== スマホの小さい画面 ==================== */
 @media (max-height:700px){.c38l .r{min-height:38px}.c38h{min-height:34px}.c38h .fc{width:34px;height:34px}.pc38 .ar{height:96px}}
