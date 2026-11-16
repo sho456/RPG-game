@@ -48,8 +48,10 @@ function setIn(v){if(v===IN){clearTimeout(offT);offT=0;return;}
 try{const _el=TX24.el;TX24.el=function(t,...a){if(t==='SP'&&a[0]==='sp')t='BP';return _el.call(this,t,...a);};}catch(e){}
 let hlTurn=-1,hlUntil=0;
 /* ver0.46：1 ターン目は「戦闘開始」が消えてから 1.4 秒、2 ターン目からはターンの始めの 1.6 秒。コマンドを決めたあと少しだけ（hpFlash）、攻撃の前に消す（hpHide） */
-let hlFrom=0;
-function hlShow(){const now=performance.now();if(B.turns!==hlTurn){hlTurn=B.turns;let be=0;try{be=BFLOW.bannerEnd();}catch(e){}hlFrom=B.turns<=1?Math.max(now,be):now;hlUntil=hlFrom+(B.turns<=1?1400:1600);}
+let hlFrom=0;const HP1=1300;
+/* 1 ターン目の HP・BP が消える時刻（このあとに開始時の強化・弱体を出す：js/v25.js の表示ゲート・js/rs/battle.js opening） */
+const hpEnd=()=>{let be=0;try{be=BFLOW.bannerEnd();}catch(e){}return be+HP1;};
+function hlShow(){const now=performance.now(),tn=Math.max(1,B.turns||0);/* 0 ターン目（開始前）と 1 ターン目は同じ扱い */if(tn!==hlTurn){hlTurn=tn;let be=0;try{be=BFLOW.bannerEnd();}catch(e){}hlFrom=tn<=1?Math.max(now,be):now;hlUntil=hlFrom+(tn<=1?HP1:1600);}
  const on=!B.over&&now<hlUntil&&now>=hlFrom;if(app.classList.contains('hl39')!==on)app.classList.toggle('hl39',on);}
 function hlState(){hlShow();const L=$('#hl24');if(!L)return;B.heroes.forEach((h,i)=>{const c=L.children[i];if(!c)return;const dy=RSB.dying(h),lp=h.alive?'':`LP ${h.lp||0}`;
  if(c.classList.contains('dy38')!==dy)c.classList.toggle('dy38',dy);if(c.dataset.lp!==lp)c.dataset.lp=lp;
@@ -72,4 +74,4 @@ function waveIn(){const w=$('#wv38');if(!w)return;w.className='on out';setTimeou
 
 function hpFlash(ms){hlFrom=performance.now();hlUntil=hlFrom+ms;}
 function hpHide(){hlUntil=0;}
-return{geo,waveOut,waveIn,heroK,hpFlash,hpHide};})();
+return{geo,waveOut,waveIn,heroK,hpFlash,hpHide,hpEnd};})();

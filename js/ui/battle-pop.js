@@ -3,7 +3,7 @@
   1 段目：Critical・Weak（Resist）・属性の漢字（Weak と漢字は同時）／Guard
   2 段目：強化・弱体・状態異常（横並びで 1 行・3 つまで）。アビリティの発動名（固有の強化）は同時に出たら 2 行目
   3 段目：ダメージ・回復の数字（連続ヒットはヒットごとの数字に置き換わる。合計は出さない）
- 置き場所：敵＝体の左下（手前）、味方＝体の左。枠は下端（数字）を固定して上へ積む。枠どうしが重なるときだけ後のものを下げる。
+ 置き場所：敵・味方とも体の中心が基準（中央揃え。数字の行の中心＝体の中心、上の段は上へ積む）。枠どうしが重なるときだけ後のものを下げる。
  1 つの行動（BFLOW.aid）の表示は行動の間ずっと残り、行動が終わって約 1 秒で消える。次の行動の表示が来たら前の表示を消してから出す。
  置き換えたもの：js/v24.js dmgPop・wordPop・tagPop、js/v25.js fxPop（V24.HK24.pop をここで差し替える。古い関数は残っているが呼ばれない） */
 'use strict';
@@ -73,7 +73,8 @@ function place(){if(!inB())return;const st=$('#stage');if(!st)return;const W0=st
  for(const[u,p]of P){if(!p.el.isConnected||!p.el.classList.contains('on'))continue;let b;try{b=V24.boxOf(u,true);}catch(e){continue;}
   const w=p.el.offsetWidth,h=p.el.offsetHeight;let x,y;
   /* キャラの範囲の中に収める（ロマサガRS の録画）：敵は体の左下寄り、味方は体の真ん中に重ねる。体より大きいときだけはみ出す */
-  if(u.side===1){x=w<b.w?b.l+(b.w-w)*.18:b.cx-w/2;y=Math.max(b.t,b.b-b.h*.06-h);}else{x=b.cx-w/2;y=Math.max(b.t-h*.25,b.b-b.h*.08-h);}
+  /* ver0.46c：敵・味方とも体の中心を基準に、中央揃え。数字の行（3 段目）の中心を体の中心に合わせ、上の段は上へ積む（数字がない間は枠の中心を体の中心に） */
+  const nh=p.r3.offsetHeight;x=b.cx-w/2;y=nh?b.cy+nh/2-h:b.cy-h/2;
   /* 味方の HP・BP が見えている間（数字の無い枠のとき）は、その上に置く */
   if(u.side===0&&!p.r3.children.length){try{const i=B.heroes.indexOf(u),c=$('#hl24').children[i],app=$('#app');if(c&&app.classList.contains('hl39')){const sr=st.getBoundingClientRect(),cr=c.getBoundingClientRect(),k=sr.width/W0;if(cr.height){const ct=(cr.top-sr.top)/k;y=Math.min(y,ct-h-2);}}}catch(e){}}
   x=Math.max(bd.l,Math.min(bd.r-w,x));y=Math.max(bd.t,Math.min(bd.b-h,y));

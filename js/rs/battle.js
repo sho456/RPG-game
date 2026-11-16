@@ -191,7 +191,9 @@ async function inputPhase(myB){const cmds=new Map();let list=B.heroes.filter(h=>
    try{V20.STN&&(nh.sts=[]);}catch(e){}C.applyForm(nh,idx);nh.sp=bpStart(nh);log(`${u.name}と${nh.name}が入れ替わった！`);SFX.sel();list[i]=nh;refresh();await wait(250);continue;}
   cmds.set(u,ch);i++;}
  B.cur=null;B.rs.phase='act';refresh();return cmds;}
-async function opening(myB){await sleep(350);let n=0;while(B===myB&&!B.over&&(B.intro>0||document.querySelector('#stage .bossin')||BFLOW.bannerOn())&&n<240){await sleep(50);n++;}}
+async function opening(myB){await sleep(350);let n=0;while(B===myB&&!B.over&&(B.intro>0||document.querySelector('#stage .bossin')||BFLOW.bannerOn())&&n<240){await sleep(50);n++;}
+ /* ver0.46c：HP・BP が消え、開始時の強化・弱体を見せ終えてからコマンドへ */
+ n=0;const hasSt=()=>!!document.querySelector('#bp46 .bp46.on:not(.out)');while(B===myB&&!B.over&&(performance.now()<V38B.hpEnd()+600||hasSt())&&n<120){await sleep(50);n++;}}
 
 /* 味方の行動 */
 async function heroExec(u,c){if(!c||!c.sk)return;try{BPOP.clearUnit(u);}catch(x){}

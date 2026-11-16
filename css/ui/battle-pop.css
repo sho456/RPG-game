@@ -1,9 +1,10 @@
 /* ===== 戦闘中の表示の枠（js/ui/battle-pop.js と対。決まりは docs/BATTLE-FLOW.md） =====
- 3 段：1 段目＝Critical・Weak＋属性の漢字／2 段目＝強化・弱体（横並び）＋アビリティ名の行／3 段目＝数字。敵は左寄せ、味方は右寄せ */
+ 3 段：1 段目＝Critical・Weak＋属性の漢字／2 段目＝強化・弱体（横並び）＋アビリティ名の行／3 段目＝数字。敵・味方とも中央揃え */
 #bp46{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:7}
 .bp46{position:absolute;left:0;top:0;display:none;flex-direction:column;gap:0;will-change:transform,opacity}
 .bp46.on{display:flex}
-.bp46.e{align-items:flex-start}.bp46.h{align-items:center}
+.bp46.e,.bp46.h{align-items:center}
+.bp46>div{justify-content:center}
 .bp46>div{display:flex;align-items:flex-end;gap:3px;white-space:nowrap}
 .bp46>div:empty{display:none}
 .bp46 canvas{display:block}
@@ -22,7 +23,7 @@
 .bp46 .nm{display:inline-flex;align-items:flex-end}
 .bp46 .nm.dg canvas{transform-origin:50% 100%;animation:dg43 .36s cubic-bezier(.25,.8,.35,1) both}
 .bp46 .nm.old{position:absolute;bottom:0;opacity:0;transition:opacity .14s ease-out}
-.bp46.e .nm.old{left:0}.bp46.h .nm.old{left:50%;transform:translateX(-50%)}
+.bp46 .nm.old{left:50%;transform:translateX(-50%)}
 /* 数字の枠が出ている味方は HP・BP を隠す */
 #hl24 .hl.p46{opacity:0!important;transition:opacity .12s}
 @media (prefers-reduced-motion:reduce){.bp46 canvas,.bp46 .st{animation:none!important}}

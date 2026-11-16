@@ -168,7 +168,7 @@ const now25=()=>performance.now();
 /* 開幕の表示ゲート：敵の登場演出（ボスの暗転・名乗り）が終わるまで、強化・弱体などの「表示だけ」を預かる。
  状態そのものは通常どおりその場で掛かる（戦闘処理には触れない）。演出が終わったら順に表示し、表示し終えてから最初の手番へ */
 const OP={t0:0,on:false,q:[],ready:0};
-const opening=()=>inB()&&OP.on&&(now25()-OP.t0<650||(B.intro>0)||!!document.querySelector('#stage .bossin')||(typeof BFLOW!=='undefined'&&BFLOW.bannerOn()));/* ver0.46：「戦闘開始」が消えてから */
+const opening=()=>inB()&&OP.on&&(now25()-OP.t0<650||(B.intro>0)||!!document.querySelector('#stage .bossin')||(typeof V38B!=='undefined'&&now25()<V38B.hpEnd()+350));/* ver0.46c：「戦闘開始」→ HP・BP が消えてから */
 function gateStart(){OP.t0=now25();OP.on=true;OP.q=[];OP.ready=0;}
 function gateTick(){if(!OP.on||!inB())return;if(opening())return;OP.on=false;const q=OP.q;OP.q=[];const step=0;/* ver0.46：全体にかかる効果は全員に同時に出す */
  /* 同じキャラの表示は同時に（積み上がる）、キャラごとに少しずつずらす */
