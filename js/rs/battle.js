@@ -156,6 +156,9 @@ function roundStart(){const R=B.rs.round;
  for(const h of aliveH()){h.bpMax=(h.bpMax0||h.bpMax)+0;
   if(R>1)h.sp=clamp(h.sp+bpReg(h),0,h.bpMax);
   if(DEV())h.sp=h.bpMax;}
+ refresh();}
+/* ターンの始めの効果（ver0.46d：ロマサガRS と同じく、コマンドを決めて全画面になったあと＝HP・BP を見せたあとに出す） */
+function roundFx(){const R=B.rs.round;
  for(const h of aliveH())for(const e of effs(h)){
   if(e.t==='tstart'){const tg=e.on==='allies'?aliveH():[h];for(const x of tg)V20.addSt(x,e.k,e.k==='shield'?Math.round(x.mhp*e.v/100):e.v,e.k==='shield'?99:2);}
   if(e.t==='autorev'&&!h._rsAR){const d=B.heroes.find(x=>!x.alive&&(x.lp||0)>0);if(d){h._rsAR=1;d.alive=true;d.hp=Math.max(1,Math.round(d.mhp*e.v/100));abPop(h,e.src);setTimeout(()=>{try{pop(d,'REVIVE','#7dffa8',true);setCT(d);}catch(x){}},200);log(`${h.name}の「${e.src}」――${d.name}が立ち上がった`);}}}
@@ -193,10 +196,10 @@ async function inputPhase(myB){const cmds=new Map();let list=B.heroes.filter(h=>
  B.cur=null;B.rs.phase='act';refresh();return cmds;}
 async function opening(myB){await sleep(350);let n=0;while(B===myB&&!B.over&&(B.intro>0||document.querySelector('#stage .bossin')||BFLOW.bannerOn())&&n<240){await sleep(50);n++;}
  /* ver0.46c：HP・BP が消え、開始時の強化・弱体を見せ終えてからコマンドへ */
- n=0;const hasSt=()=>!!document.querySelector('#bp46 .bp46.on:not(.out)');while(B===myB&&!B.over&&(performance.now()<V38B.hpEnd()+600||hasSt())&&n<120){await sleep(50);n++;}}
+ n=0;while(B===myB&&!B.over&&performance.now()<V38B.hpEnd()+1400&&n<120){await sleep(50);n++;}try{BPOP.cut();}catch(e){}await sleep(260);}
 
 /* 味方の行動 */
-async function heroExec(u,c){if(!c||!c.sk)return;try{BPOP.clearUnit(u);}catch(x){}
+async function heroExec(u,c){if(!c||!c.sk)return;try{BPOP.cut();}catch(x){}/* 行動ごとの区切り：前の行動の表示を消す */
  psEach(u,'turn');const stun=await V20.tickSts(u);if(!u.alive||!aliveE().length)return;if(stun)return;
  let sk=c.sk,t=c.t;
  if(sk.ougi&&(!u.aw||u._rsOugi))sk=ATK(u);
@@ -251,7 +254,7 @@ function prep(u,sk,t){const s=Object.assign({},sk);s.sp=0;/* 旧来の SP の消
  if(s.fixedK==='store')s.fixed=(u.store||0)*.9+st(u,'atk')*3;
  return s;}
 /* 敵の行動。全体攻撃は、倒れている味方（LP が残っている）にも追い打ちになる */
-async function enemyExec(e){try{BPOP.clearUnit(e);}catch(x){}B.rs.cq=[];B.rs.eSk=null;const down=B.heroes.filter(h=>!h.alive&&(h.lp||0)>0);
+async function enemyExec(e){try{BPOP.cut();}catch(x){}B.rs.cq=[];B.rs.eSk=null;const down=B.heroes.filter(h=>!h.alive&&(h.lp||0)>0);
  const ch0=e.charging;await enemyTurn(e);
  try{const s=B&&B.rs&&B.rs.eSk;if(s&&s.t==='all'&&!e.charging)for(const h of down)if(!h.alive&&B.heroes.includes(h))lpLose(h,1,'倒れたところに追い打ちを受けた');}catch(x){console.error(x);}
  if(B&&!B.over&&e.alive&&e.charging&&!ch0)log(`${e.name}は<b>力を溜めている</b>…！ 次の行動で強力な攻撃が来る`);
@@ -266,7 +269,10 @@ run=async function(){if(!B)return;if(B.opts&&B.opts.viewer)return oldRun();const
    const cmds=await inputPhase(myB);if(!cmds||B!==myB||B.over)return;
    const q=buildOrder(cmds);B.rs.q=q;refresh();
    /* コマンドを決め終えたら戦場を全面に。全員の HP・BP を少しだけ出し、最初の攻撃の前に全員分まとめて消す（ver0.46） */
-   try{V38B.hpFlash(560);}catch(e){}await wait(600);try{V38B.hpHide();}catch(e){}
+   /* ver0.46d：ターンの始め＝コマンドを決めて全画面になったあと。HP・BP を 1 度だけ出して消し、ターンの始めの効果を出してから行動へ */
+   try{BPOP.cut();}catch(e){}await wait(250);
+   try{V38B.hpFlash(900);}catch(e){}await wait(950);try{V38B.hpHide();}catch(e){}await wait(200);
+   roundFx();if(document.querySelector('#bp46 .bp46.on:not(.out)'))await wait(900);
    while(q.length){if(B!==myB||B.over)return;const it=q.shift(),u=it.u;
     if(!u.alive)continue;if(u.side===1&&!B.enemies.includes(u))continue;if(u.side===0&&!B.heroes.includes(u))continue;
     const snap=ctSnap();B.cur=u;refresh();
@@ -274,7 +280,7 @@ run=async function(){if(!B)return;if(B.opts&&B.opts.viewer)return oldRun();const
     if(B!==myB||B.over)return;B.cur=null;ctApply(snap,u,q);lpGuard();refresh();
     if(!aliveE().length){if(B.opts.stages&&(B.stage||0)<B.opts.stages.length-1){await nextStage();break;}await wait(500);return end(true);}
     if(!aliveH().length){await wait(500);return end(false);}}
-   roundEnd();}
+   roundEnd();try{BPOP.cut();}catch(e){}await wait(260);}/* ターンの終わり：表示を全部消してからコマンド入力へ */
  }catch(e){console.error(e);}};
 /* 行動順の表示（入力中は予想、行動中は残りの列） */
 preview=function(){if(!B||!B.rs)return[...aliveH(),...aliveE()];if(B.rs.q&&B.rs.q.length)return B.rs.q.map(x=>x.u).filter(u=>u.alive);return[...aliveH(),...aliveE()].sort((a,b)=>spdOf(b)-spdOf(a));};

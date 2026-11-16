@@ -4,7 +4,7 @@
   2 段目：強化・弱体・状態異常（横並びで 1 行・3 つまで）。アビリティの発動名（固有の強化）は同時に出たら 2 行目
   3 段目：ダメージ・回復の数字（連続ヒットはヒットごとの数字に置き換わる。合計は出さない）
  置き場所：敵・味方とも体の中心が基準（中央揃え。数字の行の中心＝体の中心、上の段は上へ積む）。枠どうしが重なるときだけ後のものを下げる。
- 1 つの行動（BFLOW.aid）の表示は行動の間ずっと残り、行動が終わって約 1 秒で消える。次の行動の表示が来たら前の表示を消してから出す。
+ 表示は区切り（キャラの行動の始め・ターンの始めの効果の前・ターンの終わり）まで残り、区切りで全員分まとめて消える（cut）。
  置き換えたもの：js/v24.js dmgPop・wordPop・tagPop、js/v25.js fxPop（V24.HK24.pop をここで差し替える。古い関数は残っているが呼ばれない） */
 'use strict';
 const BPOP=(()=>{
@@ -26,11 +26,15 @@ function panel(u){let p=P.get(u);if(p&&p.el.isConnected)return p;
  el.innerHTML='<div class="r0"></div><div class="r1"></div><div class="r2"></div><div class="r2b"></div><div class="r3"></div>';layer().appendChild(el);
  p={u,el,r0:el.children[0],r1:el.children[1],r2:el.children[2],r2b:el.children[3],r3:el.children[4],key:null,tl:0,fade:0};P.set(u,p);return p;}
 function clear(p){p.r0.innerHTML='';p.r1.innerHTML='';p.r2.innerHTML='';p.r2b.innerHTML='';p.r3.innerHTML='';p.el.classList.remove('out','on');p.crit=p.weak=p.res=p.grd=0;}
-/* 表示のまとまり：行動中はその行動の番号、行動の外（戦闘開始・ターンの始め）は 0.8 秒以内に続けて出たものを 1 つに */
-function begin(u){const p=panel(u),t=now(),a=aid();
- let k=busy()?'a'+a:(p.key==='a'+a&&t-p.tl<1600)?p.key:(p.key==='idle'&&t-p.tl<800)?'idle':null;
- if(!k){k='idle';clear(p);}else if(p.key!==k||p.el.classList.contains('out'))clear(p);
- p.key=k;p.tl=t;p.fade=busy()?Infinity:t+Math.round(1300*spdK());p.el.classList.add('on');return p;}
+/* 表示のまとまり（ver0.46d）：区切り（cut）から次の区切りまでを 1 つのまとまりにする。
+   区切り＝キャラの行動の始め（js/rs/battle.js heroExec・enemyExec）・ターンの始めの効果の前・ターンの終わり・戦闘開始の表示のあと。
+   まとまりの表示は次の区切りまで残し、区切りで全員分まとめて消える（次の行動の表示と被らない） */
+let SEG=1;
+function begin(u){const p=panel(u),t=now();
+ if(p.seg!==SEG||p.el.classList.contains('out')){clearTimeout(p.to);clear(p);p.seg=SEG;p.el.classList.remove('in');void p.el.offsetWidth;p.el.classList.add('in');}
+ p.key='s'+SEG;p.tl=t;p.fade=Infinity;p.el.classList.add('on');return p;}
+/* 区切り：出ている表示を全部、消える動き（上へ少し浮いて薄くなる）で消す */
+function cut(){SEG++;for(const p of P.values()){if(!p.el.classList.contains('on')||p.el.classList.contains('out'))continue;p.el.classList.add('out');clearTimeout(p.to);p.to=setTimeout(()=>{if(p.el.classList.contains('out')){clear(p);p.key=null;}},230);}}
 /* 1 段目：見出し。Critical は Weak・Resist の上の行（r0）、Weak・Resist・Guard と属性の漢字は r1 */
 function label(p,cls,txt,sk,fs,el){const row=cls==='cr'?p.r0:p.r1;if(row.querySelector('.'+cls))return;const d=document.createElement('span');d.className='lb '+cls;d.appendChild(tight(TX24.el(txt,sk,fs),fs,.8));
  if(el&&ELC[el]){const ks=Math.round(fs*1.25),k=tight(TX24.el(el,'elm',ks),ks,.8);k.classList.add('kj');d.appendChild(k);}
@@ -81,15 +85,15 @@ function place(){if(!inB())return;const st=$('#stage');if(!st)return;const W0=st
   /* 前に置いた枠と重なるなら下げる（入らなければ上げる） */
   for(let n=0;n<6;n++){const o=rs.find(r=>x<r.r&&x+w>r.l&&y<r.b&&y+h>r.t);if(!o)break;const dn=o.b+2;y=dn+h<=bd.b?dn:Math.max(bd.t,o.t-h-2);}
   rs.push({l:x,t:y,r:x+w,b:y+h});const tf=`translate(${Math.round(x)}px,${Math.round(y)}px)`;if(p._tf!==tf){p._tf=tf;p.el.style.transform=tf;}}}
-/* 行動の終わり：その行動の表示を約 1 秒で消す */
-function actEnd(a){const t=now();for(const p of P.values())if(p.key==='a'+a)p.fade=t+Math.round(1000*spdK());}
+/* 行動の終わり：表示は次の区切りまで残す（ver0.46d。以前は 1 秒で消していた） */
+function actEnd(){}
 function tick(){if(!inB())return;const t=now();for(const[u,p]of P){if(!p.el.isConnected){P.delete(u);continue;}
-  if(p.el.classList.contains('on')&&t>p.fade&&!p.el.classList.contains('out')){p.el.classList.add('out');setTimeout(()=>{if(p.el.classList.contains('out')){clear(p);p.key=null;}},260);}}
+  if(p.el.classList.contains('on')&&t-p.tl>8000&&!p.el.classList.contains('out')){p.el.classList.add('out');clearTimeout(p.to);p.to=setTimeout(()=>{if(p.el.classList.contains('out')){clear(p);p.key=null;}},230);}}/* 区切りが来ないまま残った表示の保険（8 秒） */
  place();
  /* 数字の枠が出ている味方は、HP・BP の表示を隠す（重ならないように） */
  try{const L=$('#hl24');if(L&&B)B.heroes.forEach((h,i)=>{const c=L.children[i],p=P.get(h),on=!!(p&&p.el.classList.contains('on')&&!p.el.classList.contains('out')&&p.r3.children.length);if(c&&c.classList.contains('p46')!==on)c.classList.toggle('p46',on);});}catch(e){}}
 /* 行動を始めるキャラの枠は消す（動いて元の場所から離れるため） */
-function clearUnit(u){const p=P.get(u);if(p&&p.el.classList.contains('on'))p.fade=0;}
+function clearUnit(){cut();}
 function reset(){for(const p of P.values())p.el.remove();P.clear();const L=$('#bp46');if(L)L.innerHTML='';}
 /* 差し替え：文字の表示はすべてここへ（技名の吹き出しは js/battle/flow.js） */
 V24.HK24.pop=(u,s,col,small,kind,el)=>{if(!inB()||!u||u.x==null)return false;s=String(s);
@@ -98,4 +102,4 @@ V24.HK24.pop=(u,s,col,small,kind,el)=>{if(!inB()||!u||u.x==null)return false;s=S
   status(u,s,col,kind);return true;}catch(e){console.error(e);return false;}};
 {const _d=draw;draw=function(){_d();try{tick();}catch(e){if(!draw._e46){draw._e46=1;console.error(e);}}};}
 {const _sb=startBattle;startBattle=function(){reset();return _sb.apply(this,arguments);};}
-return{dmg,status,word,actEnd,reset,clearUnit,P};})();
+return{dmg,status,word,actEnd,reset,clearUnit,cut,P};})();

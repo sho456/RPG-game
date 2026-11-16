@@ -92,10 +92,10 @@
 | 86 | `js/rs/abilities.js` | 10 | アビリティ（AB・ABL の正本。ver0.45：3 段階＋段階Ⅲの固有名の特殊効果） |  |
 | 87 | `js/rs/core.js` | 22 | 戦闘システム（能力値・習得・技セット・アビリティ・陣形・セーブ） | RSC |
 | 88 | `js/data/equip7.js` | 4 | 装備の能力影響（EQ7：装備が上げるのは基礎ステータスだけ。ver0.45 新規の正本） | EQ7 |
-| 89 | `js/rs/battle.js` | 29 | 戦闘の進行（ターン制・BP・HP/LP） | RSB |
+| 89 | `js/rs/battle.js` | 30 | 戦闘の進行（ターン制・BP・HP/LP） | RSB |
 | 90 | `js/rs/ui.js` | 22 | 戦闘システムの画面 | RSU |
 | 91 | `js/v38/core.js` | 4 | ver0.38 土台：攻撃属性 8 種・武器種 8 種・セーブの移行・LP | V38 |
-| 92 | `js/v38/battle-ui.js` | 6 | ver0.38 戦闘画面 | V38B |
+| 92 | `js/v38/battle-ui.js` | 7 | ver0.38 戦闘画面 | V38B |
 | 93 | `js/v38/menu.js` | 10 | ver0.38 画面全体の整理 | V38M |
 | 94 | `js/v38/help.js` | 8 | ver0.38 タップで詳細（V38H） | V38H |
 | 95 | `js/ui/skill-icons.js` | 5 | 技・術のアイコン（SKICON：白いシルエットの絵柄 27 種＋技 → 絵柄の対応。js/rs/ui.js の skIcon が使う） |  |
@@ -105,7 +105,7 @@
 | 99 | `js/ui/smith.js` | 4 | 鍛冶屋の画面（ver0.44。正本：town.js の smith・enhance と v31/items.js・ver18-town.js の包みを置き換え） | SMITH44 |
 | 100 | `js/ui/damage.js` | 3 | 戦闘のダメージ表示の書体（TX24 の書式の最終定義。ロマサガRS の録画に合わせた） |  |
 | 101 | `js/ui/keywords.js` | 6 | 用語のハイライト（KW：効果の説明文の用語を緑で示し、タップで詳しい説明を出す正本。ver0.45 新規） | KW |
-| 102 | `js/ui/battle-pop.js` | 9 | 戦闘中の表示（見出し・状態・数字）の正本（BPOP。ver0.46 新規。決まりは docs/BATTLE-FLOW.md） | BPOP |
+| 102 | `js/ui/battle-pop.js` | 10 | 戦闘中の表示（見出し・状態・数字）の正本（BPOP。ver0.46 新規。決まりは docs/BATTLE-FLOW.md） | BPOP |
 
 ## 上書きの連鎖（2 ファイル以上で定義・上書きされる関数）
 
@@ -172,6 +172,7 @@
 | `card` | ver17.js → v22.js → ui/party.js |
 | `chooseRoot` | engine.js → ch8.js → rs/ui.js |
 | `clear` | motion/fx19.js → battle/core.js → ui/battle-pop.js |
+| `cut` | sprite/spx.js → battle/prim.js → ui/battle-pop.js |
 | `drawBoard` | items.js → ver17.js → v31/board.js |
 | `drawUnit` | engine.js → ver16.js → ver17.js |
 | `frame` | sprite/legacy/dot-rig.js → ver19-art.js → v21.js |
@@ -227,7 +228,6 @@
 | `circle` | motion/fx19.js → battle/prim.js |
 | `claw` | motion/fx19.js → v21-art.js |
 | `comboAdd` | ch5.js → v24.js |
-| `cut` | sprite/spx.js → battle/prim.js |
 | `def` | v21-items.js → battle/seq.js |
 | `devAreas` | dev.js → v31/quests.js |
 | `devGear` | dev.js → v31/items.js |

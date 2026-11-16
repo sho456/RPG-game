@@ -8,7 +8,11 @@
 .bp46>div{display:flex;align-items:flex-end;gap:3px;white-space:nowrap}
 .bp46>div:empty{display:none}
 .bp46 canvas{display:block}
-.bp46.out{opacity:0;transition:opacity .25s ease-in}
+.bp46.out{animation:out46 .22s ease-in forwards}
+/* 出る動き：枠ごと少し大きく現れて落ち着く／消える動き：上へ少し浮いて薄くなる */
+.bp46.in{animation:in46 .2s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes in46{0%{opacity:0;scale:1.15}100%{opacity:1;scale:1}}
+@keyframes out46{0%{opacity:1;translate:0 0}100%{opacity:0;translate:0 -10px}}
 /* 1 段目：見出しと漢字は同時に叩きつける */
 .bp46 .r0,.bp46 .r1{gap:5px;margin-bottom:2px}
 .bp46 .lb{display:flex;align-items:flex-end;gap:2px}

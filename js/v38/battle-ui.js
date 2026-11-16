@@ -51,7 +51,7 @@ let hlTurn=-1,hlUntil=0;
 let hlFrom=0;const HP1=1300;
 /* 1 ターン目の HP・BP が消える時刻（このあとに開始時の強化・弱体を出す：js/v25.js の表示ゲート・js/rs/battle.js opening） */
 const hpEnd=()=>{let be=0;try{be=BFLOW.bannerEnd();}catch(e){}return be+HP1;};
-function hlShow(){const now=performance.now(),tn=Math.max(1,B.turns||0);/* 0 ターン目（開始前）と 1 ターン目は同じ扱い */if(tn!==hlTurn){hlTurn=tn;let be=0;try{be=BFLOW.bannerEnd();}catch(e){}hlFrom=tn<=1?Math.max(now,be):now;hlUntil=hlFrom+(tn<=1?HP1:1600);}
+function hlShow(){const now=performance.now(),tn=Math.max(1,B.turns||0);/* 0 ターン目（開始前）と 1 ターン目は同じ扱い */if(tn!==hlTurn){hlTurn=tn;let be=0;try{be=BFLOW.bannerEnd();}catch(e){}if(tn<=1){hlFrom=Math.max(now,be);hlUntil=hlFrom+HP1;}else{hlFrom=0;hlUntil=0;}/* ver0.46d：2 ターン目からはターンの始め（コマンドの後の hpFlash）だけ */}
  const on=!B.over&&now<hlUntil&&now>=hlFrom;if(app.classList.contains('hl39')!==on)app.classList.toggle('hl39',on);}
 function hlState(){hlShow();const L=$('#hl24');if(!L)return;B.heroes.forEach((h,i)=>{const c=L.children[i];if(!c)return;const dy=RSB.dying(h),lp=h.alive?'':`LP ${h.lp||0}`;
  if(c.classList.contains('dy38')!==dy)c.classList.toggle('dy38',dy);if(c.dataset.lp!==lp)c.dataset.lp=lp;
