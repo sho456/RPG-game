@@ -45,6 +45,4 @@
 #app.v38.in38[data-sc="battle"] #bp46{translate:0 var(--sl38);transition:translate .42s var(--ez38)}
 #app.v38[data-sc="battle"] #bp46{transition:translate .5s var(--ez38)}
 @media (prefers-reduced-motion:reduce){.bp46 .r3.hit,.bp46 .lb::before{animation:none!important}}
-
-/* HP・BP（キャラの中央）：見やすいよう薄い黒の下地（ver0.47）。弾む動きは ver0.48 で外した（見づらいため。前の出入りに戻す） */
-#app.v38 #hl24 .hl{padding:1px 6px 2px;border-radius:7px;background:rgba(4,6,14,.55);box-shadow:0 0 0 1px rgba(255,255,255,.08) inset}
+/* HP・BP（キャラの中央）：ver0.48 で弾む動き、続けて薄い黒の下地も外した */
