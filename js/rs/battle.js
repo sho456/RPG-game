@@ -144,8 +144,8 @@ function glimmer(u,sk){if(!sk||sk.basic||sk.ougi||u.side!==0)return null;const k
   const boss=aliveE().some(e=>e.boss),p=(g.p||.08)*(boss?2:1)*(1+(((G.fac&&G.fac.tower)||1)-1)*.1)*(DEV()?5:1);/* 星詠みの塔：ひらめき率+10%/Lv */if(Math.random()<p){h.glim.push(id);try{save();}catch(e){}return SK[id];}}
  return null;}
 async function glimShow(u,sk){banner('ひらめき！',`${u.name}は「${sk.n}」を閃いた！`,'glim');SFX.weak();pop(u,'💡','#ffe27a',true);log(`<b>💡 ${u.name}は「${sk.n}」を閃いた！</b>`);await wait(700);}
-function addProf(u,sk){if(u.side!==0||!sk||sk.basic||sk.k==='item')return;const k=C.keyOf(sk);if(!k||!D.NEW[k])return;const h=G.h[u.id];if(!h)return;
- const l0=C.profLv(u.id,k);h.skx[k]=(h.skx[k]||0)+1;const l1=C.profLv(u.id,k);if(l1>l0)setTimeout(()=>{try{pop(u,`技Lv${l1}`,'#ffe27a',true,'st20 up');}catch(e){}},300);}
+/* 技Lv（熟練）は ver0.47 で廃止（練達：js/rs/mastery.js） */
+function addProf(){}
 
 /* ==================== 見出し（奥義・ひらめき） ==================== */
 function banner(t,s,cls){let b=$('#rsban');if(!b){b=document.createElement('div');b.id='rsban';$('#stage').appendChild(b);}
@@ -170,7 +170,11 @@ function roundFx(){const R=B.rs.round;
     for(const x of tg){if(x.hp>=x.mhp)continue;const v=Math.max(1,Math.round(x.mhp*e.v/100*(h.healAb||1)*(x.healRecv||1)));x.hp=Math.min(x.mhp,x.hp+v);pop(x,'+'+v,'#7dffa8',true);}}
    if(e.t==='cleanse'&&Math.random()<(e.p||0)){const s=(h.sts||[]).find(s=>!V20.isBuff(s));if(s){V20.clearSt(h,x=>x===s);pop(h,'弱体解除','#8ff0a8',true);}}}}
  refresh();}
-function roundEnd(){for(const h of B.heroes){if(h.taunt>0)h.taunt--;
+/* 解癒（練達の効果）：ターン終了時に 1 回だけ、状態異常・能力ダウンを解除し、HP を少し回復する（効果極小＝最大HPの5%） */
+function kaiyuEnd(){for(const h of aliveH()){const s=(h.sts||[]).find(x=>x.k==='kaiyu');if(!s)continue;V20.clearSt(h,x=>x===s);
+  const a=V20.clrAil(h),d=V20.clrDown(h);abPop(h,'解癒');if(h.hp<h.mhp){const n=Math.max(1,Math.round(h.mhp*.05));h.hp=Math.min(h.mhp,h.hp+n);pop(h,'+'+n,'#7dffa8');}
+  if(a||d)log(`${h.name}の「解癒」――状態異常・能力ダウンを解除した`);}}
+function roundEnd(){try{kaiyuEnd();}catch(e){console.error(e);}for(const h of B.heroes){if(h.taunt>0)h.taunt--;
   if(h.aw&&h.alive){h.awT=(h.awT||0)+1;if(h.awT>=awN(h)){endAw(h,true);h._awE=null;log(`${h.name}の星臨が解けた`);}}}
  refresh();}
 /* 行動順 */
@@ -237,7 +241,7 @@ async function heroExec(u,c){if(!c||!c.sk)return;try{BPOP.cut();}catch(x){}/* �
  if(sk.k==='mag'&&sk.el)u._rsLe=sk.el;
  if(t&&t.side===1){if(u._rsSameT===t)u._rsSameN=(u._rsSameN||0)+1;else{u._rsSameT=t;u._rsSameN=0;}}
  /* 攻撃後の範囲効果 */
- for(const f of sk.post||[]){const tg=f.on==='allies'?aliveH():f.on==='enemies'?aliveE():f.on==='self'?[u]:t&&t.alive?[t]:[];for(const x of tg)V20.addSt(x,f.k,f.k==='shield'?Math.round(x.mhp*f.v):f.v,f.t);}
+ for(const f of s2.post||[]){const tg=f.on==='allies'?aliveH():f.on==='enemies'?aliveE():f.on==='self'?[u]:t&&t.alive?[t]:[];for(const x of tg)V20.addSt(x,f.k,f.k==='shield'?Math.round(x.mhp*f.v):f.v,f.t);}
  /* 回復した味方に被ダメ軽減 */
  const hp=sumE(u,'healprot');if(hp)B.heroes.forEach((h,i)=>{if(h.alive&&h.hp>hp0[i])V20.addSt(h,'prot',hp,2);});
  /* 追撃 */
@@ -254,6 +258,12 @@ function prep(u,sk,t){const s=Object.assign({},sk);s.sp=0;/* 旧来の SP の消
  if(s.fx20)s.fx20=s.fx20.map(f=>f.on==='t'&&f.p!=null&&!BUFFK.has(f.k)&&!(f.v>0&&['atk','def','mag','res','spd'].includes(f.k))?Object.assign({},f,{_ail:1}):f);
  const hx=sumE(u,'hits');if(hx&&s.hits>1&&(s.k==='phys'||s.k==='mag'))s.hits+=hx;
  if(s.fixedK==='store')s.fixed=(u.store||0)*.9+st(u,'atk')*3;
+ /* 練達（js/rs/mastery.js）：威力・回復量の倍率、会心、効果のターン数、追加の効果 */
+ if(u.side===0)try{const M=RSM.mods(u.id,C.keyOf(sk));if(M.pow!==1){if(s.pow)s.pow*=M.pow;if(s.heal20)s.heal20*=M.pow;}if(M.crit)s.crit=(s.crit||0)+M.crit;
+  if(M.dur){if(s.fx20)s.fx20=s.fx20.map(f=>f.t&&f.t<50?Object.assign({},f,{t:f.t+M.dur}):f);if(s.taunt20)s.taunt20+=M.dur;}
+  if(M.fx.length)s.fx20=(s.fx20||[]).concat(M.fx.map(f=>Object.assign({on:'t'},f,f.p!=null&&f.p<1?{_ail:1}:{})));
+  if(M.sup.length){if(s.k==='sup20')s.fx20=(s.fx20||[]).concat(M.sup);else s.post=(s.post||[]).concat(M.sup);}
+  if(M.post.length)s.post=(s.post||[]).concat(M.post);}catch(e){console.error(e);}
  return s;}
 /* 敵の行動。全体攻撃は、倒れている味方（LP が残っている）にも追い打ちになる */
 async function enemyExec(e){try{BPOP.cut();}catch(x){}B.rs.cq=[];B.rs.eSk=null;const down=B.heroes.filter(h=>!h.alive&&(h.lp||0)>0);
@@ -283,7 +293,7 @@ run=async function(){if(!B)return;if(B.opts&&B.opts.viewer)return oldRun();const
     if(B!==myB||B.over)return;B.cur=null;ctApply(snap,u,q);lpGuard();refresh();
     if(!aliveE().length){if(B.opts.stages&&(B.stage||0)<B.opts.stages.length-1){await nextStage();break;}await wait(500);return end(true);}
     if(!aliveH().length){await wait(500);return end(false);}}
-   roundEnd();try{BPOP.cut();}catch(e){}await wait(260);}/* ターンの終わり：表示を全部消してからコマンド入力へ */
+   roundEnd();try{BPOP.cut();}catch(e){}await wait(speed<=1?750:260);}/* 1 倍速はターンの変わり目に少し間をおく（ver0.47） *//* ターンの終わり：表示を全部消してからコマンド入力へ */
  }catch(e){console.error(e);}};
 /* 行動順の表示（入力中は予想、行動中は残りの列） */
 preview=function(){if(!B||!B.rs)return[...aliveH(),...aliveE()];if(B.rs.q&&B.rs.q.length)return B.rs.q.map(x=>x.u).filter(u=>u.alive);return[...aliveH(),...aliveE()].sort((a,b)=>spdOf(b)-spdOf(a));};

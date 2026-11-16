@@ -57,11 +57,11 @@ function hlState(){hlShow();const L=$('#hl24');if(!L)return;B.heroes.forEach((h,
  if(c.classList.contains('dy38')!==dy)c.classList.toggle('dy38',dy);if(c.dataset.lp!==lp)c.dataset.lp=lp;
  const z=h.alive?'':(h.lp||0)<=0?'z':'';if((c.dataset.z||'')!==z)c.dataset.z=z;});}
 
-/* HP・BP の置き場所（ver0.46f）：いつも同じ場所＝キャラの元の立ち位置の体の左下。
+/* HP・BP の置き場所（ver0.46f→0.47）：いつも同じ場所＝キャラの元の立ち位置の体の中央（見やすいよう薄い黒の下地）。
    以前は他の表示を避けて候補の中から選んでいたため、場面によって頭の上や右へ飛んでいた。表示中は毎フレーム置き直す（並び替え・連続戦闘・星臨で動いても付いていく） */
 try{V24.HK24.placeHL=L=>{const rs=[];let bd;try{bd=V24.bounds();}catch(e){return rs;}
   B.heroes.forEach((h,i)=>{const c=L.children[i];if(!c)return;let b;try{b=V24.boxOf(h,true);}catch(e){return;}const w=c.offsetWidth,hh=c.offsetHeight;
-   const x=Math.max(bd.l,Math.min(bd.r-w,b.l+b.w*.18-w)),y=Math.max(bd.t,Math.min(bd.b-hh,b.b-hh+2));rs.push({l:x,t:y,r:x+w,b:y+hh});
+   const x=Math.max(bd.l,Math.min(bd.r-w,b.cx-w/2)),y=Math.max(bd.t,Math.min(bd.b-hh,b.cy-hh/2));/* ver0.47：キャラの中央に */rs.push({l:x,t:y,r:x+w,b:y+hh});
    const tf=`translate(${Math.round(x)}px,${Math.round(y)}px)`;if(c._tf!==tf){c._tf=tf;c.style.transform=tf;}});return rs;};}catch(e){console.error(e);}
 
 /* ==================== 5. 毎フレーム ==================== */

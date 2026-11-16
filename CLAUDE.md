@@ -27,6 +27,7 @@
 | 装備品の詳細（装備アイコンのタップ） | `js/ui/equip-info.js`（`EQINFO`。アイコンに `data-eqi=uid` を付けると開く） | `css/ui/equip-info.css` |
 | 属性耐性（防具の種類ごとの表・キャラの合計・被ダメージの倍率）と属性の六角の印（弱点＝赤︿・耐性＝青﹀。戦闘の帯・装備・キャラ詳細で共通 `ELR.chip`） | `js/data/resist.js`（`ELR`）。計算は `js/rs/battle.js calc` の最後で `ELR.mul` | `css/ui/equip-info.css`（`.elh` `.elx`） |
 | 装備の能力影響（基礎ステータスだけ） | `js/data/equip7.js`（`EQ7`） | — |
+| 技・術の練達（3 段階・錬磨石。旧 技Lv） | `js/rs/mastery.js`（`RSM`：データ・強化・詳細の窓の欄） | `css/ui/skill.css`（`.ms47`） |
 | アビリティ（3 段階・段階Ⅲの【固有名の特殊効果】） | データ `js/rs/abilities.js`、処理 `js/rs/battle.js`、説明文 `js/rs/core.js effTxt` | — |
 | 用語の緑のハイライト＋タップで説明 | `js/ui/keywords.js`（`KW.mark`） | `css/ui/keywords.css` |
 | 編成画面・陣形と立ち位置（`formOpen`） | `js/ui/party.js`（`V38P`） | `css/ui/party.css`（`.ps41` `.pc41` `.fe41`） |
@@ -38,7 +39,7 @@
 | 戦闘：キャラ・敵の表示サイズ | 敵 `js/battle/size.js`（`BSIZE`：種類ごとの倍率 `CLS`）・味方の背丈 `js/sprite/spx.js heroHgt / regRigs`・味方の倍率 `js/v38/battle-ui.js placeHeroes`・敵の配置（はみ出し防止）`js/v23.js eDims / placeEnemies` | — |
 | 戦闘：配置・スライド・HP/BP 表示 | `js/v38/battle-ui.js`（`V38B`） | `css/v38.css` |
 | 戦闘：上の帯（対象・弱点/耐性） | `js/v22.js`（`updHud`） | `css/v22.css` `v25.css` `v38.css` |
-| 戦闘の決まり（ターン・BP・LP（全員 7＝`RSD.LP_FIX`）・熟練） | `js/rs/battle.js`（`RSB`）・`js/rs/core.js`（`RSC`）・データ `js/rs/data.js`（`RSD`） | — |
+| 戦闘の決まり（ターン・BP・LP（全員 7＝`RSD.LP_FIX`）） | `js/rs/battle.js`（`RSB`）・`js/rs/core.js`（`RSC`）・データ `js/rs/data.js`（`RSD`） | — |
 | 戦闘の行動演出の流れ（戦闘開始・技名の吹き出し・暗転・共通の技の演出・数字・撃破） | `js/battle/flow.js`（`BFLOW`）。見出し・状態・数字の表示の枠（キャラごとに固定の 3 段）は `js/ui/battle-pop.js`（`BPOP`。v24 dmgPop・v25 fxPop を置き換え）、流れの決まりは `docs/BATTLE-FLOW.md`、書式（金属の見出し・筆の属性）は `js/ui/damage.js`、撃破の赤い崩れは `js/ver19.js dissolve` | `css/ui/battle-flow.css`・`css/ui/battle-pop.css`・`css/ui/damage.css` |
 | 演出・モーション（技ごとの専用演出） | `js/battle/*`（`BX*`）・`js/battle/data/fx-heroes-*.js` → スキル `rpg-hero-motion` | — |
 | 文字のフォント（全画面で統一） | 本文＝M PLUS 1p、コマンド（ボタン・技名・名前・見出し・タブ）＝Kaisei Tokumin（`css/ui/font.css` の `--cmd`）。キャンバスの数字・英字＝`js/v24-text.js FONT` | `css/ui/font.css` |

@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.46';
+const VER='ver0.47';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,11 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　戦闘の表示の流れを整理しました<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　技・術の練達と戦闘の見やすさ<br><small>`+
+ `・<b>練達</b>：技Lv をやめ、技・術を<b>錬磨石</b>（敵が落とす）で 3 段階まで強化。Ⅲでは「解癒」などの強い効果も<br>`+
+ `・<b>戦闘</b>：HP・BP はキャラの中央に。数字は細身の斜体で詰めて、弾むように出る。複数の敵が重ならない。1 倍速はターンの変わり目に少し間<br>`+
+ `・LP は気絶と、一部の高難易度ボスの攻撃で減る。AUTO ボタンを読みやすく。画面を高画質に</small></div>`+
+ `<div class="nt n38"><b>ver0.46</b>　戦闘の表示の流れを整理しました<br><small>`+
  `・<b>表示の枠</b>：キャラごとに固定の 3 段（Critical・Weak＋属性／強化・弱体を横並び／数字）。誰への効果か一目で分かる<br>`+
  `・<b>連続ヒット</b>：ヒットごとの数字が 1 桁ずつ入れ替わる。<b>全体攻撃</b>は全員へ同時に当たる<br>`+
  `・「戦闘開始」は筆文字に。表示はキャラの範囲の中に詰めて、Critical は Weak の上。強化・弱体の文字は小さめに<br>`+

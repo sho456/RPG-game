@@ -96,10 +96,11 @@ function toggleSet(id,k){const h=hh(id);setOf(id);const i=h.sset.indexOf(k);if(i
 function moveSet(id,k,d){const h=hh(id);setOf(id);const i=h.sset.indexOf(k),j=i+d;if(i<0||j<0||j>=h.sset.length)return;[h.sset[i],h.sset[j]]=[h.sset[j],h.sset[i]];}
 /* 技の熟練 */
 const profN=(id,k)=>{const h=hh(id);return h?h.skx[k]||0:0;};
-const profLv=(id,k)=>{const n=profN(id,k);let l=1;for(let i=0;i<D.PROF.length;i++)if(n>=D.PROF[i])l=i+1;return Math.min(10,l);};
-const profMul=(id,k)=>1+(profLv(id,k)-1)*.02;
+/* ver0.47：技Lv（熟練）は廃止し、練達（js/rs/mastery.js）に置き換え。profLv は練達の段階（0〜3）を返す。威力の倍率は prep で掛ける */
+const profLv=(id,k)=>{try{return RSM.lvOf(id,k);}catch(e){return 0;}};
+const profMul=()=>1;
 function costOf(u,sk){if(!sk||sk.basic||sk.k==='item')return 0;let c=sk.bp!=null?sk.bp:0;if(!c)return 0;
- if(u&&u.side===0&&G.h[u.id]){const l=profLv(u.id,keyOf(sk));c-=(l>=4?1:0)+(l>=8?1:0);}
+ if(u&&u.side===0&&G.h[u.id]){try{c-=RSM.mods(u.id,keyOf(sk)).bp;}catch(e){}}
  try{c-=RSB.sumE(u,'bpcut',e=>RSB.cnd(e.c,u,null,sk));}catch(e){}
  return Math.max(1,c);}
 /* 回復術かどうか（ver0.46f で LP の消費は廃止。lpCost は常に 0） */

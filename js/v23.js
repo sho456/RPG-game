@@ -71,9 +71,9 @@ function placeEnemies(full){const x0=3,x1=Math.max(60,LY.heroL-10),EB=LY.ebot!=n
  for(const e of order){ANIM.setup(e);capScale(e,band,x1-x0);let ax,ay;
   if(e.boss){ax=.4;ay=.62;}else{const k=mi++;const L=boss?BANC:(ANC[Math.min(5,Math.max(1,nM))]||ANC[5]);const a=L[k%L.length];ax=a[0];ay=a[1];}
   /* 重ならない場所が無ければ、その敵を少しずつ縮めて探し直す（最小72%） */
-  let best=null;for(const shrink of[1,.86,.72]){if(shrink<1&&e.A&&!e.A.none){e.A.sc=(e._cap23||e.A.sc23||e.A.sc)*shrink;e._cap23=e.A.sc;}
+  let best=null;for(const shrink of[1,.9,.8,.7,.6,.52]){/* ver0.47：重なりが無くなるまで最小 52% まで縮める（複数の敵が被らないように） */if(shrink<1&&e.A&&!e.A.none){e.A.sc=(e._cap23||e.A.sc23||e.A.sc)*shrink;e._cap23=e.A.sc;}
    const D=eDims(e),fxA=x0+D.w/2+(x1-x0-D.w)*ax,fyA=LY.top+D.h+(band-D.h)*ay;let bc=1e18,bo=0;best=null;
-   for(let fy=LY.top+D.h;fy<=EB+.01;fy+=2)for(let fx=x0+D.w/2;fx<=x1-D.w/2+.01;fx+=2){const b=[fx-D.w/2-2,fy-D.h-2,fx+D.w/2+2,fy+2];let ov=0;
+   for(let fy=LY.top+D.h;fy<=EB+.01;fy+=2)for(let fx=x0+D.w/2;fx<=x1-D.w/2+.01;fx+=2){const b=[fx-D.w/2-4,fy-D.h-3,fx+D.w/2+4,fy+3];let ov=0;
      for(const p of placed){const ix=Math.min(b[2],p[2])-Math.max(b[0],p[0]),iy=Math.min(b[3],p[3])-Math.max(b[1],p[1]);if(ix>0&&iy>0)ov+=ix*iy;}
      const c=ov*60+Math.hypot(fx-fxA,(fy-fyA)*1.2);if(c<bc){bc=c;bo=ov;best=[fx,fy];}}
    if(!best)best=[fxA,fyA];if(bo<=0)break;}

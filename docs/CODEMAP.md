@@ -41,7 +41,7 @@
 | 35 | `js/motion/fx19.js` | 11 | ver0.19 戦闘エフェクト | FX19 |
 | 36 | `js/ver19.js` | 31 | ver0.19 ドット絵・待機モーション・戦闘演出の全面強化（戦闘への統合） | V19 |
 | 37 | `js/ver19-art.js` | 6 | ver0.19 絵柄の統一：顔グラ・立ち絵・会話の表情・探索／街／ワールドマップの歩き姿 | V19A |
-| 38 | `js/v20-battle.js` | 32 | ver0.20 戦闘の深化：状態効果・専用パッシブ・新スキル／魔法・敵の新戦術 | V20 |
+| 38 | `js/v20-battle.js` | 33 | ver0.20 戦闘の深化：状態効果・専用パッシブ・新スキル／魔法・敵の新戦術 | V20 |
 | 39 | `js/v20-ui.js` | 23 | ver0.20 UI の全面改善 | V20UI |
 | 40 | `js/v21-items.js` | 6 | ver0.21 装備・アイテムのドット絵（24×24）を全面刷新 | IC21 |
 | 41 | `js/v21-art.js` | 53 | ver0.21 装備・アイテムのデザイン定義 |  |
@@ -92,20 +92,21 @@
 | 86 | `js/rs/abilities.js` | 10 | アビリティ（AB・ABL の正本。ver0.45：3 段階＋段階Ⅲの固有名の特殊効果） |  |
 | 87 | `js/rs/core.js` | 22 | 戦闘システム（能力値・習得・技セット・アビリティ・陣形・セーブ） | RSC |
 | 88 | `js/data/equip7.js` | 4 | 装備の能力影響（EQ7：装備が上げるのは基礎ステータスだけ。ver0.45 新規の正本） | EQ7 |
-| 89 | `js/rs/battle.js` | 30 | 戦闘の進行（ターン制・BP・HP/LP） | RSB |
-| 90 | `js/rs/ui.js` | 22 | 戦闘システムの画面 | RSU |
-| 91 | `js/v38/core.js` | 4 | ver0.38 土台：攻撃属性 8 種・武器種 8 種・セーブの移行・LP | V38 |
-| 92 | `js/v38/battle-ui.js` | 8 | ver0.38 戦闘画面 | V38B |
-| 93 | `js/v38/menu.js` | 10 | ver0.38 画面全体の整理 | V38M |
-| 94 | `js/v38/help.js` | 8 | ver0.38 タップで詳細（V38H） | V38H |
-| 95 | `js/ui/skill-icons.js` | 5 | 技・術のアイコン（SKICON：白いシルエットの絵柄 27 種＋技 → 絵柄の対応。js/rs/ui.js の skIcon が使う） |  |
-| 96 | `js/ui/board.js` | 5 | 星盤・天星盤の画面（ver0.39 で 1 ファイルにまとめた。画面の正本はここ） | BOARDUI |
-| 97 | `js/ui/equip-info.js` | 4 | 装備品の詳細（EQINFO：装備アイコンのタップで出るポップアップの正本。新規） | EQINFO |
-| 98 | `js/ui/party.js` | 8 | 編成画面と陣形（ver0.41 で 1 ファイルにまとめた。画面の正本はここ。旧 js/v38/party.js を置き換え） | V38P |
-| 99 | `js/ui/smith.js` | 4 | 鍛冶屋の画面（ver0.44。正本：town.js の smith・enhance と v31/items.js・ver18-town.js の包みを置き換え） | SMITH44 |
-| 100 | `js/ui/damage.js` | 3 | 戦闘のダメージ表示の書体（TX24 の書式の最終定義。ロマサガRS の録画に合わせた） |  |
-| 101 | `js/ui/keywords.js` | 6 | 用語のハイライト（KW：効果の説明文の用語を緑で示し、タップで詳しい説明を出す正本。ver0.45 新規） | KW |
-| 102 | `js/ui/battle-pop.js` | 11 | 戦闘中の表示（見出し・状態・数字）の正本（BPOP。ver0.46 新規。決まりは docs/BATTLE-FLOW.md） | BPOP |
+| 89 | `js/rs/mastery.js` | 10 | 技・術の練達（RSM。ver0.47 新規の正本。旧「技Lv（熟練）」を置き換え） | RSM |
+| 90 | `js/rs/battle.js` | 31 | 戦闘の進行（ターン制・BP・HP/LP） | RSB |
+| 91 | `js/rs/ui.js` | 23 | 戦闘システムの画面 | RSU |
+| 92 | `js/v38/core.js` | 4 | ver0.38 土台：攻撃属性 8 種・武器種 8 種・セーブの移行・LP | V38 |
+| 93 | `js/v38/battle-ui.js` | 8 | ver0.38 戦闘画面 | V38B |
+| 94 | `js/v38/menu.js` | 11 | ver0.38 画面全体の整理 | V38M |
+| 95 | `js/v38/help.js` | 8 | ver0.38 タップで詳細（V38H） | V38H |
+| 96 | `js/ui/skill-icons.js` | 5 | 技・術のアイコン（SKICON：白いシルエットの絵柄 27 種＋技 → 絵柄の対応。js/rs/ui.js の skIcon が使う） |  |
+| 97 | `js/ui/board.js` | 5 | 星盤・天星盤の画面（ver0.39 で 1 ファイルにまとめた。画面の正本はここ） | BOARDUI |
+| 98 | `js/ui/equip-info.js` | 4 | 装備品の詳細（EQINFO：装備アイコンのタップで出るポップアップの正本。新規） | EQINFO |
+| 99 | `js/ui/party.js` | 8 | 編成画面と陣形（ver0.41 で 1 ファイルにまとめた。画面の正本はここ。旧 js/v38/party.js を置き換え） | V38P |
+| 100 | `js/ui/smith.js` | 4 | 鍛冶屋の画面（ver0.44。正本：town.js の smith・enhance と v31/items.js・ver18-town.js の包みを置き換え） | SMITH44 |
+| 101 | `js/ui/damage.js` | 3 | 戦闘のダメージ表示の書体（TX24 の書式の最終定義。ロマサガRS の録画に合わせた） |  |
+| 102 | `js/ui/keywords.js` | 7 | 用語のハイライト（KW：効果の説明文の用語を緑で示し、タップで詳しい説明を出す正本。ver0.45 新規） | KW |
+| 103 | `js/ui/battle-pop.js` | 11 | 戦闘中の表示（見出し・状態・数字）の正本（BPOP。ver0.46 新規。決まりは docs/BATTLE-FLOW.md） | BPOP |
 
 ## 上書きの連鎖（2 ファイル以上で定義・上書きされる関数）
 
@@ -126,13 +127,13 @@
 | `awaken` | engine.js → ch8.js → v22.js → v23.js → v25.js → battle/viewer.js → rs/battle.js |
 | `hero` | engine.js → ver18-battle.js → v20-battle.js → v31/items.js → v31/board.js → battle/viewer.js → rs/core.js |
 | `panel` | town.js → ver18-town.js → v20-ui.js → v22.js → battle/viewer.js → v38/help.js → ui/battle-pop.js |
+| `rewards` | engine.js → ch8.js → ch9.js → v20-ui.js → v31/core.js → v31/quests.js → rs/mastery.js |
 | `boardMenu` | items.js → ver17.js → v21.js → v31/board.js → rs/core.js → ui/board.js |
 | `charHTML` | ver17.js → v20-ui.js → v22.js → v31/core.js → v31/board.js → rs/ui.js |
 | `close` | ver17.js → battle/viewer.js → battle/flow.js → v38/help.js → ui/equip-info.js → ui/keywords.js |
 | `doAction` | engine.js → ch8.js → v20-battle.js → v20-ui.js → v22.js → battle/flow.js |
 | `enterField` | field.js → ch8.js → ver17.js → ver18-field.js → v23.js → v31/quests.js |
 | `keyOf` | sprite/legacy/dot-rig.js → ver19.js → v21-items.js → v31/items.js → battle/seq.js → rs/core.js |
-| `rewards` | engine.js → ch8.js → ch9.js → v20-ui.js → v31/core.js → v31/quests.js |
 | `autoPick` | engine.js → ch8.js → ver17.js → v20-battle.js → rs/battle.js |
 | `enemy` | engine.js → v31/enemies.js → v32.js → battle/size.js → v38/core.js |
 | `enemyTurn` | engine.js → v20-battle.js → v20-ui.js → v25.js → battle/viewer.js |
@@ -228,6 +229,7 @@
 | `circle` | motion/fx19.js → battle/prim.js |
 | `claw` | motion/fx19.js → v21-art.js |
 | `comboAdd` | ch5.js → v24.js |
+| `costOf` | rs/core.js → rs/mastery.js |
 | `def` | v21-items.js → battle/seq.js |
 | `devAreas` | dev.js → v31/quests.js |
 | `devGear` | dev.js → v31/items.js |
@@ -259,6 +261,7 @@
 | `heroK` | v25.js → v38/battle-ui.js |
 | `hiImg` | ver16.js → ver19.js |
 | `hsl2rgb` | sprite/legacy/dot.js → v31/enemies.js |
+| `html` | rs/mastery.js → ui/equip-info.js |
 | `hueTo` | sprite/legacy/dot.js → sprite/legacy/px.js |
 | `icard` | town.js → v20-battle.js |
 | `iicon` | ch3.js → ver18-art.js |

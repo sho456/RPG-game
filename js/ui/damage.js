@@ -1,13 +1,14 @@
 /* ===== 戦闘のダメージ表示の書体（TX24 の書式の最終定義。ロマサガRS の録画に合わせた） =====
  正本：数字・見出しの書式＝ここ／出し方（まとまり・大きさの比 LBK）＝js/v24.js dmgPop・addLabels／動き＝css/ui/damage.css。
  v25.js・v29.js が書き換えていた数字・Critical・Weak・Resist・Guard・属性の書式は、ここで最終的に置き換える（読み込みは最後）。
- ・数字：Noto Serif の斜体（太字）。白＋濃い縁
+ ・数字：Barlow Semi Condensed の斜体（太字・細身）。白＋濃い縁（ver0.47）
  ・Critical＝金／Weak＝赤みの金属／Resist＝青い鋼／Guard＝銀青：上下の明暗が強いクロム調（水平線で暗帯に切り替え）＋白いハイライト線＋濃い縁
  ・属性の漢字：毛筆の書体 Yuji Boku（太く迫力がある）。別の書体にするなら FONT.brush を差し替える */
 'use strict';
 (()=>{
 const T=TX24,F=T.FONT,S=T.STYLE;
-Object.assign(F.num,{f:'"Noto Serif","Times New Roman",Georgia,serif',w:900,it:'italic',cap:.72,skew:0});
+/* ver0.47：数字は細身で詰めやすい斜体（Barlow Semi Condensed の Italic）。桁どうしは重ならない（battle-pop が字の送り幅どおりに並べる） */
+Object.assign(F.num,{f:'"Barlow Semi Condensed","Arial Narrow","Roboto Condensed",sans-serif',w:800,it:'italic',cap:.72,skew:0});
 Object.assign(F.lat,F.num);
 const sh=[.04,.075,'rgba(0,0,0,.65)'];
 /* 数字 */

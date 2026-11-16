@@ -16,13 +16,13 @@ const fx=(f,...a)=>{try{if(typeof FX19!=='undefined'&&FX19[f])FX19[f](...a);}cat
 /* ==================== 1. 状態効果 ==================== */
 /* k: atk/def/mag/res/spd/crit（v=％）, regen/poison（v=最大HPに対する割合/ターン）, stun, mark（被ダメ+v%）, prot（被ダメ-v%）,
       weak（el を一時的に弱点にする）, shield（v=吸収量）, counter（v=反撃の威力）, evade（v=回避率％）, enrage（敵：攻撃・魔力+v%） */
-const STN={atk:['攻撃','攻'],def:['防御','防'],mag:['魔力','魔'],res:['精神','精'],spd:['素早さ','速'],crit:['会心','会'],regen:['継続回復','再'],poison:['毒','毒'],stun:['スタン','痺'],para:['マヒ','麻'],blind:['暗闇','暗'],
+const STN={atk:['攻撃','攻'],def:['防御','防'],mag:['魔力','魔'],res:['精神','精'],spd:['素早さ','速'],crit:['会心','会'],regen:['継続回復','再'],poison:['毒','毒'],stun:['スタン','痺'],para:['マヒ','麻'],blind:['暗闇','暗'],kaiyu:['解癒','癒'],
  mark:['被ダメ増加','標'],prot:['被ダメ軽減','護'],weak:['弱点付与','弱'],shield:['障壁','壁'],counter:['反撃態勢','返'],evade:['回避','避'],enrage:['激昂','怒']};
 const STAT5=['atk','def','mag','res','spd'];let LASTC=null;
 /* 一時的な弱点が切れたら、判明済みの弱点からも外す（図鑑には本来の弱点だけを残す） */
 function fixWeak(u){if(!u||!u._w0)return;const ws=stsOf(u).filter(s=>s.k==='weak').map(s=>s.el);u.weak=[...new Set([...u._w0,...ws])];if(u.known)for(const k of[...u.known])if(!u.weak.includes(k))u.known.delete(k);
  if(u.kind&&G.known&&G.known[u.kind])G.known[u.kind]=G.known[u.kind].filter(k=>u._w0.includes(k));}
-const isBuff=s=>['regen','prot','shield','counter','evade','enrage'].includes(s.k)||(STAT5.includes(s.k)||s.k==='crit')&&s.v>0;
+const isBuff=s=>['regen','prot','shield','counter','evade','enrage','kaiyu'].includes(s.k)||(STAT5.includes(s.k)||s.k==='crit')&&s.v>0;
 const stsOf=u=>u.sts||(u.sts=[]);
 const hasSt=(u,k)=>stsOf(u).some(s=>s.k===k);
 const stSum=(u,k)=>stsOf(u).filter(s=>s.k===k).reduce((a,s)=>a+s.v,0);
@@ -30,7 +30,14 @@ function base0(u){if(!u._b0)u._b0={atk:u.atk,def:u.def,mag:u.mag,res:u.res,spd:u
 function recalc(u){const b=base0(u);for(const k of STAT5){let p=stSum(u,k)+(k==='atk'||k==='mag'?stSum(u,'enrage'):0);p=clamp(p,-60,80);const v=b[k]*(1+p/100);u[k]=k==='spd'?Math.max(1,+v.toFixed(2)):Math.max(1,Math.round(v));}
  u.crit=b.crit+clamp(stSum(u,'crit'),-50,60);}
 /* 付与：同じ種類・同じ向き（強化／弱体）は重ねず、強い方・長い方を残す */
+const AIL=['poison','stun','para','blind'];
+/* ver0.47 練達の効果：clrdn＝能力ダウン状態を解除／clrail＝状態異常を解除／healp＝最大HPの v 割を回復（状態としては残らない） */
+function clrDown(u){return clearSt(u,s=>(STAT5.includes(s.k)||s.k==='crit')&&s.v<0);}
+function clrAil(u){return clearSt(u,s=>AIL.includes(s.k));}
 function addSt(u,k,v,t,o={}){if(!u||!u.alive)return false;const L=stsOf(u);
+ if(k==='clrdn'){if(clrDown(u))popS(u,'能力ダウン解除','#8ff0a8','up');return true;}
+ if(k==='clrail'){if(clrAil(u))popS(u,'状態異常解除','#8ff0a8','up');return true;}
+ if(k==='healp'){if(u.hp<u.mhp){const n=Math.max(1,Math.round(u.mhp*v*(u.healRecv||1)));u.hp=Math.min(u.mhp,u.hp+n);try{pop(u,'+'+n,'#7dffa8');}catch(e){}}return true;}
  if((k==='stun'||k==='para')&&u.boss){u.ct+=60/Math.max(1,u.spd);popS(u,'DELAY','#7fd6ff');return true;}
  if(k==='poison'&&u.boss)v*=.35;
  const same=L.find(s=>s.k===k&&(k==='weak'?s.el===o.el:Math.sign(s.v||1)===Math.sign(v||1)));
@@ -300,4 +307,4 @@ async function support(u,sk){u.sp-=sk.sp||0;log(`${u.name}の<b>${sk.n}</b>！`)
 /* 装備の評価：武器パッシブ分を少し加点 */
 {const _sc=score;score=function(it,id){const s=_sc(it,id);return wpOf(it)?s+6*(it.rar||1):s;};}
 
-return{PS,CPS,WPS,LSK,NSK,STN,charPS,wpOf,wpText,unitPS,addSt,clearSt,stsOf,isBuff,tickSts,CP_LV};})();
+return{PS,CPS,WPS,LSK,NSK,STN,charPS,wpOf,wpText,unitPS,addSt,clearSt,stsOf,isBuff,tickSts,CP_LV,clrDown,clrAil};})();

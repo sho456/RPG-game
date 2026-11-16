@@ -79,3 +79,19 @@
 .elh.e0 b{--c:#ff7e9a}.elh.e1 b{--c:#ffb450}.elh.e2 b{--c:#7cf0a8}.elh.e3 b{--c:#ff6a32}.elh.e4 b{--c:#6fd8ff}.elh.e5 b{--c:#ffe14a}.elh.e6 b{--c:#fff2b8}.elh.e7 b{--c:#c08cff}
 #app .b22tg .wk{gap:2px}#app .b22tg .wk span:not(.q){width:20px}
 #app .b22tg .wk span i.hx43{filter:none!important;animation:none!important}
+
+/* ver0.47 技・術の練達（js/rs/mastery.js html）：3 段階の効果と「練達する」 */
+.ms47{margin-top:8px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,214,120,.35)}
+.ms47 .mh{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.ms47 .mh b{font:800 14px/1 var(--cmd,serif);color:#ffd88a}.ms47 .mh em{margin-left:auto;font-style:normal;font-size:12px;color:#ffd88a}
+.ms47 .st{display:inline-flex;gap:3px}.ms47 .st i{width:10px;height:10px;transform:rotate(45deg);border:1px solid #c9a24a;background:#2a2410}.ms47 .st i.on{background:linear-gradient(135deg,#fff3c0,#e0a830)}
+.ms47 .ml{display:flex;gap:8px;padding:5px 0;border-top:1px dashed rgba(255,255,255,.1);opacity:.55}
+.ms47 .ml.on{opacity:1}.ms47 .ml.nx{opacity:.85}
+.ms47 .ml>i{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:800;color:#2a1800;background:#7a6a40}
+.ms47 .ml.on>i{background:linear-gradient(#fff0b0,#e0a830)}
+.ms47 .ml ul{margin:0;padding-left:1.1em;font-size:12.5px;line-height:1.6;color:#f2ede2}
+.ms47 .tbtn{margin-top:8px}.ms47 .tbtn small{display:block;font-size:11px;font-weight:700}
+.sk41 .rank.ms b{font-family:"Noto Serif",serif;font-weight:900}
+/* 長い説明も入るように、詳細の窓は縦にスクロールできる */
+#ov .ski43{max-height:72vh;overflow-y:auto}
+.ms47 li .kw{display:inline!important}

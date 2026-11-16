@@ -32,7 +32,7 @@ function wpn(id){const P=C.pf(id),W=D.WPN[P.wp]||{},H=D.HERO[id]||{},L=[];
  L.push('武器種と攻撃属性は別のもの。技・術の属性は、技ごとに決まっている');
  return{t:P.wp+(H.shape?`（形：${H.shape}）`:''),tag:'武器種',L};}
 function lp(id){const s=stats(id),h=G.h[id];return{t:'LP（ライフポイント）',v:`${h.lp??s.lpMax} / ${s.lpMax}`,L:['気絶（HP 0）すると 1 減る','一部の高難易度ボス（Lv50 以上）が使う、LP を削る攻撃に当たっても 1 減る','気絶中の追い打ち・回復術では減らない','LP が 1 以上あれば、回復術・道具で復活できる','0 になると、その戦闘では復活できない','灯都に戻ると全回復'],foot:'灯都に戻ると全回復'};}
-function bp(id){const s=stats(id),ex=Math.min(2,Math.floor((s.spGain||0)/5));return{t:'BP（バトルポイント）',tag:'技・術の消費',L:[`初期 ${s.bp0}：戦闘開始時の BP`,`最大 ${s.bpMax}：戦闘中にためられる上限`,`回復 +${s.bpReg+ex}：毎ターン回復する量${ex?`（星盤の BP回復力で +${ex}）`:''}`,'通常攻撃は BP を使わない'],foot:'技Lv4・Lv8 で、その技の消費が 1 ずつ減る。アビリティで回復が増えることもある'};}
+function bp(id){const s=stats(id),ex=Math.min(2,Math.floor((s.spGain||0)/5));return{t:'BP（バトルポイント）',tag:'技・術の消費',L:[`初期 ${s.bp0}：戦闘開始時の BP`,`最大 ${s.bpMax}：戦闘中にためられる上限`,`回復 +${s.bpReg+ex}：毎ターン回復する量${ex?`（星盤の BP回復力で +${ex}）`:''}`,'通常攻撃は BP を使わない'],foot:'技・術の練達（錬磨石で強化）で消費が下がるものがある。アビリティで回復が増えることもある'};}
 function slot(i){const f=C.formOf(),F=D.FORM[f],[x]=F.p[i]||[0],id=G.party[i];
  return{t:`${F.n}　${i+1}番目`,tag:x<.34?'前列':x<.67?'中列':'後列',L:[...(F.s[i]||[]).map(e=>C.effTxt(e)),'図の位置が、そのまま戦闘の立ち位置になる'],foot:id?HB[id].name:''};}
 const ROW={

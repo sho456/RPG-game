@@ -32,10 +32,10 @@ function info(sk,u){const id=u&&(u.id||u),s=sk.basic?Object.assign({},sk,{n:basi
  const hint=u&&B&&B.tgt&&s.el&&scene==='battle'?(B.tgt.weak.includes(s.el)&&B.tgt.known.has(s.el)?`<b class="w">${esc(B.tgt.name)}の弱点を突ける</b>`:B.tgt.kR&&B.tgt.kR.has(s.el)?`<b class="r">${esc(B.tgt.name)}は耐性がある</b>`:''):'';
  ovOpen(`<div class="ski43">
   <div class="top">${skIcon(id,s)}<div class="nm"><div class="t"><b>${esc(s.n||'')}</b><span class="els">${els.map(e=>`<i class="hx43" style="--c:${ELN[e]}">${e}</i>`).join('')}</span></div>
-   <div class="g"><div><em>威力</em><b>${s.rk||(s.basic?'D':s.ougi?'奥':'-')}</b></div><div><em>Rank</em><b>${pl||'-'}</b></div><div class="two"><span><em>BP</em><b>${cost}</b></span><i></i><span><em>LP</em><b>${lp||'-'}</b></span></div></div></div></div>
+   <div class="g"><div><em>威力</em><b>${s.rk||(s.basic?'D':s.ougi?'奥':'-')}</b></div><div><em>練達</em><b>${pl?RSM.RK[pl]:'-'}</b></div><div class="two"><span><em>BP</em><b>${cost}</b></span><i></i><span><em>LP</em><b>${lp||'-'}</b></span></div></div></div></div>
   <div class="dsc"><p class="tgs">${esc(tags)}</p><p>${KW.markT(s.d||'')}</p>
-   ${hint?`<p class="sub">${hint}</p>`:''}</div></div>
-  <button class="tbtn back wide" data-a="close">閉じる</button>`,{close:ovClose});}
+   ${hint?`<p class="sub">${hint}</p>`:''}</div>${id&&k&&HB[id]&&G.h[id]&&C.learned(id).includes(k)?RSM.html(id,k):''}</div>
+  <button class="tbtn back wide" data-a="close">閉じる</button>`,{close:ovClose,mas:()=>{const why=RSM.up(id,k);if(why){try{toastMsg(why);}catch(e){}return;}try{SFX.aw();}catch(e){}info(sk,u);try{if(typeof CTAB!=='undefined'&&CTAB==='sk'&&$('#cmd .rs37'))equipMenu(id);}catch(e){}}});}
 
 /* ==================== 戦闘のコマンド入力（RS 風） ==================== */
 const GL={hp:'<svg viewBox="0 0 16 16"><path d="M8 14 2.6 8.6a3.3 3.3 0 0 1 4.7-4.7L8 4.6l.7-.7a3.3 3.3 0 0 1 4.7 4.7z"/></svg>',
@@ -68,7 +68,7 @@ chooseRoot=function(u,ctx={}){const idx=ctx.idx||0,tot=ctx.n||1;
    if(u.aw){const ok=SK[(D.AWX[u.id]||{}).ou];if(ok){const[e,c]=badge(ok),used=!!u._rsOugi,noSnap=ok.k==='rewind'&&!B.snap;o.push({el:e,ec:c,n:ok.n,tag:'奥義',sk:ok,cost:used?'使用済':'BP 0',cls:'ougi',dis:used||noSnap,f:()=>use(ok)});}}
    basicsOf(u).forEach(a=>{const[ae,ac]=badge(a);o.push({el:ae,ec:ac,n:basicName(u,a),sk:a,cost:'BP 0',cls:'basic',f:()=>use(a)});});
    (u.rsSet||[]).forEach(k=>{const s=SK[k];if(!s)return;const[e,c]=badge(s),cs=C.costOf(u,s),lp=C.lpCost(s),pl=C.profLv(u.id,k),ngB=!dev&&cs>u.sp,ngL=!dev&&lp&&(u.lp||0)<=lp;
-    o.push({el:e,ec:c,n:s.n,lv:pl>1?pl:0,sk:s,cost:'BP '+cs,lp,ng:ngB||ngL,dis:ngB||ngL,f:()=>use(s)});});
+    o.push({el:e,ec:c,n:s.n,lv:0,sk:s,cost:'BP '+cs,lp,ng:ngB||ngL,dis:ngB||ngL,f:()=>use(s)});});
    if(!(u.rsSet||[]).length)o.push({el:'？',ec:'#aab0d8',n:'技セットが空（キャラ詳細の「技・術」でセット）',dis:1,f:()=>{}});
    return o;};
   const items=()=>{const I=G.items,down=B.heroes.some(h=>!h.alive&&(h.lp||0)>0);
@@ -109,7 +109,7 @@ const RK=['','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ'];
 function stars(r){return`<span class="rsst">${[1,2,3].map(i=>`<i class="${i<=r?'on':''}"></i>`).join('')}</span>`;}
 /* 技・術の行（ver0.41：ロマサガRS の技一覧のように「アイコン＋名前＋Rank＋属性」だけ。説明は ⓘ で出す）
    アイコン：js/ui/skill-icons.js（SKICON）の白いシルエット（技の内容ごと）。色は種類（技＝赤・術＝青・回復＝緑・補助＝金・奥義＝虹）
-   Rank＝技Lv（使うほど上がる。旧「熟練」） */
+   練達＝錬磨石で 3 段階まで強くする（ver0.47。旧 Rank＝技Lv） */
 const ELN=ELN43;/* 属性の文字の色は js/data/resist.js（耐性の印と共通） */
 /* 属性の六角マーク（ver0.43：ロマサガRS のコマンド欄のように暗い金属の六角形に銀の文字。2 属性は縦に重ねる）
    t（狙っている敵）が分かっている弱点なら赤く、耐性なら青く光る */
@@ -128,7 +128,7 @@ function elBadges(s){const L=[...new Set([s.el,s.el2].filter(x=>x&&ELN[x]))];ret
 function skCard(id,k,o={}){const s=SK[k];if(!s)return'';const on=o.set,pl=C.profLv(id,k),u={id,side:0},lp=C.lpCost(s);
  return`<div class="sk41${o.lock?' lock':''}${on?' on':''}${o.pend?' pend':''}${o.info?' tapi':''}"${o.btn?` data-a="rsk" data-v="${k}"`:o.info?` data-a="rsinfo" data-v="${k}"`:''}>
   ${skIcon(id,s)}${on?`<i class="sno">${o.i+1}</i>`:''}
-  <div class="m"><b class="n">${esc(s.n)}</b><div class="r">${o.lock?`<small class="how">${esc(o.how||'')}</small>`:`<span class="rank"><small>Rank</small><b>${pl}</b></span>`}${elBadges(s)}</div></div>
+  <div class="m"><b class="n">${esc(s.n)}</b><div class="r">${o.lock?`<small class="how">${esc(o.how||'')}</small>`:`<span class="rank ms"><small>練達</small><b>${pl?RSM.RK[pl]:'-'}</b></span>`}${elBadges(s)}</div></div>
   ${s.ougi?'<span class="c43"><span><b class="tx">奥義</b></span></span>':costHTML('BP '+C.costOf(u,s),lp)}
   ${o.btn||o.lock||o.info?`<button class="sinf" data-a="rsinfo" data-v="${k}" aria-label="詳細">i</button>`:''}</div>`;}
 /* 技・術セット（ver0.40）：枠をタップ → 技をタップで入れる／技をタップでセット・外す／枠どうしをタップで並べ替え。

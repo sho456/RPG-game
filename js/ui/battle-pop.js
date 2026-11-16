@@ -44,7 +44,7 @@ function label(p,cls,txt,sk,fs,el){const row=cls==='cr'?p.r0:p.r1;if(row.querySe
 /* 3 段目：数字（前の数字は素早く消え、新しい数字が 1 桁ずつ右から落ちる） */
 function number(p,txt,sk,fs,drop){const old=p.r3.querySelector('.nm:not(.old)');if(old){old.classList.add('old');setTimeout(()=>old.remove(),160);}
  const nm=document.createElement('span');nm.className='nm';
- if(drop&&/^[\d,]+$/.test(txt)){[...txt].forEach((ch,i)=>{const c=tight(TX24.el(ch,sk,fs),fs,1);c.style.marginLeft=c.style.marginRight=-Math.round(c._m.pad+fs*.01)+'px';c.style.animationDelay=Math.round((txt.length-1-i)*38*spdK())+'ms';nm.appendChild(c);});nm.classList.add('dg');}
+ if(drop&&/^[\d,]+$/.test(txt)){[...txt].forEach((ch,i)=>{const c=tight(TX24.el(ch,sk,fs),fs,1);c.style.marginLeft=c.style.marginRight=-(c._m.pad-fs*.015).toFixed(1)+'px';/* 字の送り幅どおり（重ならない）＋わずかな隙間 */c.style.animationDelay=Math.round((txt.length-1-i)*38*spdK())+'ms';nm.appendChild(c);});nm.classList.add('dg');}
  else nm.appendChild(tight(TX24.el(txt,sk,fs),fs,.8));
  p.r3.appendChild(nm);p.numT=now();p.r3.classList.remove('hit');void p.r3.offsetWidth;p.r3.classList.add('hit');}
 const fmt=n=>{n=Math.abs(n|0);return n>=10000000?Math.floor(n/10000)+'万':String(n);};

@@ -10,8 +10,8 @@
 .bp46 canvas{display:block}
 .bp46.out{animation:out46 .18s ease-in forwards}
 /* 出る動き：枠ごと少し大きく現れて落ち着く／消える動き：上へ少し浮いて薄くなる */
-.bp46.in{animation:in46 .2s cubic-bezier(.2,1.4,.4,1) both}
-@keyframes in46{0%{opacity:0;scale:1.15}100%{opacity:1;scale:1}}
+.bp46.in{animation:in46 .34s ease-out both}
+@keyframes in46{0%{opacity:0;scale:.55}55%{opacity:1;scale:1.14}75%{scale:.95}90%{scale:1.03}100%{opacity:1;scale:1}}
 @keyframes out46{0%{opacity:1;translate:0 0}100%{opacity:0;translate:0 -14px}}
 /* 1 段目：見出しと漢字は同時に叩きつける */
 .bp46 .r0,.bp46 .r1{gap:5px;margin-bottom:2px}
@@ -45,3 +45,12 @@
 #app.v38.in38[data-sc="battle"] #bp46{translate:0 var(--sl38);transition:translate .42s var(--ez38)}
 #app.v38[data-sc="battle"] #bp46{transition:translate .5s var(--ez38)}
 @media (prefers-reduced-motion:reduce){.bp46 .r3.hit,.bp46 .lb::before{animation:none!important}}
+
+/* ver0.47 バウンド（ロマサガRS の録画）：数字は 1 桁ずつ落ちて 2 回弾む／状態は弾んで出る */
+.bp46 .nm.dg canvas{animation:dg47 .44s cubic-bezier(.3,.7,.4,1) both}
+@keyframes dg47{0%{opacity:0;transform:translateY(-110%) scale(1.3)}38%{opacity:1;transform:translateY(8%) scale(1.08,.84)}58%{transform:translateY(-16%) scale(.97,1.06)}76%{transform:translateY(3%) scale(1.02,.97)}88%{transform:translateY(-4%)}100%{opacity:1;transform:none}}
+/* HP・BP（キャラの中央）：見やすいよう薄い黒の下地。出るときに少し弾む */
+#app.v38 #hl24 .hl{padding:1px 6px 2px;border-radius:7px;background:rgba(4,6,14,.55);box-shadow:0 0 0 1px rgba(255,255,255,.08) inset}
+#app.v38.hl39 #hl24 .hl{animation:hl47 .32s ease-out both}
+@keyframes hl47{0%{opacity:0;scale:.6}60%{opacity:1;scale:1.1}100%{scale:1}}
+@media (prefers-reduced-motion:reduce){.bp46 .nm.dg canvas,#app.v38.hl39 #hl24 .hl{animation:none!important}}
