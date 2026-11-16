@@ -53,7 +53,7 @@ def native(path):
 
 def main(out, items):
     os.makedirs(out, exist_ok=True)
-    POSEK = {'正面': 'front', '立ち': 'stand', '構え': 'ready', '瀕死': 'weak', '気絶': 'down', '詠唱': 'cast', '発動': 'act'}
+    POSEK = {'正面': 'front', '立ち': 'stand', '構え': 'ready', '瀕死': 'weak', '気絶': 'down', '選択': 'select', '詠唱': 'cast', '発動': 'act'}
     ims, rep = [], []
     stand_h = None
     parsed = [(s.rsplit(':', 1) + [''])[:2] if ':' in s else [s, '立ち'] for s in items]

@@ -1,6 +1,6 @@
 """RS 風の規格に合っているかを数で確かめる（rs-style-sprite スキル 第 3 版）
 使い方：
-  python3 rs_check.py <sprite.png> [...] [--pose stand|front|ready|cast|act|weak|down] [--stand 立ち.png] [--json]
+  python3 rs_check.py <sprite.png> [...] [--pose stand|front|ready|select|cast|act|weak|down] [--stand 立ち.png] [--json]
   ・1 倍の PNG（48×48 でも 32×32 でもよい。背景は透明）。--pose を省くとファイル名から推す（正面/構え/瀕死/気絶/…）
   ・--stand に同じキャラの立ちを渡すと、構え・瀕死・気絶の高さを「立ちとの比」で見る（無ければ立ち＝30 として見る）
 見るもの（数値の根拠は SKILL.md 2 章・references/measure-v2.md。ユーザー提供の RS 実機 11 枚の実測）：
@@ -19,12 +19,13 @@ POSE = {
     'front': dict(h=(27, 32), w=(15, 19), lean=(-1.0, 1.0), eyes=True, sym=.75),
     'ready': dict(hr=(.90, 1.0), w=(20, 26), lean=(-7.0, 1.0), eyes=False),
     'weak': dict(hr=(.78, .90), w=(18, 25), lean=(-6.0, 1.0), eyes=False),
+    'select': dict(hr=(.93, 1.03), w=(19, 25), lean=(-5.0, 1.0), eyes=False),
     'cast': dict(hr=(.9, 1.1), w=(13, 30), lean=None, eyes=False, closed=True),
     'act': dict(hr=(.85, 1.15), w=(16, 40), lean=None, eyes=False),
     'down': dict(hr=(.44, .54), w=(27, 33), lean=None, eyes=False),
 }
 NAME = [('正面', 'front'), ('front', 'front'), ('構え', 'ready'), ('ready', 'ready'), ('stance', 'ready'),
-        ('詠唱', 'cast'), ('cast', 'cast'), ('発動', 'act'), ('act', 'act'), ('瀕死', 'weak'), ('weak', 'weak'), ('気絶', 'down'), ('倒れ', 'down'), ('down', 'down')]
+        ('選択', 'select'), ('select', 'select'), ('command', 'select'), ('詠唱', 'cast'), ('cast', 'cast'), ('発動', 'act'), ('act', 'act'), ('瀕死', 'weak'), ('weak', 'weak'), ('気絶', 'down'), ('倒れ', 'down'), ('down', 'down')]
 
 
 def lum(c):

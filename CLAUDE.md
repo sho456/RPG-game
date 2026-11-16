@@ -82,9 +82,10 @@
 | `pixelbolt-pixel-art` | ドット絵のレシピ（JSON）→ PNG/GIF/シート。エフェクトのプリセット多数（`npx -y pixelbolt@0.17.0`） |
 | `pixel-art-studio` | Python/Pillow で 1 ドットずつ描く |
 | `pixelfx` | コードのドット絵エフェクト 244 種（`tools/pixelfx`） |
-| `rs-style-sprite` | この作品の RS 風キャラ・敵のドット絵の規格と検査（第 3 版：RS 実機 16 枚の実測とキャラデザインの決まり・設計シート。参考を実寸に戻す `rs_ref.py`・ポーズ別と配色の型の検査 `rs_check.py --pose`） |
+| `rs-style-sprite` | この作品の RS 風キャラ・敵のドット絵の規格と検査（第 3 版：RS 実機 19 枚の実測とキャラデザインの決まり・設計シート・コマンド選択のポーズ・応用と進化の決まり。参考を実寸に戻す `rs_ref.py`・ポーズ別と配色の型の検査 `rs_check.py --pose`） |
 | `rpg-hero-motion` | 戦闘モーション・技の演出 |
 | `rpg-equipment-icon` | 装備アイコン |
+| `rs-battle-fx` | 技・術の演出の設計（録画の実測：吹き出し→暗転→溜め→放出→着弾→明けの時間割・剣の振りの周期・術の段取り・エフェクトの色・効果音のレシピ・背景）と、参考を写さず応用・進化させる決まり。録画の分析 `scripts/vref.py` |
 | `rs-battle-flow` | ロマサガRS風の戦闘の流れと表示（HP/BP のタイミング・Critical/Weak・強化弱体・数字・区切り）。デモ `tools/battle_demo.js`・コマの一覧 `tools/frame_grid.py` |
 
 pixelbolt を最新版に上げるとき：`npx -y pixelbolt@latest skill install` → `~/.claude/skills/pixelbolt-pixel-art` を `.claude/skills/` に上書きコピーしてコミット。
