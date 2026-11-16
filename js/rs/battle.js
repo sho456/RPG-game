@@ -47,7 +47,7 @@ const isDmg=sk=>!!sk&&(!!sk.basic||['phys','mag','rhythm','pct'].includes(sk.k))
 const dying=u=>!!u&&u.alive&&u.side===0&&u.hp<=u.mhp*D.HPLP.dying;
 
 /* ==================== LP ==================== */
-/* ver0.46f：LP が減るのは、一部の高難易度ボス（LP を削る技を持つ Lv50 以上のボス）の攻撃だけ。気絶・追い打ち・回復術では減らない */
+/* LP が減るのは、気絶したとき（-1）と、一部の高難易度ボス（LP を削る技を持つ Lv50 以上のボス）の攻撃に当たったときだけ。追い打ち・回復術では減らない */
 const lpBoss=a=>!!a&&a.side===1&&!!a.boss&&(a.lv||0)>=50;
 function lpLose(t,n,why){if(!t||t.side!==0||!(n>0))return;const l0=t.lp;t.lp=Math.max(0,(t.lp||0)-n);if(t.lp===l0)return;
  /* 表示：回復と同じ 3 段目に赤い文字。ダメージの数字と被るときは時間差で（js/ui/battle-pop.js lp） */
@@ -106,8 +106,8 @@ function onKill(a,t){for(const e of effs(a))if(e.t==='kill'){if(e.bp)a._rsBpGain
    const rg=effs(t).find(e=>e.t==='rage');if(rg&&t.alive)t._rsRage=Math.min(rg.max||5,(t._rsRage||0)+1);
    if(a&&a.side===1&&a.alive&&t.hp>0&&sk&&sk.t==='one'&&!sk._fu)for(const e of effs(t))if(e.t==='counter'&&Math.random()<(e.p||0)){B.rs.cq.push({a:t,t:a,pow:Math.max(e.pow||1,...effs(t).filter(x=>x.t==='ctpow').map(x=>x.v))});break;}}}catch(e){console.error(e);}
  return r;};}
-/* 気絶（ver0.46f：LP は減らない） */
-{const _k=kill;kill=async function(t){const was=t&&t.alive;await _k(t);try{if(B&&B.rs&&t&&t.side===0&&!t.alive&&was)log(`${t.name}は気絶した…（回復術で復活できる）`);}catch(e){console.error(e);}};}
+/* 気絶：LP-1（ver0.46g で戻した。気絶中の追い打ち・回復術では減らない） */
+{const _k=kill;kill=async function(t){const was=t&&t.alive;await _k(t);try{if(B&&B.rs&&t&&t.side===0&&!t.alive&&was){lpLose(t,1,'気絶した');if(t.lp>0)log(`${t.name}は気絶した…（回復術で復活できる）`);}}catch(e){console.error(e);}};}
 /* 反撃・追撃 */
 async function strikeBack(a,t,nm,pow,el){if(!a.alive||!B)return;let tg=t&&t.alive?t:aliveE().sort((x,y)=>x.hp-y.hp)[0];if(!tg)return;
  pop(a,nm,'#ffe27a',true,'st20 fu');await wait(140);try{const[x,y]=V19.mid(tg);FX19.slash(x,y,ELC[el]||'#ffffff',{size:1});}catch(e){}

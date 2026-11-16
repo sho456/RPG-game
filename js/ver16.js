@@ -36,9 +36,10 @@ drawUnit=function(u){
  if(u.side&&ED[u.kind]&&ED[u.kind].flip){ctx.save();ctx.translate(x+s,y);ctx.scale(-1,1);ctx.drawImage(img,0,0,s,s);ctx.restore();}else ctx.drawImage(img,x,y,s,s);ctx.globalAlpha=1;
  if(u.aw&&Math.random()<.25+.2*(u.awLv||1))B.parts.push({x:x+4+Math.random()*(s-8),y:y+s-4,vy:-.4-Math.random()*.5*(u.awLv||1),l:30,c:(u.awLv||1)>=3&&Math.random()<.4?'#ffffff':(u.awLv||1)>=2&&Math.random()<.3?'#7fd6ff':'#ffe27a'});
  if(B.cur===u&&u.side===0){ctx.fillStyle='#f3c64b';const ax=x+s/2,ay=y-4+(tick>>4)%2;ctx.fillRect(ax-2,ay,5,1);ctx.fillRect(ax-1,ay+1,3,1);ctx.fillRect(ax,ay+2,1,1);}};
-/* 戦闘中だけキャンバスを端末の実解像度で描く（48ドットを潰さないため） */
-const bK=()=>Math.max(2,Math.min(6,Math.round(SC*(window.devicePixelRatio||1))));
-{const _draw=draw;draw=function(){const k=scene==='battle'?bK():1;if(cv.width!==W*k||cv.height!==H*k){cv.width=W*k;cv.height=H*k;}
+/* キャンバスを端末の実解像度で描く（48ドットを潰さないため）。ver0.46g：上限 6 → 8 に上げ、切り上げにして画面の実画素より粗くならないように。
+   戦闘だけでなくフィールド・街も同じ解像度で描く（高画質化） */
+const bK=()=>Math.max(2,Math.min(8,Math.ceil(SC*(window.devicePixelRatio||1)-.05)));
+{const _draw=draw;draw=function(){const k=bK();if(cv.width!==W*k||cv.height!==H*k){cv.width=W*k;cv.height=H*k;}
  ctx.setTransform(k,0,0,k,0,0);ctx.imageSmoothingEnabled=false;_draw();if(scene==='battle'&&B&&B.deb&&B.deb.length)drawDeb();};}
 
 /* ---------- 2. 破片の描画（B.deb）----------

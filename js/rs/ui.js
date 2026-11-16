@@ -102,7 +102,7 @@ $('#cmd').addEventListener('click',e=>{const c=$('#cmd');if(!c.classList.contain
 /* ==================== 下のボタン：通常AUTO・全力AUTO・リピート ==================== */
 bbar=function(){const b=$('#bbar');if(!b||!G)return;const p=B&&B.pick,l=p&&repOK(p.u),sg=[l?l.n:'',auto,AM,G.set.autoAw].join();if(b._s===sg&&b.firstChild)return;b._s=sg;
  b.className='b38';
- b.innerHTML=`<button data-b="n" class="au${auto&&AM==='n'?' on':''}">通常AUTO<small>${SEIRIN.n}：${AWN[G.set.autoAw]}</small></button><button data-b="f" class="au f${auto&&AM==='f'?' on':''}">全力AUTO<small>${SEIRIN.n}も使う</small></button><button data-b="rep" class="rp" ${l?'':'disabled'}>リピート<small>${l?esc(l.basic?'通常攻撃':l.n):'前回と同じ行動'}</small></button>`;};
+ b.innerHTML=`<button data-b="n" class="au${auto&&AM==='n'?' on':''}">通常<span class="lt">AUTO</span><small>${SEIRIN.n}：${AWN[G.set.autoAw]}</small></button><button data-b="f" class="au f${auto&&AM==='f'?' on':''}">全力<span class="lt">AUTO</span><small>${SEIRIN.n}も使う</small></button><button data-b="rep" class="rp" ${l?'':'disabled'}>リピート<small>${l?esc(l.basic?'通常攻撃':l.n):'前回と同じ行動'}</small></button>`;};
 
 /* ==================== キャラ詳細 ==================== */
 const RK=['','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ'];
