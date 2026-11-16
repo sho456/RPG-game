@@ -4,7 +4,7 @@
   2 段目：強化・弱体・状態異常（横並びで 1 行・3 つまで）。アビリティの発動名（固有の強化）は同時に出たら 2 行目
   3 段目：ダメージ・回復の数字（連続ヒットはヒットごとの数字に置き換わる。合計は出さない）
  置き場所：敵・味方とも体の中心が基準（中央揃え。数字の行の中心＝体の中心、上の段は上へ積む）。枠どうしが重なるときだけ後のものを下げる。
- 表示は区切り（キャラの行動の始め・ターンの始めの効果の前・ターンの終わり）まで残り、区切りで全員分まとめて消える（cut）。
+ 表示は最後の更新から約 0.85 秒で消える（LIFE）。区切り（キャラの行動の始め・ターンの始めの効果の前・ターンの終わり）でも全員分まとめて消す（cut）。
  置き換えたもの：js/v24.js dmgPop・wordPop・tagPop、js/v25.js fxPop（V24.HK24.pop をここで差し替える。古い関数は残っているが呼ばれない） */
 'use strict';
 const BPOP=(()=>{
@@ -30,9 +30,11 @@ function clear(p){p.r0.innerHTML='';p.r1.innerHTML='';p.r2.innerHTML='';p.r2b.in
    区切り＝キャラの行動の始め（js/rs/battle.js heroExec・enemyExec）・ターンの始めの効果の前・ターンの終わり・戦闘開始の表示のあと。
    まとまりの表示は次の区切りまで残し、区切りで全員分まとめて消える（次の行動の表示と被らない） */
 let SEG=1;
+/* ver0.46e：表示は残さずすぐ消す（ロマサガRS の録画：最後の表示から約 0.8 秒）。区切り（cut）でも消す */
+const LIFE=850;
 function begin(u){const p=panel(u),t=now();
  if(p.seg!==SEG||p.el.classList.contains('out')){clearTimeout(p.to);clear(p);p.seg=SEG;p.el.classList.remove('in');void p.el.offsetWidth;p.el.classList.add('in');}
- p.key='s'+SEG;p.tl=t;p.fade=Infinity;p.el.classList.add('on');return p;}
+ p.key='s'+SEG;p.tl=t;p.fade=t+Math.round(LIFE*spdK());p.el.classList.add('on');return p;}
 /* 区切り：出ている表示を全部、消える動き（上へ少し浮いて薄くなる）で消す */
 function cut(){SEG++;for(const p of P.values()){if(!p.el.classList.contains('on')||p.el.classList.contains('out'))continue;p.el.classList.add('out');clearTimeout(p.to);p.to=setTimeout(()=>{if(p.el.classList.contains('out')){clear(p);p.key=null;}},230);}}
 /* 1 段目：見出し。Critical は Weak・Resist の上の行（r0）、Weak・Resist・Guard と属性の漢字は r1 */
@@ -44,7 +46,7 @@ function number(p,txt,sk,fs,drop){const old=p.r3.querySelector('.nm:not(.old)');
  const nm=document.createElement('span');nm.className='nm';
  if(drop&&/^[\d,]+$/.test(txt)){[...txt].forEach((ch,i)=>{const c=tight(TX24.el(ch,sk,fs),fs,1);c.style.marginLeft=c.style.marginRight=-Math.round(c._m.pad+fs*.01)+'px';c.style.animationDelay=Math.round((txt.length-1-i)*38*spdK())+'ms';nm.appendChild(c);});nm.classList.add('dg');}
  else nm.appendChild(tight(TX24.el(txt,sk,fs),fs,.8));
- p.r3.appendChild(nm);}
+ p.r3.appendChild(nm);p.r3.classList.remove('hit');void p.r3.offsetWidth;p.r3.classList.add('hit');}
 const fmt=n=>{n=Math.abs(n|0);return n>=10000000?Math.floor(n/10000)+'万':String(n);};
 function dmg(u,s,kind,el){const v=parseInt(s,10),heal=s[0]==='+',crit=/crit/.test(kind),weak=/weak/.test(kind),res=/resist/.test(kind),psn=/psn/.test(kind),grd=u.side===0&&!heal&&!!u.guard;
  const p=begin(u),fs=fsNum(u),lf=Math.round(fs*1.02);
@@ -69,7 +71,7 @@ function status(u,s,col,kind){const k=stKind(s,col,kind),p=begin(u),fs=fsSt(u);l
  const row=k==='ab'?p.r2b:p.r2,max=k==='ab'?2:3;
  /* 同じ文字が同じ行にあれば出し直さない */
  if([...row.children].some(x=>x._t===txt))return;
- const z=k==='ab'?Math.round(fs*.95):fs,c=tight(TX24.el(txt,sk,z),z,.85);c._t=txt;c.classList.add('st',k);row.appendChild(c);while(row.children.length>max)row.firstChild.remove();
+ const z=k==='ab'?Math.round(fs*.95):fs,c=tight(TX24.el(txt,sk,z),z,.85);c._t=txt;c.classList.add('st',k);c.style.animationDelay=(row.children.length*55)+'ms';row.appendChild(c);while(row.children.length>max)row.firstChild.remove();
  place();}
 /* 置き場所（毎フレーム）：体の位置は動いていない「元の場所」で測る（攻撃で前へ出ても枠は動かない） */
 function place(){if(!inB())return;const st=$('#stage');if(!st)return;const W0=st.offsetWidth;let bd;try{bd=V24.bounds();}catch(e){bd={l:3,t:60,r:W0-3,b:st.offsetHeight-50};}
@@ -88,7 +90,7 @@ function place(){if(!inB())return;const st=$('#stage');if(!st)return;const W0=st
 /* 行動の終わり：表示は次の区切りまで残す（ver0.46d。以前は 1 秒で消していた） */
 function actEnd(){}
 function tick(){if(!inB())return;const t=now();for(const[u,p]of P){if(!p.el.isConnected){P.delete(u);continue;}
-  if(p.el.classList.contains('on')&&t-p.tl>8000&&!p.el.classList.contains('out')){p.el.classList.add('out');clearTimeout(p.to);p.to=setTimeout(()=>{if(p.el.classList.contains('out')){clear(p);p.key=null;}},230);}}/* 区切りが来ないまま残った表示の保険（8 秒） */
+  if(p.el.classList.contains('on')&&t>p.fade&&!p.el.classList.contains('out')){p.el.classList.add('out');clearTimeout(p.to);p.to=setTimeout(()=>{if(p.el.classList.contains('out')){clear(p);p.key=null;}},200);}}
  place();
  /* 数字の枠が出ている味方は、HP・BP の表示を隠す（重ならないように） */
  try{const L=$('#hl24');if(L&&B)B.heroes.forEach((h,i)=>{const c=L.children[i],p=P.get(h),on=!!(p&&p.el.classList.contains('on')&&!p.el.classList.contains('out')&&p.r3.children.length);if(c&&c.classList.contains('p46')!==on)c.classList.toggle('p46',on);});}catch(e){}}

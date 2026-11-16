@@ -270,7 +270,8 @@ run=async function(){if(!B)return;if(B.opts&&B.opts.viewer)return oldRun();const
    const q=buildOrder(cmds);B.rs.q=q;refresh();
    /* コマンドを決め終えたら戦場を全面に。全員の HP・BP を少しだけ出し、最初の攻撃の前に全員分まとめて消す（ver0.46） */
    /* ver0.46d：ターンの始め＝コマンドを決めて全画面になったあと。HP・BP を 1 度だけ出して消し、ターンの始めの効果を出してから行動へ */
-   try{BPOP.cut();}catch(e){}await wait(250);
+   /* 全画面に戻るスライド（約 0.5 秒）が終わってから HP・BP を出す（途中で出すと位置がずれて見える。ver0.46e） */
+   try{BPOP.cut();}catch(e){}{let n=0;while($('#app').classList.contains('in38')&&n<40){await sleep(30);n++;}}await wait(520);
    try{V38B.hpFlash(900);}catch(e){}await wait(950);try{V38B.hpHide();}catch(e){}await wait(200);
    roundFx();if(document.querySelector('#bp46 .bp46.on:not(.out)'))await wait(900);
    while(q.length){if(B!==myB||B.over)return;const it=q.shift(),u=it.u;
