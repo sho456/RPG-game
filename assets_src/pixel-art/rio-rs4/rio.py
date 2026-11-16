@@ -294,6 +294,8 @@ POSE_DEF = {
 
 
 def render(rows, foot=45, x0=8):
+    if isinstance(rows, Image.Image):    # 清書済みの PNG（gen/）はそのまま（足元 y=45 にそろえてある）
+        return rows.copy()
     if isinstance(rows, tuple):          # build() の結果：(行, 足元の行)。キャンバスの列 6 が立ちの列 0
         rows, frow = rows
         im = Image.new('RGBA', (48, 48), (0, 0, 0, 0))
@@ -343,6 +345,14 @@ if True:   # 構え・選択は limbs.py の版を使う（循環の読み込み
         POSES.update(getattr(_L, 'POSES', {}))
     except AttributeError:
         pass   # 下の行が輪郭＝地面より 4 上に置く（render の foot を 41 に）
+
+# 第 7 版：立ち・正面・構え・コマンド選択は、リオを元にした生成のドット絵を清書した PNG（gen/）を正とする
+_GEN = os.path.join(ROOT, 'gen')
+for _n in ('立ち', '正面', '構え1', '構え2', '選択'):
+    _p = os.path.join(_GEN, _n + '.png')
+    if os.path.exists(_p):
+        POSES[_n] = Image.open(_p).convert('RGBA')
+
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
