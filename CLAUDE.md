@@ -82,7 +82,7 @@
 | `pixelbolt-pixel-art` | ドット絵のレシピ（JSON）→ PNG/GIF/シート。エフェクトのプリセット多数（`npx -y pixelbolt@0.17.0`） |
 | `pixel-art-studio` | Python/Pillow で 1 ドットずつ描く |
 | `pixelfx` | コードのドット絵エフェクト 244 種（`tools/pixelfx`） |
-| `rs-style-sprite` | この作品の RS 風キャラ・敵のドット絵の規格と検査 |
+| `rs-style-sprite` | この作品の RS 風キャラ・敵のドット絵の規格と検査（第 2 版：RS 実機の実測。参考を実寸に戻す `rs_ref.py`・ポーズ別の検査 `rs_check.py --pose`） |
 | `rpg-hero-motion` | 戦闘モーション・技の演出 |
 | `rpg-equipment-icon` | 装備アイコン |
 | `rs-battle-flow` | ロマサガRS風の戦闘の流れと表示（HP/BP のタイミング・Critical/Weak・強化弱体・数字・区切り）。デモ `tools/battle_demo.js`・コマの一覧 `tools/frame_grid.py` |

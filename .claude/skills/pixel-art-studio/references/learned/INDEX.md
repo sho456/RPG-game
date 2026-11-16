@@ -12,3 +12,4 @@ One line per study card. Newest last. Format:
 | 005 | 005-tall-tactical-job-sprites.md | user-provided fantasy job lineup | 4–5 heads tall, 48–64px heroic field sprites, layered armor/robes, readable 3/4 anatomy | — |
 | 006 | 006-rs-battle-chibi.md | user-provided RS-style battle sheets (48×48 cells) | ~30px 3/4-left battle chibi, head 40%, near-black outline incl. internal part lines, 4-step hair, 21-pose vocabulary, no dither | — |
 | 007 | 007-rs-pixel-anatomy.md | user-provided RS-style 32×32 grids (stand + kick) | pixel-exact RS anatomy: 14×31 boy / 15×27 girl, 1-px eyes with 2-px black lids + sclera, 2-tone cloth with fold lines, #202020 everywhere | — |
+| 008 | 008-rs-pose-measure.md | user-provided RS in-game sprites (11, 8× WebP) | measured per pose: stand 30h, ready 0.95Hs×24w, near-death 0.83Hs, KO 0.48Hs×32w; pure-black silhouette, inner lines in darkest step, 3-row eyes, 5-step hair with white halo | — |

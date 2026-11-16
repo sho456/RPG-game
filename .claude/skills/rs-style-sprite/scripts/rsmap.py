@@ -1,5 +1,6 @@
 """RS 風ドット絵の「地図」を絵にする（rs-style-sprite スキル）
-地図＝文字列の行。'.' は透明、'o' は輪郭色、ほかの文字はパレット（dict）の色。
+地図＝文字列の行。'.' は透明、'o' は輪郭色、ほかの文字はパレット（dict）の色。第 2 版は pal に 'o': '#000000' を渡す（外周は純黒）。
+コマの名前に 正面・構え・瀕死・気絶 を含めると、検査がそのポーズの決まりで見る（立ちの高さを基準に比を取る）。
 render(frames, pal, out_dir, refs=None)
   frames: {名前: (地図の行, 追加の点 [(x, y, 文字)…])}。追加の点（剣など）には自動で輪郭が付く
   出力：<名前>.png（48×48・足元 y=45）・preview.png（拡大の並び）・check（rs_check の結果を表示）"""
@@ -46,9 +47,11 @@ def render(frames, pal, out_dir, refs=None, scale=8):
         sheet.alpha_composite(im.resize((W, W), Image.NEAREST), (i * W, 0))
     sheet.save(os.path.join(out_dir, 'preview.png'))
     try:
-        from rs_check import check
+        from rs_check import check, guess
+        stand = next((im for n, im in ims if guess(n) == 'stand'), None)
+        sh = check(stand)['h'] if stand else 30
         for name, im in ims:
-            print(name, check(im))
+            print(name, check(im, guess(name), sh))
     except Exception as e:  # noqa: BLE001
         print('check skipped:', e)
     return ims
