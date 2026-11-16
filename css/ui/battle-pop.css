@@ -3,18 +3,18 @@
 #bp46{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:7}
 .bp46{position:absolute;left:0;top:0;display:none;flex-direction:column;gap:0;will-change:transform,opacity}
 .bp46.on{display:flex}
-.bp46.e{align-items:flex-start}.bp46.h{align-items:flex-end}
-.bp46>div{display:flex;align-items:flex-end;gap:2px;white-space:nowrap}
+.bp46.e{align-items:flex-start}.bp46.h{align-items:center}
+.bp46>div{display:flex;align-items:flex-end;gap:3px;white-space:nowrap}
 .bp46>div:empty{display:none}
 .bp46 canvas{display:block}
 .bp46.out{opacity:0;transition:opacity .25s ease-in}
 /* 1 段目：見出しと漢字は同時に叩きつける */
-.bp46 .r1{gap:6px;margin-bottom:1px}
-.bp46 .lb{display:flex;align-items:center;gap:1px}
+.bp46 .r0,.bp46 .r1{gap:5px;margin-bottom:2px}
+.bp46 .lb{display:flex;align-items:flex-end;gap:2px}
 .bp46 .lb canvas{transform-origin:50% 70%;animation:sl43 .42s cubic-bezier(.25,.9,.3,1) both}
-.bp46 .lb .kj{margin-left:-2px;margin-top:-4px}
+.bp46 .lb .kj{position:relative;top:1px}
 /* 2 段目：状態の文字。小さく弾んで出る */
-.bp46 .r2,.bp46 .r2b{gap:5px;margin:1px 0}
+.bp46 .r2,.bp46 .r2b{gap:4px;margin:0 0 3px}
 .bp46 .st{animation:st46 .26s cubic-bezier(.2,1.5,.4,1) both}
 @keyframes st46{0%{opacity:0;transform:translateY(5px) scale(.7)}100%{opacity:1;transform:none}}
 /* 3 段目：数字。新しい数字は 1 桁ずつ右から落ち、前の数字は素早く消える */
@@ -22,7 +22,7 @@
 .bp46 .nm{display:inline-flex;align-items:flex-end}
 .bp46 .nm.dg canvas{transform-origin:50% 100%;animation:dg43 .36s cubic-bezier(.25,.8,.35,1) both}
 .bp46 .nm.old{position:absolute;bottom:0;opacity:0;transition:opacity .14s ease-out}
-.bp46.e .nm.old{left:0}.bp46.h .nm.old{right:0}
+.bp46.e .nm.old{left:0}.bp46.h .nm.old{left:50%;transform:translateX(-50%)}
 /* 数字の枠が出ている味方は HP・BP を隠す */
 #hl24 .hl.p46{opacity:0!important;transition:opacity .12s}
 @media (prefers-reduced-motion:reduce){.bp46 canvas,.bp46 .st{animation:none!important}}

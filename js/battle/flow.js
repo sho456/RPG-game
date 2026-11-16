@@ -64,8 +64,31 @@ regAll();
 
 /* ---------- 0. 戦闘開始の見出し（ロマサガRS：金の毛筆「戦闘開始」が横に流れて消える。ver0.45） ---------- */
 let BAN_END=0;/* 「戦闘開始」が消える時刻（HP・BP や開始時の効果はこのあとに出す） */
-function startBanner(){const st=$('#stage');if(!st||!inB()||(B.opts&&B.opts.viewer))return;const o=document.createElement('div');o.className='bs45';o.innerHTML='<b>戦闘開始</b>';st.appendChild(o);
- const ms=Math.round(1050*(ANIM.SP?ANIM.SP():1));o.style.animationDuration=ms+'ms';BAN_END=performance.now()+ms;setTimeout(()=>o.remove(),ms);}
+/* 筆の文字（ver0.46b）：衡山毛筆フォントで書いた「戦闘開始」の絵（js/battle/data/start-brush.js）を、金の墨で塗る。後ろに墨の帯（筆の払い） */
+const BIMG=(()=>{try{const i=new Image();i.src=BRUSH_START.src;return i;}catch(e){return null;}})();
+function brushBanner(W,H){const c=document.createElement('canvas'),dpr=Math.min(2,devicePixelRatio||1);c.width=W*dpr;c.height=H*dpr;c.style.width=W+'px';c.style.height=H+'px';
+ const g=c.getContext('2d');g.scale(dpr,dpr);let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+ /* 墨の帯：左から右へ太さを変えながら払う。端は筆の毛先の筋 */
+ const cy=H*.5;for(let i=0;i<240;i++){const t=i/239,x=W*(.03+.94*t),th=H*(.5+.22*Math.sin(t*Math.PI))*(.85+rnd()*.3),y=cy+(rnd()-.5)*H*.08+Math.sin(t*5)*2;
+  g.fillStyle=`rgba(8,4,4,${.07+rnd()*.05})`;g.beginPath();g.ellipse(x,y,W*.012+rnd()*W*.01,th/2,-.08,0,Math.PI*2);g.fill();}
+ for(let i=0;i<60;i++){const y=cy+(rnd()-.5)*H*.62,x0=W*(.01+rnd()*.1),x1=W*(.85+rnd()*.14);g.strokeStyle=`rgba(10,5,5,${.12+rnd()*.22})`;g.lineWidth=.6+rnd()*1.4;g.beginPath();g.moveTo(x0,y);g.quadraticCurveTo(W*.5,y+(rnd()-.5)*6,x1,y+(rnd()-.5)*4);g.stroke();}
+ if(!BIMG||!BIMG.complete||!BIMG.naturalWidth)return c;
+ /* 文字の大きさ：帯の高さの 8 割 */
+ const th=H*.8,tw=th*BRUSH_START.w/BRUSH_START.h,x0=(W-tw)/2,y0=cy-th/2;
+ const t=document.createElement('canvas');t.width=c.width;t.height=c.height;const q=t.getContext('2d');q.scale(dpr,dpr);
+ q.drawImage(BIMG,x0,y0,tw,th);q.globalCompositeOperation='source-in';
+ const gr=q.createLinearGradient(0,y0,0,y0+th);gr.addColorStop(0,'#fff8dc');gr.addColorStop(.4,'#ffd668');gr.addColorStop(.55,'#c47c14');gr.addColorStop(.72,'#f0b23c');gr.addColorStop(1,'#fff2b4');q.fillStyle=gr;q.fillRect(0,0,W,H);
+ /* 上側に白い艶（金の文字の上だけ） */
+ q.globalCompositeOperation='source-atop';const sh=q.createLinearGradient(0,y0,0,cy);sh.addColorStop(0,'rgba(255,255,255,.32)');sh.addColorStop(1,'rgba(255,255,255,0)');q.fillStyle=sh;q.fillRect(x0,y0,tw,th/2);
+ /* 濃い縁（墨）：文字の形を少しずつずらして重ね、黒く塗る */
+ const o=document.createElement('canvas');o.width=c.width;o.height=c.height;const r=o.getContext('2d');r.scale(dpr,dpr);
+ for(const[dx,dy]of[[-2.2,0],[2.2,0],[0,-2.2],[0,2.2],[-1.6,-1.6],[1.6,1.6],[1.6,-1.6],[-1.6,1.6]])r.drawImage(BIMG,x0+dx,y0+dy,tw,th);
+ r.globalCompositeOperation='source-in';r.fillStyle='#1a0a00';r.fillRect(0,0,W,H);
+ g.setTransform(1,0,0,1,0,0);g.save();g.shadowColor='rgba(0,0,0,.8)';g.shadowBlur=10*dpr;g.drawImage(o,0,0);g.restore();g.drawImage(t,0,0);
+ return c;}
+function startBanner(){const st=$('#stage');if(!st||!inB()||(B.opts&&B.opts.viewer))return;const o=document.createElement('div');o.className='bs45';st.appendChild(o);
+ const ms=Math.round(1050*(ANIM.SP?ANIM.SP():1));o.style.animationDuration=ms+'ms';BAN_END=performance.now()+ms;setTimeout(()=>o.remove(),ms);
+ const W=Math.min(st.offsetWidth,440);try{o.appendChild(brushBanner(W,Math.round(W*.27)));}catch(e){o.innerHTML='<b>戦闘開始</b>';}}
 const bannerOn=()=>performance.now()<BAN_END;
 {const _sb=startBattle;startBattle=function(list,opts){const r=_sb.apply(this,arguments);try{if(!(opts&&opts.viewer)&&!(opts&&opts.noStartBanner)){BAN_END=performance.now()+1200;setTimeout(startBanner,80);}}catch(e){}return r;};}
 

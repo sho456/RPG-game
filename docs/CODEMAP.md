@@ -86,25 +86,26 @@
 | 80 | `js/battle/data/motion-heroes.js` | 13 | ver0.35 味方のモーション（12 人） | BXM |
 | 81 | `js/battle/viewer.js` | 10 | ver0.34 演出の設定・星臨演出の長さ・演出ビューア | BXV |
 | 82 | `js/battle/version.js` | 2 | 戦闘演出の全面刷新（ver0.34〜）：版表示・お知らせ | V34 |
-| 83 | `js/battle/flow.js` | 6 | 戦闘の行動演出：ロマサガRS の流れ（ver0.42。正本） | BFLOW |
-| 84 | `js/rs/data.js` | 25 | ver0.37 戦闘システム刷新（データ） | RSD |
-| 85 | `js/rs/abilities.js` | 10 | アビリティ（AB・ABL の正本。ver0.45：3 段階＋段階Ⅲの固有名の特殊効果） |  |
-| 86 | `js/rs/core.js` | 22 | 戦闘システム（能力値・習得・技セット・アビリティ・陣形・セーブ） | RSC |
-| 87 | `js/data/equip7.js` | 4 | 装備の能力影響（EQ7：装備が上げるのは基礎ステータスだけ。ver0.45 新規の正本） | EQ7 |
-| 88 | `js/rs/battle.js` | 29 | 戦闘の進行（ターン制・BP・HP/LP） | RSB |
-| 89 | `js/rs/ui.js` | 22 | 戦闘システムの画面 | RSU |
-| 90 | `js/v38/core.js` | 4 | ver0.38 土台：攻撃属性 8 種・武器種 8 種・セーブの移行・LP | V38 |
-| 91 | `js/v38/battle-ui.js` | 6 | ver0.38 戦闘画面 | V38B |
-| 92 | `js/v38/menu.js` | 10 | ver0.38 画面全体の整理 | V38M |
-| 93 | `js/v38/help.js` | 8 | ver0.38 タップで詳細（V38H） | V38H |
-| 94 | `js/ui/skill-icons.js` | 5 | 技・術のアイコン（SKICON：白いシルエットの絵柄 27 種＋技 → 絵柄の対応。js/rs/ui.js の skIcon が使う） |  |
-| 95 | `js/ui/board.js` | 5 | 星盤・天星盤の画面（ver0.39 で 1 ファイルにまとめた。画面の正本はここ） | BOARDUI |
-| 96 | `js/ui/equip-info.js` | 4 | 装備品の詳細（EQINFO：装備アイコンのタップで出るポップアップの正本。新規） | EQINFO |
-| 97 | `js/ui/party.js` | 8 | 編成画面と陣形（ver0.41 で 1 ファイルにまとめた。画面の正本はここ。旧 js/v38/party.js を置き換え） | V38P |
-| 98 | `js/ui/smith.js` | 4 | 鍛冶屋の画面（ver0.44。正本：town.js の smith・enhance と v31/items.js・ver18-town.js の包みを置き換え） | SMITH44 |
-| 99 | `js/ui/damage.js` | 3 | 戦闘のダメージ表示の書体（TX24 の書式の最終定義。ロマサガRS の録画に合わせた） |  |
-| 100 | `js/ui/keywords.js` | 6 | 用語のハイライト（KW：効果の説明文の用語を緑で示し、タップで詳しい説明を出す正本。ver0.45 新規） | KW |
-| 101 | `js/ui/battle-pop.js` | 8 | 戦闘中の表示（見出し・状態・数字）の正本（BPOP。ver0.46 新規。決まりは docs/BATTLE-FLOW.md） | BPOP |
+| 83 | `js/battle/data/start-brush.js` | 24 | 「戦闘開始」の筆文字（衡山毛筆フォントで書いた文字を絵にしたもの。js/battle/flow.js brushBanner が金の墨で塗る） |  |
+| 84 | `js/battle/flow.js` | 9 | 戦闘の行動演出：ロマサガRS の流れ（ver0.42。正本） | BFLOW BIMG |
+| 85 | `js/rs/data.js` | 25 | ver0.37 戦闘システム刷新（データ） | RSD |
+| 86 | `js/rs/abilities.js` | 10 | アビリティ（AB・ABL の正本。ver0.45：3 段階＋段階Ⅲの固有名の特殊効果） |  |
+| 87 | `js/rs/core.js` | 22 | 戦闘システム（能力値・習得・技セット・アビリティ・陣形・セーブ） | RSC |
+| 88 | `js/data/equip7.js` | 4 | 装備の能力影響（EQ7：装備が上げるのは基礎ステータスだけ。ver0.45 新規の正本） | EQ7 |
+| 89 | `js/rs/battle.js` | 29 | 戦闘の進行（ターン制・BP・HP/LP） | RSB |
+| 90 | `js/rs/ui.js` | 22 | 戦闘システムの画面 | RSU |
+| 91 | `js/v38/core.js` | 4 | ver0.38 土台：攻撃属性 8 種・武器種 8 種・セーブの移行・LP | V38 |
+| 92 | `js/v38/battle-ui.js` | 6 | ver0.38 戦闘画面 | V38B |
+| 93 | `js/v38/menu.js` | 10 | ver0.38 画面全体の整理 | V38M |
+| 94 | `js/v38/help.js` | 8 | ver0.38 タップで詳細（V38H） | V38H |
+| 95 | `js/ui/skill-icons.js` | 5 | 技・術のアイコン（SKICON：白いシルエットの絵柄 27 種＋技 → 絵柄の対応。js/rs/ui.js の skIcon が使う） |  |
+| 96 | `js/ui/board.js` | 5 | 星盤・天星盤の画面（ver0.39 で 1 ファイルにまとめた。画面の正本はここ） | BOARDUI |
+| 97 | `js/ui/equip-info.js` | 4 | 装備品の詳細（EQINFO：装備アイコンのタップで出るポップアップの正本。新規） | EQINFO |
+| 98 | `js/ui/party.js` | 8 | 編成画面と陣形（ver0.41 で 1 ファイルにまとめた。画面の正本はここ。旧 js/v38/party.js を置き換え） | V38P |
+| 99 | `js/ui/smith.js` | 4 | 鍛冶屋の画面（ver0.44。正本：town.js の smith・enhance と v31/items.js・ver18-town.js の包みを置き換え） | SMITH44 |
+| 100 | `js/ui/damage.js` | 3 | 戦闘のダメージ表示の書体（TX24 の書式の最終定義。ロマサガRS の録画に合わせた） |  |
+| 101 | `js/ui/keywords.js` | 6 | 用語のハイライト（KW：効果の説明文の用語を緑で示し、タップで詳しい説明を出す正本。ver0.45 新規） | KW |
+| 102 | `js/ui/battle-pop.js` | 9 | 戦闘中の表示（見出し・状態・数字）の正本（BPOP。ver0.46 新規。決まりは docs/BATTLE-FLOW.md） | BPOP |
 
 ## 上書きの連鎖（2 ファイル以上で定義・上書きされる関数）
 

@@ -194,7 +194,7 @@ async function inputPhase(myB){const cmds=new Map();let list=B.heroes.filter(h=>
 async function opening(myB){await sleep(350);let n=0;while(B===myB&&!B.over&&(B.intro>0||document.querySelector('#stage .bossin')||BFLOW.bannerOn())&&n<240){await sleep(50);n++;}}
 
 /* 味方の行動 */
-async function heroExec(u,c){if(!c||!c.sk)return;
+async function heroExec(u,c){if(!c||!c.sk)return;try{BPOP.clearUnit(u);}catch(x){}
  psEach(u,'turn');const stun=await V20.tickSts(u);if(!u.alive||!aliveE().length)return;if(stun)return;
  let sk=c.sk,t=c.t;
  if(sk.ougi&&(!u.aw||u._rsOugi))sk=ATK(u);
@@ -249,7 +249,7 @@ function prep(u,sk,t){const s=Object.assign({},sk);s.sp=0;/* 旧来の SP の消
  if(s.fixedK==='store')s.fixed=(u.store||0)*.9+st(u,'atk')*3;
  return s;}
 /* 敵の行動。全体攻撃は、倒れている味方（LP が残っている）にも追い打ちになる */
-async function enemyExec(e){B.rs.cq=[];B.rs.eSk=null;const down=B.heroes.filter(h=>!h.alive&&(h.lp||0)>0);
+async function enemyExec(e){try{BPOP.clearUnit(e);}catch(x){}B.rs.cq=[];B.rs.eSk=null;const down=B.heroes.filter(h=>!h.alive&&(h.lp||0)>0);
  const ch0=e.charging;await enemyTurn(e);
  try{const s=B&&B.rs&&B.rs.eSk;if(s&&s.t==='all'&&!e.charging)for(const h of down)if(!h.alive&&B.heroes.includes(h))lpLose(h,1,'倒れたところに追い打ちを受けた');}catch(x){console.error(x);}
  if(B&&!B.over&&e.alive&&e.charging&&!ch0)log(`${e.name}は<b>力を溜めている</b>…！ 次の行動で強力な攻撃が来る`);

@@ -14,7 +14,10 @@
 /* 行動中のキャラの上の三角（js/v25.js marker）は出さない（ver0.44） */
 #mk25{display:none !important}
 /* ver0.45 戦闘開始：金の毛筆の見出しが右から入り、少し止まって左へ抜ける */
-.bs45{position:absolute;left:0;right:0;top:38%;z-index:8;pointer-events:none;text-align:center;animation:bs45 1.25s cubic-bezier(.3,.8,.4,1) both}
+.bs45{position:absolute;left:0;right:0;top:32%;z-index:8;pointer-events:none;text-align:center;animation:bs45 1.25s cubic-bezier(.3,.8,.4,1) both}
+/* 墨の帯は Canvas（brushBanner）で描く */
+.bs45 canvas{display:block;margin:0 auto}
+.bs45:has(canvas)::before{display:none}
 .bs45::before{content:'';position:absolute;left:0;right:0;top:50%;height:58px;margin-top:-29px;background:linear-gradient(90deg,transparent,rgba(0,0,0,.55) 25%,rgba(0,0,0,.55) 75%,transparent)}
 .bs45 b{position:relative;display:inline-block;font:400 52px/1 "Yuji Boku","Kaisei Tokumin",serif;letter-spacing:.08em;
  background:linear-gradient(180deg,#fff8d8 0%,#ffe08a 38%,#c8861c 52%,#7a4a08 58%,#e8b040 80%,#fff0b0 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
