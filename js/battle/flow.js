@@ -90,7 +90,9 @@ function startBanner(){const st=$('#stage');if(!st||!inB()||(B.opts&&B.opts.view
  const ms=Math.round(1050*(ANIM.SP?ANIM.SP():1));o.style.animationDuration=ms+'ms';BAN_END=performance.now()+ms;setTimeout(()=>o.remove(),ms);
  const W=Math.min(st.offsetWidth,440);try{o.appendChild(brushBanner(W,Math.round(W*.27)));}catch(e){o.innerHTML='<b>戦闘開始</b>';}}
 const bannerOn=()=>performance.now()<BAN_END;
-{const _sb=startBattle;startBattle=function(list,opts){const r=_sb.apply(this,arguments);try{if(!(opts&&opts.viewer)&&!(opts&&opts.noStartBanner)){BAN_END=performance.now()+1200;setTimeout(startBanner,80);}}catch(e){}return r;};}
+{const _sb=startBattle;startBattle=function(list,opts){const r=_sb.apply(this,arguments);try{/* 連続戦闘の 2 戦目以降（直前に BATTLE n/N の移行演出があった）は出さない：「戦闘開始」はクエストの最初の 1 回だけ（ver0.46f） */
+  const next=!!(opts&&opts.quest)&&typeof V38B!=='undefined'&&performance.now()-(V38B.waveT()||-1e9)<8000;
+  if(!(opts&&opts.viewer)&&!(opts&&opts.noStartBanner)&&!next){BAN_END=performance.now()+1200;setTimeout(startBanner,80);}else BAN_END=performance.now();}catch(e){}return r;};}
 
 /* ---------- 毎フレーム：吹き出しをキャラに合わせる ---------- */
 {const _d=draw;draw=function(){_d();if(BUB){if(!inB())close(true);else place();}};}

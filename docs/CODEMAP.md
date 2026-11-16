@@ -95,7 +95,7 @@
 | 89 | `js/rs/battle.js` | 30 | 戦闘の進行（ターン制・BP・HP/LP） | RSB |
 | 90 | `js/rs/ui.js` | 22 | 戦闘システムの画面 | RSU |
 | 91 | `js/v38/core.js` | 4 | ver0.38 土台：攻撃属性 8 種・武器種 8 種・セーブの移行・LP | V38 |
-| 92 | `js/v38/battle-ui.js` | 7 | ver0.38 戦闘画面 | V38B |
+| 92 | `js/v38/battle-ui.js` | 8 | ver0.38 戦闘画面 | V38B |
 | 93 | `js/v38/menu.js` | 10 | ver0.38 画面全体の整理 | V38M |
 | 94 | `js/v38/help.js` | 8 | ver0.38 タップで詳細（V38H） | V38H |
 | 95 | `js/ui/skill-icons.js` | 5 | 技・術のアイコン（SKICON：白いシルエットの絵柄 27 種＋技 → 絵柄の対応。js/rs/ui.js の skIcon が使う） |  |
@@ -105,7 +105,7 @@
 | 99 | `js/ui/smith.js` | 4 | 鍛冶屋の画面（ver0.44。正本：town.js の smith・enhance と v31/items.js・ver18-town.js の包みを置き換え） | SMITH44 |
 | 100 | `js/ui/damage.js` | 3 | 戦闘のダメージ表示の書体（TX24 の書式の最終定義。ロマサガRS の録画に合わせた） |  |
 | 101 | `js/ui/keywords.js` | 6 | 用語のハイライト（KW：効果の説明文の用語を緑で示し、タップで詳しい説明を出す正本。ver0.45 新規） | KW |
-| 102 | `js/ui/battle-pop.js` | 10 | 戦闘中の表示（見出し・状態・数字）の正本（BPOP。ver0.46 新規。決まりは docs/BATTLE-FLOW.md） | BPOP |
+| 102 | `js/ui/battle-pop.js` | 11 | 戦闘中の表示（見出し・状態・数字）の正本（BPOP。ver0.46 新規。決まりは docs/BATTLE-FLOW.md） | BPOP |
 
 ## 上書きの連鎖（2 ファイル以上で定義・上書きされる関数）
 
@@ -117,8 +117,8 @@
 | `title` | town.js → ver16.js → ver17.js → ver18-town.js → ver19.js → v20-ui.js → v21.js → v22.js → v23.js → v24.js → v25.js → v30.js → v31/core.js → v31/quests.js → v32.js → v33.js → battle/version.js → v38/menu.js |
 | `startBattle` | engine.js → ch8.js → ver18-battle.js → ver19.js → v20-battle.js → v21.js → v22.js → v23.js → v24.js → v25.js → battle/seq.js → battle/flow.js → rs/battle.js → v38/core.js → v38/battle-ui.js → ui/battle-pop.js |
 | `dvMenu` | dev.js → ch9.js → ver16.js → ver17.js → ver18-town.js → v20-ui.js → v21.js → v22.js → v23.js → v24.js → v25.js → v29.js → v30.js → v31/quests.js → battle/viewer.js |
+| `show` | core.js → ver17.js → ver18-town.js → v20-ui.js → v22.js → v23.js → v24.js → v25.js → battle/flow.js → v38/battle-ui.js → v38/help.js → ui/keywords.js → ui/battle-pop.js |
 | `migrate` | items.js → ch8.js → ch9.js → ver17.js → ver18-field.js → v31/items.js → data/resist.js → v31/quests.js → v32.js → rs/core.js → data/equip7.js → v38/core.js |
-| `show` | core.js → ver17.js → ver18-town.js → v20-ui.js → v22.js → v23.js → v24.js → v25.js → battle/flow.js → v38/battle-ui.js → v38/help.js → ui/keywords.js |
 | `townMenu` | town.js → ch9.js → ver17.js → ver18-town.js → v20-ui.js → v21.js → v22.js → v23.js → v31/quests.js → v38/menu.js |
 | `calc` | engine.js → ch8.js → ch9.js → ver19.js → v20-battle.js → data/terms.js → v31/core.js → rs/battle.js |
 | `refresh` | engine.js → ch5.js → ver17.js → v20-ui.js → v22.js → v24.js → v25.js → v31/quests.js |

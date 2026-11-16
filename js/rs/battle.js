@@ -47,8 +47,11 @@ const isDmg=sk=>!!sk&&(!!sk.basic||['phys','mag','rhythm','pct'].includes(sk.k))
 const dying=u=>!!u&&u.alive&&u.side===0&&u.hp<=u.mhp*D.HPLP.dying;
 
 /* ==================== LP ==================== */
+/* ver0.46f：LP が減るのは、一部の高難易度ボス（LP を削る技を持つ Lv50 以上のボス）の攻撃だけ。気絶・追い打ち・回復術では減らない */
+const lpBoss=a=>!!a&&a.side===1&&!!a.boss&&(a.lv||0)>=50;
 function lpLose(t,n,why){if(!t||t.side!==0||!(n>0))return;const l0=t.lp;t.lp=Math.max(0,(t.lp||0)-n);if(t.lp===l0)return;
- setTimeout(()=>{try{pop(t,'LP-'+(l0-t.lp),'#ff9ab0',true,'st20 down');}catch(e){}},120);
+ /* 表示：回復と同じ 3 段目に赤い文字。ダメージの数字と被るときは時間差で（js/ui/battle-pop.js lp） */
+ try{BPOP.lp(t,'LP-'+(l0-t.lp));}catch(e){}
  if(t.lp<=0){if(t.alive){t.hp=0;t.alive=false;}log(`<b>${t.name}のLPが尽きた</b>…この戦闘ではもう復活できない`);}
  else if(why)log(`${t.name}：${why}（LP ${t.lp}/${t.lpMax}）`);
  try{G.h[t.id].lp=t.lp;}catch(e){}}
@@ -84,7 +87,7 @@ function lpGuard(){if(!B)return;for(const h of B.heroes)if(h.alive&&(h.lp||0)<=0
    if(d>0){const dr=sumE(a,'drain',e=>cnd(e.c,a,t,sk));if(dr&&a.alive&&a.hp<a.mhp){const v=Math.max(1,Math.round(d*dr/100));a.hp=Math.min(a.mhp,a.hp+v);}}
    if(was&&!t.alive)onKill(a,t);}
   /* LP を直接削る敵の攻撃 */
-  if(a.side===1&&t.side===0&&sk&&sk.lp&&!B.rs.missed)lpLose(t,sk.lp,`「${sk.n}」で命が削られた`);
+  if(a.side===1&&t.side===0&&sk&&sk.lp&&!B.rs.missed&&lpBoss(a))lpLose(t,sk.lp,`「${sk.n}」で命が削られた`);
  }catch(e){console.error(e);}
  B.rs.missed=false;return d;};}
 function onHit(a,t,sk,r){if(!t.alive)return;
@@ -103,9 +106,8 @@ function onKill(a,t){for(const e of effs(a))if(e.t==='kill'){if(e.bp)a._rsBpGain
    const rg=effs(t).find(e=>e.t==='rage');if(rg&&t.alive)t._rsRage=Math.min(rg.max||5,(t._rsRage||0)+1);
    if(a&&a.side===1&&a.alive&&t.hp>0&&sk&&sk.t==='one'&&!sk._fu)for(const e of effs(t))if(e.t==='counter'&&Math.random()<(e.p||0)){B.rs.cq.push({a:t,t:a,pow:Math.max(e.pow||1,...effs(t).filter(x=>x.t==='ctpow').map(x=>x.v))});break;}}}catch(e){console.error(e);}
  return r;};}
-/* 気絶：LP-1（気絶中にさらに攻撃を受けたときも） */
-{const _k=kill;kill=async function(t){const was=t&&t.alive;await _k(t);try{if(B&&B.rs&&t&&t.side===0&&!t.alive){
-   lpLose(t,1,was?'気絶した':'倒れたところに追い打ちを受けた');if(was&&t.lp>0)log(`${t.name}は気絶した…（回復術で復活できる）`);}}catch(e){console.error(e);}};}
+/* 気絶（ver0.46f：LP は減らない） */
+{const _k=kill;kill=async function(t){const was=t&&t.alive;await _k(t);try{if(B&&B.rs&&t&&t.side===0&&!t.alive&&was)log(`${t.name}は気絶した…（回復術で復活できる）`);}catch(e){console.error(e);}};}
 /* 反撃・追撃 */
 async function strikeBack(a,t,nm,pow,el){if(!a.alive||!B)return;let tg=t&&t.alive?t:aliveE().sort((x,y)=>x.hp-y.hp)[0];if(!tg)return;
  pop(a,nm,'#ffe27a',true,'st20 fu');await wait(140);try{const[x,y]=V19.mid(tg);FX19.slash(x,y,ELC[el]||'#ffffff',{size:1});}catch(e){}
@@ -215,7 +217,7 @@ async function heroExec(u,c){if(!c||!c.sk)return;try{BPOP.cut();}catch(x){}/* �
  const g=glimmer(u,sk);if(g){sk=g;await glimShow(u,g);if(g.t==='one'&&(!t||!t.alive||t.side!==1))t=aliveE()[0];}
  const key=C.keyOf(sk),prof=key&&D.NEW[key]?C.profMul(u.id,key):1;
  u.sp-=cost;u._rsBpGain=0;
- if(lpc&&C.isHealSpell(sk))lpLose(u,lpc);
+ /* 回復術の LP 消費は ver0.46f で廃止 */
  const s2=prep(u,sk,t);
  B.rs.cur={u,sk:s2,mul:prof,hitSet:new Set(),weak:false};
  if(sk.ougi){u._rsOugi=1;banner('奥義',`${u.name}「${sk.n}」`,'ougi');B.flashBg=24;B.flashCol='#fff3b0';try{SFX.aw();}catch(e){}await wait(650);}
@@ -256,7 +258,7 @@ function prep(u,sk,t){const s=Object.assign({},sk);s.sp=0;/* 旧来の SP の消
 /* 敵の行動。全体攻撃は、倒れている味方（LP が残っている）にも追い打ちになる */
 async function enemyExec(e){try{BPOP.cut();}catch(x){}B.rs.cq=[];B.rs.eSk=null;const down=B.heroes.filter(h=>!h.alive&&(h.lp||0)>0);
  const ch0=e.charging;await enemyTurn(e);
- try{const s=B&&B.rs&&B.rs.eSk;if(s&&s.t==='all'&&!e.charging)for(const h of down)if(!h.alive&&B.heroes.includes(h))lpLose(h,1,'倒れたところに追い打ちを受けた');}catch(x){console.error(x);}
+
  if(B&&!B.over&&e.alive&&e.charging&&!ch0)log(`${e.name}は<b>力を溜めている</b>…！ 次の行動で強力な攻撃が来る`);
  await drainCounters();}
 

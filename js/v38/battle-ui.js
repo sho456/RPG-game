@@ -57,8 +57,15 @@ function hlState(){hlShow();const L=$('#hl24');if(!L)return;B.heroes.forEach((h,
  if(c.classList.contains('dy38')!==dy)c.classList.toggle('dy38',dy);if(c.dataset.lp!==lp)c.dataset.lp=lp;
  const z=h.alive?'':(h.lp||0)<=0?'z':'';if((c.dataset.z||'')!==z)c.dataset.z=z;});}
 
+/* HP・BP の置き場所（ver0.46f）：いつも同じ場所＝キャラの元の立ち位置の体の左下。
+   以前は他の表示を避けて候補の中から選んでいたため、場面によって頭の上や右へ飛んでいた。表示中は毎フレーム置き直す（並び替え・連続戦闘・星臨で動いても付いていく） */
+try{V24.HK24.placeHL=L=>{const rs=[];let bd;try{bd=V24.bounds();}catch(e){return rs;}
+  B.heroes.forEach((h,i)=>{const c=L.children[i];if(!c)return;let b;try{b=V24.boxOf(h,true);}catch(e){return;}const w=c.offsetWidth,hh=c.offsetHeight;
+   const x=Math.max(bd.l,Math.min(bd.r-w,b.l+b.w*.18-w)),y=Math.max(bd.t,Math.min(bd.b-hh,b.b-hh+2));rs.push({l:x,t:y,r:x+w,b:y+hh});
+   const tf=`translate(${Math.round(x)}px,${Math.round(y)}px)`;if(c._tf!==tf){c._tf=tf;c.style.transform=tf;}});return rs;};}catch(e){console.error(e);}
+
 /* ==================== 5. 毎フレーム ==================== */
-{const _d=draw;draw=function(){_d();if(!inB())return;try{fitNew();setIn(inputOn());hlState();
+{const _d=draw;draw=function(){_d();if(!inB())return;try{fitNew();setIn(inputOn());hlState();if(app.classList.contains('hl39'))V24.placeHL();
   const ov=!!B.over;if(app.classList.contains('ov38')!==ov)app.classList.toggle('ov38',ov);}catch(e){if(!draw._e38){draw._e38=1;console.error(e);}}};}
 {const _sh=show;show=function(m){_sh(m);if(m!=='battle'){app.classList.remove('in38','ov38','hl39');IN=false;}};}
 
@@ -66,7 +73,8 @@ function hlState(){hlShow();const L=$('#hl24');if(!L)return;B.heroes.forEach((h,
 {const _sb=startBattle;startBattle=function(list,opts){app.classList.remove('in38','hl39');IN=false;hlTurn=-1;const r=_sb(list,opts);try{bbar(true);}catch(e){}return r;};}
 
 /* ==================== 7. 連続戦闘：次の戦闘への移行演出 ==================== */
-function waveOut(o){return new Promise(res=>{let w=$('#wv38');if(!w){w=document.createElement('div');w.id='wv38';app.appendChild(w);}
+let WAVE_T=0;
+function waveOut(o){WAVE_T=performance.now();return new Promise(res=>{let w=$('#wv38');if(!w){w=document.createElement('div');w.id='wv38';app.appendChild(w);}
  w.innerHTML=`<div class="bg"></div><div class="tx"><small>${esc(o.q||'')}</small><b>BATTLE <em>${o.i}</em><i>/${o.n}</i></b>${o.tag?`<span>${esc(o.tag)}</span>`:''}${o.sub?`<p>${o.sub}</p>`:''}</div>`;
  w.className='on';try{tone(660,.06,'triangle',.04);setTimeout(()=>tone(880,.08,'triangle',.04),90);}catch(e){}
  const k=SPD&&SPD[speed]?SPD[speed]:1;setTimeout(res,Math.round(900*Math.max(.5,k)));});}
@@ -74,4 +82,4 @@ function waveIn(){const w=$('#wv38');if(!w)return;w.className='on out';setTimeou
 
 function hpFlash(ms){hlFrom=performance.now();hlUntil=hlFrom+ms;}
 function hpHide(){hlUntil=0;}
-return{geo,waveOut,waveIn,heroK,hpFlash,hpHide,hpEnd};})();
+return{geo,waveOut,waveIn,heroK,hpFlash,hpHide,hpEnd,waveT:()=>WAVE_T};})();

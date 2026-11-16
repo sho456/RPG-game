@@ -27,7 +27,7 @@ normAll();
 
 /* ---------- 敵の技：LP を削る攻撃・属性の見直し ---------- */
 const LPATK={curse:1,bell:1,voidslash:1,senju:1,tokiyomi:1,chrono:1};
-for(const k in LPATK)if(EA[k]){EA[k].lp=LPATK[k];EA[k].d=(EA[k].d?EA[k].d+'／':'')+'命中した相手の LP を 1 削る';}
+for(const k in LPATK)if(EA[k]){EA[k].lp=LPATK[k];EA[k].d=(EA[k].d?EA[k].d+'／':'')+'高難易度のボス（Lv50 以上）が使うと、命中した相手の LP を 1 削る';}
 if(EA.spore)EA.spore.el='陰';if(EA.mirror)EA.mirror.el='打';
 
 /* ---------- キャラ：得意属性・通常攻撃 ---------- */

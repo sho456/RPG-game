@@ -102,9 +102,9 @@ function costOf(u,sk){if(!sk||sk.basic||sk.k==='item')return 0;let c=sk.bp!=null
  if(u&&u.side===0&&G.h[u.id]){const l=profLv(u.id,keyOf(sk));c-=(l>=4?1:0)+(l>=8?1:0);}
  try{c-=RSB.sumE(u,'bpcut',e=>RSB.cnd(e.c,u,null,sk));}catch(e){}
  return Math.max(1,c);}
-/* 回復術：使うと LP を消費する（自分の LP が 0 になる使い方はできない） */
+/* 回復術かどうか（ver0.46f で LP の消費は廃止。lpCost は常に 0） */
 const isHealSpell=sk=>!!sk&&sk.ty==='術'&&(sk.k==='heal'||sk.k==='healAll'||sk.role==='heal'||!!sk.heal20)&&!sk.ougi;
-const lpCost=sk=>isHealSpell(sk)?D.HPLP.healLp:0;
+const lpCost=()=>0;/* ver0.46f：回復術の LP 消費は廃止（LP が減るのは一部の高難易度ボスの攻撃だけ） */
 let KEYM=null;
 function keyOf(sk){if(!sk)return null;if(sk._k)return sk._k;if(!KEYM){KEYM=new Map();for(const k in SK)KEYM.set(SK[k],k);}return KEYM.get(sk)||null;}
 for(const k in D.NEW)SK[k]._k=k;

@@ -46,7 +46,7 @@ function number(p,txt,sk,fs,drop){const old=p.r3.querySelector('.nm:not(.old)');
  const nm=document.createElement('span');nm.className='nm';
  if(drop&&/^[\d,]+$/.test(txt)){[...txt].forEach((ch,i)=>{const c=tight(TX24.el(ch,sk,fs),fs,1);c.style.marginLeft=c.style.marginRight=-Math.round(c._m.pad+fs*.01)+'px';c.style.animationDelay=Math.round((txt.length-1-i)*38*spdK())+'ms';nm.appendChild(c);});nm.classList.add('dg');}
  else nm.appendChild(tight(TX24.el(txt,sk,fs),fs,.8));
- p.r3.appendChild(nm);p.r3.classList.remove('hit');void p.r3.offsetWidth;p.r3.classList.add('hit');}
+ p.r3.appendChild(nm);p.numT=now();p.r3.classList.remove('hit');void p.r3.offsetWidth;p.r3.classList.add('hit');}
 const fmt=n=>{n=Math.abs(n|0);return n>=10000000?Math.floor(n/10000)+'万':String(n);};
 function dmg(u,s,kind,el){const v=parseInt(s,10),heal=s[0]==='+',crit=/crit/.test(kind),weak=/weak/.test(kind),res=/resist/.test(kind),psn=/psn/.test(kind),grd=u.side===0&&!heal&&!!u.guard;
  const p=begin(u),fs=fsNum(u),lf=Math.round(fs*1.02);
@@ -56,6 +56,11 @@ function dmg(u,s,kind,el){const v=parseInt(s,10),heal=s[0]==='+',crit=/crit/.tes
  number(p,(heal?'+':'')+fmt(v),heal?'heal':psn?'psn':u.side===0?'dmgH':'dmg',heal?Math.round(fs*.92):fs,!heal);
  if(!heal)try{BFLOW.close();}catch(e){}/* 吹き出しは数字が出る前に消す */
  place();}
+/* LP の減少（ver0.46f）：回復と同じ 3 段目に赤い文字。直前に数字が出ていたら、読める間（約 0.6 秒）をおいてから出す */
+try{TX24.STYLE.lpd={font:'num',fill:[[0,'#ffe0e0'],[.45,'#ff5a5a'],[.55,'#d8141e'],[1,'#a00010']],ow:.12,oc:'#2a0004',sh:[.035,.065,'rgba(0,0,0,.6)']};}catch(e){}
+function lp(u,txt){const p0=P.get(u),t=now(),gap=Math.round(600*spdK()),last=p0&&p0.numT&&p0.r3.children.length?p0.numT:0,w=last?Math.max(0,last+gap-t):0;
+ const show=()=>{if(!inB())return;const p=begin(u);number(p,txt,'lpd',Math.round(fsNum(u)*.9),false);p.numT=now();place();};
+ if(w>0){if(p0){p0.fade=Math.max(p0.fade,t+w+100);}setTimeout(show,w);}else show();}
 function word(u,s){const p=begin(u);number(p,'Miss','miss',Math.round(fsNum(u)*.82),false);place();}
 /* 2 段目：状態。kind に ab＝アビリティ名（2 行目） */
 function stKind(s,col,kind){const c=String(col||'').toLowerCase(),k=kind||'';
@@ -104,4 +109,4 @@ V24.HK24.pop=(u,s,col,small,kind,el)=>{if(!inB()||!u||u.x==null)return false;s=S
   status(u,s,col,kind);return true;}catch(e){console.error(e);return false;}};
 {const _d=draw;draw=function(){_d();try{tick();}catch(e){if(!draw._e46){draw._e46=1;console.error(e);}}};}
 {const _sb=startBattle;startBattle=function(){reset();return _sb.apply(this,arguments);};}
-return{dmg,status,word,actEnd,reset,clearUnit,cut,P};})();
+return{dmg,status,word,lp,actEnd,reset,clearUnit,cut,P};})();
