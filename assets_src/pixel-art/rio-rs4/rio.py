@@ -179,7 +179,7 @@ SCARF = {   # 首の後ろ（列 11・胴の 1 行目）から
 }
 
 
-def canvas(w=44, h=48):
+def canvas(w=60, h=60):
     return [['.'] * w for _ in range(h)]
 
 
@@ -190,30 +190,30 @@ def stamp(cv, rows, x, y):
                 cv[y + j][x + i] = ch
 
 
-def blade(cv, hx, hy, dx, dy, n):
-    """剣：柄（金 2）→ 鍔（金）→ 刃（幅 2：明るい芯 M と影 m、先は白）。外周は黒"""
-    L = math.hypot(dx, dy)
-    dx, dy = dx / L, dy / L
-    px_, py_ = (-dy, dx) if dx <= 0 else (dy, -dx)      # 影の側（下・後ろ）
+DIRS8 = {'L': (-1, 0), 'UL': (-1, -1), 'U': (0, -1), 'UR': (1, -1), 'R': (1, 0), 'DR': (1, 1), 'D': (0, 1), 'DL': (-1, 1)}
+
+
+def blade(cv, hx, hy, d, n=8):
+    """剣（全ポーズで同じ形）：柄頭（金）・柄 2（j）・鍔 3（g G g、刃に直角）・刃 幅 2（M 芯・m 影）長さ n・先 V。
+    向き d は 8 方向（DIRS8 のキー）だけ。角度を自由にすると刃の線が崩れるため"""
+    dx, dy = DIRS8[d]
+    px_, py_ = -dy, dx                     # 鍔の向き（刃に直角）
+    sx, sy = (0, 1) if dy == 0 else (1, 0)  # 刃の影の側（下か右）
     cells = {}
-    for k in range(-1, n + 1):
-        x, y = round(hx + dx * k), round(hy + dy * k)
-        if k <= 0:
-            cells[(x, y)] = 'j' if k < 0 else 'g'
-        else:
-            cells[(x, y)] = 'V' if k == n else 'M'
-            q = (round(hx + dx * k + px_), round(hy + dy * k + py_))
-            if k < n and q not in cells:
-                cells[q] = 'm'
-    gx, gy = round(hx + dx), round(hy + dy)
-    for s_ in (1, -1):
-        cells[(round(gx - dy * s_ * 1.4), round(gy + dx * s_ * 1.4))] = 'g'
+    cells[(hx - 2 * dx, hy - 2 * dy)] = 'g'            # 柄頭
+    cells[(hx - dx, hy - dy)] = 'j'
+    cells[(hx, hy)] = 'j'
+    gx, gy = hx + dx, hy + dy
     cells[(gx, gy)] = 'G'
-    for (x, y) in list(cells):
-        for ox, oy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
-            X, Y = x + ox, y + oy
-            if (X, Y) not in cells and 0 <= Y < len(cv) and 0 <= X < len(cv[0]) and cv[Y][X] == '.':
-                cv[Y][X] = 'o'
+    cells[(gx + px_, gy + py_)] = 'g'
+    cells[(gx - px_, gy - py_)] = 'g'
+    for k in range(2, n + 2):
+        x, y = hx + dx * k, hy + dy * k
+        cells[(x, y)] = 'V' if k == n + 1 else 'M'
+        if k < n + 1:
+            q = (x + sx, y + sy)
+            if q not in cells:
+                cells[q] = 'm'
     for (x, y), ch in cells.items():
         if 0 <= y < len(cv) and 0 <= x < len(cv[0]):
             cv[y][x] = ch
@@ -232,7 +232,7 @@ def close(cv):
 def build(head=None, arm='hang', legs='stand', scarf='hang', sword=None, hdx=0, hdy=0, dx=0, dy=0, lean=0):
     """sword＝(dx, dy, 長さ)：手から刃の向き。lean＝胴と頭を前（-）へずらす"""
     cv = canvas()
-    ox, oy = 6 + dx, 12 + dy
+    ox, oy = 14 + dx, 22 + dy
     L = LEGS[legs]
     ly = oy + 16 + (8 - len(L))           # 脚が短い（膝を曲げる）ほど体が下がる
     by = ly - 8
@@ -254,7 +254,7 @@ def build(head=None, arm='hang', legs='stand', scarf='hang', sword=None, hdx=0, 
                 hand = (ox + ax + lean + r.index('H'), by + ay + j)
                 cv[hand[1]][hand[0]] = 's'
     if sword and hand:
-        blade(cv, hand[0], hand[1], *sword)
+        blade(cv, hand[0], hand[1], sword)
     close(cv)
     return [''.join(r) for r in cv], oy + 23 - min(0, dy) * 0 + (0 if dy >= 0 else 0)
 
@@ -279,16 +279,16 @@ def down():
 
 
 POSE_DEF = {
-    '構え1': dict(arm='fwd', legs='wide', scarf='flow', sword=(-.95, -.35, 11), lean=-1),
-    '構え2': dict(arm='fwd', legs='wide', scarf='flow', sword=(-.95, -.35, 11), lean=-1, hdy=1),
-    '選択': dict(arm='fwd', legs='hop', scarf='up', sword=(-1, .1, 9), lean=-2, dy=-1),
-    '振りかぶり': dict(arm='up', legs='wide', scarf='flow', sword=(.9, -.55, 12)),
-    '溜め': dict(head=HEAD_SHUT, arm='back', legs='wide', scarf='flow', sword=(1, -.05, 9), lean=1),
-    '斬り': dict(arm='low', legs='lunge', scarf='up', sword=(-.8, .6, 11), lean=-2),
-    '振り抜き': dict(arm='low', legs='lunge', scarf='up', sword=(-1, .05, 12), lean=-3, hdy=1),
-    '被弾': dict(head=HEAD_SHUT, arm='back', legs='stand', scarf='hang', sword=(.35, 1, 8), lean=2, hdx=1),
-    '瀕死': dict(head=HEAD_SHUT, arm='plant', legs='kneel', scarf='hang', sword=(-.2, 1, 6), lean=-1, hdy=3),
-    '勝利': dict(head=HEAD_SHUT, arm='up', legs='stand', scarf='flow', sword=(.25, -1, 10)),
+    '構え1': dict(arm='fwd', legs='wide', scarf='flow', sword='UL', lean=-1),
+    '構え2': dict(arm='fwd', legs='wide', scarf='flow', sword='UL', lean=-1, hdy=1),
+    '選択': dict(arm='fwd', legs='hop', scarf='up', sword='L', lean=-2, dy=-1),
+    '振りかぶり': dict(arm='up', legs='wide', scarf='flow', sword='UR'),
+    '溜め': dict(head=HEAD_SHUT, arm='back', legs='wide', scarf='flow', sword='R', lean=1),
+    '斬り': dict(arm='low', legs='lunge', scarf='up', sword='DL', lean=-2),
+    '振り抜き': dict(arm='low', legs='lunge', scarf='up', sword='L', lean=-3, hdy=1),
+    '被弾': dict(head=HEAD_SHUT, arm='back', legs='stand', scarf='hang', sword='DR', lean=2, hdx=1),
+    '瀕死': dict(head=HEAD_SHUT, arm='plant', legs='kneel', scarf='hang', sword='D', lean=-1, hdy=3),
+    '勝利': dict(head=HEAD_SHUT, arm='up', legs='stand', scarf='flow', sword='U'),
 }
 
 
@@ -302,7 +302,7 @@ def render(rows, foot=45, x0=8):
                 if ch == '.':
                     continue
                 c = PAL[ch].lstrip('#')
-                X, Y = x0 - 6 + x, foot - frow + y
+                X, Y = x0 - 14 + x, foot - frow + y
                 if 0 <= X < 48 and 0 <= Y < 48:
                     px[X, Y] = (int(c[:2], 16), int(c[2:4], 16), int(c[4:], 16), 255)
         return im
@@ -327,11 +327,19 @@ def render(rows, foot=45, x0=8):
 
 POSES = {'立ち': STAND, '正面': FRONT}
 POSES.update({k: build(**v) for k, v in POSE_DEF.items()})
-POSES['気絶'] = down()   # 下の行が輪郭＝地面より 4 上に置く（render の foot を 41 に）
+POSES['気絶'] = down()
+try:
+    import hand as _H
+    for _k in ('FRONT',):
+        pass
+    POSES['正面'] = _H.FRONT
+    POSES.update(getattr(_H, 'EXTRA', {}))
+except ImportError:
+    pass   # 下の行が輪郭＝地面より 4 上に置く（render の foot を 41 に）
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
-    ims = {k: render(v, foot=41 if k == '気絶' else 45) for k, v in POSES.items()}
+    ims = {k: render(v) for k, v in POSES.items()}
     for k, im in ims.items():
         im.save(os.path.join(OUT, k + '.png'))
     W, cols = 48 * 5, 6
