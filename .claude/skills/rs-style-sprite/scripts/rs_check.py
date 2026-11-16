@@ -64,7 +64,7 @@ def eye_pair(px, w, h, y0, y1):
             if not (dark(a) and dark(up) and b[3] and not dark(b) and not is_skin(b)):
                 continue
             hh, s, v = hsv(b)
-            if s < .3 or v < .2:
+            if s < .12 or v < .2:      # 灰色に近い瞳の実機もある（正面の男性）
                 continue
             sk = sum(1 for dx in range(-2, 3) for dy in range(-1, 4)
                      if 0 <= x + dx < w and 0 <= y + dy < h and is_skin(px[x + dx, y + dy]))

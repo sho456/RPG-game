@@ -7,6 +7,7 @@
   衣装＝赤い長いマフラー・紺の短いコート（金の縁）・腰の小さなランタン（参考は紫の服）／持ち物＝片手剣
 ・地図は 32 行（y=0 が上・y=31 が足元の輪郭）。48×48 のマスには足元 y=45 に置く"""
 import math
+import sys
 import os
 from PIL import Image
 
@@ -335,7 +336,13 @@ try:
     POSES['正面'] = _H.FRONT
     POSES.update(getattr(_H, 'EXTRA', {}))
 except ImportError:
-    pass   # 下の行が輪郭＝地面より 4 上に置く（render の foot を 41 に）
+    pass
+if True:   # 構え・選択は limbs.py の版を使う（循環の読み込み中は AttributeError で飛ばす）
+    try:
+        import limbs as _L
+        POSES.update(getattr(_L, 'POSES', {}))
+    except AttributeError:
+        pass   # 下の行が輪郭＝地面より 4 上に置く（render の foot を 41 に）
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
