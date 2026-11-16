@@ -1,4 +1,4 @@
-"""参考の拡大画像（スクショ・WebP・JPEG）を実寸のドット絵に戻し、数を取る（rs-style-sprite スキル 第 2 版）
+"""参考の拡大画像（スクショ・WebP・JPEG）を実寸のドット絵に戻し、数を取る（rs-style-sprite スキル 第 3 版）
 使い方：
   python3 rs_ref.py <出力dir> <画像>[:ポーズ] [...]        例）rs_ref.py /tmp/ref a.webp:正面 b.webp:立ち c.webp:構え
   ・倍率（1 ドットが何画素か）と格子のずれは、色の変わり目の間隔の最頻値から自動で求める（方眼の線が無い画像向け。方眼なら grid2png.py）
@@ -36,9 +36,10 @@ def native(path):
             n[y, x] = np.median(c, 0)
     bg = np.zeros((H, W), bool)
     st = [(0, 0), (0, W - 1), (H - 1, 0), (H - 1, W - 1)]
+    bgc = np.median(np.array([n[y, x] for y, x in st]), 0)  # 背景色＝四隅（白でも色付きでもよい）
     while st:
         y, x = st.pop()
-        if 0 <= y < H and 0 <= x < W and not bg[y, x] and n[y, x].min() > 235:
+        if 0 <= y < H and 0 <= x < W and not bg[y, x] and np.abs(n[y, x] - bgc).sum() < 36:
             bg[y, x] = True
             st += [(y + 1, x), (y - 1, x), (y, x + 1), (y, x - 1)]
     im = Image.new('RGBA', (W, H))
@@ -52,7 +53,7 @@ def native(path):
 
 def main(out, items):
     os.makedirs(out, exist_ok=True)
-    POSEK = {'正面': 'front', '立ち': 'stand', '構え': 'ready', '瀕死': 'weak', '気絶': 'down'}
+    POSEK = {'正面': 'front', '立ち': 'stand', '構え': 'ready', '瀕死': 'weak', '気絶': 'down', '詠唱': 'cast', '発動': 'act'}
     ims, rep = [], []
     stand_h = None
     parsed = [(s.rsplit(':', 1) + [''])[:2] if ':' in s else [s, '立ち'] for s in items]
