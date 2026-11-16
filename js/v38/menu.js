@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.47';
+const VER='ver0.48';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,11 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　技・術の練達と戦闘の見やすさ<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　強化メニューと練達Ⅲの固有効果<br><small>`+
+ `・<b>強化</b>：経験値は戦闘ごとに<b>ストック</b>へ。強化メニューで好きな仲間を好きなだけレベルアップ（+1・+10・上限まで）。酒場は強化メニューに統合<br>`+
+ `・<b>練達Ⅲ</b>：すべての技・術に【固有名】の効果（追撃・弱点付与・条件で威力アップ・BP回復など）。名前をタップで説明<br>`+
+ `・戦闘：表示の弾む動きをやめて元の出入りに。キャラ近くの HP・BP の文字を少し大きく</small></div>`+
+ `<div class="nt n38"><b>ver0.47</b>　技・術の練達と戦闘の見やすさ<br><small>`+
  `・<b>練達</b>：技Lv をやめ、技・術を<b>錬磨石</b>（敵が落とす）で 3 段階まで強化。Ⅲでは「解癒」などの強い効果も<br>`+
  `・<b>戦闘</b>：HP・BP はキャラの中央に。数字は細身の斜体で詰めて、弾むように出る。複数の敵が重ならない。1 倍速はターンの変わり目に少し間<br>`+
  `・LP は気絶と、一部の高難易度ボスの攻撃で減る。AUTO ボタンを読みやすく。画面を高画質に</small></div>`+

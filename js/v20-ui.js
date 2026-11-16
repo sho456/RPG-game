@@ -69,7 +69,7 @@ const BIG=sk=>sk&&((sk.pow||0)*(sk.hits||1)>=2.4||(sk.t==='all'&&(sk.pow||0)*(sk
 
 /* ==================== ホーム画面 ==================== */
 const HMENU=[['rec','rec','メニュー'],['quest','quest','依頼'],['inv','gear','持ち物'],['zk','book','図鑑'],['bond','bond','絆'],['dev','door','発展']];
-const HNAV=[['home','door','ホーム'],['party','eq','編成'],['star','star','星詠み'],['smith','smith','鍛冶屋'],['tavern','bar','酒場'],['shop','shop','道具屋']];
+const HNAV=[['home','door','ホーム'],['party','eq','編成'],['star','star','星詠み'],['smith','smith','鍛冶屋'],['tavern','up','強化'],['shop','shop','道具屋']];
 function goH(k){({rec:()=>saveMenu(),home:()=>townMenu(),quest:()=>board(),inv:()=>invMenu(),zk:()=>zkMenu(),bond:()=>bondMenu(),trial:()=>trialMenu(),dev:()=>devMenu()})[k]?.();}
 const homeH20=()=>innerHeight<600?128:HOME_H;
 townMenu=function(m){WMS.on=false;TSC='home';if(scene!=='town')show('town');const hh=homeH20();if(H!==hh)setH(hh);devBtn(!!G.dev);hud('');$('#stage').style.display='';
@@ -126,7 +126,7 @@ function lootCard(x,i){const it=x.it,sold=/自動(売却|分解)/.test(x.txt||''
 function rewardHTML(){const r=RW.r,dr=Object.entries(r.drops||{}).map(([k,n])=>`<span class="mt20"><img src="${ICON[k]||ICON.haiseki}">${MATS[k].n}×${n}</span>`).join('')+(r.sts||[]).map(n=>`<span class="mt20 st">◆${n}</span>`).join('');
  const its=RW.items.slice(0,12),best=Math.max(-1,...its.map(x=>x.it.rar||0)),ups=RW.ups;
  return`<div class="rw20${best>=4?' leg':best>=3?' epic':''}"><div class="rwT"><span>V</span><span>I</span><span>C</span><span>T</span><span>O</span><span>R</span><span>Y</span></div>
-  <div class="rwG"><div><em>EXP</em><b data-n="${r.xp}">0</b></div><div><em>GOLD</em><b data-n="${r.gold}">0</b></div><div><em>灯力</em><b data-n="${r.tou||0}">0</b></div></div>
+  <div class="rwG"><div><em>EXP→ストック</em><b data-n="${r.xp}">0</b></div><div><em>GOLD</em><b data-n="${r.gold}">0</b></div><div><em>灯力</em><b data-n="${r.tou||0}">0</b></div></div>
   ${dr?`<div class="rwM">${dr}</div>`:''}
   ${its.length?`<div class="rwL"><div class="rwh">獲得した装備 ${RW.items.length}</div>${its.map(lootCard).join('')}${RW.items.length>12?`<small class="more">ほか${RW.items.length-12}個</small>`:''}</div>`:''}
   ${ups.length?`<div class="rwU">${ups.filter(u=>u.party).map((u,i)=>`<div class="lu20${u.party?'':' bench'}" style="--d:${.6+its.length*.16+i*.35}s;--ec:${elCol(u.id)}"><img class="lf" src="${art(u.id)}"><div class="lm"><div class="lt"><b>LEVEL UP!</b><span>${HB[u.id].name}</span><em>Lv${u.lv0} ▶ <strong>Lv${u.lv1}</strong></em></div>

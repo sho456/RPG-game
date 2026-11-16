@@ -20,7 +20,7 @@ const app=$('#app');app.classList.add('v22');
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
 
 /* ==================== 共通：アイコン（16×16 の塗りSVG） ==================== */
-const IP={
+const IP={up:'M8 1.2 14.2 7.6H10.4V14.8H5.6V7.6H1.8Z',
  home:'M8 1.2 .8 7.6h2.1V14.8h4.2v-4.2h1.8v4.2h4.2V7.6h2.1z',
  party:'M5.6 1.8a2.6 2.6 0 110 5.2 2.6 2.6 0 010-5.2zm5.3 1a2.1 2.1 0 110 4.2 2.1 2.1 0 010-4.2zM.8 14.4c0-3.2 2.1-5.6 4.8-5.6s4.8 2.4 4.8 5.6zm10 0c0-1.7-.5-3.1-1.4-4.2.5-.2 1-.3 1.6-.3 2.3 0 4.2 1.9 4.2 4.5z',
  star:'M8 .6l2.2 4.6 5 .7-3.6 3.5.9 5L8 12 3.5 14.4l.9-5L.8 5.9l5-.7z',
@@ -222,7 +222,7 @@ townMenu=function(m){WMS.on=false;TSC='home';if(scene!=='town')show('town');HM.o
   <div class="h22go">${nx?`<button class="h22nx" data-h22="go"><em>NEXT</em><b>${esc(nx.nm)}</b><small>${esc(nx.rc)}</small></button>`:''}
    <button class="h22tr${b.tr?' rdy':''}" data-h22="trial"><b>挑戦</b><small>${SEIRIN.n}の試練</small>${isBadge(b.tr?true:0)}</button>
    <button class="h22sortie" data-h22="go"><span class="rg"></span><b>出撃</b><small>WORLD MAP</small></button></div>
-  <nav class="h22nav">${[['home','home','ホーム',0],['party','party','編成',b.pts],['star','star','星詠み',b.pts],['smith','smith','鍛冶屋',0],['tavern','bar','酒場',b.bn],['shop','shop','道具屋',0]].map(([g,k,l,n])=>`<button data-h22="${g}" class="${g==='home'?'on':''}">${ic(k)}<b>${l}</b>${isBadge(n)}</button>`).join('')}</nav></div>`;
+  <nav class="h22nav">${[['home','home','ホーム',0],['party','party','編成',b.pts],['star','star','星詠み',b.pts],['smith','smith','鍛冶屋',0],['tavern','up','強化',(()=>{try{return GROW.readyN()?true:b.bn;}catch(e){return b.bn;}})()],['shop','shop','道具屋',0]].map(([g,k,l,n])=>`<button data-h22="${g}" class="${g==='home'?'on':''}">${ic(k)}<b>${l}</b>${isBadge(n)}</button>`).join('')}</nav></div>`;
  HM.news=vn;const c=$('#cmd');c.className='home22';c.innerHTML='';
  if(m&&m!==DEFMSG)toast(m+(vn&&/虚蝕/.test(vn)?'':''));else if(warn)toast(warn.replace(/^<br>/,''));
  tip('town');};

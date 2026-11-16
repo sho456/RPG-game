@@ -44,6 +44,7 @@
 | 演出・モーション（技ごとの専用演出） | `js/battle/*`（`BX*`）・`js/battle/data/fx-heroes-*.js` → スキル `rpg-hero-motion` | — |
 | 文字のフォント（全画面で統一） | 本文＝M PLUS 1p、コマンド（ボタン・技名・名前・見出し・タブ）＝Kaisei Tokumin（`css/ui/font.css` の `--cmd`）。キャンバスの数字・英字＝`js/v24-text.js FONT` | `css/ui/font.css` |
 | 用語・耐性 | `js/data/terms.js`（`TERMS`） | — |
+| 強化メニュー（経験値のストック・レベルアップ・旧酒場の統合） | `js/ui/growth.js`（`GROW`） | `css/ui/growth.css` |
 | 版表示・お知らせ | `js/v38/menu.js`（`VER` `NEWS`） | — |
 
 戦闘システムの詳細は `docs/RS-SYSTEM.md`、素材は `docs/ASSETS.md` `docs/PIPELINE.md`、演出は `docs/FX.md`。

@@ -107,7 +107,7 @@ function qClear(){const{c,q}=QR,S=QS(),first=!S.c[q.id];S.c[q.id]=(S.c[q.id]||0)
  if(q.flag)G.flags[q.flag]=true;
  if(q.tw){G.tower=G.tower||{cp:1,cur:1,max:0};G.tower.max=Math.max(G.tower.max||0,q.tw);G.tower.cp=Math.max(G.tower.cp||1,Math.min(26,q.tw+1));if(q.tw%10===0)G.flags['tw'+q.tw]=true;}
  if(q.f0){const K=kst(),fb=q.f0+9;K.max=Math.max(K.max||0,fb);K.cp=Math.max(K.cp||1,fb+1);G.flags['kr'+fb]=true;if(fb>=30)G.flags.kr30=true;}
- const bx=Math.round(QR.tot.xp*.4),bg=Math.round(q.lv*25*q.w.length*(q.lv>=70?6:1));G.gold+=bg;for(const id of G.members){const m=stats(id).mhp,hp=G.h[id].hp;const n=gainXP(id,bx);if(n&&hp!=null)G.h[id].hp=Math.min(stats(id).mhp,hp+stats(id).mhp-m);}
+ const bx=Math.round(QR.tot.xp*.4),bg=Math.round(q.lv*25*q.w.length*(q.lv>=70?6:1));G.gold+=bg;try{GROW.add(bx);}catch(e){}/* ver0.48：完了ボーナスの経験値もストックへ（js/ui/growth.js） */
  const fr=first?giveFirst(q.first):[],ups=lvUps();save();SFX.aw();
  const ch=QR.tot.chests,cc={gold:0,silver:0,bronze:0};ch.forEach(t=>cc[t]++);
  ovShow(`<div class="qc31"><div class="qcT"><span>QUEST</span><span>CLEAR</span></div><div class="qcn"><small>${esc(c.ch)}　${esc(c.n)}</small><b>${esc(q.n)}</b><em>クリア ${S.c[q.id]}回目</em></div>

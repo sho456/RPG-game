@@ -49,6 +49,7 @@ const T={
 const SP={},NM={'解癒(1回)':['解癒(1回)','[ターン終了時] 次の効果が発動する（上限 1 回）：自身のすべての状態異常を解除する／自身の攻撃・防御・魔力・精神・素早さの能力ダウン状態を解除する／自身のHPを回復する（効果極小）','練達の効果']};
 function reg(){try{const C=RSC,D=RSD;
   for(const id in D.AB)(D.AB[id]||[]).forEach(A=>{if(A.sp)SP[A.sp.n]=[A.sp.n,A.sp.d,A.n];for(const f of A.fx)if(f.nm)NM[f.nm]=[f.nm,`名前の付いた追撃。${f.el||''}属性`,A.n];});
+  try{for(const k in RSM.U3){const x=RSM.U3[k];SP[x.n]=[x.n,x.d,'練達Ⅲ・'+((SK[k]||D.NEW[k]||{}).n||'')];}for(const k in RSM.SUP){const x=RSM.SUP[k][2];if(x&&x.n)SP[x.n]=[x.n,x.d.map(t=>t.replace(/^【[^】]+】/,'')).join('／'),'練達Ⅲ・'+((SK[k]||D.NEW[k]||{}).n||'')];}}catch(e){}
   for(const id in D.AWX){const X=D.AWX[id];for(const f of X.fx)if(f.nm)NM[f.nm]=[f.nm,`星臨中の名前の付いた追撃。${f.el||''}属性・威力${f.pw||1}`,X.n];
    const s=SK[X.ou];if(s)NM[s.n]=[s.n,`奥義。${s.d||''}`,X.n];}}catch(e){}}
 let RX=null;

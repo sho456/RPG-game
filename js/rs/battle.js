@@ -37,6 +37,7 @@ function cnd(c,a,t,sk,r){if(!c||c==='any')return true;
   case'hpfull':return a.hp>=a.mhp;case'hplow':return a.hp<=a.mhp*.5;case'hphigh':return a.hp>=a.mhp*.5;
   case'tlow':return!!t&&t.hp<=t.mhp*.3;case'tfull':return!!t&&t.hp>=t.mhp;case'boss':return!!t&&!!t.boss;
   case'debuffed':return!!t&&hasDebuff(t);
+  case'tpoison':return!!t&&(t.sts||[]).some(x=>x.k==='poison');case'tbrk':return!!t&&t.hp<=t.mhp*.5;
   case'allyaw':return!!B&&B.heroes.some(h=>h!==a&&h.aw&&h.alive);case'aw':return!!a.aw;
   case'altel':return!!(sk&&sk.k==='mag'&&sk.el&&a._rsLe&&a._rsLe!==sk.el);
   case'crit':return!!(r&&r.crit);case'r1':return!!(B&&B.rs&&B.rs.round===1);}
@@ -242,6 +243,7 @@ async function heroExec(u,c){if(!c||!c.sk)return;try{BPOP.cut();}catch(x){}/* �
  if(t&&t.side===1){if(u._rsSameT===t)u._rsSameN=(u._rsSameN||0)+1;else{u._rsSameT=t;u._rsSameN=0;}}
  /* 攻撃後の範囲効果 */
  for(const f of s2.post||[]){const tg=f.on==='allies'?aliveH():f.on==='enemies'?aliveE():f.on==='self'?[u]:t&&t.alive?[t]:[];for(const x of tg)V20.addSt(x,f.k,f.k==='shield'?Math.round(x.mhp*f.v):f.v,f.t);}
+ if(s2.fu3&&isDmg(sk)&&u.alive&&aliveE().length&&Math.random()<(s2.fu3.p||0)){const x=RSM.U3[C.keyOf(sk)];await strikeBack(u,t,x?x.n:'追撃',s2.fu3.pow||.5,sk.el);}
  /* 回復した味方に被ダメ軽減 */
  const hp=sumE(u,'healprot');if(hp)B.heroes.forEach((h,i)=>{if(h.alive&&h.hp>hp0[i])V20.addSt(h,'prot',hp,2);});
  /* 追撃 */
@@ -263,7 +265,10 @@ function prep(u,sk,t){const s=Object.assign({},sk);s.sp=0;/* 旧来の SP の消
   if(M.dur){if(s.fx20)s.fx20=s.fx20.map(f=>f.t&&f.t<50?Object.assign({},f,{t:f.t+M.dur}):f);if(s.taunt20)s.taunt20+=M.dur;}
   if(M.fx.length)s.fx20=(s.fx20||[]).concat(M.fx.map(f=>Object.assign({on:'t'},f,f.p!=null&&f.p<1?{_ail:1}:{})));
   if(M.sup.length){if(s.k==='sup20')s.fx20=(s.fx20||[]).concat(M.sup);else s.post=(s.post||[]).concat(M.sup);}
-  if(M.post.length)s.post=(s.post||[]).concat(M.post);}catch(e){console.error(e);}
+  if(M.post.length)s.post=(s.post||[]).concat(M.post);
+  /* Ⅲの固有効果（ver0.48）：条件で威力、遅延・防御無視・吸収・回数の上乗せ、追撃 */
+  if(M.cp&&s.pow&&cnd(M.cp.c,u,t,s))s.pow*=M.cp.v;if(M.delay)s.delay=(s.delay||0)+M.delay;if(M.pierce)s.pierce20=Math.min(.9,(s.pierce20||0)+M.pierce);
+  if(M.drain)s.drain=(s.drain||0)+M.drain;if(M.hits&&s.hits>1)s.hits+=M.hits;else if(M.hits&&s.pow){s.hits=1+M.hits;s.pow*=.55;}if(M.fu)s.fu3=M.fu;}catch(e){console.error(e);}
  return s;}
 /* 敵の行動。全体攻撃は、倒れている味方（LP が残っている）にも追い打ちになる */
 async function enemyExec(e){try{BPOP.cut();}catch(x){}B.rs.cq=[];B.rs.eSk=null;const down=B.heroes.filter(h=>!h.alive&&(h.lp||0)>0);

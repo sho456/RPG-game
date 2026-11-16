@@ -37,6 +37,7 @@ function clrAil(u){return clearSt(u,s=>AIL.includes(s.k));}
 function addSt(u,k,v,t,o={}){if(!u||!u.alive)return false;const L=stsOf(u);
  if(k==='clrdn'){if(clrDown(u))popS(u,'能力ダウン解除','#8ff0a8','up');return true;}
  if(k==='clrail'){if(clrAil(u))popS(u,'状態異常解除','#8ff0a8','up');return true;}
+ if(k==='bpg'){if(u.side===0){u.sp=Math.min(u.bpMax||99,(u.sp||0)+v);try{pop(u,'BP+'+v,'#7fe0ff',true,'st20 up');}catch(e){}}return true;}
  if(k==='healp'){if(u.hp<u.mhp){const n=Math.max(1,Math.round(u.mhp*v*(u.healRecv||1)));u.hp=Math.min(u.mhp,u.hp+n);try{pop(u,'+'+n,'#7dffa8');}catch(e){}}return true;}
  if((k==='stun'||k==='para')&&u.boss){u.ct+=60/Math.max(1,u.spd);popS(u,'DELAY','#7fd6ff');return true;}
  if(k==='poison'&&u.boss)v*=.35;
