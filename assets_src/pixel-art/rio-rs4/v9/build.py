@@ -10,9 +10,10 @@ sys.path.insert(0, ROOT)
 from pal import PAL      # noqa: E402
 from stand import STAND  # noqa: E402
 from front import FRONT  # noqa: E402
+from front_shrink import FRONT_SHRINK  # noqa: E402
 
 OUT = os.path.join(ROOT, 'out')
-POSES = {'立ち': STAND, '正面': FRONT}
+POSES = {'立ち': STAND, '正面': FRONT, '正面_縮小': FRONT_SHRINK}   # 正面_縮小＝下絵 2 枚目を 32px に縮めて仕上げた版
 
 
 def close(rows):
@@ -53,7 +54,7 @@ if __name__ == '__main__':
         im.crop(im.getbbox()).resize((im.getbbox()[2] - im.getbbox()[0]) * 8 and
                                      ((im.getbbox()[2] - im.getbbox()[0]) * 8, (im.getbbox()[3] - im.getbbox()[1]) * 8),
                                      Image.NEAREST).save(os.path.join(OUT, 'x8', k + '_x8.png'))
-    sheet = Image.new('RGBA', (48 * 6 * 2, 48 * 6), (226, 228, 236, 255))
+    sheet = Image.new('RGBA', (48 * 6 * len(ims), 48 * 6), (226, 228, 236, 255))
     for i, im in enumerate(ims.values()):
         sheet.alpha_composite(im.resize((48 * 6, 48 * 6), Image.NEAREST), (i * 48 * 6, 0))
     sheet.save(os.path.join(OUT, 'preview.png'))
