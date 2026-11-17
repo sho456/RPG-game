@@ -27,7 +27,7 @@ const stsOf=u=>u.sts||(u.sts=[]);
 const hasSt=(u,k)=>stsOf(u).some(s=>s.k===k);
 const stSum=(u,k)=>stsOf(u).filter(s=>s.k===k).reduce((a,s)=>a+s.v,0);
 function base0(u){if(!u._b0)u._b0={atk:u.atk,def:u.def,mag:u.mag,res:u.res,spd:u.spd,crit:u.crit||0};return u._b0;}
-function recalc(u){const b=base0(u);for(const k of STAT5){let p=stSum(u,k)+(k==='atk'||k==='mag'?stSum(u,'enrage'):0);p=clamp(p,-60,80);const v=b[k]*(1+p/100);u[k]=k==='spd'?Math.max(1,+v.toFixed(2)):Math.max(1,Math.round(v));}
+function recalc(u){const b=base0(u);for(const k of STAT5){let p=stSum(u,k)+(k==='atk'||k==='mag'?stSum(u,'enrage'):0);p=clamp(p,-60,100);/* ver0.49：攻撃強化の上限 +100%（同じ枠で加算） */const v=b[k]*(1+p/100);u[k]=k==='spd'?Math.max(1,+v.toFixed(2)):Math.max(1,Math.round(v));}
  u.crit=b.crit+clamp(stSum(u,'crit'),-50,60);}
 /* 付与：同じ種類・同じ向き（強化／弱体）は重ねず、強い方・長い方を残す */
 const AIL=['poison','stun','para','blind'];

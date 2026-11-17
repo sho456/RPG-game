@@ -36,6 +36,7 @@ let WMS={on:false,tab:0,sel:null,cur:null,bgs:{}};
 {const b=document.createElement('div');b.id='bbar';b.style.display='none';$('#app').insertBefore(b,$('#ov'));
  b.addEventListener('click',e=>{const t=e.target.closest('[data-b]');if(!t||t.disabled||!B||B.over)return;const k=t.dataset.b;SFX.sel();
   if(k==='rep'){if(B.pick)B.pick.rep();return;}
+  if(k==='back'){if(B.pick&&B.pick.back)B.pick.back();return;}
   if(auto&&AM===k)auto=false;else{auto=true;AM=k;}bbar(true);if(auto&&B.res)B.res();else refresh();});
  const c=document.createElement('button');c.className='tb';c.id='cfgB';c.textContent='≡';c.onclick=()=>{SFX.sel();cfgOpen();};$('#top').appendChild(c);}
 

@@ -25,6 +25,8 @@ const STYLE={
  dmgG:{font:'num',fill:[[0,'#ffffff'],[.46,'#ffffff'],[.56,'#e0f6ff'],[1,'#8ccbf2']],ow:.13,oc:'#081828',sh:[.04,.07,'rgba(0,0,0,.55)']},
  heal:{font:'num',fill:[[0,'#f2fff4'],[.44,'#c6ffd2'],[.56,'#6ae88c'],[1,'#1ca84a']],ow:.13,oc:'#05240f',sh:[.04,.07,'rgba(0,0,0,.5)'],gl:.25},
  psn:{font:'num',fill:[[0,'#fbf0ff'],[.44,'#e6c8ff'],[.56,'#bb86ff'],[1,'#7a34d0']],ow:.13,oc:'#1a0630',sh:[.04,.07,'rgba(0,0,0,.5)']},
+ /* ver0.49：エクストラフォースの見出し（紫→桃の光） */
+ xf:{font:'lat',fill:[[0,'#fff0ff'],[.42,'#ff9cf0'],[.56,'#d86aff'],[1,'#7a2ad8']],ow:.12,oc:'#1e0630',rw:.035,rc:'#ffe8ff',sh:[.03,.06,'rgba(0,0,0,.55)'],gl:.4},
  crit:{font:'lat',fill:[[0,'#fffde2'],[.42,'#ffe85c'],[.56,'#ffc21c'],[1,'#ff8400']],ow:.12,oc:'#2e1200',rw:.035,rc:'#fff6c8',sh:[.03,.06,'rgba(0,0,0,.55)'],gl:.35},
  weak:{font:'lat',fill:[[0,'#ffe0ee'],[.42,'#ff86b2'],[.56,'#f2306e'],[1,'#b00c48']],ow:.12,oc:'#3a0018',rw:.045,rc:'#ffffff',sh:[.03,.06,'rgba(0,0,0,.55)'],gl:.3},
  guard:{font:'lat',fill:[[0,'#f2feff'],[.42,'#a6f0ff'],[.56,'#40c2f2'],[1,'#1464bc']],ow:.12,oc:'#05203a',rw:.04,rc:'#ffffff',sh:[.03,.06,'rgba(0,0,0,.55)'],gl:.35},
@@ -33,11 +35,12 @@ const STYLE={
  elm:{font:'jp',fill:[[0,'#ffffff'],[.6,'#ffffff'],[1,'#d8dcef']],ow:.14,oc:'#1a1024',sh:[.03,.06,'rgba(0,0,0,.55)']},
  stat:{font:'jp',fill:[[0,'#ffffff'],[.6,'#ffffff'],[1,'#e2e4f2']],ow:.15,oc:'#12131c',sh:[.03,.06,'rgba(0,0,0,.5)']},
  /* 戦場のHP表示（参考：白〜淡い水色の斜体数字、濃紺の縁） */
- hp:{font:'num',fill:[[0,'#ffffff'],[.48,'#f2f8ff'],[.56,'#cfe4ff'],[1,'#94bfee']],ow:.15,oc:'#081226',sh:[.03,.06,'rgba(0,0,0,.5)']},
+ /* ver0.49：HP・BP は白（濃い縁取りで見やすく）。HP が減ったときだけ黄・赤 */
+ hp:{font:'num',fill:[[0,'#ffffff'],[1,'#ffffff']],ow:.2,oc:'#05070e',sh:[.03,.07,'rgba(0,0,0,.7)']},
  hpY:{font:'num',fill:[[0,'#fffde6'],[.46,'#fff3a0'],[.56,'#ffd84a'],[1,'#f0a018']],ow:.15,oc:'#261400',sh:[.03,.06,'rgba(0,0,0,.5)']},
  hpR:{font:'num',fill:[[0,'#fff0ee'],[.46,'#ffb4a8'],[.56,'#ff6a56'],[1,'#d02418']],ow:.15,oc:'#2a0604',sh:[.03,.06,'rgba(0,0,0,.5)']},
  hpD:{font:'num',fill:[[0,'#c8ccd6'],[1,'#7a8090']],ow:.15,oc:'#101218',sh:[.03,.06,'rgba(0,0,0,.4)']},
- sp:{font:'num',fill:[[0,'#f0fbff'],[.5,'#bfeeff'],[1,'#58bff0']],ow:.16,oc:'#04162a',sh:[.03,.06,'rgba(0,0,0,.45)']}};
+ sp:{font:'num',fill:[[0,'#ffffff'],[1,'#ffffff']],ow:.2,oc:'#05070e',sh:[.03,.07,'rgba(0,0,0,.7)']}};
 /* 任意の色からタグ用（攻撃↑・AG+ など）の書式を作る */
 const hex=c=>{const m=/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(c||'');if(!m)return null;let s=m[1];if(s.length===3)s=s.split('').map(x=>x+x).join('');return[0,2,4].map(i=>parseInt(s.slice(i,i+2),16));};
 const mix=(a,b,t)=>'#'+a.map((v,i)=>Math.round(v+(b[i]-v)*t).toString(16).padStart(2,'0')).join('');

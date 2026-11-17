@@ -268,8 +268,13 @@ function onReady(){
 /* 向きを変えたら、一覧・立ち絵の控えを作り直す */
 FACING.onChange(k=>{try{zReg(k);for(const x in UIC)if(x.startsWith('a|'+k))delete UIC[x];}catch(e){}});
 /* 戦闘で実際に描かれる絵の広がり（論理座標。足元からの左右・上）。配置で画面からはみ出さないように使う（v23.js eDims） */
+/* ver0.49：コマの余白を除いた「見えている部分」の範囲で測る（以前はコマ全体で、余白の多い絵ほど大きく扱われた）。vis＝√(幅×高さ) */
+function vbox(f){if(f._vb)return f._vb;let x0=0,y0=0,x1=f.w,y1=f.h||0;try{const cv=f.cv,W=cv.width,H=cv.height,k=W/f.w,d=cv.getContext('2d').getImageData(0,0,W,H).data;let a=W,b=H,c=-1,e=-1;
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(d[(y*W+x)*4+3]>8){if(x<a)a=x;if(x>c)c=x;if(y<b)b=y;if(y>e)e=y;}
+  if(c<0)return{x0,x1,y0,y1,ng:1};x0=a/k;x1=(c+1)/k;y0=b/k;y1=(e+1)/k;}catch(e){return{x0,x1,y0,y1,ng:1};}return f._vb={x0,x1,y0,y1};}
+/* 絵は用意された段階のサイズのコマがそのまま描かれる（倍率に比例しない）ので、今の倍率で選ばれるコマを測る */
 function boxB(u){const A=u&&u.A;if(!A||A.none||!ready)return null;const b=BAT;BAT=true;try{const f=SPRX.frame(A.name,{},A.palKey,A.pal,A.flip,A.sc*DS,A.extra);if(!f)return null;
- return{l:f.ax*PXL,r:(f.w-f.ax)*PXL,t:f.ay*PXL};}catch(e){return null;}finally{BAT=b;}}
+ const v=vbox(f),k=PXL;return{l:Math.max(0,f.ax-v.x0)*k,r:Math.max(0,v.x1-f.ax)*k,t:Math.max(0,f.ay-v.y0)*k,vis:Math.sqrt(Math.max(1,v.x1-v.x0)*Math.max(1,v.y1-v.y0))*k,ng:!!v.ng};}catch(e){return null;}finally{BAT=b;}}
 return{boxB,get ready(){return ready;},FAM,parse,heroFrame,monShape,pickSize,D,cut,palOf,zReg,artCv,unitCv,AWS,FB,DEF,animFrame,phase};})();
 /* 履歴：ver0.26 敵のドット絵を提供原画へ／ver0.27 第2弾とリオ／ver0.28 ヴァルク・ジン・氷の女王・忍
    ver0.29 向きの窓口を FACING に一本化、原画の反転をデータへ焼き込み、図鑑の再生画面は js/zukan/ へ移した */

@@ -184,7 +184,7 @@ function hlLayer(){let L=$('#hl24');if(!L||!L.isConnected){L=document.createElem
   L.addEventListener('click',e=>{const c=e.target.closest('.hl');if(!c||!B)return;const h=B.heroes[+c.dataset.i];if(h){SFX.sel();heroSheet(h);}});}return L;}
 function dimHL(R,life){const L=$('#hl24');if(!L)return;HL.rects.forEach((r,i)=>{const c=L.children[i];if(!c||ov(R,r)<=0)return;c.classList.add('dim');clearTimeout(c._dt);c._dt=setTimeout(()=>c.classList.remove('dim'),life);});}
 const hpStyle=h=>!h.alive?'hpD':h.hp<h.mhp*.25?'hpR':h.hp<h.mhp*.5?'hpY':'hp';
-function renderHL(){const L=hlLayer();if(!B)return;const fs=Math.round(fsOf('hl')*clamp(fitK()+.1,.82,1)),ss=Math.round(fs*.66);
+function renderHL(){const L=hlLayer();if(!B)return;const fs=Math.round(fsOf('hl')*clamp(fitK()+.1,.82,1)),ss=Math.round(fs*.78);
  if(L.children.length!==B.heroes.length||L._ids!==B.heroes.map(h=>h.id).join()){L._ids=B.heroes.map(h=>h.id).join();L.innerHTML=B.heroes.map((h,i)=>`<div class="hl" data-i="${i}"><span class="v"></span><span class="s"></span></div>`).join('');}
  B.heroes.forEach((h,i)=>{const c=L.children[i],hp=Math.max(0,h.hp|0),sp=DEV()?'∞':String(h.sp|0),st=hpStyle(h),k=hp+'|'+st+'|'+fs;
   if(c._k!==k){c._k=k;const v=c.querySelector('.v');v.innerHTML='';v.appendChild(TX24.el(String(hp),st,fs));}

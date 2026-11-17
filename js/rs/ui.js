@@ -84,11 +84,12 @@ chooseRoot=function(u,ctx={}){const idx=ctx.idx||0,tot=ctx.n||1;
     ${chips(u)}
     ${sub?`<div class="c38t"><button data-c38="sub">${GL.back}</button><b>${sub.t}</b></div>`:''}
     <div class="c38l">${R.map((r,i)=>`<button class="r ${r.cls||''}${r.ng?' ng':''}${i===pk?' pk':''}" data-i38="${i}" ${r.dis?'disabled':''}>${r.face?`<img src="${face(r.face)}" alt="">`:r.sk&&r.sk.k!=='item'?elStack(r.sk,B.tgt):hx(r.el,r.ec,'el')}<span class="n">${r.tag?`<em>${r.tag}</em>`:''}${esc(r.n).replace(/^(.*)$/,'$1')}${r.lv?`<small>技Lv${r.lv}</small>`:''}${r.d&&(r.face||sub)?`<small class="d">${esc(r.d)}</small>`:''}</span>${costHTML(r.cost,r.lp,r.ng)}${r.sk?`<span class="inf" data-inf38="${i}">i</span>`:''}</button>`).join('')}</div>
-    <div class="c38f"><button data-c38="back" ${idx>0&&!sub?'':'disabled'}>${GL.back}<small>戻る</small></button><button data-c38="it" ${sub?'disabled':''}>${GL.bag}<small>道具</small></button><button data-c38="sw" ${rsN&&!u.swapped&&!u.aw&&!sub?'':'disabled'}>${GL.swap}<small>交代</small></button></div></div>`;
-   c.scrollTop=0;const l=c.querySelector('.c38l');if(l)l.scrollTop=0;try{bbar(true);}catch(e){}};
+    <div class="c38f"><button data-c38="it" ${sub?'disabled':''}>${GL.bag}<small>道具</small></button><button data-c38="sw" ${rsN&&!u.swapped&&!u.aw&&!sub?'':'disabled'}>${GL.swap}<small>交代</small></button></div></div>`;
+   c.scrollTop=0;const l=c.querySelector('.c38l');if(l)l.scrollTop=0;if(B.pick&&B.pick.u===u)B.pick.canBack=idx>0&&!sub&&!lock;try{bbar(true);}catch(e){}};
   B.pick={u,
    row:i=>{const r=R[i];if(!r||r.dis||lock)return;if(!sub&&cur!==i){SFX.sel();mark(i);return;}r.f();},
    info:i=>{const r=R[i];if(r&&r.sk){SFX.sel();info(r.sk,u);}},
+   back:()=>{if(lock||sub||idx<=0)return;res({back:1});},
    cmd:k=>{if(lock)return;SFX.sel();if(k==='back')return res({back:1});if(k==='it')return items();if(k==='sw')return swaps();if(k==='sub'){sub=null;draw();}if(k==='aw')B.pick.aw();},
    rep:()=>{const s=repOK(u);if(s&&!lock)use(s);},retarget:()=>{draw();},
    aw:async()=>{if(lock||u.aw||!canAw(u))return;if(DEV())u.ag=100;lock=true;sub=null;draw();const rr=B.res;B.res=null;await awaken(u);B.res=rr;lock=false;draw();}};
@@ -100,9 +101,11 @@ $('#cmd').addEventListener('click',e=>{const c=$('#cmd');if(!c.classList.contain
  const r=e.target.closest('[data-i38]');if(r&&!r.disabled)B.pick.row(+r.dataset.i38);},true);
 
 /* ==================== 下のボタン：通常AUTO・全力AUTO・リピート ==================== */
-bbar=function(){const b=$('#bbar');if(!b||!G)return;const p=B&&B.pick,l=p&&repOK(p.u),sg=[l?l.n:'',auto,AM,G.set.autoAw].join();if(b._s===sg&&b.firstChild)return;b._s=sg;
+/* ver0.49：左端に「戻る」（前のキャラのコマンドへ。以前はコマンド欄の下の段）。AUTO は小さめの濃紺＋金の札 */
+const AUI='<svg viewBox="0 0 16 16"><path d="M2 3.2v9.6L8 8zm6 0v9.6L14 8z"/></svg>';
+bbar=function(){const b=$('#bbar');if(!b||!G)return;const p=B&&B.pick,l=p&&repOK(p.u),cb=!!(p&&p.canBack&&!auto),sg=[l?l.n:'',auto,AM,G.set.autoAw,cb].join();if(b._s===sg&&b.firstChild)return;b._s=sg;
  b.className='b38';
- b.innerHTML=`<button data-b="n" class="au${auto&&AM==='n'?' on':''}">通常<span class="lt">AUTO</span><small>${SEIRIN.n}：${AWN[G.set.autoAw]}</small></button><button data-b="f" class="au f${auto&&AM==='f'?' on':''}">全力<span class="lt">AUTO</span><small>${SEIRIN.n}も使う</small></button><button data-b="rep" class="rp" ${l?'':'disabled'}>リピート<small>${l?esc(l.basic?'通常攻撃':l.n):'前回と同じ行動'}</small></button>`;};
+ b.innerHTML=`<button data-b="back" class="bk" ${cb?'':'disabled'} aria-label="戻る">${GL.back}<small>戻る</small></button><button data-b="n" class="au${auto&&AM==='n'?' on':''}"><i class="ai">${AUI}</i><span class="t"><span class="lt">AUTO</span><b>通常</b></span><small>${SEIRIN.n}：${AWN[G.set.autoAw]}</small></button><button data-b="f" class="au f${auto&&AM==='f'?' on':''}"><i class="ai">${AUI}</i><span class="t"><span class="lt">AUTO</span><b>全力</b></span><small>${SEIRIN.n}も使う</small></button><button data-b="rep" class="rp" ${l?'':'disabled'}>リピート<small>${l?esc(l.basic?'通常攻撃':l.n):'前回と同じ行動'}</small></button>`;};
 
 /* ==================== キャラ詳細 ==================== */
 const RK=['','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ'];
@@ -164,7 +167,7 @@ function abInfo(id,v,back){const h=G.h[id];let top,list,sub='',nx=[],spb='';
  if(v==='w'){let wp=null;try{wp=V20.wpOf(h.eq.w&&findItem(h.eq.w));}catch(e){}top=`<i class="n">武</i><b>${wp?esc(wp.n):'武器アビリティなし'}</b>`;list=[wp?wp.d:'アンコモン以上の武器に付く'];}
  else{const i=+v,A=D.AB[id][i],r=C.abRank(id,i),lv0=D.ABL[i],ups=C.abUps(id);top=`<i class="n">${i+1}</i><b>${esc(A.n)}</b>${stars(r)}<em>${r?'段階'+RK[r]:'未解放'}</em>`;
   list=C.abDesc(id,i,Math.max(1,r));nx=r&&r<3?C.abNext(id,i,r):[];
-  if(A.sp)spb=`<div class="sp45${r>=3?' on':''}"><div class="t"><em>段階Ⅲ</em>${KW.mark('【'+esc(A.sp.n)+'】')}${r>=3?'':'<small>未解放</small>'}</div><p>${KW.markT(A.sp.d)}</p></div>`;
+  if(A.sp)spb=`<div class="sp45${r>=3?' on':''}"><div class="t"><em>段階Ⅲ</em><b class="kwn sp">【${esc(A.sp.n)}】</b>${r>=3?'':'<small>未解放</small>'}</div><p>${KW.markT(A.sp.d)}</p></div>`;
   sub=`Lv${lv0}でⅠ・Lv${lv0+20}でⅡ・Lv${lv0+40}でⅢ（星盤・天星盤の強化で早まる）${ups[i+1]?`　強化 +${ups[i+1]}`:''}`;}
  ovOpen(`<div class="ski43 ab44"><div class="abh">${top}</div><div class="dsc"><ul>${list.map(t=>`<li>${KW.markT(t)}</li>`).join('')}</ul>
   ${nx.length?`<div class="nx45"><em>次の段階</em><ul>${nx.map(t=>`<li>${KW.markT(t)}</li>`).join('')}</ul></div>`:''}${spb}${sub?`<p class="sub">${sub}</p>`:''}</div></div>

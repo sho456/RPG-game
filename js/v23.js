@@ -62,22 +62,38 @@ const ANC={1:[[.5,.62]],2:[[.3,.4],[.68,.8]],3:[[.26,.3],[.7,.56],[.3,.88]],4:[[
 const BANC=[[.86,.22],[.86,.92],[.14,.18],[.14,.96]];
 /* ver0.41：リグの寸法に加え、実際に描かれる絵の広がり（尻尾・腕など）も含める。大型の敵が画面の左端で切れないように */
 function eDims(e){const D=V19.dims(e),X=SPX.boxB(e);if(!X)return{w:D.w,h:D.h};return{w:Math.max(D.w,2*Math.max(X.l,X.r)+2),h:Math.max(D.h,X.t+1)};}
-function capScale(e,band,wid){const A=e.A;if(!A||A.none)return;if(A.sc23==null)A.sc23=A.sc;A.sc=A.sc23;e._cap23=0;const D=eDims(e),k=Math.min(1,band*.96/D.h,wid*.96/D.w);if(k<1){A.sc=A.sc23*k;e._cap23=A.sc;}}
+function capScale(e,band,wid){const A=e.A;if(!A||A.none)return;if(A.sc23==null)A.sc23=A.sc;A.sc=A.sc23;e._cap23=0;const D=eDims(e),k=Math.min(1,band*.96/D.h,wid*.96/D.w);e._capB23=k;if(k<1){A.sc=A.sc23*k;e._cap23=A.sc;}}
+/* ver0.49：ボス以外の敵は全員同じ縮め率（S）で置く。以前は 1 体ずつ縮めたため、先に置いた敵だけ大きく見えた。
+   S を 1 → 0.52 と下げ、全員が重ならずに置けた最初の S を使う（途中から加わる敵は、その戦闘の S を引き継ぐ） */
+/* 手下の基準の大きさ：味方（リオ）の描かれる寸法の √(幅×高さ) × BSIZE.MOB。実際の寸法で測って倍率を合わせる */
+function normMob(e){const A=e.A;if(!A||A.none||A._n23===A.key)return;let hh=0;try{const h=B.heroes.find(x=>x.A&&!x.A.none);const X=h&&SPX.boxB(h);if(X&&!X.ng)hh=X.vis;}catch(x){}if(!hh)return;
+ /* コマは段階のサイズなので、測って寄せるのを数回くり返し、いちばん近かった倍率を使う */
+ const want=hh*(BSIZE.MOB||1.45);let best=null;for(let i=0;i<5;i++){const X=SPX.boxB(e),m=X&&!X.ng&&X.vis;if(!m)return;const d=Math.abs(Math.log(m/want));if(!best||d<best.d)best={d,sc:A.sc};if(d<.04)break;A.sc*=want/m;}
+ A.sc=best.sc;A.sc23=A.sc;A._n23=A.key;}
 function placeEnemies(full){const x0=3,x1=Math.max(60,LY.heroL-10),EB=LY.ebot!=null?LY.ebot:LY.bot,band=EB-LY.top,es=B.enemies;
  const fixed=full?[]:es.filter(e=>e._p23&&e.alive),todo=full?es.filter(e=>e.alive||!e._p23):es.filter(e=>!e._p23);if(!todo.length)return;
  const box=e=>{const D=eDims(e),fx=e.x+8*e.sc,fy=e.y+16*e.sc-2;return[fx-D.w/2,fy-D.h,fx+D.w/2,fy];};
- const placed=fixed.map(box),boss=es.some(e=>e.boss&&e.alive),bossT=todo.filter(e=>e.boss),mins=todo.filter(e=>!e.boss);
- const order=[...bossT,...mins],nM=mins.length+(full?0:fixed.filter(e=>!e.boss).length);let mi=full?0:fixed.filter(e=>!e.boss).length;
- for(const e of order){ANIM.setup(e);capScale(e,band,x1-x0);let ax,ay;
-  if(e.boss){ax=.4;ay=.62;}else{const k=mi++;const L=boss?BANC:(ANC[Math.min(5,Math.max(1,nM))]||ANC[5]);const a=L[k%L.length];ax=a[0];ay=a[1];}
-  /* 重ならない場所が無ければ、その敵を少しずつ縮めて探し直す（最小72%） */
-  let best=null;for(const shrink of[1,.9,.8,.7,.6,.52]){/* ver0.47：重なりが無くなるまで最小 52% まで縮める（複数の敵が被らないように） */if(shrink<1&&e.A&&!e.A.none){e.A.sc=(e._cap23||e.A.sc23||e.A.sc)*shrink;e._cap23=e.A.sc;}
-   const D=eDims(e),fxA=x0+D.w/2+(x1-x0-D.w)*ax,fyA=LY.top+D.h+(band-D.h)*ay;let bc=1e18,bo=0;best=null;
+ const boss=es.some(e=>e.boss&&e.alive),bossT=todo.filter(e=>e.boss),mins=todo.filter(e=>!e.boss);
+ const order=[...bossT,...mins],nM=mins.length+(full?0:fixed.filter(e=>!e.boss).length);
+ /* 手下の大きさ：帯に収まる倍率（capScale）の最小を全員にそろえる */
+ for(const e of order){ANIM.setup(e);if(!e.boss)normMob(e);capScale(e,band,x1-x0);}
+ let kM=1;for(const e of mins)if(e.A&&!e.A.none&&e.A.sc23)kM=Math.min(kM,(e._cap23||e.A.sc23)/e.A.sc23);
+ const scM=(e,S)=>{if(e.A&&!e.A.none){e.A.sc=e.A.sc23*kM*S;e._cap23=e.A.sc;}};
+ const pos=(e,ax,ay,placed)=>{const D=eDims(e),fxA=x0+D.w/2+(x1-x0-D.w)*ax,fyA=LY.top+D.h+(band-D.h)*ay;let bc=1e18,bo=0,best=null;
    for(let fy=LY.top+D.h;fy<=EB+.01;fy+=2)for(let fx=x0+D.w/2;fx<=x1-D.w/2+.01;fx+=2){const b=[fx-D.w/2-4,fy-D.h-3,fx+D.w/2+4,fy+3];let ov=0;
      for(const p of placed){const ix=Math.min(b[2],p[2])-Math.max(b[0],p[0]),iy=Math.min(b[3],p[3])-Math.max(b[1],p[1]);if(ix>0&&iy>0)ov+=ix*iy;}
      const c=ov*60+Math.hypot(fx-fxA,(fy-fyA)*1.2);if(c<bc){bc=c;bo=ov;best=[fx,fy];}}
-   if(!best)best=[fxA,fyA];if(bo<=0)break;}
-  e.x=best[0]-8*e.sc;e.y=Math.round(best[1]-16*e.sc+2);e._p23=1;placed.push(box(e));}}
+   return{best:best||[fxA,fyA],bo};};
+ const SL=[1,.9,.8,.7,.6,.52],S0=!full&&B._mobS23?B._mobS23:null;
+ for(const S of S0?[S0]:SL){const placed=fixed.map(box);let mi=full?0:fixed.filter(e=>!e.boss).length,tot=0;
+  for(const e of order){let ax,ay;
+   if(e.boss){ax=.4;ay=.62;}else{const k=mi++;const L=boss?BANC:(ANC[Math.min(5,Math.max(1,nM))]||ANC[5]);const a=L[k%L.length];ax=a[0];ay=a[1];}
+   let r;
+   if(e.boss){/* ボス：重ならない場所が無ければ、そのボスだけ少しずつ縮める（最小 52%） */
+    for(const sh of SL){if(sh<1&&e.A&&!e.A.none){e.A.sc=(e.A.sc23*(e._capB23||1))*sh;e._cap23=e.A.sc;}r=pos(e,ax,ay,placed);if(r.bo<=0)break;}}
+   else{scM(e,S);r=pos(e,ax,ay,placed);tot+=r.bo;}
+   e.x=r.best[0]-8*e.sc;e.y=Math.round(r.best[1]-16*e.sc+2);e._p23=1;placed.push(box(e));}
+  B._mobS23=S;if(tot<=0)break;}}
 function layout(full=true){if(scene!=='battle'||!B)return;const nh=battleH();if(nh!==H){setH(nh);try{BG=makeBg(V22.BL.th,V22.BL.boss);if(typeof VOIDED!=='undefined'&&VOIDED&&typeof desat==='function')BG=desat(BG);}catch(e){}}else fit();
  LY.hudPx=(HK23.hudPx||hudPx)();LY.botPx=(HK23.botPx||botPx)();LY.top=(LY.hudPx+6)/SC;LY.bot=H-(LY.botPx+3)/SC;if(LY.bot-LY.top<44)LY.bot=LY.top+44;
  placeHeroes();placeEnemies(full);app.style.setProperty('--hud23',LY.hudPx+'px');app.style.setProperty('--bot23',LY.botPx+'px');refresh();}

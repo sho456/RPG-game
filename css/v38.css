@@ -27,22 +27,31 @@
 .c38h .nm{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.1}
 .c38h .nm b{font-size:17px;font-weight:900;color:#fff;letter-spacing:.04em;text-shadow:0 1px 0 #000,0 0 6px rgba(0,0,0,.6)}
 .c38h .nm small{font-size:11px;color:#9fe8d8;font-weight:700}
-.c38h .aw{position:relative;flex:none;width:76px;height:34px;border-radius:17px;border:2px solid rgba(255,226,122,.45);background:#10182e;color:#c8ccd8;font:800 12px/1 inherit;overflow:hidden;cursor:pointer}
-.c38h .aw i{position:absolute;inset:0;width:var(--g,0%);background:linear-gradient(90deg,#5a4a20,#b08a30)}
-.c38h .aw b{position:relative}
-.c38h .aw.rdy{border-color:#fff1c2;color:#2a1600;animation:pulse .8s infinite alternate}
-.c38h .aw.rdy i{width:100%;background:linear-gradient(180deg,#fff6c8,#ffd34a 55%,#e09a10)}
-.c38h .aw.on{border-color:#ffe27a;color:#fff3b0}.c38h .aw.on i{width:100%;background:linear-gradient(90deg,#6a3a90,#c05ad8)}
+/* ver0.49：星臨のボタン＝金の宝珠の札。たまるまでは金の液が満ちていき、満タンで虹の縁が回って光が走る。星臨中は紫の星空 */
+.c38h .aw{position:relative;flex:none;width:86px;height:38px;border-radius:19px;border:0;padding:0;background:#0c1024;color:#d8dcf0;font:800 12px/1 inherit;overflow:hidden;cursor:pointer;isolation:isolate;
+ box-shadow:0 0 0 2px #6a5424,0 0 0 3px #1a1206,inset 0 2px 6px rgba(0,0,0,.8)}
+.c38h .aw i{position:absolute;inset:0;width:var(--g,0%);background:linear-gradient(180deg,#e8c060,#a87a20 55%,#6a4810);z-index:0;box-shadow:inset -2px 0 4px rgba(255,240,180,.5)}
+.c38h .aw b{position:relative;z-index:2;font-family:var(--cmd);font-size:13px;letter-spacing:.08em;text-shadow:0 1px 0 #000,0 0 4px rgba(0,0,0,.8)}
+.c38h .aw::before{content:"";position:absolute;inset:-40%;z-index:-1;opacity:0;background:conic-gradient(from 0deg,#ff7aa8,#ffd34a,#7affc8,#7ab8ff,#d08aff,#ff7aa8);animation:aws49 2.4s linear infinite}
+.c38h .aw.rdy{background:transparent;box-shadow:0 0 14px rgba(255,214,90,.95),0 0 28px rgba(255,180,60,.5);animation:pulse .8s infinite alternate}
+.c38h .aw.rdy::before{opacity:1}
+.c38h .aw.rdy i{inset:2px;width:auto;border-radius:17px;background:radial-gradient(ellipse at 50% 0%,#fffbe0 0%,#ffe27a 35%,#e0a020 70%,#8a5a08 100%);box-shadow:inset 0 1px 0 #fff,inset 0 -2px 4px rgba(120,60,0,.6)}
+.c38h .aw.rdy b{color:#3a1c00;font-size:16px;letter-spacing:.3em;padding-left:.3em;text-shadow:0 1px 0 #fff6d0,0 0 6px rgba(255,255,255,.8)}
+.c38h .aw.rdy::after{content:"";position:absolute;inset:0;z-index:3;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.85) 48%,transparent 62%);transform:translateX(-130%);animation:shn49 1.5s ease-in-out infinite;pointer-events:none}
+.c38h .aw.on{box-shadow:0 0 0 2px #e0c070,0 0 12px rgba(200,120,255,.8)}
+.c38h .aw.on i{width:100%;background:radial-gradient(circle at 20% 30%,#fff 0 1px,transparent 2px),radial-gradient(circle at 70% 60%,#fff 0 1px,transparent 2px),radial-gradient(circle at 45% 80%,#ffe 0 1px,transparent 2px),linear-gradient(180deg,#6a3aa0,#2a0e50)}
+.c38h .aw.on b{color:#fff3b0}
+@keyframes aws49{to{transform:rotate(360deg)}}
 /* 2 段目：HP・LP・BP */
 .c38s{display:grid;grid-template-columns:1.55fr .9fr 1.25fr;gap:5px}
 .c38s span{position:relative;display:flex;align-items:baseline;gap:3px;height:24px;padding:0 7px;border-radius:3px;border:1px solid rgba(160,240,220,.35);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(0,0,0,.25));overflow:hidden}
 .c38s em{font:italic 800 11px/24px var(--num,inherit);color:#9fe8d8;margin-right:2px}
-.c38s b{font:800 15px/24px var(--num,inherit);color:#fff}
-.c38s small{font-size:10px;color:#9fb4c8}
+.c38s b{font:800 15px/24px var(--num,inherit);color:#fff;text-shadow:0 1px 0 #000,0 0 3px rgba(0,0,0,.85)}
+.c38s small{font-size:10px;color:#d8e2ee}
 .c38s .hp i{position:absolute;left:0;bottom:0;height:2px;width:var(--r);background:linear-gradient(90deg,#5adc7a,#b8ff9a)}
 .c38s .hp.dy{border-color:#ff6a6a}.c38s .hp.dy b{color:#ff8a8a}.c38s .hp.dy i{background:#ff5a5a}
-.c38s .lp b{color:#ffb8c8}
-.c38s .bp b{color:#7fd6ff}.c38s .bp u{margin-left:auto;text-decoration:none;font-size:10px;font-weight:800;color:#8ff0a8}
+.c38s .lp b{color:#fff}
+.c38s .bp b{color:#fff}.c38s .bp u{margin-left:auto;text-decoration:none;font-size:10px;font-weight:800;color:#8ff0a8}
 /* サブ画面の見出し */
 .c38t{display:flex;align-items:center;gap:8px;height:24px}
 .c38t button{width:30px;height:24px;border-radius:4px;border:1px solid rgba(160,240,220,.45);background:#123040;display:grid;place-items:center}
@@ -54,8 +63,6 @@
 .c38l .r{position:relative;display:flex;align-items:center;gap:8px;min-height:44px;padding:0 6px 0 9px;border-radius:4px;text-align:left;color:#fff;cursor:pointer;
  border:1px solid rgba(120,200,220,.38);background:linear-gradient(180deg,rgba(32,70,96,.85),rgba(12,30,48,.9));box-shadow:inset 0 1px 0 rgba(255,255,255,.12);transition:transform .08s,filter .08s}
 .c38l .r:active{transform:scale(.985);filter:brightness(1.25)}
-.c38l .r.ougi{border-color:#8ff4ff;background:linear-gradient(180deg,rgba(40,120,150,.9),rgba(14,50,72,.92));box-shadow:0 0 10px rgba(110,230,255,.35),inset 0 1px 0 rgba(255,255,255,.25)}
-.c38l .r.ougi{border-color:#ffe27a;background:linear-gradient(180deg,rgba(130,96,30,.9),rgba(60,36,10,.92))}
 .c38l .r:disabled{opacity:.42;filter:saturate(.3);cursor:default}
 .c38l .r .hx20.el{flex:none}
 .c38l .r>img{width:30px;height:30px;image-rendering:pixelated;flex:none}
@@ -69,20 +76,36 @@
 .c38l .r.ng .c{color:#ff8a8a}
 .c38l .r .inf{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font:italic 900 14px/1 Georgia,serif;color:#fff;background:radial-gradient(circle at 35% 30%,#7af0b0,#1a9a5a);border:1px solid #c8ffe0}
 /* 下の段：戻る・道具・交代 */
-.c38f{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.c38f{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
 .c38f button{height:32px;display:flex;align-items:center;justify-content:center;gap:5px;border-radius:4px;border:1px solid rgba(160,240,220,.45);background:linear-gradient(180deg,#1e5a52,#0e2e30);color:#e8fff8;font-size:12px;font-weight:800}
 .c38f button svg{width:15px;height:15px;fill:currentColor}
 .c38f button:disabled{opacity:.35}
 
-/* ==================== 戦闘：下の帯（AUTO・リピート） ==================== */
-#app.v38[data-sc="battle"] #bbar.b38{position:absolute;z-index:6;left:max(8px,var(--sal,0px));right:max(8px,var(--sar,0px));bottom:calc(var(--sab,0px) + 6px);width:auto !important;transform:none !important;display:grid !important;grid-template-columns:1fr 1fr 1fr !important;gap:6px !important;margin:0 !important;padding:0 !important}
-#app.v38 #bbar.b38 button{height:42px;border-radius:4px;font-weight:900;font-size:13px;line-height:1.1;padding:0 4px}
-#app.v38 #bbar.b38 button small{display:block;font-size:8px;font-weight:700}
-#app.v38 #bbar.b38 .au{border:2px solid #fff1c2;background:linear-gradient(180deg,#f8e2a0,#d8a848 55%,#a8781e);color:#3a2000;box-shadow:inset 0 1px 0 #fff8e0,0 2px 0 rgba(0,0,0,.5)}
-#app.v38 #bbar.b38 .au small{color:#5a3a08}
-#app.v38 #bbar.b38 .au.on{background:linear-gradient(180deg,#fff6c8,#ffd34a 55%,#e09a10);box-shadow:0 0 12px rgba(255,214,90,.95);animation:pulse .8s infinite alternate}
-#app.v38 #bbar.b38 .rp{border:2px solid #ffe0c0;background:linear-gradient(180deg,#f0a050,#c05a18 55%,#7a3008);color:#fff}
-#app.v38 #bbar.b38 .rp small{color:#ffe8d0}#app.v38 #bbar.b38 .rp:disabled{opacity:.45;filter:saturate(.3)}
+/* ==================== 戦闘：下の帯（戻る・AUTO・リピート） ==================== */
+/* ver0.49：左端に小さな「戻る」、AUTO は低く小さい濃紺の札（金の縁・再生の印）。入っている AUTO だけ金に光る */
+#app.v38[data-sc="battle"] #bbar.b38{position:absolute;z-index:6;left:max(8px,var(--sal,0px));right:max(8px,var(--sar,0px));bottom:calc(var(--sab,0px) + 6px);width:auto !important;transform:none !important;display:grid !important;grid-template-columns:50px 1fr 1fr .9fr !important;gap:5px !important;margin:0 !important;padding:0 !important}
+#app.v38 #bbar.b38 button{position:relative;height:36px;border-radius:6px;padding:0 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:"M PLUS 1p",sans-serif !important;font-weight:900;font-size:12px;line-height:1.05;letter-spacing:.02em;overflow:hidden}
+#app.v38 #bbar.b38 button small{display:block;font-family:"M PLUS 1p",sans-serif !important;font-size:8.5px;font-weight:800;margin-top:1px;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+#app.v38 #bbar.b38 .bk{border:1px solid rgba(160,240,220,.55);background:linear-gradient(180deg,#1e5a52,#0e2e30);color:#e8fff8;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 2px 0 rgba(0,0,0,.5)}
+#app.v38 #bbar.b38 .bk svg{width:16px;height:16px;fill:currentColor}
+#app.v38 #bbar.b38 .bk small{font-size:9px;color:#bfeee2}
+#app.v38 #bbar.b38 .bk:disabled{opacity:.3}
+#app.v38 #bbar.b38 .au{flex-direction:row;gap:6px;justify-content:flex-start;padding:0 8px;border:1px solid #c9a44e;background:linear-gradient(180deg,#24305a 0%,#141c3a 55%,#0b1026 100%);color:#fff2c4;box-shadow:inset 0 1px 0 rgba(255,236,170,.35),inset 0 0 0 1px rgba(0,0,0,.6),0 2px 0 rgba(0,0,0,.55);text-shadow:0 1px 0 #000}
+#app.v38 #bbar.b38 .au .ai{flex:none;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 40% 35%,#fff3c0,#d9a63c 60%,#7a5410);box-shadow:0 0 0 1px #3a2600}
+#app.v38 #bbar.b38 .au .ai svg{width:11px;height:11px;fill:#2a1600}
+#app.v38 #bbar.b38 .au .t{display:flex;align-items:baseline;gap:3px;line-height:1}
+#app.v38 #bbar.b38 .au .lt{font-family:"Jost","M PLUS 1p",sans-serif;font-style:italic;font-weight:700;font-size:14px;letter-spacing:.05em;color:#ffe08a}
+#app.v38 #bbar.b38 .au .t b{font-size:11px;color:#fff}
+#app.v38 #bbar.b38 .au small{position:absolute;left:36px;right:4px;bottom:3px;text-align:left;color:#b8c0e0;font-size:8px}
+#app.v38 #bbar.b38 .au .t{margin-top:-9px}
+#app.v38 #bbar.b38 .au.f{border-color:#e08a5a}#app.v38 #bbar.b38 .au.f .lt{color:#ffb88a}
+#app.v38 #bbar.b38 .au.on{border-color:#fff1c2;background:linear-gradient(180deg,#fff6c8,#ffd34a 55%,#e09a10);color:#2a1600;text-shadow:0 1px 0 rgba(255,250,225,.7);box-shadow:0 0 12px rgba(255,214,90,.9);animation:pulse .8s infinite alternate}
+#app.v38 #bbar.b38 .au.on .lt{color:#5a2a00}#app.v38 #bbar.b38 .au.on .t b{color:#2a1600}#app.v38 #bbar.b38 .au.on small{color:#4a2c00}
+#app.v38 #bbar.b38 .au.on .ai{background:radial-gradient(circle at 40% 35%,#3a2a10,#1a0e00)}#app.v38 #bbar.b38 .au.on .ai svg{fill:#ffe08a}
+#app.v38 #bbar.b38 .au.on::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.65) 50%,transparent 65%);transform:translateX(-120%);animation:shn49 1.6s ease-in-out infinite}
+#app.v38 #bbar.b38 .rp{border:1px solid #ffb880;background:linear-gradient(180deg,#9a4a18,#5a2408 60%,#3a1404);color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.6);box-shadow:inset 0 1px 0 rgba(255,220,180,.35),0 2px 0 rgba(0,0,0,.55)}
+#app.v38 #bbar.b38 .rp small{color:#ffe0c8}#app.v38 #bbar.b38 .rp:disabled{opacity:.42;filter:saturate(.3)}
+@keyframes shn49{0%,40%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
 
 /* ==================== 戦闘：上の帯（行動順） ==================== */
 
@@ -183,3 +206,13 @@
 
 /* ver0.41 キャラ詳細のタブ 4 つ（能力・アビリティ・技・術・星臨） */
 .ctabs.t38 button{font-size:13px !important;padding-left:2px !important;padding-right:2px !important;white-space:nowrap;letter-spacing:0 !important}
+/* ver0.49：奥義の行（.pk の青い地より後に置く）＝黒金の豪華な札。金の二重の縁・回る光・「奥義」の金箔の札・左に光の帯 */
+.c38l .r.ougi,.c38l .r.ougi.pk{position:relative;overflow:hidden;min-height:50px;border-radius:6px;isolation:isolate;
+ background:repeating-linear-gradient(115deg,transparent 0 14px,rgba(255,220,120,.07) 14px 15px),linear-gradient(90deg,rgba(255,200,80,.25),transparent 45%),linear-gradient(180deg,#3a2408 0%,#1a0e02 55%,#2a1804 100%);
+ border:2px solid #ffe27a;box-shadow:inset 0 0 0 1px #2a1600,inset 0 0 0 2px #b07a18,inset 0 0 14px rgba(255,190,60,.45),inset 0 2px 0 rgba(255,240,190,.5)}
+.c38l .r.ougi::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,240,190,.55) 47%,rgba(255,255,255,.9) 50%,rgba(255,240,190,.55) 53%,transparent 70%);transform:translateX(-120%);animation:ogs49 2.2s ease-in-out infinite;pointer-events:none}
+.c38l .r.ougi .n{color:#fff3c4;font-size:17px;letter-spacing:.06em;text-shadow:0 0 6px rgba(255,190,60,.9),0 1px 0 #000}
+.c38l .r.ougi .n em{display:inline-block;margin-right:7px;padding:2px 6px;border-radius:2px;font-style:normal;font-size:11px;letter-spacing:.15em;color:#3a1c00;background:linear-gradient(180deg,#fffbe0,#ffd34a 50%,#c08010);box-shadow:0 0 0 1px #5a3400,0 0 8px rgba(255,214,90,.8);text-shadow:none;vertical-align:2px}
+.c38l .r.ougi.pk{border-color:#fff6c8;box-shadow:inset 0 0 0 1px #2a1600,inset 0 0 0 3px #e0a020,inset 0 0 22px rgba(255,214,90,.7),inset 0 2px 0 rgba(255,240,190,.6)}
+.c38l .r.ougi:disabled{animation:none}.c38l .r.ougi:disabled::after{display:none}
+@keyframes ogs49{0%,35%{transform:translateX(-120%)}100%{transform:translateX(120%)}}

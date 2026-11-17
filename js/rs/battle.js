@@ -60,23 +60,46 @@ function lpLose(t,n,why){if(!t||t.side!==0||!(n>0))return;const l0=t.lp;t.lp=Mat
 function lpGuard(){if(!B)return;for(const h of B.heroes)if(h.alive&&(h.lp||0)<=0){h.alive=false;h.hp=0;}}
 
 /* ==================== ダメージ計算・命中・被弾 ==================== */
+/* ==================== ダメージの計算式（ver0.49 で整理） ====================
+ 最終ダメージ＝基礎ダメージ × 与ダメ枠 × 会心枠 × 奥義枠 × 連携枠 × エクストラフォース枠 × 被ダメ軽減枠 × 属性耐性 → 上限の減衰
+  ・基礎ダメージ（engine.js calc）：攻撃（魔力）× 威力 − 防御（精神）× 0.5。弱点 ×1.7・会心 ×1.5 もここ
+    攻撃強化・弱体（能力の ±%）は能力の値に入る＝同じ枠で加算（js/v20-battle.js recalc。上限 +100%・下限 −60%）
+  ・与ダメ枠：アビリティ・装備・陣形などの「与ダメ+%」を全部足して 1 回だけ掛ける（同じ枠は加算）
+  ・会心枠：会心ダメ+% は 1.5 倍に足す（(1.5 + 会心ダメ) ÷ 1.5）
+  ・エクストラフォース（【補助効果】）：条件を満たした攻撃で、最終ダメージにさらに掛ける別枠。
+     同じ条件のエクストラフォースは重ならない（いちばん高い 1 つ）。違う条件のものが同時に出たら、この枠の中で加算
+     例）攻撃強化+100% のとき：攻撃強化+50% → (2.0+0.5)÷2.0＝+25%、エクストラフォース+50% → 2.0×1.5＝+50%
+  ・被ダメ軽減枠：アビリティ・装備・陣形の「被ダメ-%」を全部足して 1 回だけ掛ける（最大 80% 軽減）
+  ・上限：9999万（DMG_CAP）。1000万（DMG_KNEE）を超えた分は、上限に近づくほど伸びが鈍る（なめらかに減衰） */
+const DMG_CAP=99990000,DMG_KNEE=10000000;
+function dmgFin(d){d=Math.max(1,d);if(d>DMG_KNEE){const R=DMG_CAP-DMG_KNEE;d=DMG_KNEE+R*(1-Math.exp(-(d-DMG_KNEE)/R));}return Math.min(DMG_CAP,Math.max(1,Math.round(d)));}
+/* エクストラフォース：{条件: %}。条件ごとに最大値、合計を返す */
+function xfOf(a,t,sk,r){const X={};const put=(c,v)=>{c=c||'any';if(v>0&&(X[c]||0)<v)X[c]=v;};
+ for(const e of effs(a))if(e.t==='xf'&&cnd(e.c,a,t,sk,r))put(e.c,+e.v||0);
+ for(const h of B.heroes)if(h.alive&&a.side===0)for(const e of effs(h))if(e.t==='allyxf'&&cnd(e.c,a,t,sk,r))put('ally:'+(e.c||'any'),+e.v||0);
+ if(sk&&sk.xf){const L=Array.isArray(sk.xf)?sk.xf:[typeof sk.xf==='number'?{v:sk.xf}:sk.xf];for(const x of L)if(cnd(x.c,a,t,sk,r))put('sk:'+(x.c||'any'),+x.v||0);}
+ for(const s of(a.sts||[]))if(s.k==='xf'&&s.v>0)put('st',s.v);
+ let sum=0;for(const k in X)sum+=X[k];return{sum,X};}
+function frames(a,t,sk,r){const F={dmg:0,crit:1,ougi:1,cur:1,xf:0,cut:0,el:1};
+ if(a.side===0){
+  F.dmg+=sumE(a,'dmg',e=>cnd(e.c,a,t,sk,r))+(a.dmgP||0)+(sk&&!sk.basic?(a.skDmg||0):0);
+  for(const e of effs(a))if(e.t==='stack'){const n=e.c==='same'?(a._rsSameT===t?a._rsSameN||0:0):(a._rsHeat||0);F.dmg+=Math.min(e.max||5,n)*e.v;}
+  const rg=effs(a).find(e=>e.t==='rage');if(rg)F.dmg+=Math.min(rg.max||5,a._rsRage||0)*rg.v;
+  for(const h of B.heroes)if(h!==a&&h.alive)F.dmg+=sumE(h,'allydmg',e=>cnd(e.c,h,t,sk));
+  if(r.crit){const cd=sumE(a,'critd')+(a.critDmg||0);if(cd)F.crit=(1.5+cd/100)/1.5;}
+  const cur=B.rs.cur;if(cur&&cur.u===a)F.cur=cur.mul;
+  if(sk.ougi)F.ougi=(1+(a.ougiUp||0)/100)*(a.legs&&a.legs.includes('futago')?1.3:1);
+  F.xfX=xfOf(a,t,sk,r);F.xf=F.xfX.sum;}
+ if(t.side===0){F.cut=sumE(t,'cut',e=>cnd(e.c,t,a,sk))+B.heroes.reduce((x,h)=>x+(h.alive?sumE(h,'allycut'):0),0)+(t.dmgCut||0);
+  /* 属性耐性（装備の合計。js/data/resist.js）：耐性 1 で 1% 軽減、弱点（マイナス）は増加。味方が受けるときだけ */
+  if(a&&a.side===1&&sk.el)F.el=ELR.mul(t.id,sk.el);}
+ F.m=Math.max(0,1+F.dmg/100)*F.crit*F.ougi*F.cur*(1+F.xf/100)*Math.max(.2,1-F.cut/100)*F.el;return F;}
 {const _c=calc;calc=function(a,t,sk){if(!B||!B.rs||!a||!t||!sk)return _c(a,t,sk);
  let cb=0,pi=0,d0=null;
  if(a.side===0){cb=sumE(a,'crit',e=>cnd(e.c,a,t,sk))+(sk.crit||0);pi=Math.min(80,sumE(a,'pierce'));}
  if(cb)a.crit=(a.crit||0)+cb;if(pi>0){d0=[t.def,t.res];t.def=Math.round(t.def*(1-pi/100));t.res=Math.round(t.res*(1-pi/100));}
  let r;try{r=_c(a,t,sk);}finally{if(cb)a.crit-=cb;if(d0){t.def=d0[0];t.res=d0[1];}}
- try{let m=1;
-  if(a.side===0){m*=1+sumE(a,'dmg',e=>cnd(e.c,a,t,sk,r))/100;
-   for(const e of effs(a))if(e.t==='stack'){const n=e.c==='same'?(a._rsSameT===t?a._rsSameN||0:0):(a._rsHeat||0);m*=1+Math.min(e.max||5,n)*e.v/100;}
-   const rg=effs(a).find(e=>e.t==='rage');if(rg)m*=1+Math.min(rg.max||5,a._rsRage||0)*rg.v/100;
-   for(const h of B.heroes)if(h!==a&&h.alive)m*=1+sumE(h,'allydmg',e=>cnd(e.c,h,t,sk))/100;
-   if(r.crit){const cd=sumE(a,'critd');if(cd)m*=1+cd/150;}
-   const cur=B.rs.cur;if(cur&&cur.u===a)m*=cur.mul;
-   if(sk.ougi)m*=(1+(a.ougiUp||0)/100)*(a.legs&&a.legs.includes('futago')?1.3:1);}
-  if(t.side===0){const cut=sumE(t,'cut',e=>cnd(e.c,t,a,sk))+B.heroes.reduce((x,h)=>x+(h.alive?sumE(h,'allycut'):0),0);m*=Math.max(.2,1-cut/100);}
-  /* 属性耐性（装備の合計。js/data/resist.js）：耐性 1 で 1% 軽減、弱点（マイナス）は増加。味方が受けるときだけ */
-  if(t.side===0&&a&&a.side===1&&sk.el)m*=ELR.mul(t.id,sk.el);
-  if(m!==1)r.d=Math.max(1,Math.round(r.d*m));}catch(e){console.error(e);}
+ try{const F=frames(a,t,sk,r);r.d=dmgFin(r.d*F.m);r.xf=F.xf;r.frm=F;if(F.xf>0)t._xf=F.xf;}catch(e){console.error(e);}
  B.rs.lastR=r;return r;};}
 {const _hit=hit;hit=async function(a,t,sk){if(!B||!B.rs||!a||!t)return _hit(a,t,sk);const was=t.alive,myB=B;B.rs.lastR=null;
  if(a.side===1&&t.side===0)B.rs.eSk=sk;

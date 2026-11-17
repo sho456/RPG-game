@@ -38,7 +38,7 @@ function begin(u){const p=panel(u),t=now();
 /* 区切り：出ている表示を全部、消える動き（上へ少し浮いて薄くなる）で消す */
 function cut(){SEG++;for(const p of P.values()){if(!p.el.classList.contains('on')||p.el.classList.contains('out'))continue;p.el.classList.add('out');clearTimeout(p.to);p.to=setTimeout(()=>{if(p.el.classList.contains('out')){clear(p);p.key=null;}},230);}}
 /* 1 段目：見出し。Critical は Weak・Resist の上の行（r0）、Weak・Resist・Guard と属性の漢字は r1 */
-function label(p,cls,txt,sk,fs,el){const row=cls==='cr'?p.r0:p.r1;if(row.querySelector('.'+cls))return;const d=document.createElement('span');d.className='lb '+cls;d.appendChild(tight(TX24.el(txt,sk,fs),fs,.8));
+function label(p,cls,txt,sk,fs,el){const row=cls==='cr'||cls==='xf'?p.r0:p.r1;if(row.querySelector('.'+cls))return;const d=document.createElement('span');d.className='lb '+cls;d.appendChild(tight(TX24.el(txt,sk,fs),fs,.8));
  if(el&&ELC[el]){const ks=Math.round(fs*1.25),k=tight(TX24.el(el,'elm',ks),ks,.8);k.classList.add('kj');d.appendChild(k);}
  row.appendChild(d);}
 /* 3 段目：数字（前の数字は素早く消え、新しい数字が 1 桁ずつ右から落ちる） */
@@ -51,6 +51,8 @@ const fmt=n=>{n=Math.abs(n|0);return n>=10000000?Math.floor(n/10000)+'万':Strin
 function dmg(u,s,kind,el){const v=parseInt(s,10),heal=s[0]==='+',crit=/crit/.test(kind),weak=/weak/.test(kind),res=/resist/.test(kind),psn=/psn/.test(kind),grd=u.side===0&&!heal&&!!u.guard;
  const p=begin(u),fs=fsNum(u),lf=Math.round(fs*1.02);
  if(crit)label(p,'cr','Critical','crit',lf);
+ /* ver0.49：エクストラフォースが乗った一撃（js/rs/battle.js calc が対象に印 _xf を付ける） */
+ if(!heal&&u._xf>0){u._xf=0;label(p,'xf','Extra Force','xf',Math.round(lf*.82));}
  if(weak)label(p,'wk','Weak','weak',lf,el);else if(res&&!p.r1.querySelector('.wk'))label(p,'rs','Resist','resist',lf,el);
  if(grd)label(p,'gd','Guard','guard',lf);
  number(p,(heal?'+':'')+fmt(v),heal?'heal':psn?'psn':u.side===0?'dmgH':'dmg',heal?Math.round(fs*.92):fs,!heal);

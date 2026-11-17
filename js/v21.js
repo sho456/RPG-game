@@ -54,7 +54,7 @@ function frame(){if(!B||scene!=='battle'){if(EL)EL.style.display='none';return;}
  if(last.t!==t){last.t=t;last.rem=bs.rem;tr.style.transition='none';tr.style.width=fw;void tr.offsetWidth;tr.style.transition='';}
  else if(bs.rem<last.rem){/* 1本削り切った：残像を新しいゲージの満タンから始め、割れる演出 */
   tr.style.transition='none';tr.style.width='100%';void tr.offsetWidth;tr.style.transition='';el.classList.remove('brk21');void el.offsetWidth;el.classList.add('brk21');
-  try{pop(t,`ゲージ ${bs.rem}/${bs.n}`,'#ffd040',true);SFX.brk&&SFX.brk();}catch(x){}last.rem=bs.rem;}
+  /* ver0.49：ゲージの本数はダメージ表示に出さない（上の HP バーの ×N だけ） */try{SFX.brk&&SFX.brk();}catch(x){}last.rem=bs.rem;}
  else if(bs.rem>last.rem)last.rem=bs.rem;
  if(fi.style.width!==fw){fi.style.width=fw;tr.style.width=fw;}
  if(fi._c!==cur){fi._c=cur;fi.style.setProperty('--c',cur);}if(bg._c!==nxt){bg._c=nxt;bg.style.background=nxt;}

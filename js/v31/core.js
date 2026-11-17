@@ -50,7 +50,7 @@ const XK=['dmgP','skDmg','critDmg','dmgCut'];
  if(h.lv>60)o.skDmg=Math.round((o.skDmg+(h.lv-60)*1.5)*10)/10;
  return o;};}
 /* ダメージ：与ダメ・技の威力・会心ダメ・被ダメ軽減（ほかの倍率のあとに掛ける） */
-{const _c=calc;calc=function(a,t,sk){const r=_c(a,t,sk);try{let m=1;
+{const _c=calc;calc=function(a,t,sk){const r=_c(a,t,sk);/* ver0.49：RS の戦闘では与ダメ・会心ダメ・被ダメ軽減は js/rs/battle.js frames の枠で足し合わせる */if(typeof B!=='undefined'&&B&&B.rs)return r;try{let m=1;
  if(a&&a.side===0){if(a.dmgP)m*=1+a.dmgP/100;if(sk&&!sk.basic&&a.skDmg)m*=1+a.skDmg/100;if(r.crit&&a.critDmg)m*=(1.5+a.critDmg/100)/1.5;}
  if(t&&t.side===0&&t.dmgCut)m*=1-Math.min(60,t.dmgCut)/100;
  if(m!==1)r.d=Math.max(1,Math.round(r.d*m));}catch(e){console.error(e);}return r;};}

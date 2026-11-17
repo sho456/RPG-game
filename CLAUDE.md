@@ -36,10 +36,10 @@
 | 技・術の詳細の窓（ⓘ）・アビリティの詳細の窓 | `js/rs/ui.js`（`info`・`abInfo`） | `css/ui/skill.css`（`.ski43` `.ab44`） |
 | 鍛冶屋（品揃え・強化・OP付替・ソケット） | `js/ui/smith.js`（`smith`・`enhance` を置き換え。OP・ソケットの後半は `town.js opSwap / sockMenu`） | `css/ui/smith.css` |
 | タイトル（タップで開始） | `js/v38/menu.js`（`titleTap`） | `css/ui/font.css` |
-| 戦闘：キャラ・敵の表示サイズ | 敵 `js/battle/size.js`（`BSIZE`：種類ごとの倍率 `CLS`）・味方の背丈 `js/sprite/spx.js heroHgt / regRigs`・味方の倍率 `js/v38/battle-ui.js placeHeroes`・敵の配置（はみ出し防止）`js/v23.js eDims / placeEnemies` | — |
-| 戦闘：配置・スライド・HP/BP 表示 | `js/v38/battle-ui.js`（`V38B`） | `css/v38.css` |
+| 戦闘：キャラ・敵の表示サイズ | 敵 `js/battle/size.js`（`BSIZE`：ボス以外は `MOB` で同じ大きさ・ボスは種類ごとの倍率 `CLS`。見えている範囲で測る `spx.js boxB`・手下を同じ縮め率で置く `v23.js normMob / placeEnemies`）・味方の背丈 `js/sprite/spx.js heroHgt / regRigs`・味方の倍率 `js/v38/battle-ui.js placeHeroes`・敵の配置（はみ出し防止）`js/v23.js eDims / placeEnemies` | — |
+| 戦闘：配置・スライド・HP/BP 表示（キャラ横の HP・BP の字は `js/v24-text.js STYLE.hp/sp`）・下の帯（戻る・AUTO・リピート＝`js/rs/ui.js bbar`） | `js/v38/battle-ui.js`（`V38B`） | `css/v38.css` |
 | 戦闘：上の帯（対象・弱点/耐性） | `js/v22.js`（`updHud`） | `css/v22.css` `v25.css` `v38.css` |
-| 戦闘の決まり（ターン・BP・LP（全員 7＝`RSD.LP_FIX`）） | `js/rs/battle.js`（`RSB`）・`js/rs/core.js`（`RSC`）・データ `js/rs/data.js`（`RSD`） | — |
+| 戦闘の決まり（ターン・BP・LP（全員 7＝`RSD.LP_FIX`））・ダメージの計算式（枠・エクストラフォース・上限 9999万。`docs/RS-SYSTEM.md` 12 章） | `js/rs/battle.js`（`RSB`。計算式は `frames` `xfOf` `dmgFin`）・`js/rs/core.js`（`RSC`）・データ `js/rs/data.js`（`RSD`） | — |
 | 戦闘の行動演出の流れ（戦闘開始・技名の吹き出し・暗転・共通の技の演出・数字・撃破） | `js/battle/flow.js`（`BFLOW`）。見出し・状態・数字の表示の枠（キャラごとに固定の 3 段）は `js/ui/battle-pop.js`（`BPOP`。v24 dmgPop・v25 fxPop を置き換え）、流れの決まりは `docs/BATTLE-FLOW.md`、書式（金属の見出し・筆の属性）は `js/ui/damage.js`、撃破の赤い崩れは `js/ver19.js dissolve` | `css/ui/battle-flow.css`・`css/ui/battle-pop.css`・`css/ui/damage.css` |
 | 演出・モーション（技ごとの専用演出） | `js/battle/*`（`BX*`）・`js/battle/data/fx-heroes-*.js` → スキル `rpg-hero-motion` | — |
 | 文字のフォント（全画面で統一） | 本文＝M PLUS 1p、コマンド（ボタン・技名・名前・見出し・タブ）＝Kaisei Tokumin（`css/ui/font.css` の `--cmd`）。キャンバスの数字・英字＝`js/v24-text.js FONT` | `css/ui/font.css` |

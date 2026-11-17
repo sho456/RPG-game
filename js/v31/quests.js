@@ -85,7 +85,7 @@ function waveBanner0(boss){try{if(scene!=='battle'||!QR)return;const st=$('#stag
 /* ---------- 進行 ---------- */
 function qStart(c,q){if(!G.party.length)return;healAll();LV0=null;G.sorties++;let vd=false;try{vd=c.tab===0&&voidArea(G.sorties)===c.area;}catch(e){}
  QR={c,q,wave:0,vd,tot:{xp:0,gold:0,tou:0,items:0,chests:[]},lv0:Object.fromEntries(G.members.map(id=>[id,G.h[id].lv]))};save();
- const go=()=>runWave();if(q.pre&&!QS().seen[q.id]){QS().seen[q.id]=1;save();talk(q.pre,go);}else go();}
+ const go=()=>runWave();/* ver0.49：ストーリーは設定（q.pre のデータ）だけ残し、クエストの前には出さない */if(q.pre&&!QS().seen[q.id]){QS().seen[q.id]=1;save();}go();}
 function runWave(){const{c,q}=QR,w=waveOf(q.w[QR.wave]),lv=w.lv||q.lv;let list=w.e.map(kindOf).map(k=>({kind:k,lv}));
  if(QR.vd)list=list.map(e=>ED[e.kind]&&ED[e.kind].boss?e:{kind:voidKind(e.kind),lv:Math.max(e.lv+18,56)});
  const boss=list.some(e=>ED[e.kind]&&ED[e.kind].boss)||!!w.stages||!!w.ev,rk=list.map(e=>rankOf(e.kind)).includes('big')?'big':list.some(e=>rankOf(e.kind)==='mid')||w.ev?'mid':'';
@@ -139,16 +139,18 @@ function recruitAsk(P,done){const id=P.who;ovShow(`<div class="qr31"><img src="$
  $('#qy').onclick=()=>{SFX.aw();G.flags[P.flag]=1;newMember(id);save();toastMsg(`<b>${HB[id].name}が仲間になった！</b>`+(G.party.includes(id)?'':'（控えに入った）'));done();};
  $('#qn').onclick=()=>{SFX.sel();G.flags[P.flag]=1;G.declined=[...(G.declined||[]),id];save();toastMsg(P.decline||'');done();};}
 let TOAST='';const toastMsg=h=>{TOAST=h;};
+/* ver0.49：クエストの前後の会話（ストーリー）は表示しない。台詞のデータ（設定）は残し、続きの処理だけを進める */
+const NOTALK=(lines,done)=>done();
 function runPost(p,done){const P=POST[p];
- if(p==='crow'){if(G.flags.crowChoice)return done();talk([[null,'n','クロウは膝をついた。体から虚蝕が抜けていく。'],['crow','s','……とどめを刺せ。虚蝕に家族を喰われ、俺も喰われた。生きる理由なんて、もう――']],()=>{
+ if(p==='crow'){if(G.flags.crowChoice)return done();NOTALK([[null,'n','クロウは膝をついた。体から虚蝕が抜けていく。'],['crow','s','……とどめを刺せ。虚蝕に家族を喰われ、俺も喰われた。生きる理由なんて、もう――']],()=>{
    ovShow(`<div class="qr31"><img src="${art('crow')}"><b>クロウ</b><small>どうする？</small><button class="big gold" id="qy">救う</button><button class="big" id="qn">見逃す</button></div>`,'qr31ov');
    $('#qy').onclick=()=>{SFX.aw();G.flags.crowChoice='save';newMember('crow');save();toastMsg('<b>クロウが仲間になった！</b> 「……物好きだな。借りは、虚蝕で返す」');done();};
    $('#qn').onclick=()=>{SFX.sel();G.flags.crowChoice='leave';const s=addLoot(genItem(23,3));save();toastMsg(`クロウは無言で去っていった。足元に${s}が残されていた。`);done();};});return;}
- if(/^echo_/.test(p)){const id=p.slice(5);G.flags.echo=G.flags.echo||{};const pg=(typeof ECHO!=='undefined'&&ECHO[id])||[];G.flags.echo[id]=1;if(id==='c')G.flags.zenkyo=1;save();talk(pg.map(t=>[null,'n',t]),()=>{toastMsg(Object.keys(G.flags.echo).length>=3?'<b>星核の扉が開いた。</b>最後のクエスト「星核の扉」へ。':`残響はあと${3-Object.keys(G.flags.echo).length}つ。`);done();});return;}
+ if(/^echo_/.test(p)){const id=p.slice(5);G.flags.echo=G.flags.echo||{};const pg=(typeof ECHO!=='undefined'&&ECHO[id])||[];G.flags.echo[id]=1;if(id==='c')G.flags.zenkyo=1;save();NOTALK(pg.map(t=>[null,'n',t]),()=>{toastMsg(Object.keys(G.flags.echo).length>=3?'<b>星核の扉が開いた。</b>最後のクエスト「星核の扉」へ。':`残響はあと${3-Object.keys(G.flags.echo).length}つ。`);done();});return;}
  if(p==='ending'){if(G.flags.endSeen)return done();try{$('#ov').classList.remove('qc31ov','qi31ov','qr31ov');}catch(e){}ending();return;}
  if(!P)return done();
  if(P.who&&G.members.includes(P.who)){G.flags[P.flag]=1;return done();}
- talk(P.lines,()=>{if(!P.who)return done();if(P.auto){G.flags[P.flag]=1;newMember(P.who);SFX.aw();save();toastMsg(`<b>${HB[P.who].name}が仲間になった！</b>`+(G.party.includes(P.who)?'':'（控えに入った）'));return done();}recruitAsk(P,done);});}
+ NOTALK(P.lines,()=>{if(!P.who)return done();if(P.auto){G.flags[P.flag]=1;newMember(P.who);SFX.aw();save();toastMsg(`<b>${HB[P.who].name}が仲間になった！</b>`+(G.party.includes(P.who)?'':'（控えに入った）'));return done();}recruitAsk(P,done);});}
 
 /* ---------- クエスト一覧の画面 ---------- */
 const QM={on:false,tab:0,ch:{},sel:null,cur:null,bgs:{},st:new Map(),view:'list'};

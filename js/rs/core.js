@@ -151,6 +151,7 @@ function effTxt(e){const c=e.c?cn(e.c):'',cc=c?`${c}、`:'',ON={self:'自分',al
   case'taunt':return'敵に狙われやすい';case'hits':return`連撃の技・術の回数+${e.v}`;case'pierce':return`敵の防御・精神を${e.v}%無視`;
   case'stack':return`${e.c==='same'?'同じ敵を続けて攻撃するたび':'攻撃するたび'}与ダメ+${e.v}%（最大${e.max||5}回）`;case'rage':return`攻撃を受けるたび与ダメ+${e.v}%（最大${e.max||5}回）`;
   case'healprot':return`回復した味方の被ダメ-${e.v}%（2T）`;case'delay':return`${cc}${pc(e.p)}で当てた敵の行動を遅らせる`;case'allybp0':return`味方全体の初期BP+${e.v}`;case'allybpr':return`味方全体の毎ターンのBP回復+${e.v}`;
+  case'xf':return`${c?c+'、':'攻撃時、'}エクストラフォース+${e.v}%`;case'allyxf':return`${c?c+'、':''}味方全体のエクストラフォース+${e.v}%`;
   case'allydmg':return`${cc}味方全体の与ダメ+${e.v}%`;case'awturn':return`星臨の持続+${e.v}ターン`;
   case'allycut':return`味方全体の被ダメ-${e.v}%`;case'tstart':return e.k==='shield'?`毎ターンの始めに、${ON[e.on]||'自分'}に最大HP${e.v}%の障壁`:`毎ターンの始めに、${ON[e.on]||'自分'}の${STN7[e.k]||e.k}+${e.v}%（1T）`;
   case'cover':return`HPが半分以下の味方への単体攻撃を${pc(e.v)}でかばう`;case'actbp':return`${cc}行動のあとBP+${e.v}`;case'prio1':return'1ターン目は最初に行動';

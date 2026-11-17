@@ -44,6 +44,7 @@ const T={
  '巻き戻す':['巻き戻し','星臨した瞬間の味方のHP・気絶の状態に戻す'],
  '能力ダウン状態':['能力ダウン','攻撃・防御・魔力・精神・素早さ・会心率が下がっている状態（弱体の一部）'],
  '状態異常':['状態異常','毒・スタン・マヒ・暗闇'],
+ 'エクストラフォース':['エクストラフォース','【補助効果】条件を満たした攻撃で、最終ダメージにさらに掛かる別枠の倍率。同じ条件のものは重ならず（高い方だけ）、違う条件のものは同じ枠で足し合わせる。攻撃強化が高いほど、同じ数値の攻撃強化より伸びが大きい'],
  '練達':['練達','技・術を錬磨石で 3 段階まで強くする。技・術の詳細の窓から行う']};
 /* 固有名の特殊効果・名前付きの追撃（自動で登録） */
 const SP={},NM={'解癒(1回)':['解癒(1回)','[ターン終了時] 次の効果が発動する（上限 1 回）：自身のすべての状態異常を解除する／自身の攻撃・防御・魔力・精神・素早さの能力ダウン状態を解除する／自身のHPを回復する（効果極小）','練達の効果']};
@@ -56,9 +57,13 @@ let RX=null;
 function rx(){if(RX)return RX;reg();const ks=Object.keys(T).sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
  RX=new RegExp(`【([^】]+)】|「([^」]+)」|(${ks.join('|')})`,'g');return RX;}
 /* 本文の用語を包む（入力はエスケープ済みの文字列） */
-function mark(html){if(!html)return'';return String(html).replace(rx(),(m,sp,nm,w)=>{
-  if(sp)return SP[sp]?`<b class="kw sp" data-kw="sp:${esc(sp)}">【${sp}】</b>`:m;
-  if(nm)return NM[nm]?`<b class="kw nm" data-kw="nm:${esc(nm)}">「${nm}」</b>`:m;
+/* ver0.49：【名前】「名前」のすぐ後ろに、その説明が地の文で書いてあるときは、タップの印を付けない（吹き出しと同じ説明が二重に出るため）。名前は太字だけ */
+const nz=t=>String(t||'').replace(/<[^>]*>/g,'').replace(/[\s　。、・／（）()]/g,'');
+function dup(v,rest){if(!v)return false;const d=nz(v[1]).replace(/^奥義/,''),r=nz(rest);return d.length>=4&&r.length>=4&&(r.startsWith(d.slice(0,6))||d.startsWith(r.slice(0,6)));}
+function mark(html){if(!html)return'';return String(html).replace(rx(),(m,sp,nm,w,off,str)=>{
+  const rest=String(str).slice(off+m.length);
+  if(sp)return SP[sp]?(dup(SP[sp],rest)?`<b class="kwn sp">【${sp}】</b>`:`<b class="kw sp" data-kw="sp:${esc(sp)}">【${sp}】</b>`):m;
+  if(nm)return NM[nm]?(dup(NM[nm],rest)?`<b class="kwn nm">「${nm}」</b>`:`<b class="kw nm" data-kw="nm:${esc(nm)}">「${nm}」</b>`):m;
   return`<b class="kw" data-kw="${esc(w)}">${w}</b>`;});}
 /* エスケープしてから包む */
 const markT=s=>mark(esc(s));

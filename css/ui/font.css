@@ -30,11 +30,4 @@ html,body,#app,#app *,#sheet *,#ov *{font-family:var(--font) !important}
 #tap44{position:absolute;left:0;right:0;top:36%;text-align:center;font-family:var(--cmd) !important;font-weight:700;font-size:18px;letter-spacing:.3em;color:#ffe9a0;text-shadow:0 0 10px #000,0 0 4px #000;animation:tap44 1.3s ease-in-out infinite;pointer-events:none}
 @keyframes tap44{50%{opacity:.25}}
 
-/* ver0.46g 戦闘の下のボタン（通常AUTO・全力AUTO・リピート）：細い明朝が金地で読みにくかったため、太いゴシックに。
-   「AUTO」は幾何学的な欧文（Jost）で大きく、下の小さな説明は太字で濃く */
-#app.v38 #bbar.b38 button{font-family:"M PLUS 1p",sans-serif !important;font-weight:900;font-size:14px;letter-spacing:.02em;line-height:1.05}
-#app.v38 #bbar.b38 button .lt{font-family:"Jost","M PLUS 1p",sans-serif;font-style:italic;font-weight:700;font-size:15px;letter-spacing:.04em;margin-left:1px}
-#app.v38 #bbar.b38 button small{font-family:"M PLUS 1p",sans-serif !important;font-size:10px;font-weight:800;margin-top:2px;letter-spacing:0}
-#app.v38 #bbar.b38 .au{text-shadow:0 1px 0 rgba(255,250,225,.75)}
-#app.v38 #bbar.b38 .au small{color:#4a2c00}
-#app.v38 #bbar.b38 .rp{text-shadow:0 1px 1px rgba(0,0,0,.6)}
+/* 戦闘の下のボタン（戻る・AUTO・リピート）の書体は css/v38.css の「下の帯」にまとめた（ver0.49） */
