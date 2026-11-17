@@ -239,6 +239,176 @@ def hour_pos(x, y, r, i):
 
 
 
+# ---------------- 絵の部品を体の奥・手前に重ねる描画（fxlib の frame に props_back / props_front を足したもの） ----------------
+def frame_v4(sk, tl, i):
+    c = X.Ctx(sk, tl, i)
+    t = c.t
+    hh = sk.hero(t)
+    sk.draw(c, hh)
+    ekw, kb = sk.enemy(c)
+    shiver = (4 if i % 2 else -4) if c.frozen else 0
+    ex = EN_X - kb + shiver
+    lift = clamp(1 - (GROUND - hh['f']) / 260)
+    c.FB.puff(hh['x'], GROUND + 6, 40 * lift + 1, 8 * lift + .6, .5 * lift, (6, 4, 8))
+    c.FB.puff(ex, GROUND + 12, 96, 15, .55 * (1 - ekw.get('dissolve', 0)), (6, 4, 8))
+    base = X.BG * sk.dark(t)
+    nt = sk.night(t)
+    if nt:
+        base = base * (1 - nt) + X.NIGHT_BG * nt * min(1.0, sk.dark(t) + .35)
+    base = c.B.apply(base)
+    base = c.FB.apply(base)
+    base = X.paste(base, X.ENEMY, ex, GROUND + 12, **ekw)
+    pb = getattr(sk, 'props_back', None)
+    if pb:
+        base = pb(c, hh, base)
+    if hh['g']:
+        for j, al in enumerate((.8, .52, .32, .16)):
+            g = sk.hero(t - (j + 1) * .024)
+            if abs(g['x'] - hh['x']) + abs(g['f'] - hh['f']) > 6:
+                base = X.paste(base, sprite(g), g['x'], g['f'] + 8, alpha=al, glow=sk.ghost)
+    base = X.paste(base, sprite(hh), hh['x'], hh['f'] + 8)
+    pf = getattr(sk, 'props_front', None)
+    if pf:
+        base = pf(c, hh, base)
+    base = c.FF.apply(base)
+    base = c.F.apply(base)
+    white, tint, ta, dx, dy, z, zc = X.camera(sk, tl, c.rt)
+    if ta:
+        base = 255 - (255 - base) * (1 - np.array(tint) / 255 * ta)
+    if white:
+        base = base * (1 - white) + 255 * white
+    img = Image.fromarray(np.clip(base, 0, 255).astype(np.uint8))
+    img = X.apply_camera(img, dx, dy, z, zc)
+    sk.ui(c, img)
+    return img
+
+
+_frame0 = frame_v4
+
+
+# ---------------- pixelfx のスプライトシート（bake_fx.sh で焼く） ----------------
+import json  # noqa: E402
+FXD = os.path.join(HERE, 'out', 'fx')
+
+
+class Sheet:
+    """pixelfx のシートを時刻で引く。scale＝1 ドットの画面 px。pivot が置く点"""
+    _cache = {}
+
+    def __init__(self, name):
+        d = os.path.join(FXD, name)
+        js = [os.path.join(r, f) for r, _, fs in os.walk(d) for f in fs if f.endswith('.json')][0]
+        j = json.load(open(js))
+        p = j['meta']['pixelfx']
+        im = Image.open(js[:-5] + '.png').convert('RGBA')
+        fw, fh = p['frameSize']
+        cols = p['columns']
+        self.frames = [im.crop(((k % cols) * fw, (k // cols) * fh, (k % cols + 1) * fw, (k // cols + 1) * fh)) for k in range(p['frames'])]
+        self.fps, self.loop, self.pivot, self.size = p['fps'], p['loop'], p['pivot'], (fw, fh)
+
+    def at(self, a):
+        n = len(self.frames)
+        k = int(a * self.fps)
+        if self.loop:
+            return self.frames[k % n]
+        return self.frames[k] if 0 <= k < n else None
+
+    def put(self, base, a, x, y, scale=4, alpha=1.0, mirror=False, add=False):
+        """a：始まってからの秒。x, y：pivot を置く画面の位置"""
+        if a < 0:
+            return base
+        f = self.at(a)
+        if f is None:
+            return base
+        key = (id(f), scale, mirror)
+        g = Sheet._cache.get(key)
+        if g is None:
+            g = f.resize((f.width * scale, f.height * scale), Image.NEAREST)
+            if mirror:
+                g = g.transpose(Image.FLIP_LEFT_RIGHT)
+            Sheet._cache[key] = g
+        px, py = self.pivot
+        if mirror:
+            px = f.width - px
+        cx = x - px * scale + g.width / 2
+        foot = y - py * scale + g.height
+        if add:
+            return X.paste(base, g, cx, foot, alpha=alpha, add=(255, 255, 255))
+        return X.paste(base, g, cx, foot, alpha=alpha)
+
+
+FX = {}
+for _n in ('aura', 'halo', 'rune', 'timestop', 'slowed', 'starfall', 'pillar', 'burst', 'shield', 'charge'):
+    try:
+        FX[_n] = Sheet(_n)
+    except (IndexError, FileNotFoundError):
+        pass
+
+
+# ---------------- 砂時計（ドット絵の部品：金の枠・星の飾り・ガラスの照り・積もる砂・落ちる砂の筋） ----------------
+def hourglass(fill, t, crack=0.0):
+    """30×46 のドット絵。fill＝下に落ちた砂の割合（0〜1）"""
+    w, h = 30, 46
+    a = np.zeros((h, w, 4), np.uint8)
+    K, G1, G2, G3, G4 = (24, 16, 40), (110, 70, 20), (190, 140, 40), (245, 205, 90), (255, 245, 200)
+    GL, GH = (150, 140, 220), (235, 230, 255)
+    S1, S2, S3 = (120, 80, 200), (190, 160, 255), (240, 230, 255)
+    def P(x, y, c, al=255):
+        if 0 <= x < w and 0 <= y < h:
+            a[y, x] = (*c, al)
+    # 上下の板（金・3 段の陰）
+    for y0 in (0, h - 5):
+        for y in range(y0, y0 + 5):
+            for x in range(1, w - 1):
+                edge = y in (y0, y0 + 4) or x in (1, w - 2)
+                P(x, y, K if edge else (G4 if y == y0 + 1 else G3 if y == y0 + 2 else G2))
+        P(w // 2, y0 + 2, (255, 255, 255))                          # 中央の星
+        for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+            P(w // 2 + dx, y0 + 2 + dy, G4)
+    # 左右の柱
+    for y in range(5, h - 5):
+        for x in (3, w - 4):
+            P(x - 1, y, K); P(x, y, G3 if x == 3 else G2); P(x + 1, y, K)
+    # ガラス：上下のふくらみ（くびれは中央）
+    mid = h // 2
+    def half_w(y):
+        d = abs(y - mid) / (mid - 5)
+        return 1 + int(9 * math.sin(min(1, d) * math.pi / 2) ** .8)
+    top_sand = 1 - fill
+    for y in range(5, h - 5):
+        hw = half_w(y)
+        cx = w // 2
+        for x in range(cx - hw, cx + hw + 1):
+            edge = abs(x - cx) == hw
+            if edge:
+                P(x, y, GL)
+                continue
+            col, al = (60, 50, 120), 90                              # ガラスの中（うっすら）
+            if y < mid:                                              # 上：残りの砂（下側から減る＝上の面が下がる）
+                level = mid - (mid - 6) * top_sand
+                if y >= level:
+                    col, al = ((S2, S3, S2, S1)[(x * 7 + y * 13 + (x * y) % 5) % 4]), 255
+            else:                                                    # 下：積もる山
+                pile = (h - 6) - (mid - 6) * fill * (1 - .6 * abs(x - cx) / 9)
+                if y >= pile:
+                    col, al = (S1 if y > pile + 2 else S2), 255
+            P(x, y, col, al)
+        if y < mid - 1:                                              # 照り（左上の縦の線）
+            P(cx - hw + 2, y, GH, 200)
+    if 0 < fill < 1:                                                 # 落ちる砂の筋（ちらつく）
+        for y in range(mid - 1, h - 6):
+            if (y + int(t * 40)) % 3:
+                P(w // 2, y, S3)
+    if crack > 0:                                                    # ひび
+        rnd = random.Random(3)
+        for _ in range(int(14 * crack)):
+            x, y = w // 2 + rnd.randint(-6, 6), mid + rnd.randint(-12, 12)
+            for _ in range(5):
+                P(x, y, (255, 255, 255))
+                x += rnd.choice((-1, 0, 1)); y += rnd.choice((-1, 1))
+    return Image.fromarray(a, 'RGBA')
+
+
 # =============== 刻の矢（第 2 版：夜空の大時計 → 跳んで 3 連の針の矢 → 12 の星から一斉の矢・スローで両断の光柱） ===============
 SKX, SKY, SKR = W / 2 - 40, 190, 150          # 空の大時計
 
@@ -275,6 +445,13 @@ class Kokunoya(X.Skill):
         if t < 3.06:
             return hero(fr('turn', t - 2.76, .06, False), HOME_X, GROUND - 12 * math.sin(clamp((t - 2.76) / .3) * math.pi))
         return idle(t)
+
+    def props_front(self, c, hh, base):
+        t = c.t
+        if 'charge' in FX and .45 <= t < 1.36:
+            gx, gy = tip(hh)
+            base = FX['charge'].put(base, t - .45, gx + 10, gy + 14, 3, alpha=clamp((t - .45) / .15), mirror=True)
+        return base
 
     def cam(self, t):
         return camk(t, [(.4, 1, W / 2, H / 2), (.95, 1.16, HOME_X - 30, GROUND - 120), (1.34, 1.2, HOME_X - 30, GROUND - 130),
@@ -382,13 +559,13 @@ class Kokunoya(X.Skill):
 
 # =============== 遅延の砂（第 2 版：大きな砂時計が裏返る → 渦を巻く星の砂 → 時計の檻 → 時間停止（紫の単色で止まる）→ 砕ける） ===============
 class Chien(X.Skill):
-    name, dur = '遅延の砂', 4.5
+    name, dur = '遅延の砂', 5.2
     ghost = (150, 120, 255)
-    HIT, STOP = 1.85, 2.35
-    hits = [X.Hit(1.85, 2, ECX, ECY, 0, 1, stop=4, tint=VIO), X.Hit(2.35, 3, ECX, ECY, 0, 0, stop=24, z=.07, tint=VIO)]
+    HIT, STOP = 1.85, 3.05
+    hits = [X.Hit(1.85, 2, ECX, ECY, 0, 1, stop=4, tint=VIO), X.Hit(3.05, 3, ECX, ECY, 0, 0, stop=24, z=.07, tint=VIO)]
 
     def dark(self, t):
-        d = X.dim(t, .30, 3.3, .45)
+        d = X.dim(t, .30, 4.0, .45)
         if 1.10 <= t < 1.18:
             d *= .12
         return d
@@ -401,7 +578,7 @@ class Chien(X.Skill):
         h = cast_pose(t, .62, 1.10)
         if h:
             return h
-        if t < 2.9:
+        if t < 3.6:
             a = t - 1.10
             if a < .3:
                 return act_pose(t, 1.10, HOME_X, GROUND, 30 * math.sin(clamp(a / .3) * math.pi))
@@ -410,7 +587,26 @@ class Chien(X.Skill):
 
     def cam(self, t):
         return camk(t, [(.3, 1, W / 2, H / 2), (.7, 1.12, HOME_X - 20, GROUND - 120), (1.1, 1.12, HOME_X - 20, GROUND - 120),
-                        (1.3, 1.14, ECX + 40, ECY - 110), (2.2, 1.18, ECX + 40, ECY - 60), (2.36, 1, W / 2, H / 2)])
+                        (1.3, 1.16, ECX + 40, ECY - 130), (2.0, 1.12, ECX + 40, ECY - 80), (2.9, 1.2, ECX + 30, ECY - 40), (3.06, 1, W / 2, H / 2)])
+
+    def props_front(self, c, hh, base):
+        t = c.t
+        hx, hy = ECX + 10, ECY - 215
+        k = ease((t - 1.10) / .25) * (1 - ease((t - self.STOP) / .05))
+        if k > 0:                                  # ドット絵の砂時計：現れる → 裏返る → 砂が落ちる → ひび
+            fill = clamp((t - 1.6) / 1.3)
+            img = hourglass(fill if t >= 1.6 else 0, t, crack=clamp((t - 2.75) / .3))
+            img = img.resize((img.width * 4, img.height * 4), Image.NEAREST)
+            rot = -180 * (1 - ease((t - 1.30) / .3)) + 5 * math.sin(t * 3)
+            img = img.rotate(rot, resample=Image.BICUBIC, expand=True)
+            if k < 1:
+                img = img.resize((max(1, int(img.width * (.3 + .7 * k))), max(1, int(img.height * (.3 + .7 * k)))), Image.NEAREST)
+            base = X.paste(base, img, hx, hy + img.height / 2, alpha=min(1, k * 1.2))
+        if 'timestop' in FX and self.HIT <= t < self.STOP + 1.4:   # 時が止まる文字盤（pixelfx：1.2 秒目から＝ひびが STOP に合う）
+            base = FX['timestop'].put(base, t - self.HIT + 1.2, ECX, GROUND + 10, 3)
+        if 'slowed' in FX and t >= self.STOP + .5:              # 遅くなった印が残る
+            base = FX['slowed'].put(base, t, ECX + 10, GROUND - 20, 3, alpha=clamp((t - self.STOP - .5) / .3))
+        return base
 
     def post(self, t, img):
         """時間停止：紫の単色で止まる（0.4 秒）→ ひびの白い線が走って色が戻る"""
@@ -428,31 +624,19 @@ class Chien(X.Skill):
             dial(B, HOME_X, GROUND + 6, 100, ease((t - .32) / .3) * (1 - ease((t - 2.7) / .3)), t, hand=t * 5, ticks=clamp((t - .32) / .6))
         X.gather(c, gx, gy, .40, 1.08, seed=5, big=1.0, cols=(VIO, BLUE), flame=False)
         X.glint(F, gx, gy, t, 1.08, .16, 70)
-        # 大きな砂時計：組み上がる → 1.30 で裏返る（180° 回る）→ 砂が落ちる
-        hx, hy = ECX, ECY - 210
-        k = ease((t - 1.10) / .25) * (1 - ease((t - 2.32) / .05))
-        if k > 0:
-            s = 70 * k
-            tilt = math.pi * ease((t - 1.30) / .3) + math.radians(6 * math.sin(t * 3))
-
-            def P(px, py):
-                return hx + px * math.cos(tilt) - py * math.sin(tilt), hy + px * math.sin(tilt) + py * math.cos(tilt)
-            F.push()
-            for yy in (-1.2, 1.2):
-                F.line([P(-s, s * yy), P(s, s * yy)], PALE, 5, k, glow=6)
-            F.line([P(-s * .8, -s * 1.2), P(0, -3), P(-s * .8, s * 1.2)], VIO, 4, k, glow=8)
-            F.line([P(s * .8, -s * 1.2), P(0, -3), P(s * .8, s * 1.2)], VIO, 4, k, glow=8)
-            fill = clamp((t - 1.6) / .7)
-            F.poly([P(-s * .6 * (1 - fill), s * (1 - fill) + 3), P(s * .6 * (1 - fill), s * (1 - fill) + 3), P(0, 3)], mul(PALE, .85), k * (1 - fill))
-            F.poly([P(-s * .7, -s * 1.15), P(s * .7, -s * 1.15), P(0, -s * 1.15 + s * .9 * fill)], mul(VIO, .9), k)
-            for e in (-1.2, 1.2):
-                X.star_flash(F, *P(0, s * e + 10 * e), 46 * k, k, rot=t * 60, col=X.WHITE, sub=BLUE)
+        hx, hy = ECX + 10, ECY - 215
+        k = ease((t - 1.10) / .25) * (1 - ease((t - self.STOP) / .05))
+        if k > 0:                                  # 砂時計の後ろの光と、まわりを回る星
+            B.disc(hx, hy, 46 * k, mul(VIO, .45), .5 * k, glow=1.8)
+            for i in range(6):
+                ang = t * 2 + i * math.tau / 6
+                F.star(hx + math.cos(ang) * 110 * k, hy + math.sin(ang) * 40 * k, 12, 1.6, PALE, .8 * k, rot=t * 90)
         # 渦を巻く星の砂（らせんで降りる）
-        if 1.55 <= t < 2.35:
+        if 1.55 <= t < 3.0:
             rnd = random.Random(7)
             F.push()
             for i in range(260):
-                t0 = 1.55 + rnd.uniform(0, .7)
+                t0 = 1.55 + rnd.uniform(0, 1.35)
                 u = (t - t0) / .45
                 if not 0 <= u <= 1:
                     continue
@@ -468,8 +652,6 @@ class Chien(X.Skill):
         # 命中：時計の檻（敵を囲む縦の文字盤）・遅い波紋
         a = t - self.HIT
         if a >= 0:
-            kk = clamp(a / .15) * (1 - clamp((t - self.STOP - .05) / .05))
-            dial(F, ECX, ECY, 130, kk, t, hand=2 * (1 - math.exp(-a * 1.5)), flat=False)
             for j in range(3):
                 q = clamp((a - j * .2) / 1.4)
                 B.ring(ECX, GROUND + 10, 30 + 230 * eout(q), (30 + 230 * eout(q)) * .22, 3, (VIO, BLUE, PALE)[j], (1 - q) * .9)
@@ -596,6 +778,13 @@ class Kasoku(X.Skill):
             X.parts(F, HOME_X, GROUND, t - 2.2, 40, 1.4, BLUE, 100, 55, 'ember', up=3.0, spread=(240, 300))
             X.glint(F, *tip(hh), t, 2.5, .24, 56)
 
+    def props_front(self, c, hh, base):
+        t = c.t
+        if 'shield' in FX and t >= self.BURST:
+            k = clamp((t - self.BURST) / .15)
+            base = FX['shield'].put(base, t, hh['x'], hh['f'] + 4, 4, alpha=.85 * k)
+        return base
+
     def enemy(self, c):
         return {}, 0
 
@@ -711,34 +900,68 @@ class Hidan(X.Skill):
         m.chime(T(self.H2 + .8), [3000, 2600, 2200, 1800], .16, .08)
 
 
-# =============== 星臨奥義「終焉の大時計」（変身 → カットイン → 銀河へ昇る → 天空の大時計と星座 → 巻き戻し → 時間停止 → 12 の星の槍と大時計の針が落ちる → 画面が砕ける） ===============
-GX, GY, GR = W / 2 - 50, 250, 255             # 天空の大時計
+# =============== 星臨奥義「終焉の大時計」第 2 版（星臨だけの部品で組む：天球儀の時計・金の陣・星の雨・超新星。通常の文字盤・着弾は使わない） ===============
+GX, GY, GR = W / 2 - 50, 250, 255             # 天球儀の時計
 GOLDC = (255, 214, 120)
 
 
+def armillary(L, x, y, r, k, t, hand, lit=1.0):
+    """天球儀の時計：外の金の環＋12 の金の星・3D に回る 3 本の環（金・紫・青）・中心の渦巻く銀河・金の長針と短針"""
+    if k <= .01:
+        return
+    L.ring(x, y, r * k, r * k, 4, GOLDC, .9 * k, soft=5)
+    L.ring(x, y, r * .93 * k, r * .93 * k, 1, PALE, .6 * k, soft=3)
+    for j, (sp, col, ax) in enumerate(((.9, GOLDC, 'y'), (-.7, VIO, 'y'), (.5, BLUE, 'x'))):
+        q = abs(math.sin(t * sp + j * 1.3))
+        rx, ry = (r * .82 * k, r * .82 * k * max(.08, q)) if ax == 'y' else (r * .82 * k * max(.08, q), r * .82 * k)
+        L.ring(x, y, rx, ry, 3, col, .8 * k, soft=4)
+    rnd = random.Random(4)                       # 渦巻く銀河（2 本の腕）
+    L.push()
+    for i in range(160):
+        arm = i % 2
+        u = rnd.random()
+        ang = arm * math.pi + u * 4.2 + t * 1.6
+        rr = r * .62 * k * u ** .8
+        px, py = x + math.cos(ang) * rr + rnd.uniform(-6, 6), y + math.sin(ang) * rr * .85 + rnd.uniform(-6, 6)
+        col = (PALE, VIO, BLUE, GOLDC)[i % 4]
+        L.ds.rectangle([px - 1, py - 1, px + 1, py + 1], fill=mul(col, k * (1 - u * .5)))
+    L.disc(x, y, 7 * k, X.WHITE, k, glow=2.2)
+    for i in range(12):                          # 12 の金の星（灯った分だけ）
+        if (i + 1) / 12 <= lit:
+            px, py = hour_pos(x, y, r * k, i)
+            L.star(px, py, 16 if i % 3 == 0 else 10, 2, GOLDC, k, rot=t * 40)
+            L.disc(px, py, 4, X.WHITE, k, glow=2.5)
+    for ln, sp, wd in ((.75, 1.0, 6), (.48, 1 / 12, 8)):
+        a = hand * sp - math.pi / 2
+        ex, ey = x + math.cos(a) * r * ln * k, y + math.sin(a) * r * ln * k
+        L.line([(x, y), (ex, ey)], GOLDC, wd, k, glow=6)
+        L.line([(x, y), (ex, ey)], X.WHITE, 2, k, glow=2)
+        L.star(ex, ey, 14, 2, GOLDC, k)
+
+
 class Shuen(X.Skill):
-    name, dur = '終焉の大時計', 7.6
-    ghost = (190, 150, 255)
-    AW, RISE, REW, STOP, FALL, HAND = .95, 1.95, 3.05, 3.70, 3.86, 4.30
+    name, dur = '終焉の大時計', 8.2
+    ghost = (200, 160, 255)
+    AW, RISE, REW, STOP, FALL, HAND = .95, 2.0, 3.10, 3.75, 3.92, 4.40
     hits = ([X.Hit(.95, 2, HOME_X, GROUND - 100, 0, -1, stop=6, z=.06, tint=VIO)] +
-            [X.Hit(3.86 + i * .1, 1, ECX, ECY, -.3, 1, stop=2, z=0, tint=VIO) for i in range(4)] +
-            [X.Hit(4.30, 3, ECX, ECY, -.4, 1, stop=16, z=.12, tint=(220, 180, 255))])
-    slow = ((3.70, 3.84, .28), (4.26, 4.40, .4))
+            [X.Hit(3.98 + i * .11, 1, ECX, ECY, -.3, 1, stop=2, z=0, tint=GOLDC) for i in range(4)] +
+            [X.Hit(4.40, 3, ECX, ECY, -.4, 1, stop=16, z=.12, tint=GOLDC)])
+    slow = ((3.75, 3.90, .28), (4.36, 4.50, .4))
 
     def dark(self, t):
-        return X.dim(t, .25, 6.6, .62)
+        return X.dim(t, .25, 7.1, .62)
 
     def night(self, t):
-        return ease((t - .85) / .3) * (1 - ease((t - 6.3) / .6))
+        return ease((t - .85) / .3) * (1 - ease((t - 6.8) / .6))
 
     def cam(self, t):
         return camk(t, [(.3, 1, W / 2, H / 2), (.8, 1.22, HOME_X - 10, GROUND - 110), (1.0, 1.28, HOME_X - 10, GROUND - 110),
-                        (1.2, 1, W / 2, H / 2), (3.0, 1, W / 2, H / 2), (3.5, 1.08, GX, GY + 60), (3.84, 1.1, GX, GY + 80),
-                        (3.9, 1, W / 2, H / 2), (5.0, 1, W / 2, H / 2), (5.6, 1.1, ECX + 40, ECY - 40), (6.6, 1, W / 2, H / 2)])
+                        (1.2, 1, W / 2, H / 2), (3.0, 1, W / 2, H / 2), (3.55, 1.08, GX, GY + 60), (3.9, 1.1, GX, GY + 80),
+                        (3.96, 1, W / 2, H / 2), (5.1, 1, W / 2, H / 2), (5.6, 1.1, ECX + 40, ECY - 40), (6.4, 1.14, HOME_X - 20, GROUND - 110), (7.2, 1, W / 2, H / 2)])
 
     def post(self, t, img):
         a = np.asarray(img)
-        if self.REW <= t < self.STOP - .02:       # 巻き戻し：走査線が横にずれる・色が反転気味に揺れる
+        if self.REW <= t < self.STOP - .02:
             k = math.sin(clamp((t - self.REW) / (self.STOP - self.REW)) * math.pi)
             out = a.copy()
             ph = t * 90
@@ -747,128 +970,153 @@ class Shuen(X.Skill):
                 out[y:y + 3] = np.roll(a[y:y + 3], d, axis=1)
             out = (out * (1 - .25 * k) + (255 - out) * .25 * k * np.array([.5, .3, 1])).clip(0, 255).astype(np.uint8)
             return Image.fromarray(out)
-        if self.STOP <= t < self.FALL - .02:      # 時間停止：紫の単色
+        if self.STOP <= t < self.FALL - .02:
             g = a.astype(float).mean(2, keepdims=True)
-            return Image.fromarray(np.clip(g * np.array([.95, .72, 1.3]) + np.array([14, 0, 34]), 0, 255).astype(np.uint8))
+            return Image.fromarray(np.clip(g * np.array([1.05, .9, .7]) + np.array([30, 16, 0]), 0, 255).astype(np.uint8))  # 星臨の時間停止は金の単色
         return img
+
+    def awake(self, t):
+        return t >= self.AW + .04
 
     def hero(self, t):
         if t < .3:
             return idle(t)
-        if t < self.AW:                            # 星臨の前：浮いて光を集める
+        if t < self.AW:                            # 変身の前：浮いて光を集める（通常の詠唱）
             a = t - .3
             return hero(fr('cast', a, .07), HOME_X, GROUND - 20 * ease(a / .5) - 3 * math.sin(a * 9))
         if t < self.AW + .04:
             return dict(hero('aw_cast0', HOME_X, GROUND - 20), w=1)
-        if t < self.RISE:                          # 星臨：髪がはね上がり、服の星が瞬く
-            a = t - self.AW
-            return hero(fr('aw_cast', a, .08), HOME_X, GROUND - 20 - 4 * math.sin(a * 5))
-        if t < 2.9:                                # 銀河へ昇る（残像）
+        if t < self.AW + .4:                       # 星臨：くるりと回って姿を見せる
+            return hero(fr('aw_spin', t - self.AW, .07), HOME_X, GROUND - 20 - 10 * math.sin(clamp((t - self.AW) / .4) * math.pi))
+        if t < self.RISE:
+            return hero(fr('aw_float', t, .09), HOME_X, GROUND - 20 - 4 * math.sin(t * 5))
+        if t < 2.9:                                # 回りながら銀河へ昇る（残像）
             k = ease((t - self.RISE) / .9)
-            return hero(fr('aw_act', t - self.RISE, .08, False), HOME_X + (430 - HOME_X) * k, GROUND - 20 - 230 * k, g=1)
-        if t < self.FALL:                          # 空で詠唱（大時計を操る）
-            return hero(fr('aw_cast', t, .08), 430, GROUND - 250 - 5 * math.sin(t * 4))
-        if t < 4.7:                                # 振り下ろす
+            return hero(fr('aw_spin', t - self.RISE, .06), HOME_X + (430 - HOME_X) * k, GROUND - 20 - 230 * k, g=1)
+        if t < self.FALL:                          # 空で天球儀を操る（浮遊）
+            return hero(fr('aw_float', t, .09), 430, GROUND - 250 - 5 * math.sin(t * 4))
+        if t < 4.8:                                # 振り下ろす
             return hero(fr('aw_swing', t - self.FALL, .1, False), 430, GROUND - 250 + 20 * ease((t - self.FALL) / .4), g=1)
-        if t < 5.6:                                # ゆっくり降りる
-            k = ease((t - 4.7) / .9)
-            return hero(fr('aw_idle', t, .14), 430 + (HOME_X - 430) * k, GROUND - 230 * (1 - k))
-        if t < 5.8:
-            return hero(fr('land', t - 5.6, .07, False), HOME_X)
+        if t < 5.8:                                # ゆっくり降りる（回りながら）
+            k = ease((t - 4.8) / 1.0)
+            p = fr('aw_spin', t, .12) if k < .7 else fr('aw_float', t, .09)
+            return hero(p, 430 + (HOME_X - 430) * k, GROUND - 230 * (1 - k), g=1 if k < .7 else 0)
+        if t < 6.0:
+            return hero(fr('aw_land', t - 5.8, .07, False), HOME_X)
         return hero(fr('aw_idle', t, .16), HOME_X)
+
+    # ---- 星臨のまとい：足元の金の陣・体のまわりを昇る銀河の渦（奥）・頭上の光輪（手前）
+    def props_back(self, c, hh, base):
+        t = c.t
+        if 'pillar' in FX and .25 <= t < self.AW + 1.6:
+            base = FX['pillar'].put(base, t - .25, HOME_X, GROUND + 10, 3, alpha=1 - clamp((t - self.AW - 1.1) / .5))
+        if self.awake(t):
+            k = clamp((t - self.AW) / .3) * (1 - clamp((t - 7.4) / .6))
+            if 'rune' in FX:
+                base = FX['rune'].put(base, t, hh['x'], hh['f'] + 14, 2, alpha=.9 * k)
+            if 'aura' in FX:
+                base = FX['aura'].put(base, t, hh['x'], hh['f'] + 12, 2, alpha=.95 * k)
+        if 'rune' in FX and 2.3 <= t < self.HAND + .3:        # 敵の足元の金の陣（封印）
+            base = FX['rune'].put(base, t * 1.5, ECX, GROUND + 14, 3, alpha=clamp((t - 2.3) / .4) * (1 - clamp((t - self.HAND) / .3)))
+        return base
+
+    def props_front(self, c, hh, base):
+        t = c.t
+        if self.awake(t) and 'halo' in FX:
+            k = clamp((t - self.AW) / .3) * (1 - clamp((t - 7.4) / .6))
+            base = FX['halo'].put(base, t, hh['x'] + 6, hh['f'] - 70, 3, alpha=k)
+        if 'burst' in FX:
+            base = FX['burst'].put(base, t - (self.AW - .23), HOME_X, GROUND + 6, 3)
+            base = FX['burst'].put(base, t - (self.HAND - .23), ECX, GROUND + 10, 5)
+        if 'starfall' in FX:
+            base = FX['starfall'].put(base, t - (self.FALL - .35), ECX + 30, GROUND + 12, 3)
+        return base
 
     def draw(self, c, hh):
         t, F, B = c.t, c.F, c.B
-        gx, gy = tip(hh)
-        # ---- 1. 星臨（変身）：星の粒がらせんで集まる → 光の柱 → 輪がはじける
+        # ---- 1. 星臨（変身）：金と紫の星がらせんで集まる
         if .3 <= t < self.AW:
             u = (t - .3) / (self.AW - .3)
             rnd = random.Random(1)
             F.push()
-            for i in range(90):
+            for i in range(110):
                 a0 = rnd.uniform(0, math.tau)
-                r = 220 * (1 - u) ** 1.3 * rnd.uniform(.5, 1) + 8
+                r = 240 * (1 - u) ** 1.3 * rnd.uniform(.5, 1) + 8
                 ang = a0 + u * 6
                 x, y = HOME_X + math.cos(ang) * r, GROUND - 100 + math.sin(ang) * r * .6
-                F.star(x, y, 8, 1.2, (PALE, VIO, BLUE, GOLDC)[i % 4], .9, rot=45 * (i % 2))
-            dial(B, HOME_X, GROUND + 6, 120, ease(u / .4), t, hand=-t * 12, ticks=u)
-            F.beam(HOME_X, -10, GROUND, 10 + 30 * u, VIO, .5 * u)
+                F.star(x, y, 9, 1.3, (PALE, VIO, GOLDC, GOLDC)[i % 4], .9, rot=45 * (i % 2))
         a = t - self.AW
-        if 0 <= a < 1.0:
-            kb = clamp(a / .04) * (1 - clamp((a - .15) / .35))
-            F.beam(HOME_X, -10, GROUND + 10, 110 * kb, VIO, kb)
-            F.beam(HOME_X, -10, GROUND + 10, 40 * kb, X.WHITE, kb)
+        if 0 <= a < 1.0:                           # 解放：金の輪が 4 重に広がる・金の閃光
             for j in range(4):
                 q = clamp((a - j * .06) / .7)
-                F.ring(HOME_X, GROUND - 100, 30 + 620 * eout(q), (30 + 620 * eout(q)) * (.4 + .15 * j), 4, (VIO, BLUE, PALE, GOLDC)[j], 1 - q, soft=6)
-            X.star_flash(F, HOME_X, GROUND - 100, 420 * (1 - clamp(a / .4)) ** .4, 1 - clamp(a / .4), rot=a * 40, sub=VIO)
-            X.parts(F, HOME_X, GROUND - 100, a, 220, 12, PALE, 70, 201, star=True, size=(3, 6))
-            X.parts(F, HOME_X, GROUND - 40, a, 90, 3, GOLDC, 130, 202, 'ember', up=3.5, star=True, size=(3, 6))
-        if self.AW <= t < 6.8:                     # 星臨中：足元から昇る星の粒・体のまわりの光
-            X.parts(F, hh['x'], hh['f'], t - self.AW, 50, 1.5, PALE, 110, 203, 'ember', up=2.6, spread=(230, 310), star=True, size=(2, 4))
-            B.disc(hh['x'], hh['f'] - 95, 34, mul(VIO, .45), .35, glow=2.2)
-        # ---- 2. 天空の大時計：12 の星 → 星座の線でつながる → 外周の目盛り
-        k = ease((t - 2.1) / .6) * (1 - ease((t - 4.36) / .1))
+                F.ring(HOME_X, GROUND - 100, 30 + 620 * eout(q), (30 + 620 * eout(q)) * (.4 + .15 * j), 4, (GOLDC, VIO, PALE, GOLDC)[j], 1 - q, soft=6)
+            X.star_flash(F, HOME_X, GROUND - 100, 380 * (1 - clamp(a / .35)) ** .4, 1 - clamp(a / .35), rot=a * 40, col=X.WHITE, sub=GOLDC)
+            X.parts(F, HOME_X, GROUND - 40, a, 120, 3, GOLDC, 130, 202, 'ember', up=3.5, star=True, size=(3, 6))
+        if self.awake(t) and t < 7.6:              # 星臨中：体から昇る金と紫の星屑・後ろに伸びる光の尾
+            X.parts(F, hh['x'], hh['f'] - 20, t - self.AW, 70, 1.6, GOLDC, 90, 203, 'ember', up=2.8, spread=(230, 310), star=True, size=(2, 4))
+            X.parts(F, hh['x'], hh['f'] - 60, t - self.AW, 50, 1.2, VIO, 110, 204, 'ember', up=2.0, spread=(200, 340), star=True, size=(2, 3))
+            if hh['f'] < GROUND - 30:              # 空にいる間：足元から下へ流れる光の尾
+                F.line([(hh['x'] + 4, hh['f'] - 10), (hh['x'] + 14, hh['f'] + 60)], VIO, 10, .5, glow=10)
+        # ---- 2. 天球儀の時計
+        k = ease((t - 2.15) / .6) * (1 - ease((t - 4.46) / .1))
         if k > 0:
-            lit = clamp((t - 2.2) / .7)
+            lit = clamp((t - 2.25) / .7)
             hand = 1.0 - 30 * ease((t - self.REW) / (self.STOP - self.REW)) ** 1.5
             if t >= self.STOP:
-                hand = -29.0 + 2 * math.pi * 0
-            big_dial(B, GX, GY, GR, k, t, hand=hand, lit=lit, col=VIO, sub=BLUE)
+                hand = -29.0
+            armillary(B, GX, GY, GR, k, t, hand, lit)
             pts = [hour_pos(GX, GY, GR * k, i) for i in range(12)]
-            nl = int(12 * clamp((t - 2.5) / .6))
-            for i in range(nl):                    # 星座の線（1 つおきに結んで星形に）
-                p, q2 = pts[i], pts[(i + 5) % 12]
-                B.line([p, q2], mul(PALE, .7), 1, .7 * k, glow=4)
-            for i in range(12):
-                if (i + 1) / 12 <= lit:
-                    X.star_flash(F, *pts[i], 34 + 10 * math.sin(t * 8 + i), .8 * k, rot=t * 30, sub=VIO)
-            if self.REW <= t < self.STOP:          # 巻き戻し：画面の中心へ吸い込む線
-                F.speedlines(GX, GY, 50, GR * .9, PALE, .8, int(t * 60))
-        # 敵の足元の封印
-        if 2.3 <= t < 4.4:
-            dial(B, ECX, GROUND + 10, 170, ease((t - 2.3) / .4), t, hand=t * 6)
-        # ---- 3. 星の槍が 12 本降る（時間停止の明けから）
+            nl = int(12 * clamp((t - 2.55) / .6))
+            for i in range(nl):                    # 星座の線（金）
+                B.line([pts[i], pts[(i + 5) % 12]], mul(GOLDC, .6), 1, .7 * k, glow=4)
+            if self.REW <= t < self.STOP:
+                F.speedlines(GX, GY, 50, GR * .9, GOLDC, .8, int(t * 60))
+        # ---- 3. 12 の金の星が槍になって降る（星の雨はシート）
         for i in range(12):
-            t0 = self.FALL + i * .033
+            t0 = self.FALL + i * .04
             th = t0 + .1
             px, py = hour_pos(GX, GY, GR, i)
             if t0 <= t < th:
                 u = ein((t - t0) / .1)
-                tx, ty = ECX + (i - 6) * 7, ECY + 10
+                tx, ty = ECX + (i - 6) * 8, ECY + 10
                 x, y = px + (tx - px) * u, py + (ty - py) * u
                 ang = math.atan2(ty - py, tx - px)
                 F.push()
-                F.line([(x - math.cos(ang) * 120, y - math.sin(ang) * 120), (x, y)], VIO, 7, 1, glow=9)
-                F.line([(x - math.cos(ang) * 120, y - math.sin(ang) * 120), (x, y)], X.WHITE, 2, 1, glow=3)
-                F.star(x, y, 26, 2, X.WHITE, 1, rot=math.degrees(ang))
-            if th <= t:
-                X.impact(c, ECX + (i - 6) * 7, ECY + 10, .45, th, seed=300 + i, cold=True, rot=i * 30)
-        # ---- 4. 大時計の長針が剣のように落ちる
-        if self.FALL + .2 <= t < self.HAND:
-            u = ein((t - self.FALL - .2) / (self.HAND - self.FALL - .2))
-            tgt = math.atan2(ECY - GY, ECX - GX) - math.tau          # 左回り（術者の側を通らない）
+                F.line([(x - math.cos(ang) * 130, y - math.sin(ang) * 130), (x, y)], GOLDC, 7, 1, glow=9)
+                F.line([(x - math.cos(ang) * 130, y - math.sin(ang) * 130), (x, y)], X.WHITE, 2, 1, glow=3)
+                F.star(x, y, 28, 2, X.WHITE, 1, rot=math.degrees(ang))
+            if th <= t < th + .3:                  # 刺さった所に金の十字
+                q = (t - th) / .3
+                X.star_flash(F, ECX + (i - 6) * 8, ECY + 10, 90 * (1 - q), 1 - q, rot=i * 30, col=X.WHITE, sub=GOLDC)
+        # ---- 4. 金の長針が剣のように落ちる（左回り）
+        if self.FALL + .25 <= t < self.HAND:
+            u = ein((t - self.FALL - .25) / (self.HAND - self.FALL - .25))
+            tgt = math.atan2(ECY - GY, ECX - GX) - math.tau
             ang = -math.pi / 2 + (tgt + math.pi / 2) * u
             ln = GR * .95 + (math.hypot(ECX - GX, ECY - GY) - GR * .95) * u
             hx, hy = GX + math.cos(ang) * ln, GY + math.sin(ang) * ln
             F.push()
-            F.line([(GX, GY), (hx, hy)], GOLDC, 10, 1, glow=7)
+            F.line([(GX, GY), (hx, hy)], GOLDC, 12, 1, glow=8)
             F.line([(GX, GY), (hx, hy)], X.WHITE, 3, 1, glow=3)
-            for j in range(1, 5):                     # 針の残像（扇形に 4 本）
+            for j in range(1, 5):
                 a2 = ang + j * .09
-                F.line([(GX, GY), (GX + math.cos(a2) * ln, GY + math.sin(a2) * ln)], VIO, 4, .5 - j * .1, glow=6)
-            X.star_flash(F, hx, hy, 80, 1, rot=t * 300, sub=GOLDC)
+                F.line([(GX, GY), (GX + math.cos(a2) * ln, GY + math.sin(a2) * ln)], GOLDC, 4, .5 - j * .1, glow=6)
+            X.star_flash(F, hx, hy, 90, 1, rot=t * 300, col=X.WHITE, sub=GOLDC)
         b = t - self.HAND
-        if b >= 0:                                 # ---- 5. 最大の着弾：白飛び・光の柱・画面を渡る輪・ひび → 砕ける・星の雨
-            X.impact(c, ECX, ECY, 2.0, self.HAND, seed=400, cold=True)
+        if b >= 0:                                 # ---- 5. 超新星：金の芯・十字の閃光・金と紫の輪・ひび → 星屑の嵐
+            kc = max(0.0, 1 - c.ra(self.HAND) / .1) if c.ra(self.HAND) >= 0 else 0
+            F.disc(ECX, ECY, 60 * kc + 1, X.WHITE, kc, glow=2.6)
+            ks = 1 - clamp(b / .45)
+            X.star_flash(F, ECX, ECY, 420 * ks ** .4, ks, rot=b * 20, col=X.WHITE, sub=GOLDC)
+            X.star_flash(F, ECX, ECY, 260 * ks ** .4, ks, rot=45 + b * 20, col=PALE, sub=VIO)
             kb = clamp(b / .04) * (1 - clamp((b - .08) / .18))
-            F.beam(ECX, -10, GROUND + 20, 70 * kb, VIO, kb * .8)
+            F.beam(ECX, -10, GROUND + 20, 70 * kb, GOLDC, kb * .8)
             F.beam(ECX, -10, GROUND + 20, 20 * kb, X.WHITE, kb * .8)
             for j in range(5):
                 q = clamp((b - j * .06) / .9)
-                F.ring(ECX, ECY, 40 + 900 * eout(q), (40 + 900 * eout(q)) * (1 if j % 2 else .3), 5, (VIO, BLUE, PALE, GOLDC, VIO)[j], 1 - q, soft=6)
-            kc = clamp(b / .1) * (1 - clamp((b - .7) / .4))
-            if kc > 0:
+                F.ring(ECX, ECY, 40 + 900 * eout(q), (40 + 900 * eout(q)) * (1 if j % 2 else .3), 5, (GOLDC, VIO, PALE, GOLDC, BLUE)[j], 1 - q, soft=6)
+            kc2 = clamp(b / .1) * (1 - clamp((b - .7) / .4))
+            if kc2 > 0:
                 rnd = random.Random(17)
                 F.push()
                 for i in range(22):
@@ -878,20 +1126,22 @@ class Shuen(X.Skill):
                     for j in range(6):
                         r_ = ln * (j + 1) / 6
                         pts.append((ECX + math.cos(ang + rnd.uniform(-.25, .25)) * r_, ECY + math.sin(ang + rnd.uniform(-.25, .25)) * r_))
-                    F.line(pts, X.WHITE, 2, kc, glow=6)
-            X.parts(F, ECX, ECY, b, 150, 16, PALE, 50, 401, wid=2)
+                    F.line(pts, GOLDC if i % 3 == 0 else X.WHITE, 2, kc2, glow=6)
+            X.parts(F, ECX, ECY, b, 150, 16, GOLDC, 50, 401, wid=2)
             X.parts(F, ECX, ECY, b, 200, 7, VIO, 120, 402, 'ember', up=2.5, star=True, size=(3, 7))
-            X.parts(F, GX, GY - 100, b, 260, 3, PALE, 200, 403, 'ember', up=-2.4, spread=(0, 360), star=True, size=(2, 6))
-            X.parts(F, ECX, ECY, b, 120, 9, GOLDC, 90, 404, 'ember', up=1.5, star=True, size=(3, 5))
-            F.speedlines(ECX, ECY, 60, 260, PALE, .9 * (1 - clamp(b / .6)), int(t * 60))
-        X.dust(c.FF, HOME_X, GROUND + 4, t - 5.6, 22, 5, 0, seed=12)
-        if t >= 6.0:
-            X.glint(F, *tip(hh), t, 6.05, .3, 80)
+            X.parts(F, GX, GY - 100, b, 260, 3, GOLDC, 200, 403, 'ember', up=-2.4, spread=(0, 360), star=True, size=(2, 6))
+            F.speedlines(ECX, ECY, 60, 260, GOLDC, .9 * (1 - clamp(b / .6)), int(t * 60))
+        if 5.8 <= t < 6.4:                         # 着地：金の星の輪が足元から広がる
+            q = clamp((t - 5.8) / .5)
+            B.ring(HOME_X, GROUND + 8, 30 + 180 * eout(q), (30 + 180 * eout(q)) * .24, 4, GOLDC, 1 - q)
+            X.parts(F, HOME_X, GROUND, t - 5.8, 40, 6, GOLDC, 40, 77, 'ember', up=1.2, star=True, size=(3, 5))
+        if t >= 6.3:
+            X.glint(F, *tip(hh), t, 6.35, .3, 80)
 
     def enemy(self, c):
-        st, kb = X.enemy_state(c, self.hits, VIO, dis0=5.45)
+        st, kb = X.enemy_state(c, self.hits, GOLDC, dis0=5.55)
         t = c.t
-        if self.REW <= t < self.STOP:              # 巻き戻し：敵が前後に引き戻される
+        if self.REW <= t < self.STOP:
             kb += 30 * math.sin((t - self.REW) * 40)
         return st, kb
 
@@ -899,8 +1149,7 @@ class Shuen(X.Skill):
         t = c.t
         if t < .5:
             X.bubble(img, '星臨！', HOME_X - 100, GROUND - 230, c.rt)
-        # カットイン（1.15〜1.9）：斜めの帯に星臨の姿と奥義の名
-        a = t - 1.15
+        a = t - 1.2
         if 0 <= a < .8:
             sl = eout(clamp(a / .14)) - ein(clamp((a - .62) / .18))
             band = Image.new('RGBA', (W, H))
@@ -916,15 +1165,15 @@ class Shuen(X.Skill):
                 x, y = rnd.uniform(0, W) + off, rnd.uniform(yc - 160, yc + 110)
                 d.point((x - (t * 400) % 60, y), fill=(255, 255, 255, int(rnd.uniform(90, 255))))
             img.paste(Image.fromarray(np.asarray(band)[..., :3]), (0, 0), band)
-            sp = X.SPR[fr('aw_idle', t, .1)].resize((48 * 7, 50 * 7), Image.NEAREST)
+            sp = X.SPR[fr('aw_float', t, .1)].resize((48 * 7, 50 * 7), Image.NEAREST)
             px = int(W - 300 + (1 - sl) * 400 - a * 40)
             img.paste(sp, (px, yc - 250), sp)
             if a > .1:
                 X.metal(img, '星臨奥義', 170 - a * 20, yc - 60, 26, font=X.FONT_JA, stroke=4, plain=(220, 210, 255))
                 X.metal(img, '終焉の大時計', 200 - a * 20, yc + 0, 52, sc=1.25 - .25 * eout(clamp((a - .1) / .1)), font=X.FONT_JA, stroke=5,
                         shine=clamp((a - .2) / .4))
-        for i in range(12):                        # 星の槍の数字（流れるように）
-            th = self.FALL + i * .033 + .1
+        for i in range(12):
+            th = self.FALL + i * .04 + .1
             aa = t - th
             if i % 3 == 2 and 0 <= aa < .5 and t < self.HAND:
                 j = i // 3
@@ -937,32 +1186,32 @@ class Shuen(X.Skill):
 
     def sfx(self, m):
         T = m.T
-        m.band(T(.25), 6.5, 600, 2400, .05, .3, .3, .8)
+        m.band(T(.25), 7.0, 600, 2400, .05, .3, .3, .8)
         m.charge(T(.30), .65, .26, 200, 1600)
         m.boom(T(self.AW), .9)
         m.triplet(self.AW, .3)
         m.shimmer(T(self.AW), 1.2, .12, 1)
-        m.whoosh(T(1.15), .2, 600, 6000, .3)                  # カットイン
-        m.chime(T(1.3), [8300, 7400, 6500, 5700], .07, .1)
-        m.whoosh(T(self.RISE), .8, 300, 3000, .25)            # 昇る
+        m.chime(T(self.AW + .1), [5700, 6500, 7400, 8300], .06, .1)
+        m.whoosh(T(1.2), .2, 600, 6000, .3)
+        m.chime(T(1.35), [8300, 7400, 6500, 5700], .07, .1)
+        m.whoosh(T(self.RISE), .8, 300, 3000, .25)
         for k in range(12):
-            m.ring(T(2.2 + k * .058), 3000 + k * 400, .2, .06)
-        m.band(T(self.REW), .65, 200, 6000, .25, .3, .05, .1)  # 巻き戻し（上がる唸り）
+            m.ring(T(2.3 + k * .058), 3000 + k * 400, .2, .06)
+        m.band(T(self.REW), .65, 200, 6000, .25, .3, .05, .1)
         for k in range(14):
             m.ring(T(self.REW + .65 * (1 - (1 - k / 14) ** .6)), 5200 - k * 150, .03, .06)
-        m.ring(T(self.STOP), 2600, .8, .25)                    # 時が止まる
+        m.ring(T(self.STOP), 2600, .8, .25)
         for i in range(12):
-            m.whoosh(T(self.FALL + i * .033), .1, 2000, 9000, .07)
-            m.ring(T(self.FALL + i * .033 + .1), 6000 + (i % 3) * 800, .08, .07)
-        m.whoosh(T(self.FALL + .2), .25, 200, 1500, .35)
+            m.whoosh(T(self.FALL + i * .04), .1, 2000, 9000, .07)
+            m.ring(T(self.FALL + i * .04 + .1), 6000 + (i % 3) * 800, .08, .07)
+        m.whoosh(T(self.FALL + .25), .25, 200, 1500, .35)
         m.triplet(self.HAND, .4)
         m.boom(T(self.HAND), 1.0)
         m.sub(T(self.HAND), 1.0, 1.2)
         m.band(T(self.HAND), 1.6, 9000, 400, .35, .4, .005, 1.2)
         m.shimmer(T(self.HAND, .3), 2.5, .12, 6)
-        m.thump(T(5.6), .5, .25, 150)
-        m.chime(T(6.1), [8300, 6500, 6100, 5700], .14, .12)
-
+        m.thump(T(5.8), .5, .25, 150)
+        m.chime(T(6.3), [8300, 6500, 6100, 5700], .14, .12)
 
 SK = {s.name: s for s in (Kokunoya(), Chien(), Kasoku(), Hidan(), Shuen())}
 

@@ -51,6 +51,34 @@ def shear(a, k, pivot=47, top=0):
     return out
 
 
+def bend(a, k, neck=21, waist=35, staff=None):
+    """体を曲げる（パーツを崩さない）：頭（帽子ごと）を k、胴を k/2 だけ横へずらし、脚は動かさない。
+    行ごとにずらす shear と違い、帽子のつば・杖・顔がひとかたまりのまま動く。k＜0＝前（左）"""
+    keep = None
+    if staff is not None:                      # 杖（手で持つ・x≤staff・帽子より下）は動かさない
+        keep = np.zeros(a.shape[:2], bool)
+        keep[15:, :staff + 1] = a[15:, :staff + 1, 3] > 0
+        src = a.copy()
+        src[keep] = 0
+        a0, a = a, src
+    out = np.zeros_like(a)
+    for y0, y1, d in ((0, neck, k), (neck, waist, int(round(k / 2))), (waist, 48, 0)):
+        blk = a[y0:y1]
+        if d > 0:
+            out[y0:y1, d:] = blk[:, :48 - d]
+        elif d < 0:
+            out[y0:y1, :48 + d] = blk[:, -d:]
+        else:
+            out[y0:y1] = blk
+    # 継ぎ目：ずらしで空いた 1 ドットを上の行の色で埋める（輪郭が切れないように）
+    for y in (neck, waist):
+        gap = (out[y, :, 3] == 0) & (out[y - 1, :, 3] > 0) & (a[y, :, 3] > 0)
+        out[y, gap] = out[y - 1, gap]
+    if keep is not None:
+        out[keep] = a0[keep]
+    return out
+
+
 def drift(a, mask, dx, dy=0):
     """部品（mask）を dx・dy ずらして上書き（輪郭ごと）。もとの位置は残す＝外へ伸びる"""
     m = mask.copy()
@@ -130,21 +158,21 @@ c = S['cast']
 c1 = drift(c, back_hair(c, 18), 1, -1)
 A['cast'] = [c, glow(c1), glow(drift(c1, back_hair(c1, 18), 1), 2), glow(c1)]
 # 詠唱に入る：横向き → 沈む（溜め）→ 詠唱
-A['cast_in'] = [breathe(s, 26, 40, 2), shear(breathe(c, 26, 40, 1), 1)]
+A['cast_in'] = [breathe(s, 26, 40, 2), bend(breathe(c, 26, 40, 1), 1)]
 # 発動：詠唱 → のけぞって溜める → 前へ伸び切る（髪が後ろへ流れる）→ 構え
 r = S['ready']
-pre = shear(breathe(r, 24, 40, 1), 2)
-act = shear(r, -3)
+pre = bend(breathe(r, 24, 40, 1), 2)
+act = bend(r, -3)
 act = drift(act, back_hair(act, 16), 2)
-A['act'] = [pre, act, shear(r, -1), r]
+A['act'] = [pre, act, bend(r, -1), r]
 # 被弾：白い影の後のけぞり（2 段）→ 戻り
-A['hit'] = [shear(breathe(s, 26, 40, 1), 3), drift(shear(s, 4), back_hair(shear(s, 4), 16), -2), shear(s, 1)]
+A['hit'] = [bend(breathe(s, 26, 40, 1), 3, staff=15), drift(bend(s, 4, staff=15), back_hair(bend(s, 4, staff=15), 16), -2), bend(s, 1, staff=15)]
 # 瀕死：肩で息をする（沈みの 2 段）
 d = S['dying']
 A['weak'] = [d, breathe(d, 22, 34), breathe(d, 22, 34, 2), breathe(d, 22, 34)]
 # 倒れる：瀕死 → 大きくのけぞって崩れる → 気絶（弾んで止まる）
 f = S['faint']
-A['fall'] = [shear(breathe(d, 22, 40, 2), 4), shear(breathe(d, 18, 42, 4), 6), lift(f, 3), f]
+A['fall'] = [bend(d, 3, staff=14), bend(breathe(d, 26, 40, 1), 5, staff=14), lift(f, 3), f]
 # 気絶：かすかな呼吸
 A['down'] = [f, breathe(f, 34, 40)]
 # 回る（くるり）：横 → 正面 → 背を向けた横（左右反転）→ 正面 → 横
@@ -152,8 +180,8 @@ A['turn'] = [s, S['front'], mirror(s), S['front'], s]
 # 着地の沈み（2 行つぶす → 1 行）
 A['land'] = [breathe(r, 24, 44, 3), breathe(r, 24, 44, 1), r]
 # 大きく振る：のけぞり → 前へ大きく倒して髪が後ろへ流れる → 戻り
-sw = shear(r, -5)
-A['swing'] = [shear(breathe(r, 24, 40, 1), 3), drift(sw, back_hair(sw, 14), 3), shear(r, -2)]
+sw = bend(r, -5)
+A['swing'] = [bend(breathe(r, 24, 40, 1), 3), drift(sw, back_hair(sw, 14), 3), bend(r, -2)]
 # 星臨：待機（呼吸・髪のなびき・服の星が瞬く）・詠唱（浮いて髪がはね上がる）・発動・大きく振る
 w = S['awake']
 
@@ -169,8 +197,13 @@ w1 = breathe(w, 26, 34)
 A['aw_idle'] = [twinkle(w, 1), twinkle(w1, 2), twinkle(drift(w1, bh(w1), 1), 3), twinkle(w1, 4)]
 wc = drift(w, bh(w, 16), 1, -1)
 A['aw_cast'] = [twinkle(w, 5), twinkle(wc, 6, n=16), twinkle(drift(wc, bh(wc, 16), 1), 7, n=20), twinkle(wc, 8, n=16)]
-A['aw_act'] = [twinkle(shear(breathe(w, 24, 40, 1), 3), 9), twinkle(drift(shear(w, -4), bh(shear(w, -4), 14), 2), 10, n=18), twinkle(shear(w, -1), 11), twinkle(w, 12)]
-A['aw_swing'] = [twinkle(shear(breathe(w, 22, 40, 2), 4), 13), twinkle(drift(shear(w, -6), bh(shear(w, -6), 12), 3), 14, n=24), twinkle(shear(w, -2), 15)]
+A['aw_act'] = [twinkle(bend(breathe(w, 24, 40, 1), 3), 9), twinkle(drift(bend(w, -4), bh(bend(w, -4), 14), 2), 10, n=18), twinkle(bend(w, -1), 11), twinkle(w, 12)]
+# 星臨：着地（星臨の姿のまま沈む）・回る（反転で 1 回転）・浮遊（髪と裾がふわりと上がる）
+A['aw_land'] = [twinkle(breathe(w, 24, 44, 2), 16), twinkle(breathe(w, 24, 44, 1), 17), twinkle(w, 18)]
+A['aw_spin'] = [twinkle(w, 19), twinkle(bend(w, 2), 20), twinkle(mirror(w), 21), twinkle(bend(mirror(w), -2), 22)]
+wf = drift(drift(w, bh(w, 14), 1, -1), bh(w, 14), 1, -1)
+A['aw_float'] = [twinkle(w, 23), twinkle(drift(w, bh(w, 14), 1, -1), 24, n=14), twinkle(wf, 25, n=18), twinkle(drift(w, bh(w, 14), 1, -1), 26, n=14)]
+A['aw_swing'] = [twinkle(bend(breathe(w, 22, 40, 2), 4), 13), twinkle(drift(bend(w, -6), bh(bend(w, -6), 12), 3), 14, n=24), twinkle(bend(w, -2), 15)]
 # 勝利・選択に使う正面（呼吸）
 A['front'] = [S['front'], breathe(S['front'], 26, 34)]
 
@@ -188,7 +221,7 @@ if __name__ == '__main__':
     sh = Image.new('RGBA', (W, pad + len(rows) * (48 * z + pad)), (24, 24, 36, 255))
     d = ImageDraw.Draw(sh)
     JA = {'idle': '待機', 'cast': '詠唱', 'cast_in': '詠唱に入る', 'act': '発動', 'hit': '被弾', 'weak': '瀕死', 'fall': '倒れる', 'down': '気絶', 'front': '正面',
-          'turn': '回る', 'land': '着地', 'swing': '大きく振る', 'aw_idle': '星臨・待機', 'aw_cast': '星臨・詠唱', 'aw_act': '星臨・発動', 'aw_swing': '星臨・振る'}
+          'turn': '回る', 'land': '着地', 'swing': '大きく振る', 'aw_idle': '星臨・待機', 'aw_cast': '星臨・詠唱', 'aw_act': '星臨・発動', 'aw_swing': '星臨・振る', 'aw_land': '星臨・着地', 'aw_spin': '星臨・回る', 'aw_float': '星臨・浮遊'}
     for r_, (k, fr) in enumerate(rows):
         y = pad + r_ * (48 * z + pad)
         d.text((pad, y + 60), JA[k], font=F, fill=(250, 220, 120))
