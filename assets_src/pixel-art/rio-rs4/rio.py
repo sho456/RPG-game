@@ -346,12 +346,22 @@ if True:   # 構え・選択は limbs.py の版を使う（循環の読み込み
     except AttributeError:
         pass   # 下の行が輪郭＝地面より 4 上に置く（render の foot を 41 に）
 
-# 第 7 版：立ち・正面・構え・コマンド選択は、リオを元にした生成のドット絵を清書した PNG（gen/）を正とする
+# 第 7 版（第 8 版で置き換え）：立ち・正面・構え・コマンド選択は、リオを元にした生成のドット絵を清書した PNG（gen/）を正とする
 _GEN = os.path.join(ROOT, 'gen')
 for _n in ('立ち', '正面', '構え1', '構え2', '選択'):
     _p = os.path.join(_GEN, _n + '.png')
     if os.path.exists(_p):
         POSES[_n] = Image.open(_p).convert('RGBA')
+
+# 第 8 版：RS と同じ 32 行で全ポーズを描き直した v8/（立ちは手描き・他は同じ頭と胴から組む）を正とする
+try:
+    sys.path.insert(0, os.path.join(ROOT, 'v8'))
+    import poses as _V8
+    import rio8 as _R8
+    for _n, _cv in _V8.POSES.items():
+        POSES[_n] = _R8.to_img(_cv)
+except ImportError:
+    pass
 
 
 if __name__ == '__main__':
