@@ -25,8 +25,6 @@ const STYLE={
  dmgG:{font:'num',fill:[[0,'#ffffff'],[.46,'#ffffff'],[.56,'#e0f6ff'],[1,'#8ccbf2']],ow:.13,oc:'#081828',sh:[.04,.07,'rgba(0,0,0,.55)']},
  heal:{font:'num',fill:[[0,'#f2fff4'],[.44,'#c6ffd2'],[.56,'#6ae88c'],[1,'#1ca84a']],ow:.13,oc:'#05240f',sh:[.04,.07,'rgba(0,0,0,.5)'],gl:.25},
  psn:{font:'num',fill:[[0,'#fbf0ff'],[.44,'#e6c8ff'],[.56,'#bb86ff'],[1,'#7a34d0']],ow:.13,oc:'#1a0630',sh:[.04,.07,'rgba(0,0,0,.5)']},
- /* ver0.49：エクストラフォースの見出し（紫→桃の光） */
- xf:{font:'lat',fill:[[0,'#fff0ff'],[.42,'#ff9cf0'],[.56,'#d86aff'],[1,'#7a2ad8']],ow:.12,oc:'#1e0630',rw:.035,rc:'#ffe8ff',sh:[.03,.06,'rgba(0,0,0,.55)'],gl:.4},
  crit:{font:'lat',fill:[[0,'#fffde2'],[.42,'#ffe85c'],[.56,'#ffc21c'],[1,'#ff8400']],ow:.12,oc:'#2e1200',rw:.035,rc:'#fff6c8',sh:[.03,.06,'rgba(0,0,0,.55)'],gl:.35},
  weak:{font:'lat',fill:[[0,'#ffe0ee'],[.42,'#ff86b2'],[.56,'#f2306e'],[1,'#b00c48']],ow:.12,oc:'#3a0018',rw:.045,rc:'#ffffff',sh:[.03,.06,'rgba(0,0,0,.55)'],gl:.3},
  guard:{font:'lat',fill:[[0,'#f2feff'],[.42,'#a6f0ff'],[.56,'#40c2f2'],[1,'#1464bc']],ow:.12,oc:'#05203a',rw:.04,rc:'#ffffff',sh:[.03,.06,'rgba(0,0,0,.55)'],gl:.35},

@@ -150,6 +150,6 @@ function up(id,k){const why=canUp(id,k);if(why)return why;const c=costOf(id,k);G
 /* 画面：詳細の窓の練達の欄（id が味方で、覚えている技のとき） */
 function html(id,k){const L=stages(k);if(!L)return'';const lv=lvOf(id,k),c=costOf(id,k),have=(G.mats&&G.mats[STONE])||0,esc=RSC.esc;
  return`<div class="ms47"><div class="mh"><b>練達</b><span class="st">${[1,2,3].map(i=>`<i class="${i<=lv?'on':''}"></i>`).join('')}</span><em>${lv?'段階'+RK[lv]:'未練達'}</em></div>
-  ${L.map((s,i)=>`<div class="ml${i<lv?' on':''}${i===lv?' nx':''}"><i>${RK[i+1]}</i><ul>${s.d.map(t=>`<li>${KW.markT(t)}</li>`).join('')}</ul></div>`).join('')}
+  ${L.map((s,i)=>`<div class="ml${i<lv?' on':''}${i===lv?' nx':''}"><i>${RK[i+1]}</i><ul>${(i===2&&SUP[k]?s.d.slice(0,1):s.d).map(t=>`<li>${KW.markT(t)}</li>`).join('')}</ul></div>`).join('')}
   ${c!=null&&typeof scene!=='undefined'&&scene!=='battle'?`<button class="tbtn${have>=c?' gold':''} wide" data-a="mas" ${have>=c?'':'disabled'}>練達する<small>${MATS[STONE].n} ${c}（所持 ${have}）</small></button>`:''}</div>`;}
 return{STONE,COST,stages,mods,lvOf,costOf,canUp,up,html,RK,SZ,U3,SUP};})();

@@ -61,7 +61,8 @@ function lpGuard(){if(!B)return;for(const h of B.heroes)if(h.alive&&(h.lp||0)<=0
 
 /* ==================== ダメージ計算・命中・被弾 ==================== */
 /* ==================== ダメージの計算式（ver0.49 で整理） ====================
- 最終ダメージ＝基礎ダメージ × 与ダメ枠 × 会心枠 × 奥義枠 × 連携枠 × エクストラフォース枠 × 被ダメ軽減枠 × 属性耐性 → 上限の減衰
+ 最終ダメージ＝［与えるダメージ］基礎ダメージ × 与ダメ枠 × 会心枠 × 奥義枠 × 連携枠 × エクストラフォース枠
+              ×［受けるダメージ］受けるダメージの枠（被ダメ軽減＋属性耐性） → 上限の減衰
   ・基礎ダメージ（engine.js calc）：攻撃（魔力）× 威力 − 防御（精神）× 0.5。弱点 ×1.7・会心 ×1.5 もここ
     攻撃強化・弱体（能力の ±%）は能力の値に入る＝同じ枠で加算（js/v20-battle.js recalc。上限 +100%・下限 −60%）
   ・与ダメ枠：アビリティ・装備・陣形などの「与ダメ+%」を全部足して 1 回だけ掛ける（同じ枠は加算）
@@ -69,7 +70,8 @@ function lpGuard(){if(!B)return;for(const h of B.heroes)if(h.alive&&(h.lp||0)<=0
   ・エクストラフォース（【補助効果】）：条件を満たした攻撃で、最終ダメージにさらに掛ける別枠。
      同じ条件のエクストラフォースは重ならない（いちばん高い 1 つ）。違う条件のものが同時に出たら、この枠の中で加算
      例）攻撃強化+100% のとき：攻撃強化+50% → (2.0+0.5)÷2.0＝+25%、エクストラフォース+50% → 2.0×1.5＝+50%
-  ・被ダメ軽減枠：アビリティ・装備・陣形の「被ダメ-%」を全部足して 1 回だけ掛ける（最大 80% 軽減）
+  ・受けるダメージの枠：被ダメ軽減（アビリティ・装備・陣形の「被ダメ-%」）と属性耐性（装備の合計。1 につき 1%）は、
+     どちらも受けるダメージに効く効果なので全部足して 1 回だけ掛ける（0.2〜1.5 倍）。敵が受けるときは敵の耐性（terms.js）だけ
   ・上限：9999万（DMG_CAP）。1000万（DMG_KNEE）を超えた分は、上限に近づくほど伸びが鈍る（なめらかに減衰） */
 const DMG_CAP=99990000,DMG_KNEE=10000000;
 function dmgFin(d){d=Math.max(1,d);if(d>DMG_KNEE){const R=DMG_CAP-DMG_KNEE;d=DMG_KNEE+R*(1-Math.exp(-(d-DMG_KNEE)/R));}return Math.min(DMG_CAP,Math.max(1,Math.round(d)));}
@@ -80,7 +82,7 @@ function xfOf(a,t,sk,r){const X={};const put=(c,v)=>{c=c||'any';if(v>0&&(X[c]||0
  if(sk&&sk.xf){const L=Array.isArray(sk.xf)?sk.xf:[typeof sk.xf==='number'?{v:sk.xf}:sk.xf];for(const x of L)if(cnd(x.c,a,t,sk,r))put('sk:'+(x.c||'any'),+x.v||0);}
  for(const s of(a.sts||[]))if(s.k==='xf'&&s.v>0)put('st',s.v);
  let sum=0;for(const k in X)sum+=X[k];return{sum,X};}
-function frames(a,t,sk,r){const F={dmg:0,crit:1,ougi:1,cur:1,xf:0,cut:0,el:1};
+function frames(a,t,sk,r){const F={dmg:0,crit:1,ougi:1,cur:1,xf:0,cut:0,elr:0,rcv:1};
  if(a.side===0){
   F.dmg+=sumE(a,'dmg',e=>cnd(e.c,a,t,sk,r))+(a.dmgP||0)+(sk&&!sk.basic?(a.skDmg||0):0);
   for(const e of effs(a))if(e.t==='stack'){const n=e.c==='same'?(a._rsSameT===t?a._rsSameN||0:0):(a._rsHeat||0);F.dmg+=Math.min(e.max||5,n)*e.v;}
@@ -90,10 +92,13 @@ function frames(a,t,sk,r){const F={dmg:0,crit:1,ougi:1,cur:1,xf:0,cut:0,el:1};
   const cur=B.rs.cur;if(cur&&cur.u===a)F.cur=cur.mul;
   if(sk.ougi)F.ougi=(1+(a.ougiUp||0)/100)*(a.legs&&a.legs.includes('futago')?1.3:1);
   F.xfX=xfOf(a,t,sk,r);F.xf=F.xfX.sum;}
+ /* 受けるダメージの枠（味方が受けるとき）：被ダメ軽減と属性耐性は、どちらも受けるダメージに効く効果なので同じ枠で足し合わせる
+    被ダメ軽減 20% と 熱耐性 30 → 1 − 0.50 ＝ 0.50 倍。弱点（耐性がマイナス）は増える。最小 0.2 倍・最大 1.5 倍 */
  if(t.side===0){F.cut=sumE(t,'cut',e=>cnd(e.c,t,a,sk))+B.heroes.reduce((x,h)=>x+(h.alive?sumE(h,'allycut'):0),0)+(t.dmgCut||0);
-  /* 属性耐性（装備の合計。js/data/resist.js）：耐性 1 で 1% 軽減、弱点（マイナス）は増加。味方が受けるときだけ */
-  if(a&&a.side===1&&sk.el)F.el=ELR.mul(t.id,sk.el);}
- F.m=Math.max(0,1+F.dmg/100)*F.crit*F.ougi*F.cur*(1+F.xf/100)*Math.max(.2,1-F.cut/100)*F.el;return F;}
+  if(a&&a.side===1&&sk.el&&ELR.ELS.includes(sk.el))F.elr=+(ELR.sum(t.id)[sk.el]||0);else F.elr=0;
+  F.rcv=Math.min(1.5,Math.max(.2,1-(F.cut+F.elr)/100));}
+ else F.rcv=1;
+ F.m=Math.max(0,1+F.dmg/100)*F.crit*F.ougi*F.cur*(1+F.xf/100)*F.rcv;return F;}
 {const _c=calc;calc=function(a,t,sk){if(!B||!B.rs||!a||!t||!sk)return _c(a,t,sk);
  let cb=0,pi=0,d0=null;
  if(a.side===0){cb=sumE(a,'crit',e=>cnd(e.c,a,t,sk))+(sk.crit||0);pi=Math.min(80,sumE(a,'pierce'));}

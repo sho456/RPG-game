@@ -167,7 +167,7 @@ function abInfo(id,v,back){const h=G.h[id];let top,list,sub='',nx=[],spb='';
  if(v==='w'){let wp=null;try{wp=V20.wpOf(h.eq.w&&findItem(h.eq.w));}catch(e){}top=`<i class="n">武</i><b>${wp?esc(wp.n):'武器アビリティなし'}</b>`;list=[wp?wp.d:'アンコモン以上の武器に付く'];}
  else{const i=+v,A=D.AB[id][i],r=C.abRank(id,i),lv0=D.ABL[i],ups=C.abUps(id);top=`<i class="n">${i+1}</i><b>${esc(A.n)}</b>${stars(r)}<em>${r?'段階'+RK[r]:'未解放'}</em>`;
   list=C.abDesc(id,i,Math.max(1,r));nx=r&&r<3?C.abNext(id,i,r):[];
-  if(A.sp)spb=`<div class="sp45${r>=3?' on':''}"><div class="t"><em>段階Ⅲ</em><b class="kwn sp">【${esc(A.sp.n)}】</b>${r>=3?'':'<small>未解放</small>'}</div><p>${KW.markT(A.sp.d)}</p></div>`;
+  if(A.sp)spb=`<div class="sp45${r>=3?' on':''}"><div class="t"><em>段階Ⅲ</em>${r>=3?'':'<small>未解放</small>'}</div><p>${KW.mark('【'+esc(A.sp.n)+'】')}を付与</p></div>`;
   sub=`Lv${lv0}でⅠ・Lv${lv0+20}でⅡ・Lv${lv0+40}でⅢ（星盤・天星盤の強化で早まる）${ups[i+1]?`　強化 +${ups[i+1]}`:''}`;}
  ovOpen(`<div class="ski43 ab44"><div class="abh">${top}</div><div class="dsc"><ul>${list.map(t=>`<li>${KW.markT(t)}</li>`).join('')}</ul>
   ${nx.length?`<div class="nx45"><em>次の段階</em><ul>${nx.map(t=>`<li>${KW.markT(t)}</li>`).join('')}</ul></div>`:''}${spb}${sub?`<p class="sub">${sub}</p>`:''}</div></div>

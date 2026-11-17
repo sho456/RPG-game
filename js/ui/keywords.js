@@ -49,7 +49,7 @@ const T={
 /* 固有名の特殊効果・名前付きの追撃（自動で登録） */
 const SP={},NM={'解癒(1回)':['解癒(1回)','[ターン終了時] 次の効果が発動する（上限 1 回）：自身のすべての状態異常を解除する／自身の攻撃・防御・魔力・精神・素早さの能力ダウン状態を解除する／自身のHPを回復する（効果極小）','練達の効果']};
 function reg(){try{const C=RSC,D=RSD;
-  for(const id in D.AB)(D.AB[id]||[]).forEach(A=>{if(A.sp)SP[A.sp.n]=[A.sp.n,A.sp.d,A.n];for(const f of A.fx)if(f.nm)NM[f.nm]=[f.nm,`名前の付いた追撃。${f.el||''}属性`,A.n];});
+  for(const id in D.AB)(D.AB[id]||[]).forEach(A=>{if(A.sp)SP[A.sp.n]=[A.sp.n,A.sp.d,`アビリティ「${A.n}」段階Ⅲ（${(HB[id]||{}).name||id}）`];for(const f of A.fx)if(f.nm)NM[f.nm]=[f.nm,`名前の付いた追撃。${f.el||''}属性`,A.n];});
   try{for(const k in RSM.U3){const x=RSM.U3[k];SP[x.n]=[x.n,x.d,'練達Ⅲ・'+((SK[k]||D.NEW[k]||{}).n||'')];}for(const k in RSM.SUP){const x=RSM.SUP[k][2];if(x&&x.n)SP[x.n]=[x.n,x.d.map(t=>t.replace(/^【[^】]+】/,'')).join('／'),'練達Ⅲ・'+((SK[k]||D.NEW[k]||{}).n||'')];}}catch(e){}
   for(const id in D.AWX){const X=D.AWX[id];for(const f of X.fx)if(f.nm)NM[f.nm]=[f.nm,`星臨中の名前の付いた追撃。${f.el||''}属性・威力${f.pw||1}`,X.n];
    const s=SK[X.ou];if(s)NM[s.n]=[s.n,`奥義。${s.d||''}`,X.n];}}catch(e){}}
@@ -60,9 +60,12 @@ function rx(){if(RX)return RX;reg();const ks=Object.keys(T).sort((a,b)=>b.length
 /* ver0.49：【名前】「名前」のすぐ後ろに、その説明が地の文で書いてあるときは、タップの印を付けない（吹き出しと同じ説明が二重に出るため）。名前は太字だけ */
 const nz=t=>String(t||'').replace(/<[^>]*>/g,'').replace(/[\s　。、・／（）()]/g,'');
 function dup(v,rest){if(!v)return false;const d=nz(v[1]).replace(/^奥義/,''),r=nz(rest);return d.length>=4&&r.length>=4&&(r.startsWith(d.slice(0,6))||d.startsWith(r.slice(0,6)));}
-function mark(html){if(!html)return'';return String(html).replace(rx(),(m,sp,nm,w,off,str)=>{
+/* ver0.49b：固有効果は地の文では「【名前】を付与」とだけ書き、名前のタップで全文（名前・条件・効果）を出す。
+   【名前】のすぐ後ろにその説明が続いている文は、説明を落として「【名前】を付与」に置き換える */
+function fold(html){html=String(html);const re=/【([^】]+)】/g;let m;while((m=re.exec(html))){const n=m[1];if(SP[n]&&dup(SP[n],html.slice(m.index+m[0].length)))return html.slice(0,m.index)+`【${n}】を付与`;}return html;}
+function mark(html){if(!html)return'';rx();return fold(html).replace(rx(),(m,sp,nm,w,off,str)=>{
   const rest=String(str).slice(off+m.length);
-  if(sp)return SP[sp]?(dup(SP[sp],rest)?`<b class="kwn sp">【${sp}】</b>`:`<b class="kw sp" data-kw="sp:${esc(sp)}">【${sp}】</b>`):m;
+  if(sp)return SP[sp]?`<b class="kw sp" data-kw="sp:${esc(sp)}">【${sp}】</b>`:m;
   if(nm)return NM[nm]?(dup(NM[nm],rest)?`<b class="kwn nm">「${nm}」</b>`:`<b class="kw nm" data-kw="nm:${esc(nm)}">「${nm}」</b>`):m;
   return`<b class="kw" data-kw="${esc(w)}">${w}</b>`;});}
 /* エスケープしてから包む */
@@ -73,7 +76,7 @@ let P=null;
 function close(){if(P){P.remove();P=null;}}
 function show(el){const k=el.dataset.kw,v=look(k);if(!v)return;close();
  const p=document.createElement('div');p.className='kwp'+(k.startsWith('sp:')?' sp':'');
- p.innerHTML=`<b>${k.startsWith('sp:')?'【'+esc(v[0])+'】':esc(v[0])}</b>${v[2]?`<small>${esc(v[2])}</small>`:''}<p>${esc(v[1])}</p>`;
+ p.innerHTML=`<b>${k.startsWith('sp:')?'【'+esc(v[0])+'】':esc(v[0])}</b>${v[2]?`<small>${k.startsWith('sp:')?'固有効果・':''}${esc(v[2])}</small>`:''}<p>${esc(v[1]).replace(/／/g,'<br>')}</p>`;
  document.body.appendChild(p);P=p;
  const r=el.getBoundingClientRect(),W=window.innerWidth,H=window.innerHeight,w=p.offsetWidth,h=p.offsetHeight;
  let x=Math.min(Math.max(8,r.left+r.width/2-w/2),W-w-8),y=r.top-h-8;if(y<8)y=r.bottom+8;if(y+h>H-8)y=Math.max(8,H-h-8);
