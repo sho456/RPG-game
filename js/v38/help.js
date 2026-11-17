@@ -12,18 +12,20 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;',
 const pct=v=>Math.round(v*100)+'%';
 const sign=v=>(v>=0?'+':'')+v;
 /* ---------- 中身 ---------- */
+/* 防御の倍率（js/engine.js calc と同じ式）：1 ÷（1 + 防御 ÷（3 × 標準の防御）） */
+const dmul=(v,ph,id)=>(1/(1+v/(DEFK*defRef(G.h[id].lv,ph)))).toFixed(2);
 const ST_MORE={
- str:()=>['技（物理攻撃）のダメージ＝技の威力×技の倍率 − 相手の体力×0.5'],
- vit:(s)=>[`技で受けるダメージを ${Math.round(s.s7.vit*.5)} 減らす（体力×0.5）`],
+ str:()=>['技（物理攻撃）のダメージ＝技の威力×技の倍率 × 相手の防御の倍率（相手の体力が高いほど減る）'],
+ vit:(s,r,id)=>[`同じレベルの敵の技で受けるダメージ ×${dmul(s.s7.vit,true,id)}（標準の体力 ${Math.round(defRef(G.h[id].lv,true))} で ×0.75）`],
  dex:(s,r)=>[`技の命中率 ${sign(Math.round(.12*(r.dex/mean(r)-1)*100))}%（器用さが自分の能力の平均より高いほど当たる）`],
  agi:(s)=>[`行動順の速さ ${s.spd}（高いほど先に動く）`,'相手より速いほど、技が当たりやすく、技を避けやすい'],
- int:(s,r)=>[`術のダメージ＝知力×術の倍率 − 相手の精神×0.5`,`術の命中率 ${sign(Math.round(.08*(r.int/mean(r)-1)*100))}%`,'状態異常・能力変化の成功率は、相手の精神と比べて決まる'],
- wil:(s)=>[`術で受けるダメージを ${Math.round(s.s7.wil*.5)} 減らす（精神×0.5）`,'高いほど、状態異常・能力変化にかかりにくい'],
+ int:(s,r)=>[`術のダメージ＝知力×術の倍率 × 相手の防御の倍率（相手の精神が高いほど減る）`,`術の命中率 ${sign(Math.round(.08*(r.int/mean(r)-1)*100))}%`,'状態異常・能力変化の成功率は、相手の精神と比べて決まる'],
+ wil:(s,r,id)=>[`同じレベルの敵の術で受けるダメージ ×${dmul(s.s7.wil,false,id)}（標準の精神 ${Math.round(defRef(G.h[id].lv,false))} で ×0.75）`,'高いほど、状態異常・能力変化にかかりにくい'],
  cha:(s)=>[`回復を受ける量 ×${s.healRecv}`,`回復アビリティの回復量 ×${s.healAb}`,'状態異常の成功率は、知力と魅力の平均で決まる']};
 const mean=r=>D.ST7.reduce((a,k)=>a+r[k],0)/7;
 function stat(id,k){const s=stats(id),r=s.s7,P=C.pf(id),g=P.base[k][1],b0=C.rs7(id,G.h[id].lv)[k],d=r[k]-b0,L=[D.ST7D[k]];
  if(P.w[k])L.push(`${P.wp}の技の威力に ${D.ST7N[k]} を ${pct(P.w[k])} 使う`);
- try{L.push(...ST_MORE[k](s,r));}catch(e){}
+ try{L.push(...ST_MORE[k](s,r,id));}catch(e){}
  return{t:D.ST7N[k],v:r[k],tag:`成長 ${g}`,L,foot:d?`素の値 ${b0}　装備・星盤 ${sign(d)}`:`素の値 ${b0}`};}
 function wpn(id){const P=C.pf(id),W=D.WPN[P.wp]||{},H=D.HERO[id]||{},L=[];
  L.push(`技の威力：${Object.entries(P.w).map(([k,v])=>D.ST7N[k]+' '+pct(v)).join('＋')}`);

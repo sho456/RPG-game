@@ -210,7 +210,8 @@ const RALLY=['darkknight','onimusha','shade','yukirei','bookghost'];
  let m=1;
  if(a.side===0){const x=each(a,'out',t,sk);if(x!=null)m*=x;}
  if(t.side===0){const x=each(t,'inc',a,sk);if(x!=null)m*=x;}
- const mk=stSum(t,'mark'),pr=stSum(t,'prot');if(mk)m*=1+mk/100;if(pr)m*=Math.max(.3,1-pr/100);
+ /* 受けるダメージ-%（prot）・被ダメ+%（mark）：RS の戦闘では js/rs/battle.js frames の「受けるダメージの枠」で足す */
+ if(!B.rs){const mk=stSum(t,'mark'),pr=stSum(t,'prot');if(mk)m*=1+mk/100;if(pr)m*=Math.max(.3,1-pr/100);}
  const c=sk.cond20;
  if(c==='brk'&&t.hp<=t.mhp*.5)m*=1.5;
  if(c==='debuff')m*=1+.25*Math.min(3,stsOf(t).filter(s=>!isBuff(s)).length);

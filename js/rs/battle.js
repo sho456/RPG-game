@@ -71,7 +71,8 @@ function lpGuard(){if(!B)return;for(const h of B.heroes)if(h.alive&&(h.lp||0)<=0
      同じ条件のエクストラフォースは重ならない（いちばん高い 1 つ）。違う条件のものが同時に出たら、この枠の中で加算
      例）攻撃強化+100% のとき：攻撃強化+50% → (2.0+0.5)÷2.0＝+25%、エクストラフォース+50% → 2.0×1.5＝+50%
   ・受けるダメージの枠：被ダメ軽減（アビリティ・装備・陣形の「被ダメ-%」）と属性耐性（装備の合計。1 につき 1%）は、
-     どちらも受けるダメージに効く効果なので全部足して 1 回だけ掛ける（0.2〜1.5 倍）。敵が受けるときは敵の耐性（terms.js）だけ
+     強化「受けるダメージ-%」・弱体「被ダメ+%」・結界・玉座も含め、受けるダメージに効く効果は全部足して 1 回だけ掛ける（0.2〜2.0 倍）
+  ・防御（体力・精神）は基礎ダメージの比率の式（engine.js calc：攻撃 ÷（攻撃 + 0.7×防御））。防御の強化・弱体・防御無視もここに効く
   ・上限：9999万（DMG_CAP）。1000万（DMG_KNEE）を超えた分は、上限に近づくほど伸びが鈍る（なめらかに減衰） */
 const DMG_CAP=99990000,DMG_KNEE=10000000;
 function dmgFin(d){d=Math.max(1,d);if(d>DMG_KNEE){const R=DMG_CAP-DMG_KNEE;d=DMG_KNEE+R*(1-Math.exp(-(d-DMG_KNEE)/R));}return Math.min(DMG_CAP,Math.max(1,Math.round(d)));}
@@ -92,12 +93,17 @@ function frames(a,t,sk,r){const F={dmg:0,crit:1,ougi:1,cur:1,xf:0,cut:0,elr:0,rc
   const cur=B.rs.cur;if(cur&&cur.u===a)F.cur=cur.mul;
   if(sk.ougi)F.ougi=(1+(a.ougiUp||0)/100)*(a.legs&&a.legs.includes('futago')?1.3:1);
   F.xfX=xfOf(a,t,sk,r);F.xf=F.xfX.sum;}
- /* 受けるダメージの枠（味方が受けるとき）：被ダメ軽減と属性耐性は、どちらも受けるダメージに効く効果なので同じ枠で足し合わせる
-    被ダメ軽減 20% と 熱耐性 30 → 1 − 0.50 ＝ 0.50 倍。弱点（耐性がマイナス）は増える。最小 0.2 倍・最大 1.5 倍 */
- if(t.side===0){F.cut=sumE(t,'cut',e=>cnd(e.c,t,a,sk))+B.heroes.reduce((x,h)=>x+(h.alive?sumE(h,'allycut'):0),0)+(t.dmgCut||0);
-  if(a&&a.side===1&&sk.el&&ELR.ELS.includes(sk.el))F.elr=+(ELR.sum(t.id)[sk.el]||0);else F.elr=0;
-  F.rcv=Math.min(1.5,Math.max(.2,1-(F.cut+F.elr)/100));}
- else F.rcv=1;
+ /* 受けるダメージの枠：受けるダメージに効く効果は全部ここで足し合わせて 1 回だけ掛ける（0.2〜2.0 倍）
+    味方：アビリティ・味方全体・装備の被ダメ軽減＋属性耐性（装備の合計。1 につき 1%。弱点はマイナス）＋結界（30%）＋玉座（15%）
+    両方：強化「受けるダメージ-%」（prot）− 弱体「被ダメ+%」（mark）。敵：属性耐性（Resist ＝ 50%）
+    例）被ダメ軽減 20%＋熱耐性 30 → 0.5 倍。そこに被ダメ+20% の弱体 → 0.7 倍 */
+ const stv=k=>{let v=0;try{for(const s of V20.stsOf(t))if(s.k===k)v+=+s.v||0;}catch(e){}return v;};
+ F.prot=stv('prot');F.mark=stv('mark');
+ if(t.side===0){F.cut=sumE(t,'cut',e=>cnd(e.c,t,a,sk))+B.heroes.reduce((x,h)=>x+(h.alive?sumE(h,'allycut'):0),0)+(t.dmgCut||0)
+   +(B.barrier>0?30:0)+(t.legs&&t.legs.includes('gyokuza')?15:0);
+  F.elr=(a&&a.side===1&&sk.el&&ELR.ELS.includes(sk.el))?+(ELR.sum(t.id)[sk.el]||0):0;}
+ else F.elr=r.resist&&!r.weak?Math.round((1-TERMS.RESIST_MUL)*100):0;
+ F.rcv=Math.min(2,Math.max(.2,1-(F.cut+F.elr+F.prot-F.mark)/100));
  F.m=Math.max(0,1+F.dmg/100)*F.crit*F.ougi*F.cur*(1+F.xf/100)*F.rcv;return F;}
 {const _c=calc;calc=function(a,t,sk){if(!B||!B.rs||!a||!t||!sk)return _c(a,t,sk);
  let cb=0,pi=0,d0=null;

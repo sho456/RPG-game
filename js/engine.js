@@ -123,14 +123,23 @@ async function run(){
   if(!aliveH().length){await wait(500);return end(false);}
  }}
 
-function calc(a,t,sk){const phys=sk.k!=='mag';const D=st(t,phys?'def':'res');
- let d=(sk.fixed!=null?sk.fixed:st(a,phys?'atk':'mag')*sk.pow)-D*.5;d=Math.max(1,d);
+/* ver0.49：防御の式。基礎ダメージ＝攻撃（魔力）× 威力 × 防御の倍率
+   防御の倍率＝1 ÷（1 + 防御 ÷（DEFK × 標準の防御））。標準の防御＝攻撃する側のレベルでの、仲間 12 人の体力（術なら精神）の平均（基礎ステータス）
+   ・標準と同じ防御で 0.75 倍、2 倍で 0.6 倍、半分で 0.86 倍、0 で 1 倍。体力・精神・防御の強化と弱体・装備が、どのレベルでも同じ割合で効く
+   ・以前の「攻撃×威力 − 防御×0.5」は、敵の攻撃が高いほど防御が効かず（Lv100 で 1 割未満）、術は精神が高いと 1 ダメージの両極端だった */
+/* EATK：防御の式を変えて平均的な味方の受けるダメージが減った分（Lv40 で約 15%）を、敵の攻撃の倍率で戻す */
+const DEFK=3,EATK=1.15,DREF={};
+function defRef(lv,phys){lv=Math.max(1,Math.round(lv||1));const k=lv+(phys?'p':'m');if(DREF[k])return DREF[k];let v=0;
+ try{const ids=Object.keys(RSD.HERO);let n=0;for(const id of ids){const o=RSC.rs7(id,lv);v+=phys?o.vit:o.wil;n++;}v/=Math.max(1,n);}catch(e){v=0;}
+ return DREF[k]=v>0?v:20+lv*6;}
+function calc(a,t,sk){const phys=sk.k!=='mag';const D=Math.max(0,st(t,phys?'def':'res'));
+ const A=Math.max(1,sk.fixed!=null?sk.fixed:st(a,phys?'atk':'mag'));let d=(sk.fixed!=null?sk.fixed:A*sk.pow)/(1+D/(DEFK*defRef(a.lv||(a.side===0&&G.h[a.id]?G.h[a.id].lv:1),phys)));if(a.side===1)d*=EATK;d=Math.max(1,d);
  let weak=false;if(t.weak&&sk.el&&t.weak.includes(sk.el)){d*=1.7*(1+(a.weakDmg||0)/100);weak=true;}if(!phys&&a.legs&&a.legs.includes('taiyou'))d*=1.25;
  if(weak&&a.legs&&a.legs.includes('shokei'))d*=1.3;if(a.aw&&a.awDmg)d*=1+a.awDmg/100;if(a.aw&&a.id==='crow')d*=1+(1-a.hp/a.mhp)*1.5;const crit=(a.aw&&a.id==='erna')||Math.random()<.06+(a.crit||0)/100;if(crit)d*=1.5;d*=.95+Math.random()*.1;return{d:Math.round(d),weak,crit};}
 
-function hurt(t,d){if(t.side===0){if(t.legs){if(t.legs.includes('kagerou')&&!t._dodge){t._dodge=1;setTimeout(()=>pop(t,'MISS','#ffffff',true),50);return 0;}if(t.legs.includes('gyokuza'))d*=.85;}if(t.guard)d*=.5;if(t.id==='gald'&&t.aw){t.store+=d*(t.kenshu?1.5:1)*(1+(t.storeUp||0)/100);d*=.55;if(t.kenshu)d*=.5;}
+function hurt(t,d){if(t.side===0){if(t.legs){if(t.legs.includes('kagerou')&&!t._dodge){t._dodge=1;setTimeout(()=>pop(t,'MISS','#ffffff',true),50);return 0;}if(t.legs.includes('gyokuza')&&!(B&&B.rs))d*=.85;}if(t.guard)d*=.5;if(t.id==='gald'&&t.aw){t.store+=d*(t.kenshu?1.5:1)*(1+(t.storeUp||0)/100);d*=.55;if(t.kenshu)d*=.5;}
   d=Math.max(1,Math.round(d));if(!t.aw)t.ag=Math.min(100,t.ag+d/t.mhp*60);}
- if(t.side===0){if(B.barrier>0)d=Math.max(1,Math.round(d*.7));if(B.domain&&t.hp-d<=0&&!t.saved){d=t.hp-1;t.saved=1;setTimeout(()=>pop(t,'聖域が守った','#ffe27a',true),150);}}
+ if(t.side===0){/* 結界・玉座（レジェンド）は RS の戦闘では受けるダメージの枠（js/rs/battle.js frames）で足す */if(B.barrier>0&&!B.rs)d=Math.max(1,Math.round(d*.7));if(B.domain&&t.hp-d<=0&&!t.saved){d=t.hp-1;t.saved=1;setTimeout(()=>pop(t,'聖域が守った','#ffe27a',true),150);}}
  t.hp=Math.max(0,t.hp-d);return d;}
 
 function pop(u,txt,col='#fff',small,kind=''){const d=document.createElement('div');d.className='pop'+(small?' s':'')+(kind?' '+kind:'');const tx=String(txt);if(!small&&/^[+\-]?\d+$/.test(tx))[...tx].forEach((ch,i)=>{const e=document.createElement('span');e.textContent=ch;e.style.animationDelay=i*.035+'s';d.appendChild(e);});else d.textContent=tx;d.style.color=col;
@@ -138,10 +147,12 @@ function pop(u,txt,col='#fff',small,kind=''){const d=document.createElement('div
 
 async function hit(a,t,sk){
  const r=calc(a,t,sk);const d=hurt(t,r.d);t.flash=8;if(a.side===0&&a.legs&&a.legs.includes('meikai')&&d>0){a.hp=Math.min(a.mhp,a.hp+Math.round(d*.2));}B.fx.push({x:t.x+8*t.sc,y:t.y+8*t.sc,t:0,m:sk.k==='mag',c:ELC[sk.el]||'#ffffff'});
- pop(t,d,r.crit?'#ffe14a':r.weak?'#ffb030':(t.side===0?'#ff8a8a':'#ffffff'),false,(r.crit?'crit ':'')+(r.weak?'weak ':'')+(r.resist?'resist ':'')+(t.side===0?'hurt':''),sk.el);comboAdd(d);
- if(r.weak)SFX.weak();else SFX.hit();if(r.crit)B.fx.push({x:t.x+8*t.sc,y:t.y+8*t.sc,t:0,m:true,c:'#ffe14a'});
+ /* ver0.49：ミス・回避・障壁で 0 ダメージのときは、会心・弱点・耐性の印も数字も出さない（MISS・障壁の表示は hurt 側が出す） */
+ if(!(d>0)){r.crit=r.weak=r.resist=false;t._xf=0;}
+ if(d>0){pop(t,d,r.crit?'#ffe14a':r.weak?'#ffb030':(t.side===0?'#ff8a8a':'#ffffff'),false,(r.crit?'crit ':'')+(r.weak?'weak ':'')+(r.resist?'resist ':'')+(t.side===0?'hurt':''),sk.el);comboAdd(d);}
+ if(r.weak)SFX.weak();else if(d>0)SFX.hit();if(r.crit)B.fx.push({x:t.x+8*t.sc,y:t.y+8*t.sc,t:0,m:true,c:'#ffe14a'});
  if(r.crit)B.shake=6;
- if(a.side===0){if(!a.aw)a.ag=Math.min(100,a.ag+6+(r.weak?10:0)+(r.crit?4:0));
+ if(a.side===0){if(!a.aw)a.ag=Math.min(100,a.ag+(d>0?6:0)+(r.weak?10:0)+(r.crit?4:0));
   if(r.weak){t.known.add(sk.el);G.known[t.kind]=[...t.known];}}
  refresh();
  if(t.hp<=0)await kill(t);return d;}
