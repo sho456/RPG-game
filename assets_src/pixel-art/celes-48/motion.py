@@ -133,22 +133,8 @@ def mirror(a):
 
 
 def twinkle(a, seed, y0=24, n=10):
-    """星臨の服の星が瞬く：服の暗い所に白い星を足し、もとの小さな明るい点を暗くする（seed ごとに入れ替わる）"""
-    rng = np.random.RandomState(seed)
-    out = a.copy()
-    lum = a[..., :3].mean(2)
-    dark = (a[..., 3] > 0) & (lum < 90)
-    dark[:y0] = False
-    ys, xs = np.where(dark)
-    for i in rng.choice(len(ys), min(n, len(ys)), replace=False):
-        out[ys[i], xs[i], :3] = (253, 253, 254) if i % 3 else (124, 170, 223)
-    br = (a[..., 3] > 0) & (lum > 200)
-    br[:y0] = False
-    ys, xs = np.where(br)
-    for i in range(len(ys)):
-        if rng.rand() < .4:
-            out[ys[i], xs[i], :3] = (92, 95, 157)
-    return out
+    """（第 5 版でやめた）服の星をコマごとに描き替えるとチカチカするので、絵は変えない。きらめきは演出の光の粒で出す"""
+    return a.copy()
 A = {}
 # 待機（横向き）：呼吸 2 段＋後ろ髪のなびき。0.16 秒ずつ 4 コマで回す
 s = S['side']
@@ -200,7 +186,6 @@ A['aw_cast'] = [twinkle(w, 5), twinkle(wc, 6, n=16), twinkle(drift(wc, bh(wc, 16
 A['aw_act'] = [twinkle(bend(breathe(w, 24, 40, 1), 3), 9), twinkle(drift(bend(w, -4), bh(bend(w, -4), 14), 2), 10, n=18), twinkle(bend(w, -1), 11), twinkle(w, 12)]
 # 星臨：着地（星臨の姿のまま沈む）・回る（反転で 1 回転）・浮遊（髪と裾がふわりと上がる）
 A['aw_land'] = [twinkle(breathe(w, 24, 44, 2), 16), twinkle(breathe(w, 24, 44, 1), 17), twinkle(w, 18)]
-A['aw_spin'] = [twinkle(w, 19), twinkle(bend(w, 2), 20), twinkle(mirror(w), 21), twinkle(bend(mirror(w), -2), 22)]
 wf = drift(drift(w, bh(w, 14), 1, -1), bh(w, 14), 1, -1)
 A['aw_float'] = [twinkle(w, 23), twinkle(drift(w, bh(w, 14), 1, -1), 24, n=14), twinkle(wf, 25, n=18), twinkle(drift(w, bh(w, 14), 1, -1), 26, n=14)]
 A['aw_swing'] = [twinkle(bend(breathe(w, 22, 40, 2), 4), 13), twinkle(drift(bend(w, -6), bh(bend(w, -6), 12), 3), 14, n=24), twinkle(bend(w, -2), 15)]
@@ -221,7 +206,7 @@ if __name__ == '__main__':
     sh = Image.new('RGBA', (W, pad + len(rows) * (48 * z + pad)), (24, 24, 36, 255))
     d = ImageDraw.Draw(sh)
     JA = {'idle': '待機', 'cast': '詠唱', 'cast_in': '詠唱に入る', 'act': '発動', 'hit': '被弾', 'weak': '瀕死', 'fall': '倒れる', 'down': '気絶', 'front': '正面',
-          'turn': '回る', 'land': '着地', 'swing': '大きく振る', 'aw_idle': '星臨・待機', 'aw_cast': '星臨・詠唱', 'aw_act': '星臨・発動', 'aw_swing': '星臨・振る', 'aw_land': '星臨・着地', 'aw_spin': '星臨・回る', 'aw_float': '星臨・浮遊'}
+          'turn': '回る', 'land': '着地', 'swing': '大きく振る', 'aw_idle': '星臨・待機', 'aw_cast': '星臨・詠唱', 'aw_act': '星臨・発動', 'aw_swing': '星臨・振る', 'aw_land': '星臨・着地', 'aw_float': '星臨・浮遊'}
     for r_, (k, fr) in enumerate(rows):
         y = pad + r_ * (48 * z + pad)
         d.text((pad, y + 60), JA[k], font=F, fill=(250, 220, 120))

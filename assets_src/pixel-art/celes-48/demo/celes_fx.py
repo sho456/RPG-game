@@ -192,6 +192,56 @@ def clock_arrow(L, x0, y0, x1, y1, u, k=1.0, seed=0):
         L.disc(bx, by, 5 - j, BLUE, k * (1 - j * .25), glow=3)
 
 
+
+def arrow2(L, P, u, k=1.0, size=1.0, main=VIO, sub=BLUE):
+    """時の矢（第 2 版）：P(u)→(x, y) の道筋を飛ぶ。細る光のリボンの尾・らせんの星・金と白の軸・時計の針の穂先・尾の星"""
+    if u <= 0 or k <= .01:
+        return
+    hx, hy = P(u)
+    px, py = P(max(0.0, u - .02))
+    ang = math.atan2(hy - py, hx - px) if (hx, hy) != (px, py) else 0.0
+    ca, sa = math.cos(ang), math.sin(ang)
+    L.push()
+    pts = [P(max(0.0, u - j * .045)) for j in range(9)]       # 光のリボン（先が太く、尾ほど細い）
+    for j in range(8):
+        w = (9 - j) * size
+        L.line([pts[j], pts[j + 1]], main, int(w), k * (1 - j / 9), glow=6)
+        L.line([pts[j], pts[j + 1]], PALE, max(1, int(w / 3)), k * (1 - j / 8), glow=2)
+    for j in range(6):                                          # らせんの星
+        q = max(0.0, u - j * .05)
+        qx, qy = P(q)
+        off = 14 * size * math.sin(q * 40 + j)
+        L.star(qx - sa * off, qy + ca * off, 6 * size, 1, (PALE, sub)[j % 2], k * (1 - j / 6), rot=45)
+    ln = 64 * size                                              # 軸（細る多角形）
+    tx, ty = hx - ca * ln, hy - sa * ln
+    L.poly([(hx - ca * 10 * size - sa * 4 * size, hy - sa * 10 * size + ca * 4 * size), (tx, ty),
+            (hx - ca * 10 * size + sa * 4 * size, hy - sa * 10 * size - ca * 4 * size)], mul((255, 214, 120), .9), k)
+    L.line([(tx, ty), (hx, hy)], X.WHITE, max(1, int(2 * size)), k, glow=2)
+    L.poly([(hx + ca * 22 * size, hy + sa * 22 * size), (hx - sa * 9 * size, hy + ca * 9 * size),  # 時計の針の穂先（ひし形）
+            (hx - ca * 8 * size, hy - sa * 8 * size), (hx + sa * 9 * size, hy - ca * 9 * size)], PALE, k)
+    L.disc(hx, hy, 3 * size, X.WHITE, k, glow=2.5)
+    L.star(tx, ty, 14 * size, 1.4, PALE, k, rot=math.degrees(ang) + 45)    # 尾の星
+    L.star(hx + ca * 18 * size, hy + sa * 18 * size, 26 * size, 1.6, X.WHITE, k, rot=math.degrees(ang))
+
+
+def arrow_stuck(L, x, y, ang, a, size=1.0):
+    """刺さった矢：0.25 秒光って残る → 歯車の輪にはじける（a＝刺さってからの秒）"""
+    if a < 0:
+        return
+    ca, sa = math.cos(ang), math.sin(ang)
+    if a < .25:
+        k = 1 - a / .25 * .5
+        L.line([(x - ca * 50 * size, y - sa * 50 * size), (x + ca * 6, y + sa * 6)], (255, 214, 120), int(4 * size), k, glow=5)
+        L.star(x - ca * 50 * size, y - sa * 50 * size, 12 * size, 1.2, PALE, k, rot=45)
+    else:
+        q = clamp((a - .25) / .35)
+        r = 20 + 70 * eout(q) * size
+        L.ring(x, y, r, r, 2, PALE, 1 - q, soft=3)
+        for i in range(12):                                       # 歯車の歯
+            g = i * math.tau / 12 + a * 3
+            L.line([(x + math.cos(g) * r, y + math.sin(g) * r), (x + math.cos(g) * (r + 8), y + math.sin(g) * (r + 8))], VIO, 3, 1 - q, glow=3)
+
+
 def label(img, text, x, y, a, col, size=30):
     """強化・弱体の文字（ぽんと出て浮く）"""
     if a < 0 or a > 1.6:
@@ -417,6 +467,7 @@ class Kokunoya(X.Skill):
     name, dur = '刻の矢', 4.7
     ghost = (150, 120, 255)
     T1, T2, T3, TF = 1.62, 1.74, 1.83, 2.30   # 3 連はだんだん速く → 一斉射の着弾
+    SHOT = (1.46, 1.60, 1.71)                  # 撃つ時刻（着弾 T1〜T3 の 0.12〜0.16 秒前）
     hits = [X.Hit(1.62, 1, ECX, ECY, -1, 0, tint=VIO), X.Hit(1.74, 1, ECX, ECY, -1, 0, tint=VIO),
             X.Hit(1.83, 2, ECX, ECY, -1, -.3, tint=VIO), X.Hit(2.30, 3, ECX, ECY, -1, .2, stop=12, z=.09, tint=VIO)]
     slow = ((2.18, 2.42, .35),)
@@ -436,10 +487,15 @@ class Kokunoya(X.Skill):
         h = cast_pose(t, .32, 1.36, rise=18)
         if h:
             return h
-        if t < 2.55:                             # 発動：大きく跳んで空中で撃つ → 着地
+        if t < 2.55:                             # 発動：大きく跳んで空中で撃つ（1 本ごとに反動で後ろへ）→ 着地
             a = t - 1.36
             hop = 90 * math.sin(clamp(a / 1.25) * math.pi) ** .7
-            return act_pose(t, 1.36, HOME_X + 30 * math.sin(clamp(a / 1.25) * math.pi), GROUND, hop)
+            rec = sum(10 * math.exp(-(t - s0) / .08) for s0 in self.SHOT if t >= s0)
+            x = HOME_X + 30 * math.sin(clamp(a / 1.25) * math.pi) + rec
+            last = max([s0 for s0 in self.SHOT if t >= s0], default=None)
+            if last is not None and t - last < .1:
+                return hero('act1', x, GROUND - hop, g=1)       # 撃った瞬間：前へ伸び切る
+            return act_pose(t, 1.36, x, GROUND, hop)
         if t < 2.76:
             return hero(fr('land', t - 2.55, .07, False), HOME_X)
         if t < 3.06:
@@ -467,7 +523,6 @@ class Kokunoya(X.Skill):
             k = ease((t - .32) / .3) * (1 - ease((t - 2.3) / .3))
             dial(B, HOME_X, GROUND + 6, 110, k, t, hand=-t * 9, ticks=clamp((t - .32) / .5))
             X.parts(F, HOME_X, GROUND, t - .4, 70, 1.6, PALE, 120, 3, 'ember', up=3.6, spread=(200, 340), star=True, size=(2, 4))
-        X.gather(c, gx, gy, .45, 1.34, seed=3, big=1.0, cols=(VIO, BLUE), flame=False)
         # 夜空の大時計：12 の星が順に灯る → 針が逆回り
         k = ease((t - .8) / .4) * (1 - ease((t - 2.55) / .35))
         lit = clamp((t - .85) / .5)
@@ -483,12 +538,33 @@ class Kokunoya(X.Skill):
         if 1.36 <= t < 1.46:                      # 放出の直前：真っ黒に白い球
             F.disc(ECX, ECY, 40 * (1 - abs(t - 1.41) / .05), X.WHITE, 1.0, glow=2.8)
         X.glint(F, gx, gy, t, 1.34, .16, 80)
-        # 3 連の針の矢（空中から）
-        for i, (t0, th) in enumerate(((1.46, self.T1), (1.60, self.T2), (1.71, self.T3))):
+        # 溜め：3 本の時の矢が 1 本ずつ現れ、宝石のまわりを回る → 溜めの終わりに敵へ向きをそろえる
+        if .6 <= t < 1.46:
+            for i in range(3):
+                k = ease((t - .6 - i * .18) / .2)
+                if k <= 0 or t >= self.SHOT[i]:
+                    continue
+                aim = math.atan2(ECY - gy, ECX - gx)
+                orb = t * 5 + i * math.tau / 3
+                w_ = ease((t - 1.15) / .2)                   # 狙いに向く割合
+                ang = orb * (1 - w_) + (aim + (i - 1) * .18) * w_
+                rr = 76 * (1 - .25 * w_)
+                cx, cy = gx + math.cos(ang) * rr, gy + math.sin(ang) * rr
+                arrow2(F, lambda u, cx=cx, cy=cy, ang=ang: (cx + math.cos(ang) * 30 * u, cy + math.sin(ang) * 30 * u), 1.0, k, 1.25)
+        # 3 連の時の矢（空中から。発射の閃光と輪）
+        for i, (t0, th) in enumerate(zip(self.SHOT, (self.T1, self.T2, self.T3))):
+            h0 = self.hero(t0)
+            sx, sy = tip(h0)
+            tx, ty = ECX + 10, ECY - 10 + i * 14
+            def P(u, sx=sx, sy=sy, tx=tx, ty=ty, i=i):
+                return sx + (tx - sx) * u, sy + (ty - sy) * u - (50 - i * 15) * math.sin(math.pi * u)
             if t0 <= t < th:
-                clock_arrow(F, gx, gy - 6, ECX + 10, ECY - 10 + i * 14, ein((t - t0) / (th - t0)), 1.0, seed=i)
-            if t0 <= t < t0 + .08:
-                X.star_flash(F, gx, gy, 90, 1 - (t - t0) / .08, rot=t * 200, sub=BLUE)
+                arrow2(F, P, ein((t - t0) / (th - t0)), 1.0, 1.0 + .15 * i)
+            if t0 <= t < t0 + .12:
+                q = (t - t0) / .12
+                X.star_flash(F, sx, sy, 110 * (1 - q), 1 - q, rot=t * 200, sub=BLUE)
+                F.ring(sx, sy, 20 + 70 * eout(q), 20 + 70 * eout(q), 2, PALE, 1 - q, soft=3)
+            arrow_stuck(F, tx, ty, math.atan2(ty - P(.95)[1], tx - P(.95)[0]), t - th, 1.0 + .15 * i)
         for i, (th, s) in enumerate(((self.T1, .8), (self.T2, .9), (self.T3, 1.5))):
             X.impact(c, ECX, ECY - 10 + i * 14, s, th, seed=10 + i * 7, cold=True, rot=i * 22)
         # 一斉射：12 の星から針の矢が敵へ収束（少しずつずらして）
@@ -496,9 +572,14 @@ class Kokunoya(X.Skill):
             t0 = 1.95 + i * .012
             if t0 <= t < self.TF:
                 px, py = hour_pos(SKX, SKY, SKR, i)
-                clock_arrow(F, px, py, ECX, ECY, ein((t - t0) / (self.TF - t0)), 1.0, seed=20 + i)
+                arrow2(F, lambda u, px=px, py=py: (px + (ECX - px) * u, py + (ECY - py) * u), ein((t - t0) / (self.TF - t0)), 1.0, .9)
                 if t < t0 + .06:
                     X.star_flash(F, px, py, 70, 1 - (t - t0) / .06, sub=VIO)
+        for i in range(12):                       # 一斉射の矢が時計の針のように中心を指して刺さる
+            px, py = hour_pos(SKX, SKY, SKR, i)
+            ang = math.atan2(ECY - py, ECX - px)
+            if self.TF <= t < self.TF + .2:
+                arrow_stuck(F, ECX - math.cos(ang) * 30, ECY - math.sin(ang) * 30, ang, t - self.TF, .9)
         a = t - self.TF
         if a >= 0:                                # とどめ：縦の光の柱で両断・画面を渡る衝撃の輪・大時計が砕けて星が降る
             X.impact(c, ECX, ECY, 2.6, self.TF, seed=60, cold=True, rot=15)
@@ -978,32 +1059,71 @@ class Shuen(X.Skill):
     def awake(self, t):
         return t >= self.AW + .04
 
+    # ---- 動きの道筋（各段の終わりの位置＝次の段の始まり。左右に向きを変えない）
+    SKYX, SKYF = 430, GROUND - 250
+
+    def path(self, t):
+        """(x, 足元の y)。滑らかにつながる 1 本の道筋"""
+        AW = self.AW
+        def hover1(u):
+            return HOME_X, GROUND - 20 - 6 * math.sin((u - AW) * 3)
+        def sky(u):
+            return self.SKYX, self.SKYF - 5 * math.sin((u - 2.9) * 3)
+        if t < AW:
+            a = t - .3
+            return HOME_X, GROUND - 20 * ease(a / .6)
+        if t < 1.8:
+            return hover1(t)
+        if t < 2.05:                               # タメ 1：地面近くまで沈む
+            x0, y0 = hover1(1.8)
+            k = ease((t - 1.8) / .25)
+            return x0, y0 + (GROUND - 4 - y0) * k
+        if t < 2.9:                                # 一気に昇る（弧を描いて）
+            k = eout((t - 2.05) / .85)
+            return HOME_X + (self.SKYX - HOME_X) * k - 40 * math.sin(k * math.pi), GROUND - 4 + (self.SKYF - GROUND + 4) * k
+        if t < 3.62:
+            return sky(t)
+        if t < self.FALL:                          # タメ 2：少し昇って後ろへ引く
+            x0, y0 = sky(3.62)
+            k = ease((t - 3.62) / (self.FALL - 3.62))
+            return x0 + 12 * k, y0 + (self.SKYF - 18 - y0) * k
+        if t < 4.12:                               # 振り下ろす（速く）
+            k = eout((t - self.FALL) / .2)
+            return self.SKYX + 12 - 27 * k, self.SKYF - 18 + 33 * k
+        if t < 4.8:                                # 振り抜いたまま余韻
+            return self.SKYX - 15, self.SKYF + 15 - 4 * ease((t - 4.12) / .68)
+        if t < 5.8:                                # ゆっくり降りる
+            k = ease((t - 4.8) / 1.0)
+            return self.SKYX - 15 + (HOME_X - self.SKYX + 15) * k, self.SKYF + 11 + (GROUND - self.SKYF - 11) * k
+        return HOME_X, GROUND
+
     def hero(self, t):
         if t < .3:
             return idle(t)
-        if t < self.AW:                            # 変身の前：浮いて光を集める（通常の詠唱）
-            a = t - .3
-            return hero(fr('cast', a, .07), HOME_X, GROUND - 20 * ease(a / .5) - 3 * math.sin(a * 9))
+        x, f = self.path(t)
+        if t < self.AW:                            # 変身の前：詠唱（ゆっくり脈打つ）
+            return hero(fr('cast', t - .3, .16), x, f)
         if t < self.AW + .04:
-            return dict(hero('aw_cast0', HOME_X, GROUND - 20), w=1)
-        if t < self.AW + .4:                       # 星臨：くるりと回って姿を見せる
-            return hero(fr('aw_spin', t - self.AW, .07), HOME_X, GROUND - 20 - 10 * math.sin(clamp((t - self.AW) / .4) * math.pi))
-        if t < self.RISE:
-            return hero(fr('aw_float', t, .09), HOME_X, GROUND - 20 - 4 * math.sin(t * 5))
-        if t < 2.9:                                # 回りながら銀河へ昇る（残像）
-            k = ease((t - self.RISE) / .9)
-            return hero(fr('aw_spin', t - self.RISE, .06), HOME_X + (430 - HOME_X) * k, GROUND - 20 - 230 * k, g=1)
-        if t < self.FALL:                          # 空で天球儀を操る（浮遊）
-            return hero(fr('aw_float', t, .09), 430, GROUND - 250 - 5 * math.sin(t * 4))
-        if t < 4.8:                                # 振り下ろす
-            return hero(fr('aw_swing', t - self.FALL, .1, False), 430, GROUND - 250 + 20 * ease((t - self.FALL) / .4), g=1)
-        if t < 5.8:                                # ゆっくり降りる（回りながら）
-            k = ease((t - 4.8) / 1.0)
-            p = fr('aw_spin', t, .12) if k < .7 else fr('aw_float', t, .09)
-            return hero(p, 430 + (HOME_X - 430) * k, GROUND - 230 * (1 - k), g=1 if k < .7 else 0)
-        if t < 6.0:
-            return hero(fr('aw_land', t - 5.8, .07, False), HOME_X)
-        return hero(fr('aw_idle', t, .16), HOME_X)
+            return dict(hero('aw_float0', x, f), w=1)
+        if t < 1.8:
+            return hero(fr('aw_float', t, .22), x, f)
+        if t < 2.05:
+            return hero('aw_act0', x, f)               # のけぞって力を溜める
+        if t < 2.9:
+            return hero('aw_act1' if t < 2.3 else fr('aw_float', t, .22), x, f, g=1 if t < 2.6 else 0)
+        if t < 3.62:
+            return hero(fr('aw_float', t, .22), x, f)
+        if t < self.FALL:
+            return hero('aw_swing0', x, f)             # 引いて止める
+        if t < 4.12:
+            return hero('aw_swing1', x, f, g=1)
+        if t < 4.8:
+            return hero('aw_swing2' if t < 4.4 else 'aw_float0', x, f)
+        if t < 5.8:
+            return hero(fr('aw_float', t, .22), x, f)
+        if t < 6.05:
+            return hero(fr('aw_land', t - 5.8, .08, False), x, f)
+        return hero(fr('aw_idle', t, .24), x, f)
 
     # ---- 星臨のまとい：足元の金の陣・体のまわりを昇る銀河の渦（奥）・頭上の光輪（手前）
     def props_back(self, c, hh, base):
@@ -1052,6 +1172,13 @@ class Shuen(X.Skill):
                 F.ring(HOME_X, GROUND - 100, 30 + 620 * eout(q), (30 + 620 * eout(q)) * (.4 + .15 * j), 4, (GOLDC, VIO, PALE, GOLDC)[j], 1 - q, soft=6)
             X.star_flash(F, HOME_X, GROUND - 100, 380 * (1 - clamp(a / .35)) ** .4, 1 - clamp(a / .35), rot=a * 40, col=X.WHITE, sub=GOLDC)
             X.parts(F, HOME_X, GROUND - 40, a, 120, 3, GOLDC, 130, 202, 'ember', up=3.5, star=True, size=(3, 6))
+        if self.awake(t) and t < 7.6:              # 服のきらめき：体の上の 9 点がゆっくり明滅（チカチカさせない）
+            rnd = random.Random(31)
+            for i in range(9):
+                ox, oy, ph = rnd.uniform(-34, 30), rnd.uniform(-150, -20), rnd.uniform(0, math.tau)
+                kk = max(0.0, math.sin(t * 1.8 + ph)) ** 2
+                if kk > .05:
+                    F.star(hh['x'] + ox, hh['f'] + oy, 9 * kk + 2, 1.2, PALE, .8 * kk, rot=45)
         if self.awake(t) and t < 7.6:              # 星臨中：体から昇る金と紫の星屑・後ろに伸びる光の尾
             X.parts(F, hh['x'], hh['f'] - 20, t - self.AW, 70, 1.6, GOLDC, 90, 203, 'ember', up=2.8, spread=(230, 310), star=True, size=(2, 4))
             X.parts(F, hh['x'], hh['f'] - 60, t - self.AW, 50, 1.2, VIO, 110, 204, 'ember', up=2.0, spread=(200, 340), star=True, size=(2, 3))
@@ -1131,6 +1258,18 @@ class Shuen(X.Skill):
             X.parts(F, ECX, ECY, b, 200, 7, VIO, 120, 402, 'ember', up=2.5, star=True, size=(3, 7))
             X.parts(F, GX, GY - 100, b, 260, 3, GOLDC, 200, 403, 'ember', up=-2.4, spread=(0, 360), star=True, size=(2, 6))
             F.speedlines(ECX, ECY, 60, 260, GOLDC, .9 * (1 - clamp(b / .6)), int(t * 60))
+        if 1.8 <= t < 2.1:                         # タメ 1：足元に金の光が吸い込まれる
+            q = clamp((t - 1.8) / .25)
+            B.ring(HOME_X, GROUND + 8, 160 * (1 - q) + 20, (160 * (1 - q) + 20) * .24, 3, GOLDC, q)
+        if 2.05 <= t < 2.4:                        # 踏み切り：金の輪と砂ぼこり
+            q = clamp((t - 2.05) / .35)
+            B.ring(HOME_X, GROUND + 8, 30 + 200 * eout(q), (30 + 200 * eout(q)) * .24, 4, GOLDC, 1 - q)
+        X.dust(c.FF, HOME_X, GROUND + 4, t - 2.05, 16, 5, 0, seed=33)
+        if 3.62 <= t < self.FALL:                  # タメ 2：杖の先に金の光が集まる
+            gx, gy = tip(hh)
+            q = clamp((t - 3.62) / (self.FALL - 3.62))
+            F.disc(gx, gy, 6 + 16 * q, GOLDC, q, glow=3)
+            F.ring(gx, gy, 80 * (1 - q) + 10, 80 * (1 - q) + 10, 2, GOLDC, q, soft=4)
         if 5.8 <= t < 6.4:                         # 着地：金の星の輪が足元から広がる
             q = clamp((t - 5.8) / .5)
             B.ring(HOME_X, GROUND + 8, 30 + 180 * eout(q), (30 + 180 * eout(q)) * .24, 4, GOLDC, 1 - q)
