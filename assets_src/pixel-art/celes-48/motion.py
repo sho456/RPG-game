@@ -95,7 +95,32 @@ def lift(a, dy):
     return out
 
 
-S = {n: load(n) for n in ('side', 'ready', 'cast', 'dying', 'faint', 'front')}
+S = {n: load(n) for n in ('side', 'ready', 'cast', 'dying', 'faint', 'front', 'awake')}
+CA = np.load(os.path.join(SP, 'palette_awake.npy')).round().astype(int)
+HAIR_AW = [tuple(c) for c in CA if c.mean() > 150 and np.ptp(c) < 110 and not (c[0] > 200 and c[2] < 140)]
+
+
+def mirror(a):
+    return a[:, ::-1].copy()
+
+
+def twinkle(a, seed, y0=24, n=10):
+    """星臨の服の星が瞬く：服の暗い所に白い星を足し、もとの小さな明るい点を暗くする（seed ごとに入れ替わる）"""
+    rng = np.random.RandomState(seed)
+    out = a.copy()
+    lum = a[..., :3].mean(2)
+    dark = (a[..., 3] > 0) & (lum < 90)
+    dark[:y0] = False
+    ys, xs = np.where(dark)
+    for i in rng.choice(len(ys), min(n, len(ys)), replace=False):
+        out[ys[i], xs[i], :3] = (253, 253, 254) if i % 3 else (124, 170, 223)
+    br = (a[..., 3] > 0) & (lum > 200)
+    br[:y0] = False
+    ys, xs = np.where(br)
+    for i in range(len(ys)):
+        if rng.rand() < .4:
+            out[ys[i], xs[i], :3] = (92, 95, 157)
+    return out
 A = {}
 # 待機（横向き）：呼吸 2 段＋後ろ髪のなびき。0.16 秒ずつ 4 コマで回す
 s = S['side']
@@ -122,6 +147,30 @@ f = S['faint']
 A['fall'] = [shear(breathe(d, 22, 40, 2), 4), shear(breathe(d, 18, 42, 4), 6), lift(f, 3), f]
 # 気絶：かすかな呼吸
 A['down'] = [f, breathe(f, 34, 40)]
+# 回る（くるり）：横 → 正面 → 背を向けた横（左右反転）→ 正面 → 横
+A['turn'] = [s, S['front'], mirror(s), S['front'], s]
+# 着地の沈み（2 行つぶす → 1 行）
+A['land'] = [breathe(r, 24, 44, 3), breathe(r, 24, 44, 1), r]
+# 大きく振る：のけぞり → 前へ大きく倒して髪が後ろへ流れる → 戻り
+sw = shear(r, -5)
+A['swing'] = [shear(breathe(r, 24, 40, 1), 3), drift(sw, back_hair(sw, 14), 3), shear(r, -2)]
+# 星臨：待機（呼吸・髪のなびき・服の星が瞬く）・詠唱（浮いて髪がはね上がる）・発動・大きく振る
+w = S['awake']
+
+
+def bh(a, y0=20):
+    m = is_col(a, HAIR_AW)
+    m[:y0] = False
+    m[:, :24] = False
+    return m
+
+
+w1 = breathe(w, 26, 34)
+A['aw_idle'] = [twinkle(w, 1), twinkle(w1, 2), twinkle(drift(w1, bh(w1), 1), 3), twinkle(w1, 4)]
+wc = drift(w, bh(w, 16), 1, -1)
+A['aw_cast'] = [twinkle(w, 5), twinkle(wc, 6, n=16), twinkle(drift(wc, bh(wc, 16), 1), 7, n=20), twinkle(wc, 8, n=16)]
+A['aw_act'] = [twinkle(shear(breathe(w, 24, 40, 1), 3), 9), twinkle(drift(shear(w, -4), bh(shear(w, -4), 14), 2), 10, n=18), twinkle(shear(w, -1), 11), twinkle(w, 12)]
+A['aw_swing'] = [twinkle(shear(breathe(w, 22, 40, 2), 4), 13), twinkle(drift(shear(w, -6), bh(shear(w, -6), 12), 3), 14, n=24), twinkle(shear(w, -2), 15)]
 # 勝利・選択に使う正面（呼吸）
 A['front'] = [S['front'], breathe(S['front'], 26, 34)]
 
@@ -132,20 +181,21 @@ if __name__ == '__main__':
         for i, a in enumerate(fr):
             Image.fromarray(a, 'RGBA').save(os.path.join(root, k, f'frame_{i:03d}.png'))
     # 一覧
-    z, pad = 4, 10
+    z, pad = 3, 8
     F = ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc', 18)
     rows = list(A.items())
-    W = pad + max(len(v) for _, v in rows) * (48 * z + pad) + 120
+    W = pad + max(len(v) for _, v in rows) * (48 * z + pad) + 150
     sh = Image.new('RGBA', (W, pad + len(rows) * (48 * z + pad)), (24, 24, 36, 255))
     d = ImageDraw.Draw(sh)
-    JA = {'idle': '待機', 'cast': '詠唱', 'cast_in': '詠唱に入る', 'act': '発動', 'hit': '被弾', 'weak': '瀕死', 'fall': '倒れる', 'down': '気絶', 'front': '正面'}
+    JA = {'idle': '待機', 'cast': '詠唱', 'cast_in': '詠唱に入る', 'act': '発動', 'hit': '被弾', 'weak': '瀕死', 'fall': '倒れる', 'down': '気絶', 'front': '正面',
+          'turn': '回る', 'land': '着地', 'swing': '大きく振る', 'aw_idle': '星臨・待機', 'aw_cast': '星臨・詠唱', 'aw_act': '星臨・発動', 'aw_swing': '星臨・振る'}
     for r_, (k, fr) in enumerate(rows):
         y = pad + r_ * (48 * z + pad)
-        d.text((pad, y + 80), JA[k], font=F, fill=(250, 220, 120))
+        d.text((pad, y + 60), JA[k], font=F, fill=(250, 220, 120))
         for i, a in enumerate(fr):
             bg = Image.new('RGBA', (48 * z, 48 * z), (58, 62, 82, 255))
             bg.alpha_composite(Image.fromarray(a, 'RGBA').resize((48 * z, 48 * z), Image.NEAREST))
-            sh.alpha_composite(bg, (120 + i * (48 * z + pad), y))
+            sh.alpha_composite(bg, (150 + i * (48 * z + pad), y))
     os.makedirs(os.path.join(HERE, 'preview'), exist_ok=True)
     sh.save(os.path.join(HERE, 'preview', 'motion_sheet.png'))
     print({k: len(v) for k, v in A.items()})
