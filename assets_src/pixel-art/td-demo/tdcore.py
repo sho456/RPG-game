@@ -337,6 +337,8 @@ class Sim:
             r = prm.get('r', 150)
             ids = [i for i in x if hp[i] > 0 and abs(x[i] - c) < r]
         rng = np.random.default_rng(int(t * 1000) % 99991)
+        # 範囲の技の数字は 1 回に 4 体まで（群れの上が数字で埋まらないように。ダメージは全員に入る）
+        show = set(ids) if len(ids) <= 4 else set(sorted(ids, key=lambda i: -x[i])[:4])
         for i in ids:
             e = self.enemies[i]
             d = int(dmg * rng.uniform(.9, 1.1))
@@ -344,7 +346,8 @@ class Sim:
             kb[i] -= prm.get('kb', 0)
             e['hits'].append((t, col, prm.get('kb', 0)))
             w, h = self.size(e['kind'])
-            self.nums.append(dict(t=t, x=x[i] + rng.uniform(-8, 8), y=GROUND + e['z'] - h - 6, n=d, crit=crit, col=col))
+            if i in show:
+                self.nums.append(dict(t=t, x=x[i] + rng.uniform(-8, 8), y=GROUND + e['z'] - h - 6, n=d, crit=crit, col=col))
         act['hits'].append((t, kind, ids, prm))
         self.sfx.append((t, 'hit_' + act['name'], len(ids)))
 

@@ -524,7 +524,8 @@ def fx_front(Lf, t, act, sim, fi):
             lit = int(clamp((age - .3) / .45) * 12)
             spin = -ein(clamp((age - .2) / .7)) * 6.28 * 3
             pclock(P, ax, cy, 72, 72, k, GOLD, VIO, 1.0, h1=spin * .3, h2=None, lit=lit)
-            pdisk(P, ax, cy, 64, 64, DEEP, .55, dither=True)
+            if k > .5:
+                pdisk(P, ax, cy, 64 * k, 64 * k, DEEP, .55, dither=True)
             if .45 < age < NEEDLE_T[0]:
                 hold = clamp((age - .7) / .2)
                 ny = cy - 6 + 4 * (1 - hold)
