@@ -434,7 +434,7 @@ class Demo:
         if dead:
             age = t - e['death']
             mm = X.mosaic_mask(sp, clamp(age / .35), seed=e['id'], blk=2)
-            kw.update(mask=mm, white=max(white, 1 - clamp(age / .12)))
+            kw.update(mask=mm, white=max(white, .75 * (1 - clamp(age / .07))))
         X.paste(img, sp, x - w / 2, foot - h, **kw)
         if dead:
             age = t - e['death']
