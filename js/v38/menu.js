@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.50';
+const VER='ver0.51';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,11 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　タワーディフェンス「灯守の防衛線」の試作<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　灯守の防衛線：横スクロールの戦場と序盤 3 章<br><small>`+
+ `・戦場を横に長い帯に。左右にドラッグで見渡し、上の小地図で移動。章ごとの背景（灰の街道・翠の森・祈りの廃聖堂）<br>`+
+ `・序章〜第2章の 13 ステージ。章の地図・出撃準備（出る敵と弱点・手札 8 枚の編成）・物語の会話。シオン・ミレイユ・ジン・ノアが仲間に<br>`+
+ `・<b>灯を強める</b>：灯力で灯の光を広げ、灯の光弾を強くする（3 段階）。霊体は術、重装は術か打で</small></div>`+
+ `<div class="nt n38"><b>ver0.50</b>　タワーディフェンス「灯守の防衛線」の試作<br><small>`+
  `・ホームの「防衛」から遊べる試作（序章の 2 ステージ）。道を歩いてくる虚蝕から、灯（拠点）を守る<br>`+
  `・<b>灯域</b>：灯の光が届く台座にだけ仲間を置ける。リオとノアは周りを照らし、虚蝕のスライムは光を削る<br>`+
  `・灯力で配置・撤退で半分戻る。灯火 7 が 0 で敗北。星片 10 で星臨（戦闘中 1 回）。今のコマンド戦闘はそのまま遊べる</small></div>`+

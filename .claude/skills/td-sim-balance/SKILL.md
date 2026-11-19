@@ -9,7 +9,8 @@ description: アストラル・ブレイカー（このリポジトリ）のタ�
 
 ```bash
 python3 -m http.server 8765 &
-node tools/td_sim.js --n 40                       # 全ステージ × 推奨Lv−3・推奨Lv・推奨Lv+4
+node tools/td_sim.js --n 24                       # 全ステージ × 推奨Lv−3・推奨Lv・推奨Lv+4（手札はその時点の仲間＝TDD.rosterAt）
+node tools/td_sim.js --tune 4.5 --n 16            # 推奨 Lv で灯火が平均 4.5 残る雑魚の HP 倍率 hk を二分探索
 node tools/td_sim.js --stage td0_4 --lv 1,4,8 --deck rio,gald,mire,celes,noah,erna,shion,hakua
 ```
 1 戦 5〜25ms。40 戦 × 3 Lv でも数秒。結果：勝率・灯火（勝った戦の平均の残り）・秒・星。
@@ -31,10 +32,11 @@ node tools/td_sim.js --stage td0_4 --lv 1,4,8 --deck rio,gald,mire,celes,noah,er
 
 ## 4. つまみ（効きの強い順）
 
-1. WAVE の密度（数・間隔）と配置の上限 `cap`
-2. 敵の HP・攻撃の係数（`TDD.foe`：`mhp×2.3`・`atk×1.15`・Lv ごと +10%/+8%）
-3. 仲間の Lv の効き（`lvK`：+5%/Lv）
-4. 光の削り（`sim.js tick`：1 体 1.5/秒・下限 60%・倒すと +10・虚蝕がいないと +4/秒）
-5. ボスの呼び出し（`ai.every×3` 秒・2 体）
+1. ステージの `hk`（雑魚の HP 倍率）・`bk`（ボスの HP 倍率）。まず `--tune` で `hk` を出す。`hk` が 0.6 未満なら原因はボス：`bk` を下げる。2.2 を超えるなら敵の数を増やす（HP を固くしすぎない）
+2. WAVE の密度（数・間隔）と配置の上限 `cap`、道の数（仲間が 3 人以下なら 1 本道）
+3. 灯を強める（`sim.js` の `LAMP` の値段・`lampSet` の威力）
+4. 敵の基本の係数（`TDD.foe`：`mhp×2.3`・`atk×1.15`・ボス ×0.9）と仲間の Lv の効き（`lvK`：+5%/Lv）
+5. 光の削り（1 体 1.5/秒・下限 60%・倒すと +10・虚蝕がいないと +4/秒）
 
+自動の配置（`TDS.bot`）は、置ける台座が無いとき・上限のときに灯を強める。人より下手なので、人は 1 段易しく感じる。
 数値を変えたら `docs/TD-DESIGN.md` の該当の行も直す。計測の表はコミットメッセージに貼る。
