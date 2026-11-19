@@ -1,0 +1,27 @@
+/* ===== ホーム画面（js/ui/home.js）。トークンは tokens.css のみ。下のタブは旧 .h22nav と同じ位置・高さ ===== */
+.hm{text-shadow:none;font-family:var(--tk-font);color:var(--tk-ink)}
+.hm button{pointer-events:auto;font-family:inherit;color:inherit;cursor:pointer;border:0;border-radius:var(--tk-r)}
+.hm-ic{width:22px;height:22px;fill:currentColor;flex:none}
+.hm-top{position:absolute;left:8px;right:8px;top:8px;display:flex;align-items:center;gap:var(--tk-gap)}
+.hm-res{display:flex;align-items:center;gap:6px;height:30px;padding:0 10px;background:var(--tk-night-2);box-shadow:var(--tk-frame)}
+.hm-res img{width:18px;height:18px;image-rendering:pixelated}
+.hm-res b{font-size:var(--tk-fs-m);font-variant-numeric:tabular-nums;font-weight:700}
+.hm-xp{display:flex;color:var(--tk-star)}.hm-xp .hm-ic{width:16px;height:16px}
+.hm-bt{margin-left:auto;width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:var(--tk-night-3);box-shadow:var(--tk-frame),var(--tk-drop)}
+.hm-sheet{position:absolute;right:8px;top:54px;display:grid;grid-template-columns:repeat(2,1fr);gap:var(--tk-gap);padding:var(--tk-pad);background:var(--tk-night-2);box-shadow:var(--tk-frame),var(--tk-drop);pointer-events:auto;z-index:2}
+.hm-sheet[hidden]{display:none}
+.hm-sheet button{display:flex;align-items:center;gap:8px;min-width:104px;height:40px;padding:0 10px;background:var(--tk-night-3);box-shadow:var(--tk-drop)}
+.hm-sheet b{font-family:var(--tk-disp);font-size:var(--tk-fs-m);font-weight:400}
+.hm-main{position:absolute;left:12px;right:12px;bottom:84px;display:flex;gap:var(--tk-gap);align-items:stretch}
+.hm-go{flex:1;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:12px;align-items:center;text-align:left;min-height:78px;padding:10px 16px;background:var(--tk-lamp);color:var(--tk-night);box-shadow:0 0 0 2px var(--tk-lamp-deep),0 0 0 3px var(--tk-shade),var(--tk-drop)}
+.hm-go .hm-ic{grid-row:1/3;width:34px;height:34px}
+.hm-go b{font-family:var(--tk-disp);font-size:var(--tk-fs-xl);font-weight:400;line-height:1.1}
+.hm-go small{font-size:var(--tk-fs-s);font-variant-numeric:tabular-nums;color:var(--tk-lamp-deep);font-weight:700}
+.hm-map{width:62px;display:flex;align-items:center;justify-content:center;background:var(--tk-night-3);box-shadow:var(--tk-frame),var(--tk-drop)}
+.hm-go:active,.hm-map:active,.hm-bt:active,.hm-nav button:active,.hm-sheet button:active{transform:translateY(1px);box-shadow:none}
+.hm-nav{position:absolute;left:4px;right:4px;bottom:4px;display:grid;grid-template-columns:repeat(4,1fr);gap:3px;padding:4px;background:var(--tk-night-2);box-shadow:var(--tk-frame)}
+.hm-nav button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:54px;background:var(--tk-night-3);box-shadow:var(--tk-drop)}
+.hm-nav b{font-family:var(--tk-disp);font-size:var(--tk-fs-s);font-weight:400;white-space:nowrap}
+.hm-nav .hm-ic{color:var(--tk-lamp)}
+.hm-dot{position:absolute;right:6px;top:6px;width:9px;height:9px;border-radius:var(--tk-r-round);background:var(--tk-notice);box-shadow:0 0 0 1px var(--tk-shade)}
+@media (max-height:700px){.hm-nav button{height:48px}.hm-nav .hm-ic{width:20px;height:20px}.hm-main{bottom:76px}}

@@ -114,6 +114,7 @@
 | 108 | `js/td/bg.js` | 6 | TD の戦場の背景（TDBG）：章ごとの空・遠景・中景・地面と道・灯（拠点）。横スクロールの奥行き（遠いほどゆっくり動く） | TDBG |
 | 109 | `js/td/view.js` | 23 | TD の戦闘画面（TD）：横スクロールの戦場・上下の帯・手札・ユニットの窓・リザルト。ロジックは js/td/sim.js（TDS） | TD |
 | 110 | `js/td/menu.js` | 10 | TD の章の地図・出撃準備・会話・仲間の加入（TDM）。戦闘画面は js/td/view.js（TD） | TDM |
+| 111 | `js/ui/home.js` | 4 | ホーム画面（灯都ルミナス）の正本：TD「防衛」を主役にした重ね表示 | HOME |
 
 ## 上書きの連鎖（2 ファイル以上で定義・上書きされる関数）
 
@@ -127,7 +128,7 @@
 | `dvMenu` | dev.js → ch9.js → ver16.js → ver17.js → ver18-town.js → v20-ui.js → v21.js → v22.js → v23.js → v24.js → v25.js → v29.js → v30.js → v31/quests.js → battle/viewer.js |
 | `show` | core.js → ver17.js → ver18-town.js → v20-ui.js → v22.js → v23.js → v24.js → v25.js → battle/flow.js → v38/battle-ui.js → v38/help.js → ui/keywords.js → ui/battle-pop.js → td/view.js → td/menu.js |
 | `migrate` | items.js → ch8.js → ch9.js → ver17.js → ver18-field.js → v31/items.js → data/resist.js → v31/quests.js → v32.js → rs/core.js → data/equip7.js → v38/core.js |
-| `townMenu` | town.js → ch9.js → ver17.js → ver18-town.js → v20-ui.js → v21.js → v22.js → v23.js → v31/quests.js → v38/menu.js → td/menu.js |
+| `townMenu` | town.js → ch9.js → ver17.js → ver18-town.js → v20-ui.js → v21.js → v22.js → v23.js → v31/quests.js → v38/menu.js → td/menu.js → ui/home.js |
 | `calc` | engine.js → ch8.js → ch9.js → ver19.js → v20-battle.js → data/terms.js → v31/core.js → rs/battle.js |
 | `hero` | engine.js → ver18-battle.js → v20-battle.js → v31/items.js → v31/board.js → battle/viewer.js → rs/core.js → td/data.js |
 | `refresh` | engine.js → ch5.js → ver17.js → v20-ui.js → v22.js → v24.js → v25.js → v31/quests.js |
@@ -136,6 +137,7 @@
 | `close` | ver17.js → battle/viewer.js → battle/flow.js → v38/help.js → ui/equip-info.js → ui/keywords.js → td/menu.js |
 | `panel` | town.js → ver18-town.js → v20-ui.js → v22.js → battle/viewer.js → v38/help.js → ui/battle-pop.js |
 | `boardMenu` | items.js → ver17.js → v21.js → v31/board.js → rs/core.js → ui/board.js |
+| `build` | motion/skeleton.js → items/icons36.js → v38/help.js → td/view.js → td/menu.js → ui/home.js |
 | `charHTML` | ver17.js → v20-ui.js → v22.js → v31/core.js → v31/board.js → rs/ui.js |
 | `doAction` | engine.js → ch8.js → v20-battle.js → v20-ui.js → v22.js → battle/flow.js |
 | `face` | ui-assets.js → ver18-art.js → sprite/legacy/dot-rig.js → ver19-art.js → sprite/spx.js → td/view.js |
@@ -145,7 +147,6 @@
 | `row` | ver17.js → v22.js → v24-text.js → zukan/zukan.js → data/resist.js → v31/quests.js |
 | `add` | motion/fx19.js → data/terms.js → motion/registry.js → battle/core.js → ui/growth.js |
 | `autoPick` | engine.js → ch8.js → ver17.js → v20-battle.js → rs/battle.js |
-| `build` | motion/skeleton.js → items/icons36.js → v38/help.js → td/view.js → td/menu.js |
 | `end` | engine.js → v20-ui.js → v31/quests.js → rs/battle.js → td/sim.js |
 | `enemy` | engine.js → v31/enemies.js → v32.js → battle/size.js → v38/core.js |
 | `enemyTurn` | engine.js → v20-battle.js → v20-ui.js → v25.js → battle/viewer.js |
@@ -201,6 +202,7 @@
 | `makeTown` | field.js → town.js → ver18-town.js |
 | `mark` | zukan/zukan.js → rs/ui.js → ui/keywords.js |
 | `menu` | engine.js → ver18-town.js → v22.js |
+| `nextStage` | ch7.js → ver18-battle.js → ui/home.js |
 | `onClick` | battle/viewer.js → td/view.js → td/menu.js |
 | `openBoard` | items.js → v21.js → v31/board.js |
 | `pick` | ver17.js → v31/items.js → battle/seq.js |
@@ -250,6 +252,7 @@
 | `devAreas` | dev.js → v31/quests.js |
 | `devGear` | dev.js → v31/items.js |
 | `dir` | sprite/legacy/dot-rig.js → battle/core.js |
+| `dot` | motion/fx19.js → ui/home.js |
 | `drawHome` | ver18-town.js → v22.js |
 | `drawTitle` | ui-assets.js → ver18-town.js |
 | `drawTown` | field.js → ver18-town.js |
@@ -296,7 +299,6 @@
 | `map` | td/stages.js → td/menu.js |
 | `mid` | ver19.js → td/bg.js |
 | `newMember` | ch1.js → v31/items.js |
-| `nextStage` | ch7.js → ver18-battle.js |
 | `now` | v24.js → ui/battle-pop.js |
 | `one` | v24.js → items/icons36.js |
 | `opening` | v25.js → rs/battle.js |
