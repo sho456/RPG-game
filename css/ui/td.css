@@ -1,0 +1,96 @@
+/* ===== TD（タワーディフェンス）の画面。トークンは css/ui/tokens.css。js/td/view.js と対 ===== */
+#td{position:fixed;inset:0;z-index:900;display:flex;flex-direction:column;background:var(--tk-night);color:var(--tk-ink);font-family:var(--tk-font);
+ padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);user-select:none;-webkit-user-select:none;touch-action:manipulation}
+#td.hide{display:none}
+#td button{font-family:inherit;color:inherit;cursor:pointer}
+/* 上の帯 */
+.td-top{display:flex;align-items:center;gap:var(--tk-gap);padding:6px 10px;background:var(--tk-night-2);box-shadow:var(--tk-drop);height:44px;flex:none}
+.td-wave{display:flex;flex-direction:column;line-height:1.1;min-width:64px}
+.td-wave small{font-size:var(--tk-fs-xs);color:var(--tk-ink-2);letter-spacing:.1em}
+.td-wave b{font-size:var(--tk-fs-l);font-variant-numeric:tabular-nums}
+.td-life{display:flex;gap:2px;flex:1;align-items:center}
+.td-life i{width:9px;height:12px;background:var(--tk-life);clip-path:polygon(50% 0,100% 45%,50% 100%,0 45%)}
+.td-life i.off{background:var(--tk-void);opacity:.45}
+.td-life span{font-size:var(--tk-fs-xs);color:var(--tk-ink-2);margin-right:4px}
+.td-btn{min-width:40px;height:32px;padding:0 10px;border:0;border-radius:var(--tk-r);background:var(--tk-night-3);box-shadow:var(--tk-frame);font-size:var(--tk-fs-m);font-weight:700}
+.td-btn.on{background:var(--tk-lamp);color:var(--tk-shade);box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp-deep)}
+.td-btn:active{transform:translateY(1px)}
+.td-btn:focus-visible,.td-card:focus-visible{outline:2px solid var(--tk-star);outline-offset:2px}
+/* 戦場 */
+.td-field{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.td-field canvas{display:block;image-rendering:pixelated}
+.td-banner{position:absolute;left:0;right:0;top:40%;text-align:center;pointer-events:none;font-family:var(--tk-disp);font-size:var(--tk-fs-xxl);
+ color:var(--tk-star);text-shadow:0 2px 0 var(--tk-shade);opacity:0;transform:translateY(8px);transition:opacity .25s,transform .25s}
+.td-banner small{display:block;font-family:var(--tk-font);font-size:var(--tk-fs-s);color:var(--tk-ink-2);letter-spacing:.2em}
+.td-banner.show{opacity:1;transform:none}
+.td-tip{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);background:var(--tk-shade);color:var(--tk-ink);font-size:var(--tk-fs-s);padding:6px 12px;
+ border-radius:var(--tk-r);box-shadow:var(--tk-frame);white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none}
+.td-tip.show{opacity:1}
+.td-call{position:absolute;left:10px;top:10px;border:0;border-radius:var(--tk-r);background:var(--tk-lamp);color:var(--tk-shade);font-weight:800;font-size:var(--tk-fs-s);
+ padding:6px 10px;box-shadow:var(--tk-drop);line-height:1.2;text-align:left}
+.td-call small{display:block;font-weight:500;font-size:var(--tk-fs-xs)}
+.td-call[hidden]{display:none}
+/* ユニットの窓 */
+.td-unit{position:absolute;min-width:168px;background:var(--tk-night-2);box-shadow:var(--tk-frame),0 3px 0 var(--tk-shade);border-radius:var(--tk-r);padding:8px 10px;font-size:var(--tk-fs-s)}
+.td-unit[hidden]{display:none}
+.td-unit h4{margin:0;font-family:var(--tk-disp);font-size:var(--tk-fs-m);font-weight:700;display:flex;justify-content:space-between;gap:8px}
+.td-unit h4 em{font-style:normal;font-family:var(--tk-font);font-size:var(--tk-fs-xs);color:var(--tk-ink-2)}
+.td-unit p{margin:2px 0 6px;color:var(--tk-ink-2);line-height:1.5}
+.td-unit .row{display:flex;gap:6px}
+.td-unit .row .td-btn{flex:1;height:30px;font-size:var(--tk-fs-s)}
+.td-unit .ult:disabled{opacity:.4}
+/* 下の帯 */
+.td-bar{display:flex;align-items:center;gap:10px;padding:6px 10px 4px;flex:none}
+.td-cost{display:flex;align-items:baseline;gap:4px;min-width:84px}
+.td-cost small{font-size:var(--tk-fs-xs);color:var(--tk-ink-2)}
+.td-cost b{font-size:var(--tk-fs-xl);color:var(--tk-lamp);font-variant-numeric:tabular-nums;line-height:1}
+.td-cost i{display:block;height:3px;background:var(--tk-lamp);width:0}
+.td-costw{display:flex;flex-direction:column;gap:2px}
+.td-star{flex:1;display:flex;align-items:center;gap:6px;font-size:var(--tk-fs-xs);color:var(--tk-ink-2)}
+.td-star .g{flex:1;height:6px;background:var(--tk-night-3);box-shadow:var(--tk-frame)}
+.td-star .g i{display:block;height:100%;width:0;background:var(--tk-star)}
+.td-star.full{color:var(--tk-star)}
+.td-star.full .g{animation:tdpulse .9s infinite alternate}
+@keyframes tdpulse{to{box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-star)}}
+/* 手札 */
+.td-deck{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:4px 10px 10px;flex:none}
+.td-card{position:relative;height:62px;border:0;border-radius:var(--tk-r);background:var(--tk-night-2);box-shadow:var(--tk-frame);padding:0;overflow:hidden;display:flex;align-items:flex-end;justify-content:center}
+.td-card img{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);image-rendering:pixelated;height:44px}
+.td-card .c{position:absolute;left:3px;top:2px;font-size:var(--tk-fs-m);font-weight:800;color:var(--tk-lamp);text-shadow:0 1px 0 var(--tk-shade);font-variant-numeric:tabular-nums}
+.td-card .r{position:absolute;right:0;top:0;width:4px;height:100%}
+.td-card .n{position:relative;font-size:var(--tk-fs-xs);background:var(--tk-shade);width:100%;line-height:12px;padding:0 2px;white-space:nowrap;overflow:hidden}
+.td-card .cd{position:absolute;inset:0;background:conic-gradient(rgba(7,7,26,.78) var(--p,0%),transparent 0);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:var(--tk-fs-l)}
+.td-card.poor .c{color:var(--tk-void)}
+.td-card.poor img{filter:saturate(.25) brightness(.7)}
+.td-card.on{opacity:.45}
+.td-card.on::after{content:'配置中';position:absolute;top:22px;left:0;right:0;font-size:var(--tk-fs-xs);text-align:center}
+.td-card.sel{box-shadow:0 0 0 1px var(--tk-shade),0 0 0 3px var(--tk-lamp);transform:translateY(-3px)}
+/* 選ぶ・結果 */
+.td-sheet{position:absolute;inset:0;background:rgba(7,7,26,.82);display:flex;align-items:center;justify-content:center;padding:16px;z-index:5}
+.td-sheet[hidden]{display:none}
+.td-panel{width:min(340px,100%);background:var(--tk-night-2);box-shadow:var(--tk-frame),0 4px 0 var(--tk-shade);border-radius:var(--tk-r);padding:16px}
+.td-panel h3{margin:0 0 2px;font-family:var(--tk-disp);font-size:var(--tk-fs-xl);text-align:center}
+.td-panel .sub{text-align:center;color:var(--tk-ink-2);font-size:var(--tk-fs-s);margin-bottom:12px}
+.td-stars{display:flex;justify-content:center;gap:10px;margin:8px 0 12px}
+.td-stars i{width:34px;height:34px;background:var(--tk-void);clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);opacity:.5}
+.td-stars i.on{background:var(--tk-star);opacity:1}
+.td-goal{list-style:none;padding:0;margin:0 0 12px;font-size:var(--tk-fs-s)}
+.td-goal li{display:flex;gap:8px;padding:4px 0;border-bottom:1px solid var(--tk-line);color:var(--tk-ink-2)}
+.td-goal li.on{color:var(--tk-ink)}
+.td-goal li::before{content:'';width:8px;height:8px;margin-top:5px;background:var(--tk-void);flex:none}
+.td-goal li.on::before{background:var(--tk-star)}
+.td-rw{display:flex;justify-content:center;gap:16px;font-size:var(--tk-fs-m);margin-bottom:14px}
+.td-rw b{color:var(--tk-lamp);font-variant-numeric:tabular-nums}
+.td-acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.td-acts .td-btn{height:40px}
+.td-acts .wide{grid-column:1/-1}
+.td-st{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.td-st button{display:flex;justify-content:space-between;align-items:center;text-align:left;border:0;border-radius:var(--tk-r);background:var(--tk-night-3);box-shadow:var(--tk-frame);padding:10px 12px}
+.td-st button b{font-family:var(--tk-disp);font-size:var(--tk-fs-l);font-weight:700}
+.td-st button small{display:block;color:var(--tk-ink-2);font-size:var(--tk-fs-xs)}
+.td-st .ss{display:flex;gap:2px}
+.td-st .ss i{width:10px;height:10px;background:var(--tk-void);clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+.td-st .ss i.on{background:var(--tk-star)}
+/* ホームの入口（右の縦メニューの最後） */
+.td-entry .td-ic{display:block;font-family:var(--tk-disp);font-size:18px;line-height:20px;color:var(--tk-lamp);text-shadow:0 1px 0 var(--tk-shade)}
+@media (prefers-reduced-motion:reduce){.td-banner,.td-tip{transition:none}.td-star.full .g{animation:none}}

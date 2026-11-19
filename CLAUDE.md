@@ -51,6 +51,10 @@
 | 用語・耐性 | `js/data/terms.js`（`TERMS`） | — |
 | 強化メニュー（経験値のストック・レベルアップ・旧酒場の統合） | `js/ui/growth.js`（`GROW`） | `css/ui/growth.css` |
 | 版表示・お知らせ | `js/v38/menu.js`（`VER` `NEWS`） | — |
+| **タワーディフェンス「灯守の防衛線」**（移行先の戦闘。入口＝ホーム左の「防衛」・`index.html#td`） | データ `js/td/data.js`（`TDD`）・ロジック `js/td/sim.js`（`TDS`。DOM なしの固定刻み・自動の配置 `bot`）・画面 `js/td/view.js`（`TD`）。設計 `docs/TD-DESIGN.md` | `css/ui/td.css` |
+| デザイントークン（新しい画面はこれ以外の色・角・影を使わない） | — | `css/ui/tokens.css` |
+
+**今後の方針（2026-11）：コマンドRPG → タワーディフェンスへ移行中**（縦画面・横から見たジグザグの道・灯域）。新しい戦闘の作業は `js/td/` と `docs/TD-DESIGN.md` に。`startBattle` 系（ver16〜v38・`js/rs/*`）には新しい機能を足さない（TD が置き換えたあと削除する）。
 
 戦闘システムの詳細は `docs/RS-SYSTEM.md`、素材は `docs/ASSETS.md` `docs/PIPELINE.md`、演出は `docs/FX.md`。
 
@@ -90,6 +94,8 @@
 | `rpg-hero-motion` | 戦闘モーション・技の演出 |
 | `rpg-equipment-icon` | 装備アイコン |
 | `rs-battle-fx` | 技・術の演出の設計（録画の実測：吹き出し→暗転→溜め→放出→着弾→明けの時間割・剣の振りの周期・術の段取り・エフェクトの色・効果音のレシピ・背景）と、参考を写さず応用・進化させる決まり。録画の分析 `scripts/vref.py` |
+| `td-stage-author` | TD のステージ・WAVE・道と台座・灯域・敵の型・仲間の役割と技（`js/td/data.js`） |
+| `td-sim-balance` | TD の難易度の計測と調整（`tools/td_sim.js`。自動の配置で何十回も戦わせる） |
 | `rs-battle-flow` | ロマサガRS風の戦闘の流れと表示（HP/BP のタイミング・Critical/Weak・強化弱体・数字・区切り）。デモ `tools/battle_demo.js`・コマの一覧 `tools/frame_grid.py` |
 
 **PixelLab（MCP サーバー `pixellab`、AI のドット絵生成・アニメ・タイル・効果音。有料の回数制）**：クラウドでは環境「rpg-game」の起動スクリプトが `claude mcp add -s user -t http pixellab https://api.pixellab.ai/mcp` で登録し、API キーは環境のネットワークシークレット（api.pixellab.ai）からプロキシが付ける（キーをリポジトリに書かない）。手元の PC では `claude mcp add pixellab https://api.pixellab.ai/mcp -t http -H "Authorization: Bearer <キー>"`。使い方は `search_help`、残りの回数は `get_balance`。生成した絵はセレス案1・案2の絵柄（`assets_src/pixel-art/celes-48`・`celes-hd`）に合わせて手直ししてから取り込む。

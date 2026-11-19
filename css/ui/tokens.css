@@ -1,0 +1,33 @@
+/* ===== デザイントークン（色・文字・角・影の正本。TD 移行の新しい画面はここ以外の値を使わない） =====
+ 方向：「灯と虚蝕」。夜藍の地に、押せるもの・主役だけが灯の琥珀で光る。未解放・無効は虚蝕の灰紫（灰色の箱にしない）。
+ 禁止：枠のグラデーション・ぼかした影・角丸の乱用・斜体の英字バッジ・赤い通知の乱用（通知は --tk-notice の 1 種類だけ）。
+ 枠はドット絵に合わせて直角＋1 段の濃い影。攻撃属性の 8 色は戦闘の情報専用（飾りに使わない）。 */
+:root{
+ /* 地と文字 */
+ --tk-night:#12132a;      /* 地（夜藍） */
+ --tk-night-2:#1b1d3c;    /* 一段上の面 */
+ --tk-night-3:#272a52;    /* 押せる面・台座 */
+ --tk-line:#3b3f72;       /* 枠の線 */
+ --tk-shade:#07071a;      /* 影（ぼかさない 1 段） */
+ --tk-ink:#efeaf8;        /* 文字 */
+ --tk-ink-2:#a9a5c4;      /* 補足の文字 */
+ /* 世界観の色 */
+ --tk-lamp:#f2b347;       /* 灯：主役・押せる・決定（1 画面に 1 か所） */
+ --tk-lamp-deep:#8a5414;  /* 灯の縁 */
+ --tk-star:#fff0b8;       /* 星：報酬・希少・星片 */
+ --tk-void:#6f6888;       /* 虚蝕：未解放・無効・光の外 */
+ --tk-life:#ff8a6a;       /* 灯火（拠点の残り）・被害 */
+ --tk-notice:#ff6a4a;     /* 通知の印（これ 1 種類だけ） */
+ /* 戦闘の情報（攻撃属性 8 色） */
+ --el-zan:#e8e8f0;--el-da:#d9a066;--el-totsu:#b0e0ff;--el-netsu:#ff7a3c;--el-rei:#7fd8ff;--el-rai:#ffe14a;--el-you:#fff1a8;--el-in:#b07aff;
+ /* 文字 */
+ --tk-font:"M PLUS 1p","Hiragino Sans",sans-serif;  /* 本文・数字 */
+ --tk-disp:"Kaisei Tokumin","Hiragino Mincho ProN",serif; /* 見出し・技名だけ */
+ --tk-fs-xs:10px;--tk-fs-s:12px;--tk-fs-m:14px;--tk-fs-l:17px;--tk-fs-xl:22px;--tk-fs-xxl:30px;
+ /* 角・影・間 */
+ --tk-r:2px;              /* 角（ほぼ直角） */
+ --tk-r-round:50%;        /* 丸（アイコン・扇だけ） */
+ --tk-drop:0 2px 0 var(--tk-shade);         /* 押せるものの影 */
+ --tk-frame:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-line); /* ドット絵の 2 重の枠 */
+ --tk-gap:8px;--tk-pad:12px;
+}
