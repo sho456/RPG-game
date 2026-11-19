@@ -15,7 +15,7 @@ import numpy as np
 from PIL import Image, ImageFont
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(HERE, '..', '..', 'rio-rs4'))
+sys.path.insert(0, HERE)
 import fxlib as X  # noqa: E402
 
 # ---- 色（fxlib の色の役割をセレスの色に置き換える：関数の中は呼ぶときに参照されるので全体に効く） ----

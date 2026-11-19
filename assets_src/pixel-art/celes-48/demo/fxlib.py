@@ -22,8 +22,6 @@ import numpy as np
 from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, ROOT)
-import rio as R  # noqa: E402
 
 OUT = os.path.join(ROOT, 'out')
 W, H, FPS, PX = 640, 720, 60, 4
@@ -42,8 +40,8 @@ GOLD, EMBER, WHITE, HOT = (255, 206, 90), (255, 132, 40), (255, 255, 255), (255,
 NIGHT, PALE = (80, 120, 255), (196, 218, 255)          # 奥義だけ
 DUST = (150, 134, 116)
 
-# ---- 絵（rio.py の手描き） ----
-SPR = {k: R.render(v, foot=41 if k == '気絶' else 45).convert('RGBA') for k, v in R.POSES.items()}
+# ---- 絵（使う側が SPR を差し替える。元はリオ rio-rs4/rio.py の手描きだったが RS 風の素材を削除したので空） ----
+SPR = {}
 
 
 def big(im, k=PX):

@@ -1,6 +1,6 @@
 # Study: RS battle presentation from two 60fps screen recordings + command-select poses
 
-- source: two user-provided recordings (sword multi-hit skill; water spell with summon), split with `.claude/skills/rs-battle-fx/scripts/vref.py`; three command-select sprites via `rs_ref.py`. Numbers: `.claude/skills/rs-battle-fx/references/video-2026-11.md`, `.claude/skills/rs-style-sprite/references/design-v3.md` §5
+- source: two user-provided recordings (sword multi-hit skill; water spell with summon), split with `.claude/skills/rs-battle-fx/scripts/vref.py`; three command-select sprites via `rs_ref.py`. Numbers: `.claude/skills/rs-battle-fx/references/video-2026-11.md` (the RS sprite-style notes were removed in 2026-11)
 - recordings are not kept in the repo; only timings, structure and colour logic
 
 ## Timing (speed ×1)
