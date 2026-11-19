@@ -93,4 +93,6 @@
 | `rs-battle-fx` | 技・術の演出の設計（録画の実測：吹き出し→暗転→溜め→放出→着弾→明けの時間割・剣の振りの周期・術の段取り・エフェクトの色・効果音のレシピ・背景）と、参考を写さず応用・進化させる決まり。録画の分析 `scripts/vref.py` |
 | `rs-battle-flow` | ロマサガRS風の戦闘の流れと表示（HP/BP のタイミング・Critical/Weak・強化弱体・数字・区切り）。デモ `tools/battle_demo.js`・コマの一覧 `tools/frame_grid.py` |
 
+**PixelLab（MCP サーバー `pixellab`、AI のドット絵生成・アニメ・タイル・効果音。有料の回数制）**：クラウドでは環境「rpg-game」の起動スクリプトが `claude mcp add -s user -t http pixellab https://api.pixellab.ai/mcp` で登録し、API キーは環境のネットワークシークレット（api.pixellab.ai）からプロキシが付ける（キーをリポジトリに書かない）。手元の PC では `claude mcp add pixellab https://api.pixellab.ai/mcp -t http -H "Authorization: Bearer <キー>"`。使い方は `search_help`、残りの回数は `get_balance`。生成した絵は `rs-style-sprite` の規格に合わせて手直ししてから取り込む。
+
 pixelbolt を最新版に上げるとき：`npx -y pixelbolt@latest skill install` → `~/.claude/skills/pixelbolt-pixel-art` を `.claude/skills/` に上書きコピーしてコミット。
