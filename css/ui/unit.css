@@ -20,9 +20,9 @@
 .un-grid .mt em{font-style:normal}.un-grid .mt .cs{color:var(--tk-lamp)}
 .un-dot{position:absolute;top:8px;right:6px;width:8px;height:8px;border-radius:var(--tk-r-round);background:var(--tk-notice)}
 .un-hero{display:flex;align-items:center;justify-content:space-between;padding:12px 10px 0}
-.un-hero .pv{flex:1;height:130px;display:flex;align-items:flex-end;justify-content:center;background:var(--tk-night-2);box-shadow:var(--tk-frame);margin:0 8px;padding-bottom:8px}
-.un-hero img{height:110px;image-rendering:pixelated;object-fit:contain}
-#unit .nv{height:130px;min-width:36px}
+.un-hero .pv{flex:1;height:min(34vh,260px);display:flex;align-items:flex-end;justify-content:center;background:var(--tk-night-2);box-shadow:var(--tk-frame);margin:0 8px;padding-bottom:8px}
+.un-hero img{height:min(28vh,200px);image-rendering:pixelated;object-fit:contain}
+#unit .nv{height:min(34vh,260px);min-width:36px}
 .un-id{display:flex;align-items:center;gap:8px;margin:10px;font-size:var(--tk-fs-m)}
 .un-id .role{width:6px;height:22px}
 .un-id .el{color:var(--tk-ink-2);font-size:var(--tk-fs-s)}
@@ -48,3 +48,6 @@
 .un-sheet .sb{display:flex;justify-content:space-between;margin-bottom:8px}
 .un-sheet ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
 .un-sheet li button{position:relative;width:100%;height:50px;border:0;border-radius:var(--tk-r);background:var(--tk-night-3);box-shadow:var(--tk-frame);padding:0;display:flex;align-items:center;justify-content:center}
+
+/* 灯の琥珀は主役（+1）だけ。ほかの押せるボタンは琥珀の縁と字 */
+#unit .td-btn.ok{box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp);color:var(--tk-lamp)}

@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.51';
+const VER='ver0.52';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,11 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　灯守の防衛線：横スクロールの戦場と序盤 3 章<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　新しいホームと仲間画面<br><small>`+
+ `・ホーム：主役は「防衛」。下のタブは 防衛・仲間・強化・鍛冶、ほかは ≡ に<br>`+
+ `・仲間：Lv・技の練達・装備・星盤を 1 つの画面で。装備・練達・星臨の位階が防衛の強さに効く<br>`+
+ `・画面の説明の字を減らした。本編でクリアしたクエストは防衛でもクリア済みに</small></div>`+
+ `<div class="nt n38"><b>ver0.51</b>　灯守の防衛線：横スクロールの戦場と序盤 3 章<br><small>`+
  `・戦場を横に長い帯に。左右にドラッグで見渡し、上の小地図で移動。章ごとの背景（灰の街道・翠の森・祈りの廃聖堂）<br>`+
  `・序章〜第2章の 13 ステージ。章の地図・出撃準備（出る敵と弱点・手札 8 枚の編成）・物語の会話。シオン・ミレイユ・ジン・ノアが仲間に<br>`+
  `・<b>灯を強める</b>：灯力で灯の光を広げ、灯の光弾を強くする（3 段階）。霊体は術、重装は術か打で</small></div>`+

@@ -97,7 +97,7 @@
 | 91 | `js/rs/ui.js` | 23 | 戦闘システムの画面 | RSU |
 | 92 | `js/v38/core.js` | 4 | ver0.38 土台：攻撃属性 8 種・武器種 8 種・セーブの移行・LP | V38 |
 | 93 | `js/v38/battle-ui.js` | 8 | ver0.38 戦闘画面 | V38B |
-| 94 | `js/v38/menu.js` | 14 | ver0.38 画面全体の整理 | V38M |
+| 94 | `js/v38/menu.js` | 15 | ver0.38 画面全体の整理 | V38M |
 | 95 | `js/v38/help.js` | 8 | ver0.38 タップで詳細（V38H） | V38H |
 | 96 | `js/ui/skill-icons.js` | 5 | 技・術のアイコン（SKICON：白いシルエットの絵柄 27 種＋技 → 絵柄の対応。js/rs/ui.js の skIcon が使う） |  |
 | 97 | `js/ui/board.js` | 5 | 星盤・天星盤の画面（ver0.39 で 1 ファイルにまとめた。画面の正本はここ） | BOARDUI |

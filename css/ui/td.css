@@ -204,3 +204,4 @@
 .tdm-foes .tr i{font-style:normal;font-size:var(--tk-fs-xs);font-weight:800;width:18px;height:18px;display:flex;align-items:center;justify-content:center;color:var(--tk-ink);background:var(--tk-night-3)}
 .tdm-foes .tr i.t-void{background:var(--tk-tr-void)}.tdm-foes .tr i.t-ghost{background:var(--tk-tr-ghost)}.tdm-foes .tr i.t-armor{background:var(--tk-tr-armor)}
 .tdm-pool{margin-top:14px}
+.tdm-tags button.lv{border:0;border-radius:var(--tk-r);font:inherit;font-size:var(--tk-fs-xs);font-weight:800;padding:2px 8px;cursor:pointer}

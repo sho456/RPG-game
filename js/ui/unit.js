@@ -1,5 +1,5 @@
 /* ===== 仲間の画面（UNIT）：TD 用の一覧＋1 人の詳細。Lv・装備・技の練達・星臨・星盤をここにまとめる =====
- UNIT.open() で一覧、UNIT.open(id) で詳細。全画面の #unit（z902）。閉じたら townMenu()。
+ UNIT.open() で一覧、UNIT.open(id) で詳細、UNIT.open(null, 戻り先の関数)。全画面の #unit（z902）。閉じたら townMenu()。
  能力は TDD.hero(id,lv,TDD.real(id)) の数字。Lv は GROW.lvUp、装備は equip、練達は RSM.up。変えたら save() */
 'use strict';
 const UNIT=(()=>{
@@ -17,8 +17,9 @@ const dots=(n,m=3)=>`<span class="un-dots">${Array.from({length:m},(_,i)=>`<i cl
 const itSrc=it=>{try{const r=itemIcon(it);return/^</.test(r)?r:`<img src="${r}" alt="">`;}catch(e){return'';}};
 const byRole=()=>{const o=Object.keys(TDD.ROLE);return(G.members||[]).filter(id=>TDD.HERO[id]&&G.h[id]).sort((a,b)=>o.indexOf(TDD.HERO[a].role)-o.indexOf(TDD.HERO[b].role));};
 function build(){if(root)return;root=document.createElement('div');root.id='unit';root.className='hide';document.body.appendChild(root);root.addEventListener('click',onClick);}
-function open(id){build();sheet=null;cur=id&&G.h[id]?id:null;root.classList.remove('hide');draw();root.scrollTop=0;}
-function close(){if(root)root.classList.add('hide');try{townMenu();}catch(e){}}
+let back=null;/* 戻り先（出撃準備から開いたときは出撃準備へ） */
+function open(id,bk){build();back=bk||null;sheet=null;cur=id&&G.h[id]?id:null;root.classList.remove('hide');draw();root.scrollTop=0;}
+function close(){if(root)root.classList.add('hide');const b=back;back=null;if(b){try{b();}catch(e){console.error(e);}return;}try{townMenu();}catch(e){}}
 const stats=id=>TDD.hero(id,G.h[id].lv,TDD.real(id));
 const itOf=u=>u&&G.inv.find(x=>x.uid===u);
 function list(){const L=byRole();
@@ -41,7 +42,7 @@ function detail(id){const all=byRole(),s=stats(id),d=TDD.HERO[id],R=TDD.ROLE[d.r
  <div class="un-id"><span class="role" style="background:${R.col}" title="${esc(R.n)}"></span><span class="el">${esc(R.n)}　${esc(s.el||'')}</span><b>Lv${h.lv}</b>
   <button class="td-btn${ok?' on':' dis'}" data-a="lv" data-v="1" ${ok?'':'aria-disabled="true"'}>+1</button><button class="td-btn${ok?'':' dis'}" data-a="lv" data-v="9999" ${ok?'':'aria-disabled="true"'}>${max?'MAX':'↑'}</button></div>
  <ul class="un-stats">${stat('HP',fm(s.hp))}${stat('攻',fm(s.atk))}${stat('間',s.iv)}${stat('射',s.rng)}${stat('費',s.cost)}${s.blk?stat('止',s.blk):''}</ul>
- <div class="un-row"><i class="k">技</i><b class="nm">${esc(s.sk.n)}</b>${dots(ml)}<button class="td-btn${why===null?' on':' dis'}" data-a="mas" ${why===null?'':'aria-disabled="true"'}>${why==='max'?'MAX':`${stI()}${cost}`}</button></div>
+ <div class="un-row"><i class="k">技</i><b class="nm">${esc(s.sk.n)}</b>${dots(ml)}<button class="td-btn${why===null?' ok':' dis'}" data-a="mas" ${why===null?'':'aria-disabled="true"'}>${why==='max'?'MAX':`${stI()}${cost}`}</button></div>
  <div class="un-row"><i class="k">臨</i><b class="nm">${esc(s.ult.n)}</b>${dots(s.ult.aw)}</div>
  <div class="un-eqs">${SLOTS.map(([sl,g])=>slotBtn(id,sl,g)).join('')}</div>
  <button class="td-btn un-bd" data-a="board" aria-label="星盤">星盤</button>${sheetHTML(id)}`;}

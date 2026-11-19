@@ -41,7 +41,7 @@ function prep(id){if(!open(id))return map();cur=id;const S=TDD.STAGE[id],C=chOf(
  const avg=deck.length?Math.round(deck.reduce((a,h)=>a+(G.h[h]?G.h[h].lv:1),0)/deck.length):1;
  show(`<header class="tdm-h"><button class="td-btn" data-a="map" aria-label="地図へ戻る">◀</button><b>出撃準備</b><span class="tdm-sum">${esc(C.ch)}</span></header>
  <section class="tdm-st"><h2>${S.boss?'<i class="bs">◆</i>':''}${esc(S.name)}</h2><canvas class="tdm-prev" width="360" height="90"></canvas>
- <div class="tdm-tags"><span class="lv${avg<S.lv?' warn':''}" title="推奨 Lv${S.lv}・手札の平均 Lv${avg}">Lv${S.lv}</span><span class="cap" title="配置の上限">${'<i></i>'.repeat(S.cap)}</span><span title="WAVE">≋ ${S.waves.length}</span></div></section>
+ <div class="tdm-tags">${avg<S.lv&&typeof UNIT!=='undefined'?`<button class="lv warn" data-a="grow" title="推奨 Lv${S.lv}・手札の平均 Lv${avg}">Lv${S.lv} ↑</button>`:`<span class="lv" title="推奨 Lv${S.lv}">Lv${S.lv}</span>`}<span class="cap" title="配置の上限">${'<i></i>'.repeat(S.cap)}</span><span title="WAVE">≋ ${S.waves.length}</span></div></section>
  <ul class="tdm-foes">${kinds.map(k=>{const f=TDD.foe(k,S.lv);if(!f)return'';return`<li><img src="${pic(f.spr,k,1,28)}" alt=""><span class="tx"><b>${f.boss?'<i class="bs">◆</i>':''}${esc(f.name)}</b></span><span class="tr">${f.tr.map(t=>`<i class="t-${t}" title="${esc(TDD.TRN[t]||t)}">${({void:'蝕',ghost:'霊',armor:'重',fly:'飛'})[t]||''}</i>`).join('')}</span><span class="wk">${f.weak.map(e=>`<i style="--c:${ELC[e]}">${e}</i>`).join('')}</span><span class="n">×${cnt(k)}</span></li>`;}).join('')}</ul>
   <div class="tdm-pool">${mem.map(h=>{const x=TDD.hero(h,G.h[h]?G.h[h].lv:1),on=deck.includes(h);
   return`<button class="${on?'on':''}" data-a="pick" data-v="${h}"><img src="${pic(h,h,0,40)}" alt=""><span class="c">${x.cost}</span><span class="r" style="background:${TDD.ROLE[x.role].col}"></span>
@@ -69,6 +69,7 @@ function after(id,next){const fin=()=>{const i=TDD.ORDER.indexOf(id),nx=TDD.ORDE
   show(`<div class="tdm-join"><img src="${pic(who,who,0,64)}" alt=""><b>${esc(HB[who].name)}が仲間になった</b><button class="td-btn on" data-a="fin">続ける</button></div>`);
   root.querySelector('[data-a="fin"]').onclick=e=>{e.stopPropagation();fin();};});}
 function onClick(e){const b=e.target.closest('[data-a]');if(!b||b.disabled)return;const a=b.dataset.a,v=b.dataset.v;
+ if(a==='grow'){const id=cur;root.classList.add('hide');UNIT.open(null,()=>prep(id));return;}
  if(a==='home')close();else if(a==='map')map();else if(a==='tab'){tab=v;map();}else if(a==='stage')prep(v);else if(a==='go')go(v);
  else if(a==='pick'){const d=G.td.deck||[];const i=d.indexOf(v);if(i>=0){if(d.length>1)d.splice(i,1);}else if(d.length<8)d.push(v);G.td.deck=d;const y=root.scrollTop;prep(cur);root.scrollTop=y;}}
 /* ---------- 入口：ホーム右の縦メニューに「防衛」・index.html#td ---------- */
