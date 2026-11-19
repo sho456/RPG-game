@@ -3,26 +3,9 @@
 const EXN={n:'通常',h:'笑顔',a:'怒り',s:'悲しみ',o:'驚き'},EXBG={n:'#1a2048',h:'#3a3012',a:'#44141c',s:'#10224a',o:'#2e3a12'};
 const EXC={};
 function eyeOf(id){const r=SPR[id]||[];for(let y=0;y<r.length;y++){const x=r[y].indexOf('e');if(x>=0)return[x,y];}return null;}
-function exprFace(id,ex='n'){const key=id+':'+ex;if(EXC[key])return EXC[key];const S=4,b=bbox(id),w=Math.min(16,b.w),h=Math.min(12,b.h),ox=(16-w)>>1,oy=2;
- const c=document.createElement('canvas');c.width=c.height=16*S;const g=c.getContext('2d');g.imageSmoothingEnabled=false;
- g.fillStyle=EXBG[ex]||EXBG.n;g.fillRect(0,0,c.width,c.height);g.drawImage(IMG[id],b.x,b.y,w,h,ox*S,oy*S,w*S,h*S);
- const e=eyeOf(id),P=(x,y,ww,hh,col)=>{g.fillStyle=col;g.fillRect(x,y,ww,hh);};
- if(e){const X=(e[0]-b.x+ox)*S,Y=(e[1]-b.y+oy)*S,sk=(()=>{const d=g.getImageData(X+S+1,Y+1,1,1).data;return`rgb(${d[0]},${d[1]},${d[2]})`;})(),D='#1a1420';
-  if(ex==='h'){P(X,Y,S,S,sk);P(X,Y+2,1,2,D);P(X+1,Y+1,2,1,D);P(X+3,Y+2,1,2,D);P(X-2,Y+S+1,6,3,'#ff8aa0');P(c.width-12,5,6,6,'#ffe27a');P(c.width-10,3,2,10,'#ffe27a');P(c.width-14,7,10,2,'#ffe27a');}
-  if(ex==='a'){P(X-1,Y-2,2,1,D);P(X+1,Y-1,2,1,D);P(X+3,Y,1,1,D);P(c.width-14,4,3,9,'#ff4050');P(c.width-17,7,9,3,'#ff4050');}
-  if(ex==='s'){P(X,Y,S,S,sk);P(X,Y+2,S,2,D);P(X-1,Y-2,2,1,D);P(X+1,Y-3,2,1,D);P(X,Y+S,3,5,'#7fd6ff');P(X,Y+S+5,3,4,'#bff4ff');}
-  if(ex==='o'){P(X-1,Y-1,S+2,S+2,'#ffffff');P(X+1,Y+1,2,2,D);P(c.width-10,3,4,12,'#ffe27a');P(c.width-10,18,4,4,'#ffe27a');}}
- else{if(ex==='a')P(c.width-14,4,3,9,'#ff4050');if(ex==='o')P(c.width-10,3,4,12,'#ffe27a');if(ex==='s')P(8,c.height-14,3,6,'#7fd6ff');}
- return EXC[key]=c.toDataURL();}
+function exprFace(){}/* 未使用：js/ver18-art.js が置き換え */
 /* lines: [[話者id|null, 表情, 本文], ...] */
-function talk(lines,done){const d=document.createElement('div');d.id='talk';
- d.innerHTML='<div class="tkw"><div class="tkp"><img></div><div class="tkb"><div class="tkn"></div><div class="tkt"></div><div class="tkx">▼</div></div></div><button class="tksk">スキップ ▶▶</button>';
- $('#app').appendChild(d);let i=-1,tm=null,full='';const im=d.querySelector('.tkp img'),pp=d.querySelector('.tkp'),nm=d.querySelector('.tkn'),tx=d.querySelector('.tkt');
- const fin=()=>{clearInterval(tm);tm=null;tx.innerHTML=full;};
- const next=()=>{i++;if(i>=lines.length){d.remove();if(done)done();return;}const[sp,ex,t]=lines[i];full=t;
-  if(sp&&HB[sp]){pp.style.display='';im.src=exprFace(sp,ex);nm.textContent=HB[sp].name;nm.style.display='';d.classList.remove('nar');}else{pp.style.display='none';nm.style.display='none';d.classList.add('nar');}
-  tx.textContent='';let n=0;const cs=[...t];clearInterval(tm);tm=setInterval(()=>{n++;tx.textContent=cs.slice(0,n).join('');if(n>=cs.length)fin();},28);};
- d.onclick=e=>{if(e.target.closest('.tksk')){SFX.sel();i=lines.length-1;fin();next();return;}if(tm)fin();else{SFX.sel();next();}};next();}
+function talk(){}/* 未使用：js/ver17.js が置き換え */
 /* 1行＝「話者.表情 本文」 話者：R=リオ C=相手 N=語り */
 const parseEp=(id,s)=>s.split('|').map(l=>{const sp=l[0]==='R'?'rio':l[0]==='C'?id:null;return[sp,sp?l[2]:'n',l.slice(4)];});
 
@@ -151,16 +134,11 @@ function zkMenu(m){G.zk=G.zk||{e:{},i:{}};G.inv.forEach(zkItem);const Z=G.zk,es=
  if(ZKT==='h')body=hs.map(id=>{const j=G.members.includes(id),P=PROF[id],b=G.bond&&G.bond[id];return`<div class="icard r${j?2:0}${j?'':' off'}" data-a="h" data-v="${id}"><img class="iic" src="${j?exprFace(id,'n'):zimg(id,1)}"><div class="ibody"><div class="inm">${j?HB[id].name:'？？？'}${j&&BSTORY[id]?`　<span style="color:#ff8ab0">${'♥'.repeat(b?b.ep:0)}</span>`:''}</div><div class="isub">${j?P[0]+'　'+P[1]:'加入条件：'+P[3]}</div><div>${j?chips([P[2]]):''}</div></div></div>`;}).join('');
  panel(`<div class="ftabs" style="grid-template-columns:repeat(3,1fr)">${[['e','敵'],['i','装備'],['h','仲間']].map(([k,n])=>`<button class="${ZKT===k?'on':''}" data-a="tab" data-v="${k}">${n}</button>`).join('')}</div>${body}<button class="tbtn back wide" data-a="back">戻る</button>`,
  {tab:k=>{ZKT=k;zkMenu();},e:k=>zkEnemy(k),h:id=>zkHero(id),back:()=>tavern()});}
-function zkEnemy(k){const d=ED[k],n=G.zk.e[k];if(!n){log('<b>？？？</b>　まだ倒したことがない敵');return;}
- log(`<b>${d.name}</b>${d.boss?' <span style="color:#ff7a7a">BOSS</span>':''}　撃破 ${n}体<br><small>HP${d.mhp} 攻${d.atk} 防${d.def} 魔${d.mag} 精${d.res} 速${d.spd}</small><br>弱点：${d.weak.map(e=>`<span style="color:${ELC[e]}">${e}</span>`).join(' ')}　落とす物：${(d.drop||[]).map(([m])=>MATS[m]?MATS[m].n:m).filter((v,i,a)=>a.indexOf(v)===i).join('・')||'なし'}`);}
-function zkHero(id){if(!G.members.includes(id)){log('<b>？？？</b>　加入条件：'+PROF[id][3]);return;}const P=PROF[id];
- talk([[id,'n',`${HB[id].name}。${P[0]}。${P[1]}。`],[id,'h',P[2]+'――そんなふうに見えているなら、それでいい。']],()=>zkMenu());}
+function zkEnemy(){}/* 未使用：js/zukan/zukan.js が置き換え */
+function zkHero(){}/* 未使用：js/zukan/zukan.js が置き換え */
 
 /* --- 酒場・街への組み込み --- */
-tavern=function(){const dec=G.declined||[],n=bondReadyN();
- log('<b>酒場「星降り亭」</b>'+goldTxt()+'<br>'+G.members.map(id=>statLine(id)+(G.party.includes(id)?'':' <small style="color:#aab">（控え）</small>')).join('<br>'));
- menu([{l:'編成',s:'前衛は4人まで',f:formation},{l:'絆の語らい',s:n?`♥ 新しい話 ${n}件`:'仲間との会話',cls:n?'ready':'',f:()=>bondMenu()},{l:'図鑑',s:'敵・装備・仲間',f:()=>zkMenu()},{l:'依頼掲示板',f:board},
-  ...dec.map(id=>({l:HB[id].name+'を誘う',cls:'ready',f:()=>{G.declined=dec.filter(x=>x!==id);newMember(id);SFX.aw();save();tavern();}})),{l:'戻る',cls:'back',f:()=>townMenu()}],true);};
+tavern=function(){};/* 未使用：js/ver18-town.js が置き換え */
 {const _tm=townMenu;townMenu=function(m){_tm(m);const n=bondReadyN(),b=$('#cmd').children[2];if(n&&b){b.classList.add('ready');b.insertAdjacentHTML('beforeend','<small>♥絆'+n+'</small>');}};}
 
 /* --- 開発者モード --- */

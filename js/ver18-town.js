@@ -148,18 +148,7 @@ drawWM=function(){const x0=WMS.cur;if(!x0||!WMS.bg)return;ctx.drawImage(WMS.bg,0
 /* ---------- ホーム画面 ---------- */
 const HSPOT=[['bar','酒場',2,84,52,44,'tavern'],['smith','鍛冶屋',126,86,52,42,'smith'],['shop','道具屋',0,134,48,36,'shop'],['eye','鑑定屋',132,134,44,36,'appraise'],['star','星詠みの塔',132,22,44,58,'star'],['door','空中庭園',12,36,52,30,'dev']];
 function goFac(k){({tavern:()=>tavern(),smith:()=>smith(),shop:()=>shop(),appraise:()=>appraise(),star:()=>openBoard(G.party[0]),dev:()=>devMenu(),party:()=>partyScreen(),rec:()=>saveMenu(),go:()=>worldMap()})[k]();}
-townMenu=function(m){WMS.on=false;TSC='home';if(scene!=='town')show('town');const hh=homeH();if(H!==hh)setH(hh);devBtn(!!G.dev);hud('');$('#stage').style.display='';
- const un=G.inv.filter(i=>i.unid).length,pts=G.members.some(i=>ptsLeft(i)>0),bn=typeof bondReadyN==='function'?bondReadyN():0,qn=QS.filter(q=>!G.q.done[q.id]&&q.ok()).length,gd=G.fac.garden&&G.garden.n,off=H-HOME_H;
- log((m||'大灯（おおあかり）に守られた最後の街。準備を整えよう。')+(!G.dev&&G.sorties-(G.lastExp??0)>=8?'<br><small style="color:#ffb030">⚠ しばらく記録の控えを取っていません。「記録・設定→書き出す」で控えを</small>':''));
- if(G.flags.boss8)$('#msg').insertAdjacentHTML('beforeend',voidNews());
- const bad={tavern:bn+qn,appraise:un,dev:gd?1:0,star:pts?1:0};
- $('#labels').innerHTML=`<div class="htop"><span class="ch">灯都ルミナス<b>${chapter()}</b></span><span class="g"><img src="${ICON.coin}">${fmt(G.gold)}</span><span class="t"><img src="${ICON.tou}">${fmt(G.tou||0)}</span></div>`+
-  HSPOT.filter(s=>s[6]!=='dev'||G.fac.garden).map(([ic,nm,x,y,w,h2,go])=>`<button class="hsp" data-go="${go}" style="left:${x*SC}px;top:${(y+off)*SC}px;width:${w*SC}px;height:${h2*SC}px"><span>${nm}${bad[go]?`<i>${bad[go]>1?bad[go]:'!'}</i>`:''}</span></button>`).join('');
- const tile=(go,ic,l,s,b)=>`<button class="hn${b?' on':''}" data-go="${go}"><img src="${ICON[ic]}"><b>${l}</b><small>${s}</small>${b?`<i>${b===true?'!':b}</i>`:''}</button>`;
- const c=$('#cmd');c.className='home';c.innerHTML=`<button class="hgo" data-go="go"><img src="${ICON.go}"><span><b>出 撃</b><small>ワールドマップへ　出撃${G.sorties}回</small></span><em>戦闘力<b>${fmt(G.party.reduce((s,id)=>s+power(id),0))}</b></em><div class="hgf">${G.party.map(id=>`<img src="${face(id)}">`).join('')}</div></button>
-  <div class="hgrid">${tile('party','eq','編成','装備・星盤',pts)}${tile('tavern','bar','酒場','依頼・絆・図鑑',bn+qn||0)}${tile('smith','smith','鍛冶屋','強化・売買',0)}${tile('shop','shop','道具屋','回復薬・素材',0)}
-  ${tile('appraise','eye','鑑定屋',un?`未鑑定 ${un}`:'未鑑定品を鑑定',un||0)}${tile('star','star','星詠みの塔','星盤・試練・試練',pts)}${tile('dev','door','街の発展',`施設を育てる`,gd?true:0)}${tile('rec','rec','記録・設定','セーブ・書き出し',0)}</div>`;
- tip('town');};
+townMenu=function(){};/* 未使用：js/v20-ui.js が置き換え */
 document.addEventListener('click',e=>{const t=e.target.closest('[data-go]');if(!t||scene!=='town'||TSC!=='home'||t.disabled)return;if(!t.closest('#cmd.home')&&!t.closest('#labels'))return;SFX.sel();goFac(t.dataset.go);});
 {const _sh=show;show=function(m){_sh(m);if(m!=='town')TSC='other';};}
 {const _pn=panel;panel=function(html,acts){if(scene==='town'&&TSC==='home')TSC='other';_pn(html,acts);if(scene==='town'){if(RSHOW&&ROOMH[TSC]){$('#stage').style.display='';RSHOW=0;}else if(!ROOMH[TSC])$('#labels').innerHTML='';}};}
@@ -179,11 +168,7 @@ tavern=function(m){roomOpen('bar','酒場「星降り亭」',`酒場Lv${G.fac.ba
   ${dec.length?`<div class="ttl2">声をかけられる仲間</div>`+dec.map(id=>`<div class="icard r2"><img class="iic" src="${face(id)}"><div class="ibody"><div class="inm">${HB[id].name}</div><div class="isub">${typeof PROF!=='undefined'&&PROF[id]?PROF[id][1]:'酒場で待っている'}</div></div><div class="iright"><button class="tbtn gold" style="width:76px;height:40px" data-a="join" data-v="${id}">誘う</button></div></div>`).join(''):''}${backBtn()}`,
   {form:()=>partyScreen(),board:()=>board(),bond:()=>bondMenu(),zk:()=>zkMenu(),sheet:id=>openSheet(id),join:id=>{G.declined=dec.filter(x=>x!==id);newMember(id);SFX.aw();save();tavern(`<b>${HB[id].name}が仲間になった！</b>`);},back:()=>townMenu()});};
 /* 依頼掲示板 */
-board=function(m){roomOpen('bar','依頼掲示板','達成した依頼は報告で報酬を受け取れる');log(m||'<b>依頼掲示板</b>　貼り紙が並んでいる。達成したものは<b>報告</b>しよう');
- const row=q=>{const done=!!G.q.done[q.id],ok=!done&&q.ok(),pg=String(q.pg()),mt=/^(\d+)\/(\d+)$/.exec(pg),pc=done||ok?100:mt?Math.min(100,+mt[1]/+mt[2]*100):0;
-  return`<div class="qcard${done?' done':ok?' ok':''}"><div class="qh"><b>${q.n}</b><span>${done?'報告済み ✓':ok?'達成！':pg}</span></div><div class="qd">${q.d}</div><div class="qb"><i style="width:${pc}%"></i></div><div class="qr"><em>報酬</em>${q.rw}${ok?`<button class="tbtn gold" data-a="rep" data-v="${q.id}">報告する</button>`:''}</div></div>`;};
- const ls=[...QS].sort((a,b)=>(G.q.done[a.id]?2:a.ok()?0:1)-(G.q.done[b.id]?2:b.ok()?0:1));
- panel(`<div class="ttl2">依頼（${QS.filter(q=>G.q.done[q.id]).length}/${QS.length} 報告済み）</div>${ls.map(row).join('')}${backBtn('◀ 酒場へ戻る')}`,{rep:id=>{const q=QS.find(x=>x.id===id);if(!q||G.q.done[id]||!q.ok())return;q.give();G.q.done[id]=1;SFX.aw();save();board(`「${q.n}」を報告した！　報酬：<b>${q.rw}</b>`);if(G.members&&typeof renderPartyStatic==='function'){}},back:()=>tavern()});};
+board=function(){};/* 未使用：js/v22.js が置き換え */
 /* ---------- 道具屋 ---------- */
 let SHT='buy';const SHQ={};
 shop=function(m,tab){if(tab)SHT=tab;roomOpen('shop','道具屋',`道具屋Lv${G.fac.shop}　持ち込みは各9個まで`);log(m||'<b>店番</b>「いらっしゃい！ 出撃の前に、回復薬の数は確かめた？」');

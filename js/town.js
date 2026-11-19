@@ -1,24 +1,11 @@
 /* ===== 灯都ルミナス ===== */
 function enterTown(m){show('town');setH(128);TOWN=makeTown(townP());gardenTick();$('#ov').classList.add('hide');healAll();save();townMenu(m);}
-function worldMap(){const nv=voidArea(G.sorties+1),vt=id=>nv===id?' ◆虚蝕化':'',vs=id=>nv===id?'虚蝕化中：敵が強くドロップ増　':'';
- const ar=(id,nm,bf,need,un,ch)=>({l:nm+(G.flags[bf]?' ★':'')+vt(id),s:need?vs(id)+AREAS[id].rec+ch:un,cls:need?(nv===id?'ready vd':'ready'):'',dis:!need,f:()=>enterField(id)});
- log('<b>ワールドマップ</b>　行き先を選ぶ'+goldTxt()+(G.flags.boss8?voidNews():''));
- menu([ar('haido','灰の街道','boss1',true,'',''),ar('midori','翠の森・沈黙の図書遺跡','boss2',G.flags.boss1,'灰の街道のボスを倒すと解放','（第1章）'),
-  ar('seido','祈りの廃聖堂','boss3',G.flags.boss2,'図書遺跡のボスを倒すと解放','（第2章）'),ar('raimei','雷鳴高原・黒鉄鉱山','boss4',G.flags.boss3,'廃聖堂のボスを倒すと解放','（第3章）'),
-  ar('kouka','東方の島・氷華の社','boss5',G.flags.boss4,'第3章のボスを倒すと解放','（第4章）'),ar('ouito','沈んだ王都','boss6',G.flags.boss5,'第4章のボスを倒すと解放','（第5章）'),
-  {l:'天への塔'+(G.flags.boss7?' ★':''),s:G.flags.boss6?`第6章（最高${(G.tower&&G.tower.max)||0}階）`:'第5章のボスを倒すと解放',cls:G.flags.boss6?'ready':'',dis:!G.flags.boss6,f:towerMenu},
-  ar('zankyo','星核の残響','boss8',G.flags.boss7,'天への塔の頂上を制すると解放','（終章）'),
-  {l:'虚の回廊'+(G.flags.kr30?' ★':''),s:G.flags.boss8?`クリア後（最深${kst().max||0}層）`:'？？？',cls:G.flags.boss8?'ready':'',dis:!G.flags.boss8,f:kairouMenu},
-  ar('ryuu','竜の巣','boss9',G.flags.boss8,'？？？','（クリア後）'),{l:'戻る',cls:'back',f:()=>townMenu()}],true);}
+function worldMap(){}/* 未使用：js/ver17.js が置き換え */
 const QS=[{id:'q1',n:'灰狼退治',d:'灰狼を3体倒す',ok:()=>G.q.wolf>=3,pg:()=>`${Math.min(3,G.q.wolf)}/3`,rw:'150G',give:()=>{G.gold+=150;}},
  {id:'q2',n:'灰石の納品',d:'灰石を3個納める',ok:()=>G.mats.haiseki>=3,pg:()=>`${G.mats.haiseki}/3`,rw:'星の雫×1',give:()=>{G.mats.haiseki-=3;addItem('drop',1);}},
  {id:'q3',n:'街道の番人',d:'虚ろの番人を倒す',ok:()=>G.flags.boss1,pg:()=>G.flags.boss1?'達成':'未達成',rw:'500G・不死鳥の羽',give:()=>{G.gold+=500;addItem('feather',1);}}];
-function board(m){log((m||'<b>依頼掲示板</b>　達成した依頼は報告で報酬を受け取れる')+goldTxt());
- menu([...QS.map(q=>G.q.done[q.id]?{l:q.n+' ✓',s:'報告済み',dis:true,f:()=>{}}:{l:q.n,s:`${q.d}（${q.pg()}）報酬:${q.rw}`,cls:q.ok()?'ready':'',dis:!q.ok(),f:()=>{q.give();G.q.done[q.id]=1;SFX.aw();save();board(`「${q.n}」を報告した！ 報酬：<b>${q.rw}</b>`);}}),{l:'戻る',cls:'back',f:tavern}],true);}
-function shop(m){log((m||'<b>道具屋</b>　持ち込みは各9個まで')+goldTxt()+'<br>'+Object.keys(ITEMS).map(k=>`${ITEMS[k].n}×${G.items[k]||0}`).join('　'));
- const sell=Object.keys(MATS).reduce((a,k)=>a+(G.mats[k]||0)*MATS[k].p,0);
- menu([...Object.keys(ITEMS).filter(k=>(ITEMS[k].lv||1)<=G.fac.shop).map(k=>({ic:k,l:ITEMS[k].n,s:`${ITEMS[k].p}G ${ITEMS[k].d}`,dis:G.gold<ITEMS[k].p||G.items[k]>=9,f:()=>{G.gold-=ITEMS[k].p;addItem(k,1);save();shop(`${ITEMS[k].n}を買った`);}})),
-  {l:'素材を売る',s:sell?`全部で${sell}G`:'売れる素材なし',dis:!sell,f:()=>{G.gold+=sell;for(const k in MATS)G.mats[k]=0;SFX.heal();save();shop(`素材を売って${sell}Gを得た`);}},{l:'戻る',cls:'back',f:()=>townMenu()}],true);}
+function board(){}/* 未使用：js/ver18-town.js が置き換え */
+function shop(){}/* 未使用：js/ver18-town.js が置き換え */
 function townMenu(m){devBtn(!!G.dev);log((m||'大灯（おおあかり）に守られた最後の街。準備を整えよう。')+goldTxt()+(!G.dev&&G.sorties-(G.lastExp??0)>=8?'<br><small style="color:#ffb030">⚠ しばらく記録の控えを取っていません。「記録→書き出す」で控えを</small>':''));const un=G.inv.filter(i=>i.unid).length;
  hud(`灯都ルミナス　<b>${chapter()}</b>`);if(G.flags.boss8)$('#msg').insertAdjacentHTML('beforeend',voidNews());
  menu([{l:'出撃',ic:'go',cls:'ready',f:worldMap},{l:'装備',ic:'eq',f:()=>equipMenu(G.party[0])},{l:'酒場',ic:'bar',f:tavern},
@@ -26,12 +13,8 @@ function townMenu(m){devBtn(!!G.dev);log((m||'大灯（おおあかり）に守�
   {l:'星詠みの塔',ic:'star',cls:G.members.some(i=>ptsLeft(i)>0)?'ready':'',f:()=>openBoard(G.party[0])},{l:'街の発展',ic:'door',cls:G.fac.garden&&G.garden.n?'ready':'',f:devMenu},{l:'記録',ic:'rec',f:saveMenu}],false,'grid9');}
 function statLine(id){const s=stats(id),h=G.h[id];return`<b>${HB[id].name}</b> Lv${h.lv}　HP${s.mhp} 攻${s.atk} 防${s.def} 魔${s.mag} 精${s.res} 速${+s.spd.toFixed(1)}`+
  [s.crit&&`会心+${s.crit}%`,s.weakDmg&&`弱点+${s.weakDmg}%`,s.startAG&&`開始AG${s.startAG}`,s.awDmg&&`星臨中+${s.awDmg}%`,s.spGain&&`SP+${s.spGain}`,s.drop&&`ドロップ+${s.drop}%`,s.atkEl&&`攻撃${s.atkEl}属性`].filter(Boolean).map(t=>`<span style="color:#7fd6ff"> ${t}</span>`).join('');}
-function tavern(){const dec=G.declined||[];
- log('<b>酒場「星降り亭」</b>'+goldTxt()+'<br>'+G.members.map(id=>statLine(id)+(G.party.includes(id)?'':' <small style="color:#aab">（控え）</small>')).join('<br>'));
- menu([{l:'編成',s:'前衛は4人まで',f:formation},{l:'依頼掲示板',f:board},...dec.map(id=>({l:HB[id].name+'を誘う',cls:'ready',f:()=>{G.declined=dec.filter(x=>x!==id);newMember(id);SFX.aw();save();tavern();}})),{l:'戻る',cls:'back',f:()=>townMenu()}],true);}
-function formation(){log('<b>編成</b>　タップで前衛／控えを切り替え（前衛1〜4人・番号は並び順）<br><small>控えにも経験値が100%入る</small>');
- menu([...G.members.map(id=>{const on=G.party.includes(id);return{l:`${on?'● 前衛'+(G.party.indexOf(id)+1):'○ 控え'}　${HB[id].name} Lv${G.h[id].lv}`,cls:on?'ready':'',
-  f:()=>{if(on){if(G.party.length>1)G.party=G.party.filter(x=>x!==id);}else if(G.party.length<4)G.party.push(id);save();formation();}};}),{l:'戻る',cls:'back',f:tavern}],true);}
+function tavern(){}/* 未使用：js/ch9.js が置き換え */
+function formation(){}/* 未使用：js/ver17.js が置き換え */
 function ecost(it){return{g:Math.round((it.plus+1)*25*(1+it.ilv/4)),haiseki:it.plus+1,kakera:Math.max(0,it.plus-4)};}
 function saveMenu(m){log((m?m+'<br>':'<b>記録</b>　街に戻ると自動でセーブ<br>')+`<div style="margin-top:6px;padding:6px 8px;border:1px solid #ffb030;border-radius:6px;background:rgba(255,176,48,.1);font-size:12px;color:#ffe0a0">⚠ セーブはこの端末のブラウザの中だけにあります。ブラウザのデータ削除・機種変更・プライベートブラウズで消えるので、ときどき<b>「書き出す」</b>で文字列を控え、メモ帳などに保管してください。<br>最後の書き出し：${G.lastExp==null?'まだ一度もない':G.sorties-G.lastExp===0?'今回の出撃中':(G.sorties-G.lastExp)+'回前の出撃'}</div>`);
  menu([{l:'セーブする',f:()=>saveMenu(save()?'セーブしました。':'この環境ではブラウザに保存できません。書き出しを使ってください。')},
@@ -68,13 +51,7 @@ function icard(it,o={}){const w=eqBy(it.uid),c=RAR[it.rar];
  <div>${o.diff||chips(it.unid?['未鑑定']:Object.entries(itemBase(it)).map(([k,v])=>BN[k]+' '+v))}${it.unid?'':chips(it.ops.map(opTxt),'op')}${it.leg&&!it.unid?chips(['★'+LEG[it.leg].d],'lg'):''}${it.set&&!it.unid?chips([`${SETS[it.set].n}　2部位：${SETS[it.set].d2}／4部位：${SETS[it.set].d4}`],'lg'):''}${!it.unid&&it.sock&&it.sock.length?chips(it.sock.map(k=>k?'◆'+STONES[k].n:'◇空き'),'sk'):''}</div></div>${o.right?`<div class="iright">${o.right}</div>`:''}</div>`;}
 function ehead(id){const s=stats(id),h=G.h[id];return`<div class="ehd"><img class="efc" src="${face(id)}"><div><div class="enm">${HB[id].name} <small>Lv${h.lv}</small></div>
  <div class="est">${[['HP',s.mhp],['攻',s.atk],['防',s.def],['魔',s.mag],['精',s.res],['速',+s.spd.toFixed(1)]].map(([k,v])=>`<span><i>${k}</i>${v}</span>`).join('')}</div></div></div>`;}
-function equipMenu(id,m){log((m||'<b>装備</b>　枠をタップして着替え')+goldTxt());
- panel(ehead(id)+`<div class="slots">${SLOTS6.map(sl=>{const it=G.h[id].eq[sl]&&findItem(G.h[id].eq[sl]);
-  return`<div class="slot ${it?'r'+it.rar:''}" data-a="pick" data-v="${sl}"><div class="sln">${SLOTN[sl]}</div>${it?`<img class="iic" src="${itemIcon(it)}"><div class="sit">${iname(it)}<br><small>${mainTxt(it)}</small></div>`:'<div class="sit emp">― なし ―</div>'}</div>`;}).join('')}</div>
- <div class="tbar"><button class="tbtn gold" data-a="best">最強装備</button><button class="tbtn" data-a="prev">◀</button><button class="tbtn" data-a="next">▶</button><button class="tbtn" data-a="inv">持ち物 <small>${G.inv.length}</small></button></div>
- <button class="tbtn back wide" data-a="back">戻る</button>`,
- {pick:sl=>pickEq(id,sl),best:()=>{bestEquip(id);SFX.aw();save();equipMenu(id,'おすすめの装備にした');},prev:()=>equipMenu(G.members[(G.members.indexOf(id)-1+G.members.length)%G.members.length]),
-  next:()=>equipMenu(nextM(id)),inv:()=>invMenu(),back:()=>townMenu()});}
+function equipMenu(){}/* 未使用：js/ver17.js が置き換え */
 function pickEq(id,slot){const cur=G.h[id].eq[slot]&&findItem(G.h[id].eq[slot]),cb=cur?itemBase(cur):{},cs=cur?score(cur,id):0;
  const list=G.inv.filter(it=>canEq(it,id,slot)&&it.uid!==(cur&&cur.uid)).sort((a,b)=>score(b,id)-score(a,id)).slice(0,40);
  log(`<b>${HB[id].name}の${SLOTN[slot]}</b>　▲は今より強い候補`);
@@ -102,11 +79,7 @@ function smith(m){if(G.stockAt!==G.sorties||!G.stock){const lv=Math.max(1,Math.m
  panel(`<div class="ttl2">今日の品揃え</div>`+G.stock.map(it=>icard(it,{a:'buy',off:G.gold<price(it)*3,right:`<span class="pr">${price(it)*3}G</span>`})).join('')+
  `<div class="tbar2"><button class="tbtn gold" data-a="enh">強化<small>上限+${ecap()}</small></button><button class="tbtn" data-a="op" ${G.fac.smith<2?'disabled':''}>OP付け替え<small>${G.fac.smith<2?'鍛冶屋Lv2':''}</small></button><button class="tbtn" data-a="sock" ${G.fac.smith<3?'disabled':''}>ソケット<small>${G.fac.smith<3?'鍛冶屋Lv3':''}</small></button><button class="tbtn back" data-a="back">戻る</button></div>`,
  {buy:u=>{const it=G.stock.find(x=>x.uid===+u);G.gold-=price(it)*3;G.stock=G.stock.filter(x=>x!==it);it.uid=++G.uid;G.inv.push(it);SFX.aw();save();smith(`${iname(it)}を買った`);},enh:()=>enhance(),op:()=>opSwap(),sock:()=>sockMenu(),back:()=>townMenu()});}
-function enhance(m){const list=G.inv.filter(i=>!i.unid&&i.plus<ecap()).sort((a,b)=>(eqBy(b.uid)?1:0)-(eqBy(a.uid)?1:0)||b.rar-a.rar).slice(0,40);
- log((m||'<b>強化</b>　失敗なし。+1ごとに基本性能+10%')+goldTxt()+'<br>'+matLine());
- panel(list.map(it=>{const c=ecost(it),ok=G.gold>=c.g&&G.mats.haiseki>=c.haiseki&&G.mats.kakera>=c.kakera;
-  return icard(it,{a:'up',off:!ok,right:`<span class="pr">+${it.plus}→+${it.plus+1}</span><br><small>${c.g}G<br>灰石${c.haiseki}${c.kakera?' 欠片'+c.kakera:''}</small>`});}).join('')+`<button class="tbtn back wide" data-a="back">戻る</button>`,
- {up:u=>{const it=findItem(+u),c=ecost(it);G.gold-=c.g;G.mats.haiseki-=c.haiseki;G.mats.kakera-=c.kakera;it.plus++;SFX.aw();save();enhance(`${iname(it)}に強化した！`);},back:()=>smith()});}
+function enhance(){}/* 未使用：js/ui/smith.js が置き換え */
 function appraise(m){const un=G.inv.filter(i=>i.unid),cost=it=>Math.round((30+it.ilv*10)*(1-.1*(G.fac.eye-1))),tot=un.reduce((a,i)=>a+cost(i),0);
  log((m||'<b>鑑定屋</b>　エピック以上は鑑定するまで性能がわからない')+goldTxt());
  panel((un.length?`<div class="ttl2">未鑑定 ${un.length}個</div>`+un.map(it=>icard(it,{right:`<span class="pr">${cost(it)}G</span>`})).join(''):'<div class="emp">未鑑定品はない</div>')+
@@ -129,23 +102,7 @@ const fcost=(k,l)=>k==='garden'&&!l?{tou:60,gold:1000,haiseki:10}:{tou:40*l*l,go
 const invCap=()=>200+(G.fac.store-1)*75;
 const ecap=()=>Math.min(12,2+2*G.fac.smith);
 const townP=()=>{if(!G||!G.fac)return 1;const s=Object.values(G.fac).reduce((a,b)=>a+b,0);return .15+.85*Math.min(1,(s-6)/29);};
-function makeTown(p=1){const c=document.createElement('canvas');c.width=W;c.height=128;const g=c.getContext('2d');const R=rng(11),R2=rng(23);
- const sky=['#0b1030','#1b2350','#3a3a6e','#7a5a7a'],hz=96;
- for(let y=0;y<hz;y++)for(let x=0;x<W;x++){const t=y/hz*(sky.length-1),i=Math.min(sky.length-2,Math.floor(t));g.fillStyle=(t-i)*16>BY[(y%4)*4+x%4]?sky[i+1]:sky[i];g.fillRect(x,y,1,1);}
- for(let i=0;i<50;i++){g.fillStyle=R()<.5?'#fff':'#c8d0ff';g.fillRect(R()*W|0,R()*60|0,1,1);}
- for(let y=30;y<hz;y++){const w=4+(y-30)*.09;g.fillStyle=(y>>3)%2?'#2e2e44':'#3a3a56';g.fillRect(90-w|0,y,Math.ceil(w*2),1);}
- g.fillStyle='#22223a';g.fillRect(84,28,12,3);g.fillStyle='#fff3b0';g.fillRect(86,20,8,8);g.fillStyle='#ffd36a';g.fillRect(87,21,6,6);
- g.fillStyle='#22223a';for(let i=0;i<5;i++)g.fillRect(85+i,19-i,10-i*2,1);
- if(p>.7){g.fillStyle='#c83a3a';g.fillRect(95,12,6,4);g.fillStyle='#3a3a56';g.fillRect(94,12,1,12);}
- const roofs=['#8a3a3a','#3a6a7a','#7a5a2a','#4a3a7a','#3a7a4a'];
- let x=0;while(x<W){const w=12+R()*12|0,h=16+R()*26|0;if(x+w>74&&x<106){x=106;continue;}const lit=R2()<p;
-  g.fillStyle=lit?(R()<.5?'#1a1d33':'#22264a'):(R()<.5?'#262628':'#2e2e32');g.fillRect(x,hz-h,w,h);
-  g.fillStyle=lit?roofs[R2()*5|0]:'#38383c';for(let i=0;i<=w/2;i++)g.fillRect(x+i,hz-h-i*.6|0,w-i*2,1);
-  for(let wy=hz-h+4;wy<hz-4;wy+=6)for(let wx=x+2;wx<x+w-3;wx+=5)if(R()<.55){g.fillStyle=lit?(R()<.8?'#ffd36a':'#ffa040'):(R()<.1?'#6a6450':'#1c1c20');g.fillRect(wx,wy,2,3);}
-  x+=w+1;}
- for(let y=hz;y<128;y++)for(let x2=0;x2<W;x2++){g.fillStyle=((x2+(y>>2)*3)%8===0||y%4===0)?'#24222f':'#33304a';g.fillRect(x2,y,1,1);}
- if(p>.45)for(let i=0;i<8;i++){const lx=8+i*22;if(lx>72&&lx<108)continue;g.fillStyle='#3a3a56';g.fillRect(lx,hz-10,1,10);g.fillStyle='#ffe08a';g.fillRect(lx-1,hz-12,3,2);}
- return c;}
+function makeTown(){}/* 未使用：js/ver18-town.js が置き換え */
 const ISLE=(()=>{const c=document.createElement('canvas');c.width=40;c.height=24;const g=c.getContext('2d'),R=rng(31);
  for(let y=8;y<22;y++){const w=Math.max(0,18-(y-8)*1.4);g.fillStyle=y<11?'#5a4030':'#3a2820';g.fillRect(20-w|0,y,w*2|0,1);}
  g.fillStyle='#3e8a3a';g.fillRect(3,6,34,3);g.fillStyle='#5aac4a';g.fillRect(4,5,32,1);

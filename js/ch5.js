@@ -4,34 +4,18 @@ function stTags(u){const t=[];if(u.side===0){if(u.aw)t.push(['星臨','aw']);if(
  if(u.aw){if(u.id==='gald')t.push(['蓄'+Math.round(u.store),'ch']);else if(u.id==='mire')t.push(['対消滅'+(u.stk||0),'ch']);else if(u.id==='balza')t.push(['熱'+u.awT,'ch']);else if(!GAUGE.includes(u.id))t.push(['残'+(awN(u)-u.awT),'ch']);}}
  else{if(u.charging)t.push(['溜め','cg']);if(u.stolen)t.push(['盗済','st']);}return t;}
 const tagH=u=>stTags(u).map(([l,c])=>`<span class="tg ${c}">${l}</span>`).join('');
-function refresh(){if(!B)return;const P=$('#party'),key=B.heroes.map(h=>h.id).join();
- if(P.dataset.k!==key||P.className!=='bt'){P.className='bt';P.dataset.k=key;P.innerHTML=B.heroes.map(()=>`<div class="pc"><img class="fc"><div class="nm"><span class="n"></span><div class="tgs"></div></div><div class="bars"><div class="bar hp"><i class="gh"></i><i class="fg"></i><span></span></div><div class="bar sp"><i class="fg"></i><span></span></div><div class="bar ag"><i class="fg"></i><span></span></div></div></div>`).join('');}
- B.heroes.forEach((h,i)=>{const r=P.children[i];if(!r)return;r.className=`pc ${B.cur===h?'cur':''} ${h.alive?'':'down'} ${h.aw?'awk':''}`;const f=face(h.id,h.aw),im=r.querySelector('.fc');if(im.getAttribute('src')!==f)im.src=f;
-  r.querySelector('.n').textContent=h.name;r.querySelector('.tgs').innerHTML=tagH(h);const[hp,sp,ag]=r.querySelectorAll('.bar'),pc=Math.max(0,h.hp/h.mhp*100);
-  hp.querySelector('.fg').style.width=pc+'%';hp.querySelector('.gh').style.width=pc+'%';hp.classList.toggle('low',pc<30&&h.alive);hp.querySelector('span').textContent=`HP ${h.hp}`;
-  sp.querySelector('.fg').style.width=h.sp+'%';sp.querySelector('span').textContent=`SP ${h.sp}`;ag.querySelector('.fg').style.width=Math.min(100,h.ag)+'%';ag.classList.toggle('full',h.ag>=100&&!h.aw);
-  ag.querySelector('span').textContent=h.aw?(GAUGE.includes(h.id)?'ゲージ'+Math.round(h.ag):'星臨中'):h.ag>=100?'星臨OK':`AG ${Math.floor(h.ag)}`;});
- const L=$('#labels');[...L.children].forEach(el=>{if(!el._e||!B.enemies.includes(el._e)||!el._e.alive)el.remove();});
- aliveE().forEach(e=>{let el=e._el;if(!el||!el.isConnected){el=document.createElement('div');el.className='lab';el.innerHTML='<div class="n"></div><div class="hp"><b></b><i></i></div><div class="cs"></div>';el._e=e;e._el=el;L.appendChild(el);}
-  el.style.left=Math.max(0,e.x*SC)+'px';el.style.top=Math.max(0,(e.y+(e.boss?-3:6))*SC-32)+'px';el.querySelector('.n').innerHTML=`${e.name} <small>Lv${e.lv}</small>`;
-  const pc=e.hp/e.mhp*100;el.querySelector('.hp i').style.width=pc+'%';el.querySelector('.hp b').style.width=pc+'%';const unk=e.weak.length-e.known.size;
-  el.querySelector('.cs').innerHTML=[...e.known].map(k=>`<span class="ch el" style="background:${ELC[k]};border-color:${ELC[k]}">${k}</span>`).join('')+'<span class="ch">?</span>'.repeat(unk)+tagH(e);});
- const o=$('#order');o.innerHTML='';preview().slice(0,7).forEach((u,i)=>{const d=document.createElement('div');d.className='o'+(u.side?' e':'')+(u.aw?' aw':'');const c=document.createElement('canvas');c.width=c.height=18;
-  const b=bbox(u.spr);c.getContext('2d').drawImage(IMG[sprKey(u)],b.x,b.y,b.w,b.h,(18-b.w)>>1,(18-b.h)>>1,b.w,b.h);d.appendChild(c);
-  const hb=document.createElement('i');hb.className='ob';hb.style.width=`calc(${Math.max(0,u.hp/u.mhp*100)}% - 4px)`;d.appendChild(hb);
-  const sf=u.side&&/[ABC]$/.test(u.name)?u.name.slice(-1):'';if(sf){const t=document.createElement('b');t.textContent=sf;d.appendChild(t);}if(!i){const n=document.createElement('em');n.textContent='NEXT';d.appendChild(n);}o.appendChild(d);});}
+function refresh(){}/* 未使用：js/ver17.js が置き換え */
 function pop(u,txt,col='#fff',small,kind='',el){const d=document.createElement('div');const tx=String(txt),dg=!small&&/^[+\-]?\d+$/.test(tx);d.className='pop'+(small?' s':'')+(dg?' dg':'')+(kind?' '+kind:'');
  if(dg){d.style.setProperty('--c',col);d.style.setProperty('--c2',shadeHex(col.length===7?col:'#ffffff',.55));if(el&&ELC[el]){const b=document.createElement('i');b.className='pe';b.textContent=el;b.style.background=ELC[el];d.appendChild(b);}
   [...tx].forEach((ch,i)=>{const e=document.createElement('span');e.textContent=ch;e.style.animationDelay=i*.035+'s';d.appendChild(e);});}else{d.textContent=tx;d.style.color=col;}
  const n=(u._pn=(u._pn||0)+1);setTimeout(()=>{u._pn=Math.max(0,(u._pn||1)-1);},650);const ox=dg?((n-1)%3-1)*15:0,oy=dg?-((n-1)%4)*7:0;
  d.style.left=(u.x+8*u.sc)*SC+ox+'px';d.style.top=(u.y+(u.side?6:2)*u.sc/2)*SC+oy+'px';$('#pops').appendChild(d);setTimeout(()=>d.remove(),1500);}
-function comboAdd(d){if(!B.combo)return;B.combo.n++;B.combo.tot+=d;if(B.combo.n<2)return;let c=$('#combo');if(!c){c=document.createElement('div');c.id='combo';$('#stage').appendChild(c);}
- c.innerHTML=`<b>${B.combo.n}</b>HITS<span>${B.combo.tot}</span>`;c.style.display='block';c.classList.remove('bump');void c.offsetWidth;c.classList.add('bump');}
+function comboAdd(){}/* 未使用：js/v24.js が置き換え */
 function comboEnd(){B.combo=null;const c=$('#combo');if(c)setTimeout(()=>{if(!B||!B.combo)c.style.display='none';},900);}
 /* ===== 第5章：沈んだ王都 ===== */
 const SETS={royal:{n:'王家の遺品',b2:{mhpP:10,defP:10},b4:{awDmg:25,startAG:20},d2:'最大HP+10%・防御+10%',d4:'星臨中与ダメ+25%・開始時AG+20'}};
 const ROYAL={head:'王家の冠',body:'王家の鎧',sub:'王家の盾',acc:'王家の指輪'};ITYPE.unshift(['冠','circ'],['盾','shield']);
-function royalItem(slot,ilv){const it=genItem(ilv,0,0,slot,3);if(slot==='sub'){it.base={def:Math.round(5+ilv*1.3)};}it.set='royal';it.name=ROYAL[slot];return it;}
+function royalItem(){}/* 未使用：js/v31/items.js が置き換え */
 const royalRand=ilv=>royalItem(['head','body','sub','acc'][Math.random()*4|0],ilv);
 for(const[k,b,pal]of[['drowned','gald',{a:'#3a6a6a',A:'#1a3a3a',r:'#2a5a7a',R:'#103040',s:'#7a9a9a',d:'#1a3a3a',y:'#6ac0c0',e:'#40ffff'}],['jelly','shroom',{r:'#e070c0',R:'#8a3070',w:'#c0e0ff',e:'#203060'}],
  ['waterslime','slime',{v:'#3a8ad0',V:'#1a4a7a',p:'#8ad0ff'}],['boss6','noah',{w:'#2a4a7a',k:'#a0d0ff',y:'#40e0ff',s:'#a0b8d0',q:'#1a2a4a',e:'#40ffff'}]]){SPR[k]=SPR[b];IMG[k]=mk(SPR[b],pal);IMG[k+'_w']=mk(SPR[b],null,'#ffffff');}

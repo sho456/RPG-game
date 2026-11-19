@@ -28,5 +28,5 @@ function makeTowerArea(f){const lv=38+Math.floor(f*.4),map=genFloor(f),boss=f%10
 function towerMenu(){if(!G.tower)G.tower={...G_TOWER_DEF};const cps=[];for(let f=1;f<=G.tower.cp;f+=5)cps.push(f);
  log(`<b>天への塔</b>　5階ごとの中継地点から挑める（最高到達：${G.tower.max||1}階）`+goldTxt());
  menu([...cps.map(f=>({l:`${f}階から`,s:`推奨Lv${38+Math.floor(f*.4)}`,cls:f===cps[cps.length-1]?'ready':'',f:()=>enterTower(f)})),{l:'戻る',cls:'back',f:worldMap}],true);}
-function enterTower(f,keep){G.tower.cur=f;G.tower.max=Math.max(G.tower.max||1,f);if(f%5===1&&f>G.tower.cp)G.tower.cp=f;AREAS.tower=makeTowerArea(f);enterField('tower',keep);if(keep&&f%5===1)banner(`中継地点 ${f}階を記録した`,'#9fd8ff');save();}
+function enterTower(){}/* 未使用：js/v31/quests.js が置き換え */
 const Q6=[{id:'q9',n:'天への塔',d:'星核の守護者を倒す',ok:()=>!!G.flags.boss7,pg:()=>G.flags.boss7?'達成':`最高${(G.tower&&G.tower.max)||0}階`,rw:'30000G・不死鳥の尾×3',give:()=>{G.gold+=30000;addItem('tail',3);}}];

@@ -10,8 +10,7 @@ star:[".....y......",".....y......","....yyy.....","yyyyyyyyyyy.",".yyyyyyyyy.."
 rec:["............",".rrrrrrrr...",".rwwwwwwrr..",".rwqqqqwrr..",".rwwwwwwrr..",".rwqqqqwrr..",".rwwwwwwrr..",".rwqqqwwrr..",".rwwwwwwrr..",".rrrrrrrrr..","..RRRRRRRR..","............"],
 door:["............","...bbbbbb...","..bddddddb..","..bddddddb..","..bddddddb..","..bddddydb..","..bddddddb..","..bddddddb..","..bddddddb..","..bddddddb..",".bbbbbbbbbb.","............"]};
 const ICON={};for(const k in ICS){const c=document.createElement('canvas');c.width=c.height=12;const g=c.getContext('2d');ICS[k].forEach((r,y)=>{r=r.padEnd(12,'.');for(let x=0;x<12;x++){const ch=r[x];if(ch!=='.'){g.fillStyle=PAL[ch]||'#f0f';g.fillRect(x,y,1,1);}}});ICON[k]=c.toDataURL();}
-const FACE={};function face(id,aw){const k=id+(aw?'_aw':'');if(FACE[k])return FACE[k];const b=bbox(id),c=document.createElement('canvas');c.width=c.height=16;
- c.getContext('2d').drawImage(IMG[aw&&IMG[id+'_aw']?id+'_aw':id],b.x,b.y,Math.min(16,b.w),Math.min(12,b.h),(16-Math.min(16,b.w))>>1,2,Math.min(16,b.w),Math.min(12,b.h));return FACE[k]=c.toDataURL();}
+const FACE={};function face(){}/* 未使用：js/ver18-art.js が置き換え */
 function hud(h){const d=$('#hud');d.innerHTML=h||'';d.style.display=h?'block':'none';}
 const chapter=()=>G.flags.boss8?'クリア後':G.flags.boss7?'終章':G.flags.boss6?'第6章':G.flags.boss5?'第5章':G.flags.boss4?'第4章':G.flags.boss3?'第3章':G.flags.boss2?'第2章':G.flags.boss1?'第1章':'序章';
 let TBG=null;const SHOOT=[];

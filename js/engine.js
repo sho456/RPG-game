@@ -111,8 +111,7 @@ function startBattle(list,opts={}){show('battle');setH(128);
  $('#ov').classList.add('hide');log(opts.boss?ED[list[0].kind].name+'が立ちはだかる！':opts.first?'<b>先制攻撃！</b> 魔物の不意を突いた':'魔物が現れた！');refresh();setTimeout(run,500);}
 
 function nextActor(){const us=[...aliveH(),...aliveE()];const m=Math.min(...us.map(u=>u.ct));us.forEach(u=>u.ct-=m);return us.find(u=>u.ct<=1e-6)||us[0];}
-function preview(){const a=[...aliveH(),...aliveE()].map(u=>({u,ct:u.ct}));const out=[];
- for(let i=0;i<8&&a.length;i++){a.sort((p,q)=>p.ct-q.ct);const p=a[0];out.push(p.u);p.ct+=100/spdOf(p.u);}return out;}
+function preview(){}/* 未使用：js/rs/battle.js が置き換え */
 
 async function run(){
  while(!B.over){
@@ -142,8 +141,7 @@ function hurt(t,d){if(t.side===0){if(t.legs){if(t.legs.includes('kagerou')&&!t._
  if(t.side===0){/* 結界・玉座（レジェンド）は RS の戦闘では受けるダメージの枠（js/rs/battle.js frames）で足す */if(B.barrier>0&&!B.rs)d=Math.max(1,Math.round(d*.7));if(B.domain&&t.hp-d<=0&&!t.saved){d=t.hp-1;t.saved=1;setTimeout(()=>pop(t,'聖域が守った','#ffe27a',true),150);}}
  t.hp=Math.max(0,t.hp-d);return d;}
 
-function pop(u,txt,col='#fff',small,kind=''){const d=document.createElement('div');d.className='pop'+(small?' s':'')+(kind?' '+kind:'');const tx=String(txt);if(!small&&/^[+\-]?\d+$/.test(tx))[...tx].forEach((ch,i)=>{const e=document.createElement('span');e.textContent=ch;e.style.animationDelay=i*.035+'s';d.appendChild(e);});else d.textContent=tx;d.style.color=col;
- d.style.left=(u.x+8*u.sc)*SC+'px';d.style.top=(u.y+(u.side?6:2)*u.sc/2)*SC+'px';$('#pops').appendChild(d);setTimeout(()=>d.remove(),1000);}
+function pop(){}/* 未使用：js/ch5.js が置き換え */
 
 async function hit(a,t,sk){
  const r=calc(a,t,sk);const d=hurt(t,r.d);t.flash=8;if(a.side===0&&a.legs&&a.legs.includes('meikai')&&d>0){a.hp=Math.min(a.mhp,a.hp+Math.round(d*.2));}B.fx.push({x:t.x+8*t.sc,y:t.y+8*t.sc,t:0,m:sk.k==='mag',c:ELC[sk.el]||'#ffffff'});
@@ -296,8 +294,7 @@ function itemMenu(u,back,res){const I=G.items,dead=B.heroes.some(h=>!h.alive);
   {l:'戻る',cls:'back',f:back}],true);}
 
 /* ===== 敵 ===== */
-function pickHero(){const hs=aliveH();const g=hs.find(h=>h.id==='gald');
- if(g&&(g.aw||(g.taunt>0&&Math.random()<.8)))return g;return hs[Math.random()*hs.length|0];}
+function pickHero(){}/* 未使用：js/rs/battle.js が置き換え */
 async function enemyTurn(e){
  e.turn++;let sk;const ai=ED[e.kind].ai,pick=a=>{let r=Math.random();for(const[k,w]of a){if((r-=w)<0)return k;}return a[0][0];};
  if(ai){
@@ -327,7 +324,7 @@ async function end(win){B.over=true;$('#cmd').innerHTML='';B.heroes.forEach(h=>{
  const dr=Object.entries(r.drops).map(([k,n])=>`${MATS[k].n}×${n}`).join('・');
  ov.innerHTML=`<div class="logo" style="font-size:28px">VICTORY</div><div class="sub">経験値 +${r.xp}　${r.gold}G 獲得　灯力+${r.tou}${r.sts.length?'<br>星石：'+r.sts.join('・'):''}${dr?'<br>入手：'+dr:''}${r.loot.length?'<br>装備：'+r.loot.join('、'):''}${r.ups.length?'<br><b style="color:#ffe27a">レベルアップ！ '+r.ups.join('・')+'</b>':''}</div><button class="big" id="cont">続ける</button>`;
  $('#cont').onclick=()=>{SFX.sel();B.opts.onEnd&&B.opts.onEnd(true);};}
-function gainXP(id,x){const s=G.h[id];s.xp+=x;let n=0;while(s.lv<99&&s.xp>=nextXP(s.lv)){s.xp-=nextXP(s.lv);s.lv++;n++;}return n;}
+function gainXP(){}/* 未使用：js/v31/core.js が置き換え */
 function rewards(es){let xp=0,gold=0;const drops={};
  es.forEach(e=>{const d=ED[e.kind],m=1+.3*(e.lv-1);xp+=Math.round(d.xp*m*(1+.05*(G.fac.bar-1)));gold+=Math.round(d.gold*m);
   d.drop.forEach(([k,p])=>{if(Math.random()<p)drops[k]=(drops[k]||0)+1;});if(e.kind==='wolf')G.q.wolf++;if(e.kind==='jadewolf')G.q.jade=(G.q.jade||0)+1;});
@@ -342,16 +339,7 @@ function rewards(es){let xp=0,gold=0;const drops={};
 
 /* ===== 描画 ===== */
 let tick=0;
-function drawUnit(u){
- if(!u.alive&&u.side===1){if(u.fade<=0)return;u.fade--;ctx.globalAlpha=u.fade/24;}
- const img=IMG[u.flash>0?u.spr+'_w':sprKey(u)];if(u.flash>0)u.flash--;
- u.ox+=(u.tox-u.ox)*.18;const s=16*u.sc;let x=u.x+Math.round(u.ox),y=u.y;
- if(u.side===1&&u.alive)y+=Math.round(Math.sin(tick/20+u.x)*1);
- ctx.fillStyle='rgba(0,0,0,.3)';ctx.fillRect(x+s*.2,y+s-2,s*.6,2);
- if(u.side===0&&!u.alive){ctx.globalAlpha=.55;ctx.save();ctx.translate(x+s/2,y+s-4);ctx.rotate(-Math.PI/2);ctx.drawImage(img,-s/2,-s/2+4,s,s);ctx.restore();ctx.globalAlpha=1;return;}
- if(u.side&&ED[u.kind]&&ED[u.kind].flip){ctx.save();ctx.translate(x+s,y);ctx.scale(-1,1);ctx.drawImage(img,0,0,s,s);ctx.restore();}else ctx.drawImage(img,x,y,s,s);ctx.globalAlpha=1;
- if(u.aw&&Math.random()<.25+.2*(u.awLv||1))B.parts.push({x:x+4+Math.random()*(s-8),y:y+s-4,vy:-.4-Math.random()*.5*(u.awLv||1),l:30,c:(u.awLv||1)>=3&&Math.random()<.4?'#ffffff':(u.awLv||1)>=2&&Math.random()<.3?'#7fd6ff':'#ffe27a'});
- if(B.cur===u&&u.side===0){ctx.fillStyle='#f3c64b';const ax=x+s/2,ay=y-4+(tick>>4)%2;ctx.fillRect(ax-2,ay,5,1);ctx.fillRect(ax-1,ay+1,3,1);ctx.fillRect(ax,ay+2,1,1);}}
+function drawUnit(){}/* 未使用：js/ver16.js が置き換え */
 function draw(){tick++;if(scene==='field'){drawField();requestAnimationFrame(draw);return;}if(scene==='board'){drawBoard();requestAnimationFrame(draw);return;}if(scene==='title'){drawTitle();requestAnimationFrame(draw);return;}if(scene!=='battle'){drawTown();requestAnimationFrame(draw);return;}ctx.save();
  if(B&&B.shake>0){ctx.translate((Math.random()*4-2)|0,(Math.random()*4-2)|0);B.shake--;}
  ctx.drawImage(BG,0,0);
@@ -368,14 +356,6 @@ function draw(){tick++;if(scene==='field'){drawField();requestAnimationFrame(dra
 
 /* ===== UI更新 ===== */
 function bar(cls,v,m,txt){return`<div class="bar ${cls}${cls==='ag'&&v>=100?' full':''}"><i style="width:${Math.max(0,Math.min(100,v/m*100))}%"></i><span>${txt}</span></div>`;}
-function refresh(){if(!B)return;
- $('#party').className='';$('#party').innerHTML=B.heroes.map(h=>`<div class="pc ${B.cur===h?'cur':''} ${h.alive?'':'down'} ${h.aw?'awk':''}"><img class="fc" src="${face(h.id,h.aw)}"><div class="nm">${h.name}${h.aw?`<span class="tag">${AW[h.id].name}${awTag(h)}</span>`:''}${h.taunt>0?'<span class="tag2">挑発中</span>':''}</div>
-  <div class="bars">${bar('hp',h.hp,h.mhp,`HP ${h.hp}`)}${bar('sp',h.sp,100,`SP ${h.sp}`)}${bar('ag',h.ag,100,h.aw?(h.id==='mire'?'ゲージ'+Math.round(h.ag):'星臨中'):h.ag>=100?'星臨OK':`AG ${Math.floor(h.ag)}`)}</div></div>`).join('');
- $('#labels').innerHTML=aliveE().map(e=>{const unk=e.weak.length-e.known.size;
-  return`<div class="lab" style="left:${Math.max(0,(e.x)*SC)}px;top:${Math.max(0,(e.y+(e.boss?-3:6))*SC-32)}px"><div class="n">${e.name} <small style="color:#aab">Lv${e.lv}</small></div><div class="hp"><i style="width:${e.hp/e.mhp*100}%"></i></div>`+
-  [...e.known].map(k=>`<span class="ch" style="color:#111;background:${ELC[k]};border-color:${ELC[k]}">${k}</span>`).join('')+'<span class="ch">?</span>'.repeat(unk)+(e.charging?'<span class="ch chg">溜</span>':'')+'</div>';}).join('');
- const o=$('#order');o.innerHTML='';preview().slice(0,7).forEach(u=>{const d=document.createElement('div');d.className='o'+(u.side?' e':'');const c=document.createElement('canvas');c.width=c.height=18;
-  const b=bbox(u.spr);c.getContext('2d').drawImage(IMG[sprKey(u)],b.x,b.y,b.w,b.h,(18-b.w)>>1,(18-b.h)>>1,b.w,b.h);d.appendChild(c);
-  const sf=u.side&&/[ABC]$/.test(u.name)?u.name.slice(-1):'';if(sf){const t=document.createElement('b');t.textContent=sf;d.appendChild(t);}o.appendChild(d);});}
+function refresh(){}/* 未使用：js/ch5.js が置き換え */
 const BBOX={};function bbox(k){if(BBOX[k])return BBOX[k];let x0=16,y0=16,x1=0,y1=0;SPR[k].forEach((r,y)=>[...r].forEach((c,x)=>{if(c!=='.'){x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y);}}));return BBOX[k]={x:x0,y:y0,w:x1-x0+1,h:y1-y0+1};}
 const ELC={'斬':'#cfd6e6','打':'#e0b98a','突':'#b9e0c9','熱':'#ff7a3a','冷':'#7fd6ff','雷':'#ffe14a','風':'#8ff0a8','地':'#d0a060','陽':'#fff3a6','陰':'#b07cff'};

@@ -11,7 +11,7 @@ const lsGet=k=>{try{return localStorage.getItem(k);}catch(e){return null;}};
 const lsSet=(k,v)=>{try{localStorage.setItem(k,v);}catch(e){}};
 /* 立ち絵（48×48ドットを拡大表示） */
 const ARTC={};
-function art(id,aw){const k=id+(aw?'_aw':'');if(ARTC[k])return ARTC[k];const c=hiImg(IMG[aw&&IMG[id+'_aw']?id+'_aw':id],48,true);return ARTC[k]=c&&c.toDataURL?c.toDataURL():'';}
+function art(){}/* 未使用：js/ver18-art.js が置き換え */
 /* 戦闘力：能力・星臨位階・技の数から算出する目安 */
 function power(id){const s=stats(id),h=G.h[id];return Math.round(s.mhp*.6+Math.max(s.atk,s.mag)*7+Math.min(s.atk,s.mag)*1.5+(s.def+s.res)*3.5+s.spd*18+s.crit*6+s.weakDmg*3+s.awDmg*3+s.startAG*2+(h.awLv||1)*120+skillList(id).length*25);}
 /* 星盤を星座として描く（解放した星が光り、線でつながる） */
@@ -49,9 +49,8 @@ const awPolicy=()=>{const p=G.set.autoAw||'save';return p==='any'||(p==='boss'&&
 {const _ap=autoPick;autoPick=function(u){if(auto&&AM==='n'&&!u.aw&&u.ag>=100&&!awPolicy()){const ag=u.ag;u.ag=99;try{return _ap(u);}finally{u.ag=ag;}}return _ap(u);};}
 const skDis=(u,s)=>{const lock=s.req==='charged'?!u.charged:s.req==='lowhp'?u.hp>u.mhp*.25:s.req==='stk3'?(u.stk||0)<3:s.req&&!B.awUsed.has(s.req);
  return!!((s.sp||0)>u.sp||lock||(s.k==='zen'&&B.zenUsed)||(s.revive&&!B.heroes.some(h=>!h.alive)));};
-function repOK(u){const L=LASTA[u.id];if(!L)return null;let s=L.sk;if(s.basic)s=ATK(u);else if(s.k==='guard'){}else{if(s.k==='item'||s.k==='reso'||s.t==='ally')return null;if(!(u.aw?awCmds(u):u.skills).some(k=>SK[k]===s)||skDis(u,s))return null;}return s;}
-function bbar(force){const b=$('#bbar');if(!b||!G)return;const p=B&&B.pick,l=p&&repOK(p.u),sg=[l?l.n:'',auto,AM,G.set.autoAw].join();if(!force&&b._s===sg)return;b._s=sg;
- b.innerHTML=`<button data-b="rep" ${l?'':'disabled'}>リピート<small>${l?l.n:'前回と同じ行動'}</small></button><button data-b="n" class="${auto&&AM==='n'?'on':''}">通常AUTO<small>星臨：${AWN[G.set.autoAw]}</small></button><button data-b="f" class="${auto&&AM==='f'?'on':''}">全力AUTO<small>星臨も使う</small></button>`;}
+function repOK(){}/* 未使用：js/rs/battle.js が置き換え */
+function bbar(){}/* 未使用：js/v22.js が置き換え */
 const skBadge=s=>{const heal=['heal','healAll','revive','reviveAll','item'].includes(s.k);const el=s.el||(heal?'癒':['phys','mag','rhythm'].includes(s.k)?'無':'補');return[el,ELC[el]||(heal?'#7dffa8':el==='無'?'#d8d8e8':'#9fb4ff')];};
 $('#cmd').addEventListener('click',e=>{const c=$('#cmd');if(!c.classList.contains('bcmd')||!B||!B.pick)return;const tb=e.target.closest('[data-t]'),rw=e.target.closest('[data-i]');if(tb)B.pick.tab(tb.dataset.t);else if(rw&&!rw.disabled)B.pick.row(+rw.dataset.i);});
 $('#party').addEventListener('click',e=>{if(e.target.closest('#awB')&&B&&B.pick){au();B.pick.aw();}});
@@ -92,7 +91,7 @@ function partyScreen(m){const P=G.party,bench=G.members.filter(id=>!P.includes(i
   det:()=>{const a=PSEL;PSEL=null;equipMenu(a);},bd:id=>{PSEL=null;BFROM='party';BS.sel=null;openBoard(id);},
   rm:()=>{const a=PSEL;PSEL=null;G.party=P.filter(x=>x!==a);save();partyScreen(`<b>${HB[a].name}</b>を控えに下げた`);},x:()=>{PSEL=null;partyScreen();},inv:()=>invMenu(),back:()=>{PSEL=null;townMenu();}});
  tip('party');}
-formation=function(){partyScreen();};
+formation=function(){};/* 未使用：js/v22.js が置き換え */
 
 /* ==================== キャラ詳細（装備・能力・技・星盤） ==================== */
 function charHTML(id,tab,ed){const s=stats(id),h=G.h[id],b=HB[id],A2=AW[id],lv=h.awLv||1,hp=h.hp??s.mhp;
@@ -191,11 +190,7 @@ worldMap=function(m){if(scene!=='town')show('town');if(WMS.tab&&!G.flags.boss8)W
   <div class="wlist">${list.map(row).join('')}</div><div class="wfoot"><button class="tbtn back" data-a="back">◀ 戻る</button><div class="wfp">${G.party.map(id=>`<img src="${face(id)}">`).join('')}<small>パーティ戦闘力 <b>${fmt(G.party.reduce((s,id)=>s+power(id),0))}</b></small></div></div>`;
  const sr=c.querySelector('.wrow.sel');if(sr&&sr.scrollIntoView)sr.scrollIntoView({block:'nearest'});tip('map');};
 /* プレビュー：選んだエリアの戦場にボスとパーティを並べる */
-function drawWM(){const x0=WMS.cur;if(!x0||!WMS.bg)return;ctx.drawImage(WMS.bg,0,0);if(x0.vd){ctx.fillStyle='rgba(120,60,200,.24)';ctx.fillRect(0,0,W,H);}
- const bk=x0.bk;if(bk&&IMG[bk]){const d=ED[bk],s=16*(d.sc||2),x=22,y=90-s+Math.round(Math.sin(tick/26)*1.5),known=x0.clear||(G.zk&&G.zk.e&&G.zk.e[bk]);let img=hiImg(IMG[bk],d.boss?64:48,true);if(!known)img=silOf(img);
-  ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(x+s*.15,89,s*.7,3);if(d.flip){ctx.save();ctx.translate(x+s,y);ctx.scale(-1,1);ctx.drawImage(img,0,0,s,s);ctx.restore();}else ctx.drawImage(img,x,y,s,s);}
- [[100,30],[134,37],[112,52],[146,59]].slice(0,G.party.length).map((p,i)=>[p,G.party[i]]).sort((a,b)=>a[0][1]-b[0][1]).forEach(([[x,y],id],i)=>{const yy=y+((tick>>5)+i)%2;ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(x+7,y+31,18,2);ctx.drawImage(hiImg(IMG[id],48,true),x,yy,32,32);});
- const g=ctx.createLinearGradient(0,84,0,H);g.addColorStop(0,'rgba(5,6,15,0)');g.addColorStop(1,'rgba(5,6,15,.9)');ctx.fillStyle=g;ctx.fillRect(0,84,W,H-84);}
+function drawWM(){}/* 未使用：js/ver18-town.js が置き換え */
 {const _d=draw;draw=function(){if(WMS.on&&scene==='town'){tick++;const k=bK();if(cv.width!==W*k||cv.height!==H*k){cv.width=W*k;cv.height=H*k;}ctx.setTransform(k,0,0,k,0,0);ctx.imageSmoothingEnabled=false;drawWM();requestAnimationFrame(draw);return;}_d();};}
 
 /* ==================== 街メニューへの組み込み ==================== */

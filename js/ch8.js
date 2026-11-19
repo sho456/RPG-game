@@ -111,7 +111,7 @@ function makeKairouArea(f){const lv=kLv(f),boss=f%10===0,pool=KMOBS.map(voidKind
 function kairouMenu(){const K=kst(),cps=[];for(let f=1;f<=K.cp;f+=10)cps.push(f);
  log(`<b>虚の回廊</b>　果てのない回廊。10層ごとに番人がいて、倒した先の層が中継地点になる（最深到達：${K.max||0}層）`+goldTxt());
  menu([...cps.slice(-7).map(f=>({l:`${f}層から`,s:`推奨Lv${kLv(f)}`,cls:f===cps[cps.length-1]?'ready':'',f:()=>enterKairou(f)})),{l:'戻る',cls:'back',f:worldMap}],true);}
-function enterKairou(f,keep){const K=kst();K.cur=f;K.max=Math.max(K.max||0,f);if(f%10===1&&f>K.cp)K.cp=f;AREAS.kairou=makeKairouArea(f);enterField('kairou',keep);if(keep&&f%10===1)banner(`中継地点 ${f}層を記録した`,'#c8b0ff');save();}
+function enterKairou(){}/* 未使用：js/v31/quests.js が置き換え */
 function kairouBossWin(){const f=kst().cur;banner('番人が崩れ、階段が開いた','#c8b0ff');if(f+1>kst().cp&&(f+1)%10===1)kst().cp=f+1;save();if(f===30&&!G.flags.celesMet)setTimeout(celesEvent,300);}
 function celesEvent(){F.pause=true;banner('セレス','#e0d0ff');
  log('番人が砂のように崩れ、止まっていた時計の音が戻った。瓦礫の玉座に、砂時計の杖を抱えた少女が腰かけている。<br><b>セレス</b>「……ようやく来たか、灯守。千年ぶんの退屈を数えておったところじゃ」<br>「勘違いするでないぞ。寂しかったわけではない。……おぬしらの旅、わらわが見届けてやろう」');

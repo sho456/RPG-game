@@ -15,25 +15,8 @@ const wtypeOf=who=>{try{return(RSD.HERO[who]||{}).w||'剣';}catch(e){return'剣'
 const wnounOf=who=>{try{const H=RSD.HERO[who];if(H&&H.shape)return H.shape;}catch(e){}const t=wtypeOf(who);return WNOUN[t]||t;};
 function wbase(it,ilv,m){const t=wtypeOf(it.who),[a,b]=WBASE[it.who]||[6,2.5],v=Math.round(a+ilv*b);it.base=t==='杖'?{mag:v}:{atk:v};if(it.who==='crow')it.base.atk=Math.round(v*.6);/* 鎌杖：魔力に加えて攻撃も上がる */it.name=m+'の'+wnounOf(it.who);}
 function rollRar(minR,bonus){const r=Math.random()*100/(1+bonus);return Math.max(minR,r<.5?4:r<5?3:r<17?2:r<45?1:0);}
-function genItem(ilv,minR=0,bonus=0,slot=null,rarFix=null){
- const rar=rarFix!=null?rarFix:rollRar(minR,bonus);
- if(!slot){const r=Math.random();slot=r<.28?'w':r<.4?'sub':r<.58?'head':r<.78?'body':'acc';}
- const it={uid:++G.uid,slot,ilv,rar,plus:0,ops:[],unid:rar>=3,lock:false,base:{}};
- if(rar===4){const al=Object.keys(LEG).filter(k=>!LEG[k].uq),ks=al.filter(k=>LEG[k].slot===slot);it.leg=ks.length?ks[Math.random()*ks.length|0]:al[Math.random()*al.length|0];it.slot=slot=LEG[it.leg].slot;}
- const m=MATL(ilv);
- if(slot==='w'){it.who=(it.leg&&LEG[it.leg].who)||G.members[Math.random()*G.members.length|0];wbase(it,ilv,m);}
- else if(slot==='sub'){if(Math.random()<.5){it.base.def=Math.round(3+ilv*1.1);it.name=m+'の小盾';}else{it.base.res=Math.round(3+ilv*1.2);it.name='灯の護符';}}
- else if(slot==='head'){it.base.def=Math.round(2+ilv*.9);it.name=m+(Math.random()<.5?'の兜':'の額当て');}
- else if(slot==='body'){it.base.def=Math.round(4+ilv*1.6);it.name=m+'の鎧';}
- else{const r=Math.random();if(r<.4){it.base.mhp=Math.round(12+ilv*5);it.name='生命の指輪';}else if(r<.6){it.base.spd=+(.3+ilv*.06).toFixed(1);it.name='疾風の指輪';}
-  else if(r<.8){it.base.mag=Math.round(2+ilv*1.2);it.name='魔石の首飾り';}else{it.base.res=Math.round(2+ilv*1.2);it.name='星砂の首飾り';}}
- if(it.leg)it.name=LEG[it.leg].n;
- for(let i=0;i<rar;i++){
-  if(Math.random()<.12&&!it.ops.some(o=>o.k==='atkEl')){it.ops.push({k:'atkEl',v:['陽','熱','雷'][Math.random()*3|0]});continue;}
-  const av=Object.keys(OPS).filter(k=>!it.ops.some(o=>o.k===k)),k=av[Math.random()*av.length|0],[,,a,b]=OPS[k];
-  let v=(a+(b-a)*Math.random())*(.6+.4*Math.min(1,ilv/10))*(1+rar*.08);it.ops.push({k,v:k==='spd'?+v.toFixed(1):Math.max(1,Math.round(v))});}
- it.sock=Array(it.rar>=3?2:it.rar>=2?1:0).fill(null);return it;}
-function fixedItem(slot,who,ilv,name){const it=genItem(ilv,0,0,slot,0);if(who&&slot==='w'){it.who=who;wbase(it,ilv,MATL(ilv));}if(name)it.name=name;return it;}
+function genItem(){}/* 未使用：js/v31/items.js が置き換え */
+function fixedItem(){}/* 未使用：js/v31/items.js が置き換え */
 const findItem=u=>G.inv.find(i=>i.uid===u);
 const nextM=id=>G.members[(G.members.indexOf(id)+1)%G.members.length];
 const eqBy=u=>G.members.find(id=>Object.values(G.h[id].eq).includes(u))||null;
@@ -120,36 +103,12 @@ const bcv=$('#bcv'),bctx=bcv.getContext('2d');
 const SHORT={atkP:'攻',defP:'防',mhpP:'HP',resP:'精',magP:'魔',spd:'速',crit:'会',weakDmg:'弱',startAG:'AG',awDmg:'覚',spGain:'BP'};
 const BGS=Array.from({length:90},(_,i)=>{const f=v=>v-Math.floor(v);return[f(Math.sin(i*99.7)*1e4),f(Math.sin(i*31.3)*1e4),f(Math.sin(i*7.1)*1e4)];});
 /* 星盤の表示の高さ（CSS px）。ver0.21 で画面の高さに合わせて変える */
-function BCH(){return 224*SC;}
+function BCH(){}/* 未使用：js/v21.js が置き換え */
 function sizeBoard(){const d=window.devicePixelRatio||1;bcv.width=W*SC*d;bcv.height=Math.round(BCH()*d);bcv.style.width=W*SC+'px';bcv.style.height=BCH()+'px';bctx.setTransform(d,0,0,d,0,0);}
-function bpos(n){const cw=W*SC,s=cw/(Math.sqrt(3)*7.4);return[cw/2+s*Math.sqrt(3)*(n.q+n.r/2),BCH()/2+18+s*1.5*n.r,s];}
+function bpos(){}/* 未使用：js/v21.js が置き換え */
 function hexPath(c,x,y,r){c.beginPath();for(let i=0;i<6;i++){const a=Math.PI/180*(60*i-30);c.lineTo(x+r*Math.cos(a),y+r*Math.sin(a));}c.closePath();}
 const shade=h=>{const n=parseInt(h.slice(1),16);return`rgb(${(n>>16)*.4|0},${(n>>8&255)*.4|0},${(n&255)*.4|0})`;};
-function drawBoard(){const c=bctx,cw=W*SC,ch=BCH(),id=BS.id,N=BOARD[id],U=G.h[id].board;
- const bg=c.createRadialGradient(cw/2,ch/2,20,cw/2,ch/2,ch*.75);bg.addColorStop(0,'#1c2150');bg.addColorStop(1,'#05060f');c.fillStyle=bg;c.fillRect(0,0,cw,ch);
- BGS.forEach(([x,y,b],i)=>{c.fillStyle=`rgba(200,210,255,${.2+.5*b*(.6+.4*Math.sin(tick/30+i))})`;c.fillRect(x*cw,y*ch,1.5,1.5);});
- c.lineCap='round';
- for(const k in N){const n=N[k],[ax,ay]=bpos(n);for(const[dq,dr]of HEXD){const k2=(n.q+dq)+','+(n.r+dr);if(!N[k2]||k2<k)continue;const[bx,by]=bpos(N[k2]),on=U.includes(k)&&U.includes(k2);
-  if(on){c.strokeStyle='rgba(255,214,110,.95)';c.lineWidth=3;c.shadowColor='#ffcf5a';c.shadowBlur=10;}else{c.strokeStyle='rgba(120,135,210,.2)';c.lineWidth=1.5;c.shadowBlur=0;}
-  c.beginPath();c.moveTo(ax,ay);c.lineTo(bx,by);c.stroke();}}
- c.shadowBlur=0;c.textAlign='center';c.textBaseline='middle';
- for(const k in N){const n=N[k],[x,y,s]=bpos(n),on=U.includes(k),av=!on&&canUnlock(id,k),col=NCOL[n.t],r=s*.64;
-  hexPath(c,x,y,r);
-  if(on){const g=c.createLinearGradient(x,y-r,x,y+r);g.addColorStop(0,col);g.addColorStop(1,shade(col));c.fillStyle=g;c.shadowColor=col;c.shadowBlur=14;c.fill();c.shadowBlur=0;c.strokeStyle='rgba(255,255,255,.9)';c.lineWidth=1.5;c.stroke();}
-  else if(av){c.fillStyle='#141a3a';c.fill();c.strokeStyle=col;c.globalAlpha=.55+.45*Math.sin(tick/9);c.lineWidth=2.5;c.stroke();c.globalAlpha=1;}
-  else{c.fillStyle='#0b0e22';c.fill();c.strokeStyle='#283060';c.lineWidth=1.5;c.stroke();}
-  if(BS.sel===k){hexPath(c,x,y,r+5);c.strokeStyle='#fff';c.lineWidth=2;c.stroke();}
-  const lab=n.t==='core'?'★':n.t==='skill'?'技':n.t==='aw'?'醒':n.t==='fork'?'分':SHORT[Object.keys(n.v)[0]];
-  c.fillStyle=on?'#10142e':av?col:'#4a5288';c.font=`bold ${Math.round(s*.42)}px "M PLUS 1p","Hiragino Sans",sans-serif`;c.fillText(lab,x,y+1);}
- c.textAlign='left';c.textBaseline='alphabetic';c.fillStyle='#ffe27a';c.font='bold 15px "M PLUS 1p","Hiragino Sans",sans-serif';c.fillText(`${HB[id].name}の星盤「${BDEF[id].star}」`,12,24);
- c.fillStyle='#cfd3f5';c.font='13px "M PLUS 1p","Hiragino Sans",sans-serif';c.fillText(`星ポイント 残り ${ptsLeft(id)}　Lv${G.h[id].lv}`,12,44);}
+function drawBoard(){}/* 未使用：js/ver17.js が置き換え */
 function openBoard(id,m){show('board');setH(224);sizeBoard();BS.id=id;if(!BOARD[id][BS.sel])BS.sel=null;boardMenu(m);}
-function boardMenu(m){const id=BS.id,n=BS.sel&&BOARD[id][BS.sel],U=G.h[id].board;
- const info=n?`<b style="color:${NCOL[n.t]}">${{core:'星片',stat:'能力',skill:'技',aw:'星臨',fork:'分岐（どちらか1つ）'}[n.t]}</b>　${n.d}　<small>必要ポイント${n.cost}・${U.includes(n.k)?'解放済み':canUnlock(id,n.k)?'解放できる':'未接続'}</small>`:'星をタップで詳細。光る輪の星が解放できる。<br><small>青：能力　緑：技　赤：星臨強化　紫：分岐（どちらか一方）</small>';
- log((m?m+'<br>':'')+info);
- menu([{l:'解放',s:n?`ポイント${n.cost}`:'星を選ぶ',cls:'ready',dis:!n||!canUnlock(id,n.k)||n.cost>ptsLeft(id),f:()=>{U.push(n.k);SFX.aw();save();boardMenu(`<b>${n.d}</b> を解放した！`);}},
-  {l:'おまかせ解放',s:'自動で振り分け',f:()=>{const c=autoUnlock(id);if(c)SFX.aw();save();boardMenu(c?`${c}個の星を解放した`:'解放できる星がない（ポイント不足）');}},
-  {l:'リセット',s:'無料でやり直し',f:()=>{G.h[id].board=['0,0'];save();boardMenu('星盤をリセットした');}},
-  {l:`${HB[nextM(id)].name}の星盤`,f:()=>{BS.sel=null;openBoard(nextM(id));}},
-  {l:'星臨の試練',s:'位階'+ROMAN[G.h[id].awLv||1],cls:'ready',f:()=>{enterTown();trialMenu();}},{l:'戻る',cls:'back',f:()=>enterTown()}]);}
+function boardMenu(){}/* 未使用：js/ver17.js が置き換え */
 function boardTap(x,y){const N=BOARD[BS.id];let best=null,bd=1e9;for(const k in N){const[nx,ny,s]=bpos(N[k]),d=Math.hypot(nx-x,ny-y);if(d<s*.8&&d<bd){bd=d;best=k;}}if(best){BS.sel=best;SFX.sel();boardMenu();}}

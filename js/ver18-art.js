@@ -12,32 +12,14 @@ function trimCanvas(src,pad=1){const w=src.width,h=src.height,d=src.getContext('
 const awO=aw=>aw?'{"aw":1}':'';
 const FACE18={},ART18={};
 face=function(id,aw){const key=SPDEF[id]?id:'rio',k=key+(aw?'_aw':'');return FACE18[k]||(FACE18[k]=portrait(key,awO(aw),18).toDataURL());};
-art=function(id,aw){const key=SPDEF[id]?id:'rio',k=key+(aw?'_aw':'');if(ART18[k])return ART18[k];const f=frameOf(key,'idle',0,awO(aw)),c=document.createElement('canvas');c.width=c.height=42;c.getContext('2d').drawImage(f.c,HAX-25,HAY-40,42,42,0,0,42,42);return ART18[k]=c.toDataURL();};
+art=function(){};/* 未使用：js/ver19-art.js が置き換え */
 /* 旧16×16の絵を参照している箇所（図鑑など）へ新しい絵を渡す */
 function syncIMG(){for(const k in SPDEF){try{const d=SPDEF[k],f=frameOf(k,'idle',0,''),t=trimCanvas(f.c);IMG[k]=t;IMG[k+'_w']=whiteOf(t);if(d.human&&d.aw)IMG[k+'_aw']=trimCanvas(frameOf(k,'idle',0,awO(1)).c);}catch(e){}}}
 syncIMG();
 {const _vk=voidKind;voidKind=function(k){const vk=_vk(k);try{if(!IMG[vk]||IMG[vk].width===16){const key=resolveSpr(vk),t=trimCanvas(frameOf(key,'idle',0,'').c);IMG[vk]=t;IMG[vk+'_w']=whiteOf(t);}}catch(e){}return vk;};}
 /* 行動順バー：新しい顔ドットで描き直す */
 /* 会話の顔グラ（表情5種）：目・眉・口を描き分ける */
-exprFace=function(id,ex='n'){const key=id+':'+ex;if(EXC[key])return EXC[key];const k=SPDEF[id]?id:'rio',d=SPDEF[k],S=4,N=16,src=portrait(k,'',N),c=document.createElement('canvas');c.width=c.height=N*S;const g=c.getContext('2d');g.imageSmoothingEnabled=false;
- const t=document.createElement('canvas');t.width=t.height=N;const q=t.getContext('2d');q.drawImage(src,0,0);
- /* 目の位置：頭グリッドの 'e'（上まぶた）を探す */
- const eyes=[];d.head.forEach((r,y)=>[...r].forEach((ch,x)=>{if(ch==='e'||(ch==='o'&&d.head[y+1]&&d.head[y+1][x]==='b'))eyes.push([x,y]);}));
- const f0=frameOf(k,'idle',0,''),[cx,cy]=faceCenter(k),hw=d.head.reduce((a,r)=>Math.max(a,r.length),0),hx0=HAX-(hw>>1)+(d.hdx||0),hy0=HAY-(d.hip??7)-(d.float?3:0)-(d.tup??8)-d.head.length+(d.hup??2),ox=Math.round(cx-N/2),oy=Math.round(cy-N/2);
- const P=(x,y,w,h,col)=>{q.fillStyle=col;q.fillRect(x,y,w,h);},sk=cHex(ramp(d.pal.skin)[1]),sk2=cHex(ramp(d.pal.skin)[2]),D='#1a1420',E=eyes.map(([x,y])=>[hx0+x-ox,hy0+y-oy]).filter(([x,y])=>x>=0&&y>=0&&x<N&&y<N);
- if(E.length){const my=Math.max(...E.map(e=>e[1]))+3,mx=Math.round((E[0][0]+E[E.length-1][0])/2);
-  if(ex==='h'){E.forEach(([x,y])=>{P(x,y,1,2,sk);P(x,y,1,1,D);});if(E.length>1)P(E[1][0]+1,E[1][1],1,2,sk);P(mx,my,2,1,'#c0405a');E.forEach(([x,y])=>P(x-1,y+2,1,1,'#ff9aa8'));}
-  if(ex==='a'){E.forEach(([x,y],i)=>{P(x-(i?0:1),y-1,2,1,D);});P(mx,my,2,1,D);}
-  if(ex==='s'){E.forEach(([x,y],i)=>{P(x,y,1,1,sk2);P(x,y+1,1,1,D);});P(E[0][0],E[0][1]+2,1,2,'#7fd6ff');P(mx,my,2,1,sk2);}
-  if(ex==='o'){E.forEach(([x,y])=>{P(x,y-1,1,1,'#ffffff');P(x,y,1,2,D);});P(mx,my,1,2,D);}
-  if(ex==='n')P(mx,my,2,1,sk2);}
- g.fillStyle=EXBG[ex]||EXBG.n;g.fillRect(0,0,c.width,c.height);for(let y=0;y<c.height;y+=4)for(let x=(y>>2)%2*4;x<c.width;x+=8){g.fillStyle='rgba(255,255,255,.035)';g.fillRect(x,y,4,4);}
- g.drawImage(t,0,0,N,N,0,0,N*S,N*S);const M=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x*2,y*2,w*2,h*2);};
- if(ex==='h'){M(25,3,1,5,'#ffe27a');M(23,5,5,1,'#ffe27a');M(28,9,1,3,'#fff6c8');M(27,10,3,1,'#fff6c8');}
- if(ex==='a'){M(24,3,2,5,'#ff4050');M(22,5,6,2,'#ff4050');M(27,2,2,2,'#ff4050');}
- if(ex==='s'){M(26,3,1,4,'#7fd6ff');M(25,6,3,2,'#7fd6ff');M(28,8,1,3,'#7fd6ff');}
- if(ex==='o'){M(26,2,2,5,'#ffe27a');M(26,8,2,2,'#ffe27a');}
- return EXC[key]=c.toDataURL();};
+exprFace=function(){};/* 未使用：js/ver19-art.js が置き換え */
 
 /* ---------- アイコン（16×16） ---------- */
 const IC18={};

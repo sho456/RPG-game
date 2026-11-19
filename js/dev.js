@@ -1,8 +1,7 @@
 /* ===== 開発者モード（通常セーブとは別枠 astral_save_dev） ===== */
 const DEVKEY='astral_save_dev';
 function devLeg(k,lv=55){for(let n=0;n<300;n++){const it=genItem(lv,4,0,LEG[k].slot,4);if(it.leg===k){it.unid=false;return it;}}return null;}
-function devGear(){G.inv=G.inv.filter(i=>!i.dev);for(const id of G.members){const h=G.h[id],w=fixedItem('w',id,55);w.rar=3;w.unid=false;w.dev=1;G.inv.push(w);h.eq.w=w.uid;
-  for(const[sl,es]of[['body','body'],['head','head'],['sub','sub'],['acc','acc1'],['acc','acc2']]){const it=genItem(55,2,0,sl,2);it.unid=false;it.dev=1;G.inv.push(it);h.eq[es]=it.uid;}}}
+function devGear(){}/* 未使用：js/v31/items.js が置き換え */
 function devGame(){SAVE=DEVKEY;migrate(newGame());G.dev=1;G.gold=999999;G.tou=99999;
  for(const id of Object.keys(HB))if(!G.members.includes(id))newMember(id);
  Object.assign(G.flags,{boss1:true,boss2:true,boss3:true,boss4:true,boss5:true,boss6:true,boss7:true,mireMet:1,noahMet:1,ernaMet:1,balzaMet:1,crowChoice:'save',hakuaMet:1,jinMet:1,celesMet:1,valkMet:1});
@@ -45,7 +44,7 @@ function dev12(m){log((m||'<b>ver0.12 天への塔</b>　階を選んで直行')
   {l:'レジェンド全種を受け取る',s:Object.keys(LEG).filter(k=>!LEG[k].uq).length+'種',f:()=>{devLegs();save();dev12('レジェンドを全種受け取った（装備画面で確認）');}},{l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
 function dev11(m){log(m||'<b>ver0.11 星臨の深化</b>');
  menu([{l:'星臨の試練',cls:'ready',f:()=>trialMenu()},...[1,2,3].map(n=>({l:`全員の星臨位階を${ROMAN[n]}に`,f:()=>{G.members.forEach(id=>G.h[id].awLv=n);save();dev11(`全員の星臨位階を${ROMAN[n]}にした`);}})),{l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
-function devAreas(){menu([...Object.keys(AREAS).filter(k=>k!=='tower'&&k!=='kairou').map(k=>({l:AREAS[k].name,s:AREAS[k].rec||'',f:()=>enterField(k)})),{l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
+function devAreas(){}/* 未使用：js/v31/quests.js が置き換え */
 function devBoss(){const ks=Object.keys(ED).filter(k=>ED[k].boss&&!k.startsWith('tr_')&&!k.startsWith('kb')),ar={boss1:'haido',boss2:'midori',boss3:'seido',boss4:'raimei',boss5:'kouka',boss6:'ouito',boss9:'ryuu'};
  menu([...ks.map(k=>({l:ED[k].name,s:`HP${ED[k].mhp}`,f:()=>devBattle([{kind:k,lv:55}],k.startsWith('last')?'zankyo':ar[k]||'haido',k.startsWith('last')?{theme:'void'}:{})})),{l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
 function devGrow(m){log((m||'<b>育成・所持品</b>')+`<br><small>${G.party.map(i=>HB[i].name+' Lv'+G.h[i].lv).join('　')}</small>`);

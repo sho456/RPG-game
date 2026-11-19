@@ -97,23 +97,5 @@ function crowChoice(){F.pause=true;banner('クロウ','#b07cff');
 
 /* ===== ステータス画面 ===== */
 let sheetPrev=null;
-function openSheet(id,tab='st'){const ids=G.members,sh=$('#sheet'),s=stats(id),h=G.h[id],A2=AW[id],b=HB[id];
- if(sh.style.display!=='flex'&&scene==='field'){sheetPrev=F.pause;F.pause=true;}
- const row=(k,v)=>`<div class="sr"><span>${k}</span><b>${v}</b></div>`;let body='';
- if(tab==='st')body=`<div class="sgrid">${row('最大HP',s.mhp)}${row('攻撃',s.atk)}${row('防御',s.def)}${row('魔力',s.mag)}${row('精神',s.res)}${row('素早さ',+s.spd.toFixed(1))}${row('会心率',(6+s.crit)+'%')}${row('弱点ダメ','+'+s.weakDmg+'%')}${row('開始時AG',s.startAG)}${row('星臨中与ダメ','+'+s.awDmg+'%')}${row('攻撃時SP','+'+(10+s.spGain))}${row('ドロップ率','+'+s.drop+'%')}</div>
- <div class="sh2">成長傾向</div><div class="gro">${['mhp','atk','def','mag','res','spd'].map(k=>`<span>${{mhp:'HP',atk:'攻',def:'防',mag:'魔',res:'精',spd:'速'}[k]}<i class="g${b.g[k]}">${b.g[k]}</i></span>`).join('')}</div>
- <div class="sh2">星盤</div><div class="stx">星盤「${BDEF[id].star}」　解放 ${h.board.length-1}／残りポイント ${ptsLeft(id)}${s.atkEl?'<br>通常攻撃：'+s.atkEl+'属性':''}</div>`;
- if(tab==='eq')body=SLOTS6.map(sl=>{const it=h.eq[sl]&&findItem(h.eq[sl]);return`<div class="seq"><div class="sl">${SLOTN[sl]}</div>${it?`<div>${ihtml(it)}<br><small>${detailTxt(it)}</small></div>`:'<div style="color:#667">なし</div>'}</div>`;}).join('');
- if(tab==='sk')body=`<div class="sh2">星臨「${A2.name}」<small>（${A2.type}・位階${ROMAN[h.awLv||1]}）</small></div><div class="stx">${AWD[id]}<br>${[...A2.cmds,...((h.awLv||1)>=3?['goku'+id]:[])].map(k=>`<b>${SK[k].n}</b>：${SK[k].d||''}`).join('<br>')}</div><div class="sh2">技</div><div class="stx">${skillList(id).map(k=>`<b>${SK[k].n}</b> <small>SP${SK[k].sp||0}</small>：${SK[k].d||''}`).join('<br>')}</div>`;
- const i=ids.indexOf(id),pv=ids[(i-1+ids.length)%ids.length],nx=ids[(i+1)%ids.length],hp=h.hp??s.mhp;
- sh.innerHTML=`<div class="swin"><div class="shead"><canvas id="spt" width="16" height="16"></canvas><div><div class="snm">${b.name} <small>Lv${h.lv}</small></div><div class="ssub">${G.party.includes(id)?'前衛':'控え'}　次のLvまで ${nextXP(h.lv)-h.xp}</div>
- <div class="bar hp" style="margin-top:4px"><i style="width:${Math.min(100,hp/s.mhp*100)}%"></i><span>HP ${hp}/${s.mhp}</span></div><div class="bar sp" style="margin-top:3px"><i style="width:${h.xp/nextXP(h.lv)*100}%"></i><span>EXP</span></div></div><button class="sx" id="sxc">✕</button></div>
- <div class="stabs">${[['st','能力'],['eq','装備'],['sk','技・星臨']].map(([k,l])=>`<button class="${tab===k?'on':''}" data-t="${k}">${l}</button>`).join('')}</div><div class="sbody">${body}</div>
- <div class="snav"><button id="spv">◀ ${HB[pv].name}</button><button id="snx">${HB[nx].name} ▶</button></div></div>`;
- sh.style.display='flex';const c=$('#spt').getContext('2d');c.imageSmoothingEnabled=false;c.drawImage(IMG[id],0,0);
- sh.querySelectorAll('.stabs button').forEach(bt=>bt.onclick=()=>{SFX.sel();openSheet(id,bt.dataset.t);});
- $('#spv').onclick=()=>{SFX.sel();openSheet(pv,tab);};$('#snx').onclick=()=>{SFX.sel();openSheet(nx,tab);};
- $('#sxc').onclick=()=>{SFX.sel();sh.style.display='none';if(scene==='field'&&sheetPrev!==null){F.pause=sheetPrev;sheetPrev=null;}};}
-function fitField(){if(scene!=='field')return;const app=$('#app'),cs=getComputedStyle(app);
- const av=app.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom)-$('#msg').offsetHeight-$('#party').offsetHeight-6-6-74;
- const h=Math.max(144,Math.min(272,Math.floor(av/SC/16)*16));if(h!==H)setH(h);}
+function openSheet(){}/* 未使用：js/ver17.js が置き換え */
+function fitField(){}/* 未使用：js/v23.js が置き換え */
