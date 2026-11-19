@@ -1,0 +1,50 @@
+/* ===== 仲間の画面（js/ui/unit.js の #unit）。色・角・影は tokens.css の値だけ ===== */
+#unit{position:fixed;inset:0;z-index:902;overflow-y:auto;background:var(--tk-night);color:var(--tk-ink);font-family:var(--tk-font);
+ padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 16px);font-variant-numeric:tabular-nums}
+#unit.hide{display:none}
+#unit button{font-family:inherit;color:inherit;cursor:pointer}
+#unit .td-btn{min-width:40px;height:32px;padding:0 10px;border:0;border-radius:var(--tk-r);background:var(--tk-night-3);box-shadow:var(--tk-frame);font-size:var(--tk-fs-m);font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:4px}
+#unit .td-btn.on{background:var(--tk-lamp);color:var(--tk-shade);box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp-deep)}
+#unit .td-btn.dis,#unit .td-btn:disabled{background:transparent;color:var(--tk-void);box-shadow:0 0 0 1px var(--tk-void);cursor:default}
+.un-h{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:10px;padding:6px 10px;height:44px;background:var(--tk-night-2);box-shadow:var(--tk-drop)}
+.un-h b{flex:1;font-family:var(--tk-disp);font-size:var(--tk-fs-l)}
+.un-sum{display:flex;align-items:center;gap:5px;font-size:var(--tk-fs-m);color:var(--tk-star)}
+.un-xp{width:10px;height:10px;background:var(--tk-star);clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+.un-st{width:14px;height:14px;image-rendering:pixelated}
+.un-grid{list-style:none;margin:10px;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.un-grid button{position:relative;width:100%;display:flex;flex-direction:column;align-items:center;gap:2px;border:0;border-radius:var(--tk-r);background:var(--tk-night-2);box-shadow:var(--tk-frame);padding:0 0 6px;overflow:hidden}
+.un-grid .r{align-self:stretch;height:4px}
+.un-grid img{height:52px;margin-top:6px;image-rendering:pixelated;object-fit:contain}
+.un-grid b{font-family:var(--tk-disp);font-size:var(--tk-fs-s)}
+.un-grid .mt{display:flex;gap:8px;font-size:var(--tk-fs-xs);color:var(--tk-ink-2)}
+.un-grid .mt em{font-style:normal}.un-grid .mt .cs{color:var(--tk-lamp)}
+.un-dot{position:absolute;top:8px;right:6px;width:8px;height:8px;border-radius:var(--tk-r-round);background:var(--tk-notice)}
+.un-hero{display:flex;align-items:center;justify-content:space-between;padding:12px 10px 0}
+.un-hero .pv{flex:1;height:130px;display:flex;align-items:flex-end;justify-content:center;background:var(--tk-night-2);box-shadow:var(--tk-frame);margin:0 8px;padding-bottom:8px}
+.un-hero img{height:110px;image-rendering:pixelated;object-fit:contain}
+#unit .nv{height:130px;min-width:36px}
+.un-id{display:flex;align-items:center;gap:8px;margin:10px;font-size:var(--tk-fs-m)}
+.un-id .role{width:6px;height:22px}
+.un-id .el{color:var(--tk-ink-2);font-size:var(--tk-fs-s)}
+.un-id b{flex:1;font-family:var(--tk-disp);font-size:var(--tk-fs-xl)}
+.un-stats{list-style:none;margin:0 10px;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.un-stats li{display:flex;align-items:baseline;justify-content:space-between;padding:6px 10px;background:var(--tk-night-2);box-shadow:var(--tk-frame)}
+.un-stats i{font-style:normal;font-size:var(--tk-fs-xs);color:var(--tk-ink-2)}
+.un-stats b{font-size:var(--tk-fs-m)}
+.un-row{display:flex;align-items:center;gap:8px;margin:10px;padding:6px 10px;background:var(--tk-night-2);box-shadow:var(--tk-frame)}
+.un-row .k{font-style:normal;font-size:var(--tk-fs-xs);color:var(--tk-lamp);width:14px}
+.un-row .nm{flex:1;font-family:var(--tk-disp);font-size:var(--tk-fs-m)}
+.un-dots{display:flex;gap:4px}
+.un-dots i{width:8px;height:8px;background:var(--tk-void)}
+.un-dots i.on{background:var(--tk-star)}
+.un-eqs{display:flex;gap:6px;margin:10px}
+.un-eq{position:relative;flex:1;height:52px;border:0;border-radius:var(--tk-r);background:var(--tk-night-2);box-shadow:var(--tk-frame);padding:0;display:flex;align-items:center;justify-content:center}
+.un-eq.on{box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp)}
+.un-eq .g{color:var(--tk-void);font-family:var(--tk-disp);font-size:var(--tk-fs-l)}
+.un-eq .ic img,.un-sheet .ic img{width:32px;height:32px;image-rendering:pixelated}
+.un-eq em,.un-sheet em{font-style:normal;position:absolute;right:3px;bottom:1px;font-size:var(--tk-fs-xs);color:var(--tk-star)}
+#unit .un-bd{display:flex;margin:10px auto 0;width:calc(100% - 20px);height:40px}
+.un-sheet{position:fixed;left:0;right:0;bottom:0;max-height:48vh;overflow-y:auto;background:var(--tk-night-2);box-shadow:0 -2px 0 var(--tk-shade),0 -4px 0 var(--tk-line);padding:8px 10px calc(env(safe-area-inset-bottom,0px) + 10px)}
+.un-sheet .sb{display:flex;justify-content:space-between;margin-bottom:8px}
+.un-sheet ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.un-sheet li button{position:relative;width:100%;height:50px;border:0;border-radius:var(--tk-r);background:var(--tk-night-3);box-shadow:var(--tk-frame);padding:0;display:flex;align-items:center;justify-content:center}
