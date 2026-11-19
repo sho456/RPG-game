@@ -190,7 +190,8 @@ function result(){const o=st.over,S0=st.S,win=o.win,n=o.stars.reduce((a,b)=>a+b,
 function lvMap(){const o={};try{for(const id in G.h)o[id]=G.h[id].lv||1;}catch(e){}return o;}
 function stop(){cancelAnimationFrame(raf);st=null;}
 function open(id,deck){build();sid=id;cancelAnimationFrame(raf);
- st=TDS.create(sid,deck||TDD.deckOf(),{lv:lvMap(),seed:(Date.now()%100000)+1});speed=1;paused=false;sel=null;selU=null;fx=[];nums=[];ended=false;acc=0;for(const k in memo)delete memo[k];
+ const dk=deck||TDD.deckOf(),rl={};for(const h of dk)rl[h]=TDD.real(h);
+ st=TDS.create(sid,dk,{lv:lvMap(),real:rl,seed:(Date.now()%100000)+1});speed=1;paused=false;sel=null;selU=null;fx=[];nums=[];ended=false;acc=0;for(const k in memo)delete memo[k];
  root.classList.remove('hide');sheet(null);unitPanel(null);$('.td-deck').innerHTML=deckHTML();const sb=$('[data-a="spd"]');sb.textContent='×1';sb.classList.remove('on');
  const pb=$('[data-a="pause"]');pb.textContent='Ⅱ';pb.classList.remove('on');
  requestAnimationFrame(()=>{fit();setCam(st.S.W);last=performance.now();raf=requestAnimationFrame(loop);banner(st.S.name,TDM.chOf(sid).ch+'・灯を守れ',1600);

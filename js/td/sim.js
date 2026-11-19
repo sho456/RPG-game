@@ -17,7 +17,7 @@ function create(stageId,deck,o={}){const S=D.STAGE[stageId];if(!S)throw new Erro
  const Ps=S.paths.map(mkPath),P=Ps[0],lvOf=o.lv||{},st={S,P,Ps,t:0,R:rng(o.seed||1),cost:S.cost0??K.COST0,costAcc:0,lives:K.LIVES,star:0,r0:S.light.r,lightR:S.light.r,
   lamp:0,lampT:1,wave:-1,phase:'gap',gapT:o.prep??10,spawnQ:[],foes:[],units:[],fields:[],ev:[],uid:1,over:null,kills:0,leaks:0,timeSlow:0,cap:S.cap||6};
  st.pads=S.pads.map(p=>{const q=Object.assign({},p);if(p.k==='f'){q.lane=p.lane||0;const L=Ps[q.lane];q.s=p.s??findS(L,p.x);const a=at(L,q.s);q.x=a.x;q.y=a.y;}q.unit=null;q.lit=false;return q;});
- st.deck=(deck||D.deckOf()).map(id=>({id,h:D.hero(id,lvOf[id]||1),cd:0,on:null,ult:false})).filter(c=>c.h);
+ st.deck=(deck||D.deckOf()).map(id=>({id,h:D.hero(id,lvOf[id]||1,o.real&&o.real[id]),cd:0,on:null,ult:false})).filter(c=>c.h);
  /* 後ろの台座が道をどれだけ見ているか（自動の配置が使う） */
  for(const p of st.pads){p.cov={};for(const r of[108,112,150]){let n=0;for(const L of Ps)for(let s=0;s<L.L;s+=12){const a=at(L,s);if(dist(a.x,a.y,p.x,p.y)<=r)n++;}p.cov[r]=n;}}
  st.lampU={id:'lamp',x:S.base[0],y:S.base[1]-110,face:-1,lit:true,h:{name:'灯',atk:0,el:'陽',dmgK:'mag',rng:999,sk:{}}};lampSet(st);

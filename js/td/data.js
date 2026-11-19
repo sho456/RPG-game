@@ -37,14 +37,22 @@ const lvK=lv=>1+.05*(Math.max(1,lv)-1);
 const skName=k=>{try{return(SK[k]&&(SK[k].n||SK[k].name))||k;}catch(e){return k;}};
 const awName=id=>{try{return(AW[id]&&AW[id].name)||'星臨';}catch(e){return'星臨';}};
 /* 仲間：HB（RPG 版の能力）と Lv から TD の能力を作る。杖（術の武器）は知力が主 */
-function hero(id,lv=1){const h=HB[id],d=HERO[id],R=ROLE[d.role];if(!h||!d)return null;
+/* 育成の反映（ver0.52）：o＝real(id) の結果。gear＝装備ありとなしの本編の能力の比（攻撃・HP・防御・術防）、mas＝技の練達の段階（0〜3）、aw＝星臨の位階（1〜3）。
+ 計測（tools/td_sim.js）は o なし＝装備なし・練達 0 の基準で回す */
+function hero(id,lv=1,o){const h=HB[id],d=HERO[id],R=ROLE[d.role];if(!h||!d)return null;
  let mag=false;try{mag=RSD.WPN[RSD.HERO[id].w].mag===1;}catch(e){}
- const prim=mag?h.mag:h.atk,k=lvK(lv);
+ const prim=mag?h.mag:h.atk,k=lvK(lv),gk=(o&&o.gear)||{},q=x=>Math.max(.8,Math.min(3,x||1)),mas=Math.min(3,(o&&o.mas)||0),aw=Math.max(1,Math.min(3,(o&&o.aw)||1));
+ const sk=Object.assign({id:d.sk,n:skName(d.sk)},d,{mas});if(sk.m&&sk.k!=='heal'&&sk.k!=='slow')sk.m=+(sk.m*(1+.15*mas)).toFixed(2);if(sk.k==='heal')sk.m=+(sk.m*(1+.1*mas)).toFixed(2);sk.ch=+(d.ch*(1-.08*mas)).toFixed(1);
+ const ult=Object.assign({n:awName(id),k:'unova',m:7,r:92},ULT[id]||{},{aw});if(ult.m)ult.m=+(ult.m*(1+.25*(aw-1))).toFixed(2);
  return{id,name:h.name,role:d.role,pad:R.pad,el:d.el,dmgK:mag||d.role==='spell'?'mag':'phys',
-  hp:Math.round((200+h.mhp*2.2)*k),atk:Math.round((20+prim*1.6)*k*(d.atkK||1)),def:Math.round(h.def*1.5*k),res:Math.round(h.res*1.5*k),
+  hp:Math.round((200+h.mhp*2.2)*k*q(gk.hp)),atk:Math.round((20+prim*1.6)*k*(d.atkK||1)*q(gk.atk)),def:Math.round(h.def*1.5*k*q(gk.def)),res:Math.round(h.res*1.5*k*q(gk.res)),
   iv:+((d.iv||R.iv)*(1-(h.spd-10)*.015)).toFixed(2),rng:d.rng||R.rng,blk:d.blk!=null?d.blk:R.blk,cost:d.cost||R.cost,splash:R.splash||0,
-  lt:d.lt||0,sk:Object.assign({id:d.sk,n:skName(d.sk)},d),ult:Object.assign({n:awName(id),k:'unova',m:7,r:92},ULT[id]||{}),
-  redeploy:Math.round(22+(14-Math.min(14,h.spd))*1.5),lv};}
+  lt:d.lt||0,sk,ult,redeploy:Math.round(22+(14-Math.min(14,h.spd))*1.5),lv};}
+/* 本編のセーブ（G）から、その仲間の育成を読む：装備の比・練達の段階・星臨の位階 */
+function real(id){const o={gear:null,mas:0,aw:1};try{const h=G.h[id];if(!h)return o;o.aw=h.awLv||1;try{o.mas=RSM.lvOf(id,HERO[id].sk)||0;}catch(e){}
+ if(h.eq&&typeof stats==='function'){let mag=false;try{mag=RSD.WPN[RSD.HERO[id].w].mag===1;}catch(e){}const P=mag?'mag':'atk',s1=stats(id),eq=h.eq;
+  h.eq={w:null,main:null,sub:null,acc1:null,acc2:null};let s0;try{s0=stats(id);}finally{h.eq=eq;}
+  o.gear={atk:s1[P]/Math.max(1,s0[P]),hp:s1.mhp/Math.max(1,s0.mhp),def:s1.def/Math.max(1,s0.def),res:s1.res/Math.max(1,s0.res)};}}catch(e){console.error(e);}return o;}
 /* 敵：ED（RPG 版）とステージの Lv から。移動 = 14 + 素早さ × 2.4 px/秒 */
 function foe(kind,lv=1){const e=ED[kind];if(!e)return null;const hk=1+.05*(Math.max(1,lv)-1),ak=1+.04*(Math.max(1,lv)-1);
  const boss=!!e.boss,tr=(TRAIT[kind]||[]).slice();
@@ -62,5 +70,5 @@ function deckOf(){const L=(typeof G!=='undefined'&&G&&G.members?G.members:Object
  const saved=typeof G!=='undefined'&&G&&G.td&&G.td.deck;if(saved){const d=saved.filter(id=>L.includes(id));if(d.length)return d.slice(0,8);}
  const pri=['rio','gald','mire','celes','noah','erna','shion','hakua','balza','crow','jin','valk'];
  return pri.filter(id=>L.includes(id)).slice(0,8);}
-return{K,ROLE,HERO,ULT,TRAIT,TRN,hero,foe,STAGE,CH,ORDER,deckOf,skName,reward};})();
+return{K,ROLE,HERO,ULT,TRAIT,TRN,hero,real,foe,STAGE,CH,ORDER,deckOf,skName,reward};})();
 if(typeof module!=='undefined')module.exports=TDD;
