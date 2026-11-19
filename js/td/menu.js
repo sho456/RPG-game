@@ -7,7 +7,8 @@ const TDM=(()=>{
 let root=null,tab=null,pend=null,cur=null;
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const ELC={'斬':'#e8e8f0','打':'#d9a066','突':'#b0e0ff','熱':'#ff7a3c','冷':'#7fd8ff','雷':'#ffe14a','陽':'#fff1a8','陰':'#b07aff'};
-const TD0=()=>{G.td=G.td||{c:{}};G.td.c=G.td.c||{};return G.td;};
+/* セーブの移行（ver0.52）：本編でクリア済みのクエストに当たるステージは、星 1 のクリア済みから始める */
+const TD0=()=>{G.td=G.td||{c:{}};G.td.c=G.td.c||{};if(!G.td.v){G.td.v=1;try{for(const id of TDD.ORDER){const q=TDD.STAGE[id].q;if(q&&typeof qCleared==='function'&&qCleared(q)&&!G.td.c[id])G.td.c[id]=1;}}catch(e){console.error(e);}}return G.td;};
 const stars=id=>(G&&G.td&&G.td.c&&G.td.c[id])||0;
 const chOf=id=>TDD.CH.find(c=>c.st.includes(id))||{ch:'',n:''};
 function open(id){const i=TDD.ORDER.indexOf(id);return i<=0||stars(TDD.ORDER[i-1])>0;}
