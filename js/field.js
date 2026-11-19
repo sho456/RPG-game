@@ -28,10 +28,9 @@ function makeTown(){const c=document.createElement('canvas');c.width=W;c.height=
 let TOWN=makeTown();
 function drawTown(){}/* 未使用：js/ver18-town.js が置き換え */
 
-/* ===== フィールドのタイル（探索マップは廃止。ch7・ch8 が TL に足すので入れ物と tl だけ残す） ===== */
+/* ===== フィールドのタイル（探索マップは廃止。tl と px は町の絵などで使うので残す） ===== */
 function tl(fn,seed){const c=document.createElement('canvas');c.width=c.height=16;const g=c.getContext('2d');fn(g,rng(seed));return c;}
 const px=(g,c,x,y,w=1,h=1)=>{g.fillStyle=c;g.fillRect(x,y,w,h);};
-const TL={};
 
 /* ===== 灰の街道 ===== */
 const MAP_HAIDO=["TTTTTTTT####TTTTTTTT","TTTTTTT#,,,,#TTTTTTT","TTTTTTT#,,B,#TTTTTTT","TTTTTTT#,,,,#TTTTTTT","TTTT...##,,##...TTTT","TTT.....,,,,....C.TT","TT..RR..,,......R.TT","TT.....,,...~~~...TT","T..G...,,..~~~~~..TT","T.....,,....~~~...TT","TT...,,..........TTT","TT..,,.....TT.....TT","TTC.,,....TTTT....TT","TT..,,,....TT...G.TT","TTT...,,,.........TT","TTTT....,,,....RR.TT","TTT.......,,......TT","TT..~~~....,,.....TT","TT.~~~~~...,,..C..TT","TT..~~~...,,......TT","TT.......,,....TTTTT","TTTT...,,,...TTTTTTT","TTTTT.,,......TTTTTT","TTTT..,,...R...TTTTT","TTT...,,.......G.TTT","TT....,,,.........TT","TT.C....,,....RR..TT","TTT......,,.......TT","TTTT......,,....TTTT","TTTTT.....,,..TTTTTT","TTTTTT....,,.TTTTTTT","TTTTTTT...,,TTTTTTTT","TTTTTTTT..S.TTTTTTTT","TTTTTTTTTTTTTTTTTTTT"].map(r=>r.padEnd(20,'T').slice(0,20));

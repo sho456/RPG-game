@@ -93,8 +93,6 @@ function kBoss(f){const k='kb'+f;if(ED[k])return k;const[bk,nm]=f===30?['boss7',
   ai:{every:3,charge:f===30?'chrono':b.ai.charge,acts:b.ai.acts,summon:voidKind(b.ai.summon),sumLv:kLv(f)},ilv:kLv(f)};return k;}
 
 /* --- 虚の回廊（自動生成・無限階層・10層ごとに番人） --- */
-TL.v=tl((g,R)=>{px(g,'#2a2040',0,0,16,16);px(g,'#221a36',0,15,16,1);px(g,'#221a36',15,0,1,16);for(let i=0;i<9;i++)px(g,R()<.6?'#4a3a6a':R()<.5?'#8a8aa0':'#c8b0ff',R()*16|0,R()*16|0);},230);
-TL.q=tl((g,R)=>{px(g,'#0e0818',0,0,16,16);for(let y=0;y<16;y+=4){px(g,'#1a1028',0,y+3,16,1);for(let x=(y%8?4:0);x<16;x+=8)px(g,'#1a1028',x,y,1,4);}for(let i=0;i<5;i++)px(g,R()<.5?'#3a2a5a':'#6a4c9c',R()*16|0,R()*16|0);},231);
 const KMOBS=['drowned','onimusha','golemkin','shade','darkknight','raiwolf','jelly','yukirei','dragonewt','firedrake','ember','minerghost'];
 const kst=()=>G.kairou||(G.kairou={cp:1,cur:1,max:0});
 function genVoidFloor(f){for(let tr=0;;tr++){const R=rng(f*7919+101+tr*31),Wd=20,Hd=24,g=Array.from({length:Hd},()=>Array(Wd).fill('q')),rooms=[];
@@ -119,8 +117,6 @@ function celesEvent(){F.pause=true;banner('セレス','#e0d0ff');
   {l:'今はやめる',f:()=>{G.flags.celesMet=1;G.declined=[...(G.declined||[]),'celes'];save();fieldMenu('セレス「ふん、好きにせい。……酒場で待っておるからな」');}}]);}
 
 /* --- 竜の巣 --- */
-TL.m0=tl((g,R)=>{px(g,'#a02a0a',0,0,16,16);for(let i=0;i<22;i++)px(g,R()<.5?'#ff6a20':'#d04010',R()*16|0,R()*16|0);px(g,'#ffd060',4,5,3,1);px(g,'#ffd060',10,11,2,1);},240);
-TL.m1=tl((g,R)=>{px(g,'#b0340c',0,0,16,16);for(let i=0;i<22;i++)px(g,R()<.5?'#ff8a30':'#d04010',R()*16|0,R()*16|0);px(g,'#ffe080',6,9,3,1);px(g,'#ffe080',11,3,2,1);},241);
 AREAS.ryuu={name:'竜の巣',lv:[60,68],theme:'lava',rec:'推奨Lv60〜68',bflag:'boss9',boss:{kind:'boss9',lv:68},
  map:["YYYYYYYYYYYYYYYYYYYY","YYYYYYYYrBrYYYYYYYYY","YYYYYYYrrrrrYYYYYYYY","YYrrrYYrrrrrYYrrCrYY","YYrCrrrrrmrrrrrrrrYY","YYrrrYYmmmmmYYrrrrYY","YYYrYYYmmmmmYYYYrYYY","YrrrrrrrrmrrrrrrrrrY",
   "YrmmrrrrrrrrrrrmmrrY","YrmmrrYYYrYYYrrmmrDY","YrrrrrYrrrrrYrrrrrrY","YYYrYYYrrGrrYYYYrYYY","YrrrrrrrrrrrrrrrrrrY","YrrmmmrrrYYrrrmmmrrY","YrrmmmrrrYYrrrmmmrCY","YrrrrrrrrrrrrrrrrrrY",
