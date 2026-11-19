@@ -44,7 +44,7 @@
 .td-cost{display:flex;align-items:baseline;gap:4px;min-width:84px}
 .td-cost small{font-size:var(--tk-fs-xs);color:var(--tk-ink-2)}
 .td-cost b{font-size:var(--tk-fs-xl);color:var(--tk-lamp);font-variant-numeric:tabular-nums;line-height:1}
-.td-cost i{display:block;height:3px;background:var(--tk-lamp);width:0}
+.td-costw .cb{display:block;height:3px;background:var(--tk-lamp);width:0}
 .td-costw{display:flex;flex-direction:column;gap:2px}
 .td-lampb{height:36px;padding:0 8px;font-size:var(--tk-fs-xs);line-height:1.15;display:flex;flex-direction:column;justify-content:center;background:var(--tk-lamp);color:var(--tk-shade);box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp-deep)}
 .td-lampb small{font-size:9px;font-weight:500}
@@ -66,7 +66,6 @@
 .td-card.poor .c{color:var(--tk-void)}
 .td-card.poor img{filter:saturate(.25) brightness(.7)}
 .td-card.on{opacity:.45}
-.td-card.on::after{content:'配置中';position:absolute;top:22px;left:0;right:0;font-size:var(--tk-fs-xs);text-align:center}
 .td-card.sel{box-shadow:0 0 0 1px var(--tk-shade),0 0 0 3px var(--tk-lamp);transform:translateY(-3px)}
 /* 選ぶ・結果 */
 .td-sheet{position:absolute;inset:0;background:rgba(7,7,26,.82);display:flex;align-items:center;justify-content:center;padding:16px;z-index:5}
@@ -178,3 +177,30 @@
 .tdm-join small{color:var(--tk-ink-2)}
 .tdm-join .td-btn{margin-top:12px;min-width:160px;height:42px}
 .tdm-blank{min-height:100vh}
+
+/* ===== 文字の代わりのしるし（ver0.52：説明の字を減らす） ===== */
+.ic-lamp{display:inline-block;width:9px;height:12px;background:var(--tk-lamp);clip-path:polygon(50% 0,100% 55%,50% 100%,0 55%);vertical-align:-1px}
+.ic-star{display:inline-block;width:14px;height:14px;background:var(--tk-star);clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);flex:none}
+.ic-tower{display:inline-block;width:8px;height:16px;background:linear-gradient(var(--tk-star) 0 35%,var(--tk-lamp-deep) 35%);clip-path:polygon(50% 0,100% 20%,70% 35%,70% 100%,30% 100%,30% 35%,0 20%)}
+.td-cost{align-items:center}
+.td-lampb{flex-direction:row;align-items:center;gap:5px;font-size:var(--tk-fs-m);font-weight:800}
+.td-lampb .pp{display:flex;flex-direction:column;gap:2px}
+.td-lampb .pp i{width:5px;height:3px;background:var(--tk-shade);opacity:.5}
+.td-lampb .pp i.on{background:var(--tk-shade);opacity:1}
+.td-lampb.poor .pp i.on{background:var(--tk-lamp)}
+.td-call{font-size:var(--tk-fs-m);display:flex;align-items:center;gap:4px}
+.td-call .ic-lamp{background:var(--tk-shade)}
+.td-banner.boss{color:var(--tk-life)}
+.nope{animation:tdnope .35s}
+.td-cost.nope b{color:var(--tk-notice)}
+@keyframes tdnope{20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+
+.bs{font-style:normal;color:var(--tk-life);margin-right:4px}
+.tdm-tags .cap{display:flex;gap:2px;align-items:center}
+.tdm-tags .cap i{width:5px;height:10px;background:var(--tk-lamp)}
+.tdm-tags .lv{font-weight:800}
+.tdm-tags .warn{color:var(--tk-shade);background:var(--tk-life)}
+.tdm-foes .tr{display:flex;gap:3px}
+.tdm-foes .tr i{font-style:normal;font-size:var(--tk-fs-xs);font-weight:800;width:18px;height:18px;display:flex;align-items:center;justify-content:center;color:var(--tk-ink);background:var(--tk-night-3)}
+.tdm-foes .tr i.t-void{background:var(--tk-tr-void)}.tdm-foes .tr i.t-ghost{background:var(--tk-tr-ghost)}.tdm-foes .tr i.t-armor{background:var(--tk-tr-armor)}
+.tdm-pool{margin-top:14px}

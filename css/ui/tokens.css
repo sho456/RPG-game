@@ -18,6 +18,8 @@
  --tk-void:#6f6888;       /* 虚蝕：未解放・無効・光の外 */
  --tk-life:#ff8a6a;       /* 灯火（拠点の残り）・被害 */
  --tk-notice:#ff6a4a;     /* 通知の印（これ 1 種類だけ） */
+ /* 敵の型の印（出撃準備） */
+ --tk-tr-void:#5a3a8a;--tk-tr-ghost:#3a5a7a;--tk-tr-armor:#5a5a6a;
  /* 戦闘の情報（攻撃属性 8 色） */
  --el-zan:#e8e8f0;--el-da:#d9a066;--el-totsu:#b0e0ff;--el-netsu:#ff7a3c;--el-rei:#7fd8ff;--el-rai:#ffe14a;--el-you:#fff1a8;--el-in:#b07aff;
  /* 文字 */

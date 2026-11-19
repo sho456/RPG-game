@@ -24,10 +24,10 @@ function map(){build();try{TD0();}catch(e){}const cur=TDD.CH.filter(chOpen).pop(
  const nx=TDD.ORDER.find(id=>open(id)&&!stars(id));
  show(`<header class="tdm-h"><button class="td-btn" data-a="home" aria-label="灯都へ戻る">◀</button><b>灯守の防衛線</b><span class="tdm-sum">★ ${TDD.ORDER.reduce((a,id)=>a+stars(id),0)}/${TDD.ORDER.length*3}</span></header>
  <nav class="tdm-tabs">${TDD.CH.map(c=>{const ok=chOpen(c);return`<button class="${c.id===tab?'on':''}${ok?'':' lock'}" data-a="tab" data-v="${c.id}" ${ok?'':'disabled'}><small>${esc(c.ch)}</small>${ok?esc(c.n):c.soon?'準備中':'未踏'}</button>`;}).join('')}</nav>
- <section class="tdm-ch"><canvas class="tdm-sky" width="360" height="96"></canvas><div class="tdm-cht"><small>${esc(C.ch)}</small><b>${esc(C.n)}</b><p>${esc(C.intro)}</p></div></section>
+ <section class="tdm-ch"><canvas class="tdm-sky" width="360" height="96"></canvas><div class="tdm-cht"><small>${esc(C.ch)}</small><b>${esc(C.n)}</b></div></section>
  <ol class="tdm-road">${C.st.map((id,i)=>{const S=TDD.STAGE[id],ok=open(id),n=stars(id),me=id===nx;
   return`<li class="${ok?'':'lock'}${me?' next':''}${n?' done':''}"><button data-a="stage" data-v="${id}" ${ok?'':'disabled'}><span class="no">${S.boss?'◆':i+1}</span>
-  <span class="tx"><b>${ok?esc(S.name):'？？？'}</b><small>推奨Lv${S.lv}・${S.waves.length} WAVE${S.boss?'・ボス':''}</small></span>
+  <span class="tx"><b>${ok?esc(S.name):'？？？'}</b><small>Lv${S.lv}</small></span>
   ${S.join&&ok&&!(G.members||[]).includes(S.join)?`<img class="jn" src="${pic(S.join,S.join,0,30)}" alt="加入：${esc(HB[S.join].name)}">`:''}
   <span class="ss">${[0,1,2].map(k=>`<i class="${k<n?'on':''}"></i>`).join('')}</span></button></li>`;}).join('')}</ol>`);
  try{skyArt(root.querySelector('.tdm-sky'),C.th);}catch(e){}}
@@ -40,17 +40,14 @@ function prep(id){if(!open(id))return map();cur=id;const S=TDD.STAGE[id],C=chOf(
  const kinds=[...new Set(S.waves.flatMap(w=>w.e.map(e=>e[1])))],cnt=k=>S.waves.reduce((a,w)=>a+w.e.filter(e=>e[1]===k).reduce((b,e)=>b+e[2],0),0);
  const avg=deck.length?Math.round(deck.reduce((a,h)=>a+(G.h[h]?G.h[h].lv:1),0)/deck.length):1;
  show(`<header class="tdm-h"><button class="td-btn" data-a="map" aria-label="地図へ戻る">◀</button><b>出撃準備</b><span class="tdm-sum">${esc(C.ch)}</span></header>
- <section class="tdm-st"><h2>${esc(S.name)}</h2><p>${esc(stDesc(S))}</p><canvas class="tdm-prev" width="360" height="90"></canvas>
- <div class="tdm-tags"><span>推奨 Lv${S.lv}</span><span class="${avg<S.lv?'warn':''}">手札の平均 Lv${avg}</span><span>配置の上限 ${S.cap}</span><span>${S.waves.length} WAVE</span></div></section>
- <h3 class="tdm-sec">出てくる敵</h3><ul class="tdm-foes">${kinds.map(k=>{const f=TDD.foe(k,S.lv);if(!f)return'';return`<li><img src="${pic(f.spr,k,1,28)}" alt=""><span class="tx"><b>${esc(f.name)}${f.boss?'<em>ボス</em>':''}</b>
-  <small>${f.tr.map(t=>esc(TDD.TRN[t]||t)).join('・')||'—'}</small></span><span class="wk">${f.weak.map(e=>`<i style="--c:${ELC[e]}">${e}</i>`).join('')}</span><span class="n">×${cnt(k)}</span></li>`;}).join('')}</ul>
- <h3 class="tdm-sec">手札 <small>${deck.length}/8・タップで出し入れ</small></h3>
- <div class="tdm-pool">${mem.map(h=>{const x=TDD.hero(h,G.h[h]?G.h[h].lv:1),on=deck.includes(h);
+ <section class="tdm-st"><h2>${S.boss?'<i class="bs">◆</i>':''}${esc(S.name)}</h2><canvas class="tdm-prev" width="360" height="90"></canvas>
+ <div class="tdm-tags"><span class="lv${avg<S.lv?' warn':''}" title="推奨 Lv${S.lv}・手札の平均 Lv${avg}">Lv${S.lv}</span><span class="cap" title="配置の上限">${'<i></i>'.repeat(S.cap)}</span><span title="WAVE">≋ ${S.waves.length}</span></div></section>
+ <ul class="tdm-foes">${kinds.map(k=>{const f=TDD.foe(k,S.lv);if(!f)return'';return`<li><img src="${pic(f.spr,k,1,28)}" alt=""><span class="tx"><b>${f.boss?'<i class="bs">◆</i>':''}${esc(f.name)}</b></span><span class="tr">${f.tr.map(t=>`<i class="t-${t}" title="${esc(TDD.TRN[t]||t)}">${({void:'蝕',ghost:'霊',armor:'重',fly:'飛'})[t]||''}</i>`).join('')}</span><span class="wk">${f.weak.map(e=>`<i style="--c:${ELC[e]}">${e}</i>`).join('')}</span><span class="n">×${cnt(k)}</span></li>`;}).join('')}</ul>
+  <div class="tdm-pool">${mem.map(h=>{const x=TDD.hero(h,G.h[h]?G.h[h].lv:1),on=deck.includes(h);
   return`<button class="${on?'on':''}" data-a="pick" data-v="${h}"><img src="${pic(h,h,0,40)}" alt=""><span class="c">${x.cost}</span><span class="r" style="background:${TDD.ROLE[x.role].col}"></span>
-  <b>${esc(x.name)}</b><small>${TDD.ROLE[x.role].n}・Lv${x.lv}</small>${on?`<i class="k">${deck.indexOf(h)+1}</i>`:''}</button>`;}).join('')}</div>
+  <b>${esc(x.name)}</b><small>Lv${x.lv}</small>${on?`<i class="k">${deck.indexOf(h)+1}</i>`:''}</button>`;}).join('')}</div>
  <div class="tdm-go"><button class="td-btn on" data-a="go" data-v="${id}" ${deck.length?'':'disabled'}>出撃</button></div>`);
  try{prevArt(root.querySelector('.tdm-prev'),id);}catch(e){console.error(e);}}
-function stDesc(S){const q=(()=>{try{for(const c of QD.CH)for(const x of c.qs)if(x.id===S.q)return x;}catch(e){}return null;})();return(q&&q.d)||'';}
 function prevArt(c,id){const st=TDS.create(id,['rio'],{}),b=TDBG.make(st,360),g=c.getContext('2d'),W=st.S.W,kx=360/W,ky=90/240,Y=y=>(y-180)*ky;g.imageSmoothingEnabled=false;
  g.drawImage(b.ground,0,180,W,240,0,0,360,90);const[bx,by]=st.S.base;
  g.fillStyle='rgba(242,179,71,.2)';g.beginPath();g.ellipse(bx*kx,Y(by),st.lightR*kx,st.lightR*ky,0,0,7);g.fill();
@@ -69,7 +66,7 @@ function cleared(id,win,first){const S=TDD.STAGE[id];pend=win&&first&&S.join&&!(
 function after(id,next){const fin=()=>{const i=TDD.ORDER.indexOf(id),nx=TDD.ORDER[i+1];if(next&&nx&&TDD.STAGE[nx]&&open(nx))prep(nx);else map();};
  TD.hide();if(!pend)return fin();const who=pend,S=TDD.STAGE[id];pend=null;show('<div class="tdm-blank"></div>');
  talk(S.join_lines,()=>{try{newMember(who);G.td.deck=G.td.deck||[];if(G.td.deck.length<8&&!G.td.deck.includes(who))G.td.deck.push(who);save();}catch(e){console.error(e);}
-  show(`<div class="tdm-join"><img src="${pic(who,who,0,64)}" alt=""><b>${esc(HB[who].name)}が仲間になった</b><small>${TDD.ROLE[TDD.HERO[who].role].n}・技「${esc(TDD.hero(who,1).sk.n)}」</small><button class="td-btn on" data-a="fin">続ける</button></div>`);
+  show(`<div class="tdm-join"><img src="${pic(who,who,0,64)}" alt=""><b>${esc(HB[who].name)}が仲間になった</b><button class="td-btn on" data-a="fin">続ける</button></div>`);
   root.querySelector('[data-a="fin"]').onclick=e=>{e.stopPropagation();fin();};});}
 function onClick(e){const b=e.target.closest('[data-a]');if(!b||b.disabled)return;const a=b.dataset.a,v=b.dataset.v;
  if(a==='home')close();else if(a==='map')map();else if(a==='tab'){tab=v;map();}else if(a==='stage')prep(v);else if(a==='go')go(v);

@@ -22,7 +22,7 @@ function build(){if(root)return;root=document.createElement('div');root.id='td';
  <button class="td-btn" data-a="spd" aria-label="速度">×1</button><button class="td-btn" data-a="pause" aria-label="一時停止">Ⅱ</button><button class="td-btn" data-a="menu" aria-label="やめる">≡</button></div>
  <div class="td-field"><canvas></canvas><button class="td-call" data-a="call" hidden></button><div class="td-banner"></div><div class="td-unit" hidden></div><div class="td-tip"></div>
  <div class="td-sheet" hidden><div class="td-panel"></div></div></div>
- <div class="td-bar"><div class="td-costw"><div class="td-cost"><small>灯力</small><b>0</b></div><i class="cb"></i></div><button class="td-btn td-lampb" data-a="lamp"></button><div class="td-star"><span>星片</span><div class="g"><i></i></div><span class="sn">0/10</span></div></div>
+ <div class="td-bar"><div class="td-costw"><div class="td-cost"><i class="ic-lamp"></i><b>0</b></div><i class="cb"></i></div><button class="td-btn td-lampb" data-a="lamp"></button><div class="td-star"><i class="ic-star"></i><div class="g"><i></i></div></div></div>
  <div class="td-deck"></div>`;
  document.body.appendChild(root);cv=root.querySelector('canvas');g=cv.getContext('2d');
  root.addEventListener('click',onClick);cv.addEventListener('pointerdown',pDown);cv.addEventListener('pointermove',pMove);cv.addEventListener('pointerup',pUp);cv.addEventListener('pointercancel',()=>{drag=null;});
@@ -54,11 +54,11 @@ function take(){for(const e of st.ev){
  else if(e.k==='heal'){if(nums.length<24)nums.push({t:0,x:e.u.x,y:e.u.y-46,v:'+'+e.v,c:'#9fe8b8'});}
  else if(e.k==='hurt'){e.u.hitT=st.t;}
  else if(e.k==='cast')fx.push({t:0,d:.6,k:'name',x:e.u.x,y:e.u.y-58,s:e.sk.n});
- else if(e.k==='ult'){fx.push({t:0,d:.7,k:'ult',x:e.x,y:e.y,r:e.r,c:ELC[e.u.h.el]||'#fff'});banner(e.u.h.ult.n,e.u.h.name+'の星臨',900);shake=3;}
- else if(e.k==='leak'){baseHit=st.t;shake=3;tip('灯火が 1 つ消えた'+(e.n>1?'（×'+e.n+'）':''));}
- else if(e.k==='wave'){banner('WAVE '+e.n,e.boss?'強い気配が近づいてくる':'虚蝕が来る',1200);if(e.n===2&&st.S.tut)setTimeout(()=>tip('左右にドラッグ・上の地図をタップで見渡せる'),1500);}
- else if(e.k==='lamp'){fx.push({t:0,d:.7,k:'ring',x:st.S.base[0],y:st.S.base[1],r:st.lightR*.6,c:'#f2b347'});banner('灯が強まった','光が広がる（'+e.n+'/3）',900);}
- else if(e.k==='clear')banner('WAVE '+e.n+' 突破','',900);
+ else if(e.k==='ult'){fx.push({t:0,d:.7,k:'ult',x:e.x,y:e.y,r:e.r,c:ELC[e.u.h.el]||'#fff'});banner(e.u.h.ult.n,'',900);shake=3;}
+ else if(e.k==='leak'){baseHit=st.t;shake=3;nope('.td-life');}
+ else if(e.k==='wave'){banner('WAVE '+e.n,'',1200,e.boss);}
+ else if(e.k==='lamp'){fx.push({t:0,d:.7,k:'ring',x:st.S.base[0],y:st.S.base[1],r:st.lightR*.6,c:'#f2b347'});}
+ else if(e.k==='clear')banner('WAVE '+e.n,'',700);
  else if(e.k==='fall'){fx.push({t:0,d:.4,k:'puff',x:e.u.x,y:e.u.y-18});if(selU===e.u)unitPanel(null);}
  else if(e.k==='summon')fx.push({t:0,d:.4,k:'ring',x:e.f.x,y:e.f.y,r:30,c:'#b07aff'});}
  st.ev.length=0;}
@@ -127,22 +127,24 @@ const memo={};const set=(k,el,v,f)=>{if(memo[k]===v)return;memo[k]=v;f(el,v);};
 function hud(){set('wv',$('.wv'),(st.wave+1)+'/'+st.S.waves.length,(e,v)=>e.textContent=v);
  set('lv',$('.td-life'),st.lives,(e,v)=>{e.innerHTML='<span>灯火</span>'+Array.from({length:K.LIVES},(_,i)=>`<i class="${i<v?'':'off'}"></i>`).join('');});
  set('co',$('.td-cost b'),st.cost,(e,v)=>e.textContent=v);$('.cb').style.width=Math.round(st.costAcc/K.COST_EVERY*84)+'px';
- const sr=Math.min(K.STAR_MAX,st.star);set('sr',$('.td-star'),st.star,(e,v)=>{e.querySelector('.g i').style.width=(sr/K.STAR_MAX*100)+'%';e.querySelector('.sn').textContent=Math.min(v,K.STAR_MAX)+'/'+K.STAR_MAX+(v>=K.STAR_MAX?' 星臨できる':'');e.classList.toggle('full',v>=K.STAR_MAX);});
- const call=$('.td-call'),gap=st.phase==='gap'&&!st.over;set('call',call,gap?Math.ceil(st.gapT)+'|'+st.wave:'',(e,v)=>{e.hidden=!v;if(v)e.innerHTML=st.wave<0?`開始<small>あと ${Math.ceil(st.gapT)} 秒</small>`:`次の WAVE を呼ぶ<small>灯力 +${Math.ceil(st.gapT)}</small>`;});
- const lc=TDS.lampCost(st);set('lamp',$('.td-lampb'),lc+'|'+(st.cost>=lc?1:0),(e)=>{e.innerHTML=lc?`灯を強める<small>灯力 ${lc}</small>`:'灯<small>最大</small>';e.classList.toggle('poor',!lc||st.cost<lc);});
+ const sr=Math.min(K.STAR_MAX,st.star);set('sr',$('.td-star'),st.star,(e,v)=>{e.querySelector('.g i').style.width=(sr/K.STAR_MAX*100)+'%';e.classList.toggle('full',v>=K.STAR_MAX);});
+ const call=$('.td-call'),gap=st.phase==='gap'&&!st.over;set('call',call,gap?Math.ceil(st.gapT)+'|'+st.wave:'',(e,v)=>{e.hidden=!v;if(v)e.innerHTML=st.wave<0?`▶ <b>${Math.ceil(st.gapT)}</b>`:`▶▶ <i class="ic-lamp"></i><b>+${Math.ceil(st.gapT)}</b>`;});
+ const lc=TDS.lampCost(st);set('lamp',$('.td-lampb'),lc+'|'+(st.cost>=lc?1:0),(e)=>{e.innerHTML=`<i class="ic-tower"></i><span class="pp">${[0,1,2].map(i=>`<i class="${i<st.lamp?'on':''}"></i>`).join('')}</span>${lc?`<b>${lc}</b>`:''}`;e.classList.toggle('poor',!lc||st.cost<lc);});
  for(const c of st.deck){const el=root.querySelector(`.td-card[data-id="${c.id}"]`);if(!el)continue;const st8=`${c.on?1:0}${c.cd>0?Math.ceil(c.cd):0}${st.cost>=c.h.cost?1:0}${sel===c.id?1:0}`;
   set('c'+c.id,el,st8,(e)=>{e.classList.toggle('on',!!c.on);e.classList.toggle('poor',st.cost<c.h.cost);e.classList.toggle('sel',sel===c.id);const d=e.querySelector('.cd');
    if(c.cd>0){d.hidden=false;d.textContent=Math.ceil(c.cd);}else d.hidden=true;});
   if(c.cd>0){const full=c.h.redeploy*1.5;el.querySelector('.cd').style.setProperty('--p',Math.round(c.cd/full*100)+'%');}}
  if(selU)unitPanelPos();}
 function deckHTML(){return st.deck.map(c=>`<button class="td-card" data-id="${c.id}" aria-label="${esc(c.h.name)} コスト${c.h.cost}"><img src="${face(c.id)}" alt=""><span class="c">${c.h.cost}</span>
- <span class="r" style="background:${TDD.ROLE[c.h.role].col}"></span><span class="n">${esc(c.h.name)}・${TDD.ROLE[c.h.role].n}</span><span class="cd" hidden></span></button>`).join('');}
-let bT=0;function banner(a,b,ms){const e=$('.td-banner');e.innerHTML=`${esc(a)}${b?`<small>${esc(b)}</small>`:''}`;e.classList.add('show');clearTimeout(bT);bT=setTimeout(()=>e.classList.remove('show'),ms);}
+ <span class="r" style="background:${TDD.ROLE[c.h.role].col}"></span><span class="n">${esc(c.h.name)}</span><span class="cd" hidden></span></button>`).join('');}
+let bT=0;function banner(a,b,ms,boss){const e=$('.td-banner');e.innerHTML=`${esc(a)}${b?`<small>${esc(b)}</small>`:''}`;e.classList.toggle('boss',!!boss);e.classList.add('show');clearTimeout(bT);bT=setTimeout(()=>e.classList.remove('show'),ms);}
+/* できない操作は文章でなく、その場所を揺らして赤く光らせる */
+function nope(q){const e=typeof q==='string'?$(q):q;if(!e)return;e.classList.remove('nope');void e.offsetWidth;e.classList.add('nope');}
 let tT=0;function tip(s,ms=1600){const e=$('.td-tip');e.textContent=s;e.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>e.classList.remove('show'),ms);}
 /* ---------- ユニットの窓 ---------- */
 function unitPanel(u){selU=u;const p=$('.td-unit');if(!u){p.hidden=true;return;}const h=u.h,c=st.deck.find(c=>c.on===u),can=TDS.canUlt(st,u.uid);
- p.innerHTML=`<h4>${esc(h.name)}<em>${TDD.ROLE[h.role].n}・Lv${h.lv}</em></h4><p>技「${esc(h.sk.n)}」${h.lt?'・周りを照らす':''}${u.lit?'':'<br>光の外：攻撃 −40%'}</p>
- <div class="row"><button class="td-btn ult${can?' on':''}" data-a="ult" ${can?'':'disabled'}>${esc(h.ult.n)}</button><button class="td-btn" data-a="ret">撤退 +${Math.floor(h.cost/2)}</button></div>`;
+ p.innerHTML=`<h4>${esc(h.name)}<em>Lv${h.lv}</em></h4><p>${esc(h.sk.n)}</p>
+ <div class="row"><button class="td-btn ult${can?' on':''}" data-a="ult" ${can?'':'disabled'}>${esc(h.ult.n)}</button><button class="td-btn" data-a="ret">撤退</button></div>`;
  p.hidden=false;unitPanelPos();if(c&&c.ult)p.querySelector('.ult').textContent='星臨済み';}
 function unitPanelPos(){const p=$('.td-unit'),f=$('.td-field'),r=cv.getBoundingClientRect(),fr=f.getBoundingClientRect(),sx=(selU.x-cam)*S,sy=selU.y*S;
  let x=r.left-fr.left+sx-p.offsetWidth/2,y=r.top-fr.top+sy+10;if(y+p.offsetHeight>fr.height-4)y=r.top-fr.top+sy-70-p.offsetHeight;
@@ -155,18 +157,18 @@ function pUp(ev){const d=drag;drag=null;if(!d||d.moved||!st||st.over)return;cons
  if(sy<=MINI.y+MINI.h+4&&sx>=MINI.x&&sx<=VW-MINI.x){setCam((sx-MINI.x)/(VW-MINI.x*2)*st.S.W-VW/2);return;}
  const x=sx+cam,y=sy,u=st.units.find(u=>Math.abs(u.x-x)<16&&y>u.y-54&&y<u.y+10);
  if(sel){const c=st.deck.find(c=>c.id===sel);let best=null,bd=28;for(const p of st.pads){if(p.k!==c.h.pad)continue;const dd=Math.hypot(p.x-x,(p.y-y)*1.4);if(dd<bd){bd=dd;best=p;}}
-  if(best){const why=TDS.deploy(st,sel,best.id);if(why)tip(why);else sel=null;return;}
+  if(best){const why=TDS.deploy(st,sel,best.id);if(why){if(/灯力/.test(why))nope('.td-cost');else if(/上限/.test(why))nope('.td-deck');else{fx.push({t:0,d:.35,k:'ring',x:best.x,y:best.y,r:16,c:'#ff6a4a'});}}else sel=null;return;}
   if(!u){sel=null;return;}}
  if(u){sel=null;unitPanel(u===selU?null:u);return;}unitPanel(null);}
 function onClick(ev){const b=ev.target.closest('[data-a],.td-card');if(!b)return;const a=b.dataset.a;
  if(b.classList.contains('td-card')){if(!st||st.over)return;const c=st.deck.find(c=>c.id===b.dataset.id);unitPanel(null);
-  if(c.on){setCam(c.on.x-VW/2);unitPanel(c.on);return;}const why=c.cd>0?'再配置まで '+Math.ceil(c.cd)+' 秒':st.cost<c.h.cost?'灯力が足りない（'+c.h.cost+' 必要）':'';
-  if(why){tip(why);return;}sel=sel===c.id?null:c.id;if(sel){tip(c.h.pad==='f'?'光っている道の上の台座をタップ':'光っている道の外の台座をタップ');
+  if(c.on){setCam(c.on.x-VW/2);unitPanel(c.on);return;}const why=c.cd>0||st.cost<c.h.cost;
+  if(why){nope(b);if(st.cost<c.h.cost)nope('.td-cost');return;}sel=sel===c.id?null:c.id;if(sel){
    const P=st.pads.filter(p=>p.k===c.h.pad&&p.lit&&!p.unit);if(P.length&&!P.some(p=>p.x>cam&&p.x<cam+VW))setCam(P[P.length-1].x-VW/2);}return;}
  if(a==='spd'){speed=speed===1?2:1;b.textContent='×'+speed;b.classList.toggle('on',speed===2);}
- else if(a==='pause'){paused=!paused;b.classList.toggle('on',paused);b.textContent=paused?'▶':'Ⅱ';if(paused)banner('一時停止','配置・撤退・星臨はできる',99999);else $('.td-banner').classList.remove('show');}
+ else if(a==='pause'){paused=!paused;b.classList.toggle('on',paused);b.textContent=paused?'▶':'Ⅱ';if(paused)banner('Ⅱ','',99999);else $('.td-banner').classList.remove('show');}
  else if(a==='call')TDS.callWave(st);
- else if(a==='lamp'){if(!st||st.over)return;const why=TDS.lampUp(st);if(why)tip(why);}
+ else if(a==='lamp'){if(!st||st.over)return;const why=TDS.lampUp(st);if(why){nope(b);if(/灯力/.test(why))nope('.td-cost');}}
  else if(a==='ult'){if(selU&&TDS.ult(st,selU.uid))unitPanel(null);}
  else if(a==='ret'){if(selU){TDS.retreat(st,selU.uid);unitPanel(null);}}
  else if(a==='menu'){paused=true;sheet(`<h3>防衛をやめる</h3><div class="sub">ここまでの報酬は得られない</div><div class="td-acts"><button class="td-btn" data-a="resume">続ける</button><button class="td-btn" data-a="quit">やめる</button></div>`);}
@@ -194,8 +196,8 @@ function open(id,deck){build();sid=id;cancelAnimationFrame(raf);
  st=TDS.create(sid,dk,{lv:lvMap(),real:rl,seed:(Date.now()%100000)+1});speed=1;paused=false;sel=null;selU=null;fx=[];nums=[];ended=false;acc=0;for(const k in memo)delete memo[k];
  root.classList.remove('hide');sheet(null);unitPanel(null);$('.td-deck').innerHTML=deckHTML();const sb=$('[data-a="spd"]');sb.textContent='×1';sb.classList.remove('on');
  const pb=$('[data-a="pause"]');pb.textContent='Ⅱ';pb.classList.remove('on');
- requestAnimationFrame(()=>{fit();setCam(st.S.W);last=performance.now();raf=requestAnimationFrame(loop);banner(st.S.name,TDM.chOf(sid).ch+'・灯を守れ',1600);
-  if(st.S.tut&&!(G.td&&G.td.c&&G.td.c[sid]))setTimeout(()=>tip('下の手札を選んで、光っている台座に置こう',3800),1800);});}
+ requestAnimationFrame(()=>{fit();setCam(st.S.W);last=performance.now();raf=requestAnimationFrame(loop);banner(st.S.name,'',1600);
+  });}
 function show(){build();root.classList.remove('hide');}
 function hide(){stop();if(root)root.classList.add('hide');}
 return{open,show,hide,sheet:h=>{build();sheet(h);},root:()=>(build(),root),get st(){return st;},get cam(){return cam;},setCam:x=>{if(st)setCam(x);}};})();
