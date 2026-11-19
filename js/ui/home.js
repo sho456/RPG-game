@@ -29,10 +29,10 @@ function build(){
  const f=n=>typeof fmt==='function'?fmt(n):n;
  const tabs=[['def','防衛','data-hm="map"'],['party','仲間','data-hm="unit"'],['up','強化','data-h22="tavern"'],['smith','鍛冶','data-h22="smith"']];
  return `<div class="h22 hm">
-  <div class="hm-top"><span class="hm-res"><img src="${ICON.coin}" alt=""><b>${f(G.gold||0)}</b></span><span class="hm-res"><i class="hm-xp">${ic('xp')}</i><b>${f(G.xpStock||0)}</b></span>
+  <div class="hm-top"><span class="hm-res"><img src="${ICON.coin}" alt=""><b>${f(G.gold||0)}</b></span><span class="hm-res"><i class="hm-xp">${ic('up')}</i><b>${f(G.xpStock||0)}</b></span>
    <button class="hm-bt" data-hm="sheet" aria-label="menu">${ic('menu')}</button></div>
   <div class="hm-sheet" hidden>${[['news','bell','お知らせ'],['inv','bag','持ち物'],['zk','book','図鑑'],['appraise','eye','鑑定'],['menu','save','セーブ'],['go','sword','冒険']].map(([g,k,l])=>`<button data-h22="${g}">${ic(k)}<b>${l}</b></button>`).join('')}</div>
-  <div class="hm-main"><button class="hm-go" data-hm="prep" data-id="${id}">${ic('def')}<b>${String(S.name||"防衛").replace(/[<>&]/g,"")}</b><small>${ch!==''?ch+' ・ ':''}Lv${S.lv||''}</small></button>
+  <div class="hm-main"><button class="hm-go" data-hm="prep" data-id="${id}">${ic('def')}<b>${String(S.name||"防衛").replace(/[<>&]/g,"")}</b><small>Lv${S.lv||''}</small></button>
    <button class="hm-map" data-hm="map" aria-label="map">${ic('map')}</button></div>
   <nav class="hm-nav">${tabs.map(([k,l,a])=>`<button ${a}>${ic(k)}<b>${l}</b>${k==='up'?dot(ready>0):''}</button>`).join('')}</nav></div>`;}
 {const _tm=townMenu;townMenu=function(){const r=_tm.apply(this,arguments);try{const L=document.querySelector('#labels');if(!L)return r;
