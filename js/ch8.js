@@ -141,11 +141,7 @@ function voidArea(s=G.sorties){if(!G.flags.boss8)return null;if(G.voidOv!==undef
 function voidNews(){const n=G.sorties+1,a=voidArea(n),left=3-n%3;
  return a?`<div class="vnews">◆<b>虚蝕化</b>：${AREAS[a].name}（あと${left}回の出撃）　敵が強いぶん、ドロップと灯力が増える</div>`:`<div class="vnews">◆虚蝕化しているエリアはない（あと${left}回の出撃で変化）</div>`;}
 const voidify=e=>{e.kinds=e.kinds.map(voidKind);e.lv=Math.max(e.lv+18,56);};
-{const _ef=enterField;enterField=function(id='haido',keep){VOIDED=false;_ef(id,keep);if(!keep&&voidArea(G.sorties)===id){VOIDED=F.voided=true;F.en.forEach(voidify);
- log('<b style="color:#d0b0ff">【虚蝕化】</b>'+A.intro+'<br><small>虚蝕で色を失い、魔物が強くなっている。そのぶんドロップと灯力が増える。</small>'+goldTxt());hud(`${A.name}　<b>虚蝕化</b>`);}};}
-{const _so=spawnOne;spawnOne=function(){const n=F.en.length;_so();if(F.voided&&F.en.length>n)voidify(F.en[F.en.length-1]);};}
 {const _et=enterTown;enterTown=function(m){VOIDED=false;_et(m);};}
-{const _ab=afterBattle;afterBattle=function(mode){_ab(mode);if(F&&F.voided)hud(`${A.name}　<b>虚蝕化</b>`);};}
 {const _rw=rewards;rewards=function(es){const r=_rw(es);
  if(VOIDED){es.forEach(e=>{if(!ED[e.kind].boss){G.q.voidK=(G.q.voidK||0)+1;if(Math.random()<.3)r.loot.push(addLoot(genItem(e.lv,1,1)));}});
   const ex=Math.round(r.gold*.5);G.gold+=ex;r.gold+=ex;G.tou+=r.tou;r.tou*=2;for(const k in r.drops){G.mats[k]+=r.drops[k];r.drops[k]*=2;}}

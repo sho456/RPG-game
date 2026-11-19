@@ -197,8 +197,6 @@ function drawWM(){}/* 未使用：js/ver18-town.js が置き換え */
 {const _tm=townMenu;townMenu=function(m){WMS.on=false;_tm(m);const c=$('#cmd'),b=c.children[1],r=c.children[8];
  if(b){b.innerHTML=`<img class="ic" src="${ICON.eq}">編成<small>装備・星盤</small>`;b.onclick=()=>{SFX.sel();partyScreen();};if(G.members.some(i=>ptsLeft(i)>0))b.classList.add('ready');}
  if(r)r.innerHTML=`<img class="ic" src="${ICON.rec}">記録・設定`;tip('town');};}
-{const _ef=enterField;enterField=function(id,keep){_ef(id,keep);tip('field');};}
-{const _pm=pauseMenu;pauseMenu=function(m){_pm(m);addCmd('設定','速度・オート・フィルター',()=>cfgOpen(),3);};}
 {const _inv=invMenu;invMenu=function(m){_inv(m);const b=$('#cmd').querySelector('[data-a="auto"]'),f=G.set.flt;if(b){b.className='tbtn'+(f.rar>=0?' gold':'');b.innerHTML=`拾う前フィルター<small>${f.rar>=0?FLN[f.rar+1]+'を'+(f.mode==='dism'?'分解':'売却'):'OFF'}</small>`;}ACT.auto=()=>cfgOpen(()=>invMenu());ACT.back=()=>partyScreen();};}
 
 /* ==================== 拾う前フィルター拡張 ==================== */

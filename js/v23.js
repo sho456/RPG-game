@@ -140,7 +140,6 @@ fitField=function(){if(scene!=='field'||!F)return;const cmd=$('#cmd'),mapH=(type
 let FKT=0;
 new MutationObserver(()=>{if(scene!=='field'||!msgHidden())return;const m=$('#msg'),k=$('#fk23');if(!m||!k)return;const html=m.innerHTML.trim();if(!html||k._h===html)return;k._h=html;
  k.innerHTML=`<span>${html}</span>`;k.classList.remove('show');void k.offsetWidth;k.classList.add('show');clearTimeout(FKT);FKT=setTimeout(()=>k.classList.remove('show'),3600);}).observe($('#msg'),{childList:true,subtree:true,characterData:true});
-{const _ef=enterField;enterField=function(...a){const r=_ef(...a);try{applyFieldMsg(false);}catch(e){console.error(e);}return r;};}
 {const _sh=show;show=function(m){_sh(m);if(m!=='field')app.classList.remove('fmh23');else requestAnimationFrame(()=>{try{applyFieldMsg(false);}catch(e){}});};}
 
 /* ==================== 4. 図鑑 ====================
