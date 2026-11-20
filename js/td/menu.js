@@ -62,8 +62,14 @@ function talk(lines,done){if(!lines||!lines.length)return done();let i=0;build()
 /* ---------- 出撃・結果のあと ---------- */
 function go(id){const S=TDD.STAGE[id],deck=G.td.deck||TDD.deckOf();try{save();}catch(e){}
  const run=()=>{root.classList.add('hide');root.innerHTML='';TD.open(id,deck);};if(S.pre&&!stars(id))talk(S.pre,run);else run();}
-function cleared(id,win,first){const S=TDD.STAGE[id];pend=win&&first&&S.join&&!(G.members||[]).includes(S.join)?S.join:null;}
-function after(id,next){const fin=()=>{const i=TDD.ORDER.indexOf(id),nx=TDD.ORDER[i+1];if(next&&nx&&TDD.STAGE[nx]&&open(nx))prep(nx);else map();};
+let pendEnd=false;
+function cleared(id,win,first){const S=TDD.STAGE[id];pendEnd=!!(win&&first&&S.fin);pend=win&&first&&S.join&&!(G.members||[]).includes(S.join)?S.join:null;}
+/* エンディング（最終ステージの初回クリア） */
+const ENDING=[[null,'n','星核の光が、灯都の灯台へ流れこんでいく。'],['rio','n','……色が、戻ってくる'],['gald','h','ああ。おまえが継いだ灯だ'],['celes','n','千年ぶんの夜明けじゃな。……悪くない'],[null,'n','灰色だった街道に、朝の色が差した。']];
+function ending(done){show('<div class="tdm-blank"></div>');talk(ENDING,()=>{const n=TDD.ORDER.reduce((a,id)=>a+stars(id),0);
+ show(`<div class="tdm-join tdm-end"><i class="ic-star"></i><b>灯は継がれた</b><span class="tdm-sum">★ ${n}/${TDD.ORDER.length*3}</span><button class="td-btn on" data-a="fin">灯都へ</button></div>`);
+ root.querySelector('[data-a="fin"]').onclick=e=>{e.stopPropagation();done();};});}
+function after(id,next){if(pendEnd){pendEnd=false;return ending(()=>close());}const fin=()=>{const i=TDD.ORDER.indexOf(id),nx=TDD.ORDER[i+1];if(next&&nx&&TDD.STAGE[nx]&&open(nx))prep(nx);else map();};
  TD.hide();if(!pend)return fin();const who=pend,S=TDD.STAGE[id];pend=null;show('<div class="tdm-blank"></div>');
  talk(S.join_lines,()=>{try{newMember(who);G.td.deck=G.td.deck||[];if(G.td.deck.length<8&&!G.td.deck.includes(who))G.td.deck.push(who);save();}catch(e){console.error(e);}
   show(`<div class="tdm-join"><img src="${pic(who,who,0,64)}" alt=""><b>${esc(HB[who].name)}が仲間になった</b><button class="td-btn on" data-a="fin">続ける</button></div>`);
