@@ -37,7 +37,7 @@ function startWave(st){st.wave++;st.phase='wave';const W=st.S.waves[st.wave];W.e
  st.spawnQ.sort((a,b)=>a.t-b.t);ev(st,{k:'wave',n:st.wave+1,of:st.S.waves.length,boss:W.e.some(e=>{const f=D.foe(e[1],1);return f&&f.boss;})});}
 function callWave(st){if(st.phase!=='gap'||st.over)return false;const b=Math.ceil(st.gapT);if(st.wave>=0)st.cost+=b;ev(st,{k:'call',bonus:st.wave>=0?b:0});startWave(st);return true;}
 function spawn(st,kind,s=0,lane=0){const f=D.foe(kind,st.S.lv);if(!f)return null;f.hp=Math.round(f.hp*(f.boss?(st.S.bk||1):(st.S.hk||1)));const P=st.Ps[lane]||st.P,a=at(P,s);
- const u=Object.assign(f,{uid:st.uid++,lane,P,mhp:f.hp,s,x:a.x,y:a.y,dir:a.dir,by:null,atkT:f.iv,stun:0,slow:0,curse:0,aiT:f.ai?f.ai.every:0,hitT:-9});st.foes.push(u);ev(st,{k:'spawn',f:u});return u;}
+ const u=Object.assign(f,{uid:st.uid++,lane,P,mhp:f.hp,s,x:a.x,y:a.y,dir:a.dir,by:null,atkT:f.iv,stun:0,slow:0,curse:0,aiT:f.ai?f.ai.every:0,hitT:-9});if(u.boss&&st.S.gim)u.gim={k:st.S.gim.k,every:st.S.gim.every||10,t:(st.S.gim.every||10)*.6,ch:0};st.foes.push(u);ev(st,{k:'spawn',f:u});return u;}
 /* ---------- ダメージ：攻撃 × 倍率 × 攻撃/(攻撃+防御) × 属性 × 会心 ---------- */
 function hit(st,u,f,m=1,o={}){if(f.hp<=0)return 0;const A=u.h.atk*(u.lit?1:K.DARK);let df=u.h.dmgK==='mag'?f.res:f.def;if(f.curse>0)df*=.6;
  let v=A*m*A/(A+df);const el0=o.el||u.h.el;
@@ -82,6 +82,20 @@ function cast(st,u){const k=u.h.sk;let t=null;
  else if(k.k==='curse'){for(const f of st.foes.slice())if(f.hp>0&&dist(t.x,t.y,f.x,f.y)<=40){f.curse=k.dur;hit(st,u,f,k.m,{sk:1});}}
  else if(k.k==='slow'){st.fields.push({x:t.x,y:t.y,r:k.r,m:k.m,t:k.dur,u});ev(st,{k:'area',u,x:t.x,y:t.y,r:k.r,slow:1});}
  return true;}
+/* ---------- ボスの仕掛け（ステージの gim：{k, every}）。true を返すとその刻みは動かない ----------
+ charge：灯の光の中に入ると、3 秒溜めて灯を撃つ（灯火 −1）。止められていれば撃たれるのは止めている仲間（攻撃の 3 倍）。気絶で溜めが消える
+ shift：別の道へ移る（止めていた仲間から外れる）／drain：灯の光を元の 18% ぶん削る */
+function gimmick(st,f,dt){const G=f.gim;
+ if(G.ch>0){G.ch-=dt;if(G.ch<=0){if(f.by&&f.by.hp>0){const u=f.by,v=Math.round(f.atk*3*f.atk/(f.atk+u.h.def));u.hp-=v;ev(st,{k:'beam',f,u,v});if(u.hp<=0)fall(st,u);}
+   else{st.lives-=1;st.leaks+=1;ev(st,{k:'beam',f});if(st.lives<=0){st.lives=0;end(st,false);}}}return true;}
+ G.t-=dt;if(G.t>0)return false;
+ if(G.k==='charge'&&dist(f.x,f.y,st.S.base[0],st.S.base[1])>st.lightR){G.t=.5;return false;}/* 溜めは灯の光の中に入ってから */
+ G.t=G.every;
+ if(G.k==='charge'){G.ch=3;ev(st,{k:'charge',f});return true;}
+ if(G.k==='shift'&&st.Ps.length>1){const r=f.s/f.P.L;if(f.by){f.by.blocking=f.by.blocking.filter(x=>x!==f);f.by=null;}f.lane=(f.lane+1)%st.Ps.length;f.P=st.Ps[f.lane];f.s=r*f.P.L;
+  const a=at(f.P,f.s);f.x=a.x;f.y=a.y;ev(st,{k:'shift',f});return false;}
+ if(G.k==='drain'){st.lightR=Math.max(st.r0*.5,st.lightR-st.r0*.18);lightUpdate(st);ev(st,{k:'drain',f});}
+ return false;}
 /* ---------- 1 刻み ---------- */
 function tick(st){if(st.over)return;const dt=K.STEP;st.t+=dt;
  /* 灯力 */
@@ -97,9 +111,10 @@ function tick(st){if(st.over)return;const dt=K.STEP;st.t+=dt;
  const nv=st.foes.filter(f=>f.hp>0&&f.tr.includes('void')).length;st.lightR=nv?Math.max(st.r0*.6,st.lightR-1.5*nv*dt):Math.min(st.r0,st.lightR+4*dt);
  if(Math.round(st.t*30)%6===0)lightUpdate(st);
  /* 敵 */
- for(const f of st.foes){if(f.hp<=0)continue;if(f.stun>0){f.stun-=dt;continue;}if(f.curse>0)f.curse-=dt;
+ for(const f of st.foes){if(f.hp<=0)continue;if(f.stun>0){f.stun-=dt;if(f.gim&&f.gim.ch>0){f.gim.ch=0;ev(st,{k:'gcancel',f});}continue;}if(f.curse>0)f.curse-=dt;
   let sk=1;for(const z of st.fields)if(dist(z.x,z.y,f.x,f.y)<=z.r)sk=Math.min(sk,1-z.m);if(st.timeSlow>0)sk=Math.min(sk,.35);
   if(f.ai){f.aiT-=dt;if(f.aiT<=0){f.aiT=f.ai.every;if(f.ai.summon){for(let i=0;i<f.ai.n;i++)spawn(st,f.ai.summon,Math.max(0,f.s-18-i*14),f.lane);ev(st,{k:'summon',f});}}}
+  if(f.gim&&gimmick(st,f,dt*sk))continue;
   if(f.by&&f.by.hp>0){f.atkT-=dt*sk;if(f.atkT<=0){f.atkT=f.iv;f.actT=st.t;hurt(st,f,f.by);}continue;}
   f.by=null;const s1=f.s+f.spd*sk*dt;
   if(!f.tr.includes('fly'))for(const p of st.pads){const u=p.unit;if(p.k!=='f'||p.lane!==f.lane||!u||u.h.blk<=0)continue;const cap=u.h.blk+(u.blkUp>0?2:0);

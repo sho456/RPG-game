@@ -55,8 +55,8 @@ function real(id){const o={gear:null,mas:0,aw:1};try{const h=G.h[id];if(!h)retur
   o.gear={atk:s1[P]/Math.max(1,s0[P]),hp:s1.mhp/Math.max(1,s0.mhp),def:s1.def/Math.max(1,s0.def),res:s1.res/Math.max(1,s0.res)};}}catch(e){console.error(e);}return o;}
 /* 敵：ED（RPG 版）とステージの Lv から。移動 = 14 + 素早さ × 2.4 px/秒 */
 function foe(kind,lv=1){const e=ED[kind];if(!e)return null;const hk=1+.05*(Math.max(1,lv)-1),ak=1+.04*(Math.max(1,lv)-1);
- const boss=!!e.boss,tr=(TRAIT[kind]||[]).slice();
- return{kind,name:e.name,spr:e.spr||kind,boss,rank:e.rank||(boss?'big':''),hp:Math.round(e.mhp*2.3*hk*(boss?1.6:1)),atk:Math.round((e.atk||30)*(boss?.9:1.15)*ak),
+ const boss=!!e.boss||kind==='ernaE'||kind==='valkE',bh=boss?1:hk,ba=boss?1:ak,tr=(TRAIT[kind]||[]).slice();
+ return{kind,name:e.name,spr:e.spr||kind,boss,rank:e.rank||(boss?'big':''),hp:Math.round(e.mhp*2.3*bh*(boss?1.6:1)),atk:Math.round((e.atk||30)*(boss?.9:1.15)*ba),
   def:e.def||0,res:e.res||0,spd:+(14+(e.spd||8)*2.4).toFixed(1)*(boss?.7:1),weak:(e.weak||[]).slice(0,2),resist:(e.resist||[]).slice(0,1),
   iv:boss?1:1.2,leak:boss?3:1,cost:boss?10:1,star:boss?5:1,tr,ai:boss&&e.ai?{every:Math.max(6,(e.ai.every||4)*3),summon:e.ai.summon||null,n:2}:null};}
 
