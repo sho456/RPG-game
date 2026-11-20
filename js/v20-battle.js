@@ -15,13 +15,13 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
       weak（el を一時的に弱点にする）, shield（v=吸収量）, counter（v=反撃の威力）, evade（v=回避率％）, enrage（敵：攻撃・魔力+v%） */
 const STN={atk:['攻撃','攻'],def:['防御','防'],mag:['魔力','魔'],res:['精神','精'],spd:['素早さ','速'],crit:['会心','会'],regen:['継続回復','再'],poison:['毒','毒'],stun:['スタン','痺'],para:['マヒ','麻'],blind:['暗闇','暗'],kaiyu:['解癒','癒'],
  mark:['被ダメ増加','標'],prot:['被ダメ軽減','護'],weak:['弱点付与','弱'],shield:['障壁','壁'],counter:['反撃態勢','返'],evade:['回避','避'],enrage:['激昂','怒']};
-const STAT5=['atk','def','mag','res','spd'];let LASTC=null;
+const STAT5=['atk','def','mag','res','spd'];
 /* 一時的な弱点が切れたら、判明済みの弱点からも外す（図鑑には本来の弱点だけを残す） */
 function fixWeak(u){if(!u||!u._w0)return;const ws=stsOf(u).filter(s=>s.k==='weak').map(s=>s.el);u.weak=[...new Set([...u._w0,...ws])];if(u.known)for(const k of[...u.known])if(!u.weak.includes(k))u.known.delete(k);
  if(u.kind&&G.known&&G.known[u.kind])G.known[u.kind]=G.known[u.kind].filter(k=>u._w0.includes(k));}
 const isBuff=s=>['regen','prot','shield','counter','evade','enrage','kaiyu'].includes(s.k)||(STAT5.includes(s.k)||s.k==='crit')&&s.v>0;
 const stsOf=u=>u.sts||(u.sts=[]);
-const hasSt=(u,k)=>stsOf(u).some(s=>s.k===k);
+
 const stSum=(u,k)=>stsOf(u).filter(s=>s.k===k).reduce((a,s)=>a+s.v,0);
 function base0(u){if(!u._b0)u._b0={atk:u.atk,def:u.def,mag:u.mag,res:u.res,spd:u.spd,crit:u.crit||0};return u._b0;}
 function recalc(u){const b=base0(u);for(const k of STAT5){let p=stSum(u,k)+(k==='atk'||k==='mag'?stSum(u,'enrage'):0);p=clamp(p,-60,100);/* ver0.49：攻撃強化の上限 +100%（同じ枠で加算） */const v=b[k]*(1+p/100);u[k]=k==='spd'?Math.max(1,+v.toFixed(2)):Math.max(1,Math.round(v));}
@@ -142,8 +142,6 @@ function wpText(it){const w=wpOf(it);return w?`<span class="wp20">◆武器パ�
 function charPS(id){const lv=(G.h[id]&&G.h[id].lv)||1;return(CPS[id]||[]).map((k,i)=>({id:k,v:0,on:lv>=CP_LV[i],lv:CP_LV[i]}));}
 /* 戦闘ユニットに付くパッシブの一覧 */
 function unitPS(u){if(u.side!==0)return[];const o=charPS(u.id).filter(p=>p.on);const w=G.h[u.id]&&G.h[u.id].eq.w&&findItem(G.h[u.id].eq.w),wp=wpOf(w);if(wp)o.push(wp);return o;}
-function each(u,ev,...a){let r=null;for(const p of(u.ps20||[])){const P=PS[p.id];if(P&&P[ev]){try{const x=P[ev](u,...a,p.v);if(typeof x==='number')r=(r==null?1:r)*x;}catch(e){console.error(e);}}}return r;}
-function sumEv(u,ev,...a){let s=0;for(const p of(u.ps20||[])){const P=PS[p.id];if(P&&P[ev]){try{s+=+P[ev](u,...a,p.v)||0;}catch(e){}}}return s;}
 
 /* ==================== 3. 新しいスキル・魔法 ==================== */
 /* sup20：支援技（fx20 を付与・heal20 で回復）。攻撃技の fx20 は命中した相手ごとに1回だけ判定。
@@ -195,49 +193,12 @@ for(const k in EFX)if(EA[k])EA[k].fx20=EFX[k].map(f=>Object.assign({on:'t'},f));
 /* ユニット生成：パッシブを付ける（武器パッシブの能力変化もここで） */
 
 /* 与ダメ・被ダメの倍率（状態効果・パッシブ・スキルの条件） */
-{const _c=calc;calc=function(a,t,sk){let def0=null;
- if(sk.pierce20){def0=[t.def,t.res];t.def=Math.round(t.def*(1-sk.pierce20));t.res=Math.round(t.res*(1-sk.pierce20));}
- /* 会心率の上乗せ（パッシブ） */
- let cb=0;if(a.side===0)cb=sumEv(a,'critB',t,sk);if(cb)a.crit=(a.crit||0)+cb;
- let r;try{r=_c(a,t,sk);}finally{if(def0){t.def=def0[0];t.res=def0[1];}if(cb)a.crit-=cb;}
- let m=1;
- if(a.side===0){const x=each(a,'out',t,sk);if(x!=null)m*=x;}
- if(t.side===0){const x=each(t,'inc',a,sk);if(x!=null)m*=x;}
- /* 受けるダメージ-%（prot）・被ダメ+%（mark）：RS の戦闘では js/rs/battle.js frames の「受けるダメージの枠」で足す */
- if(!B.rs){const mk=stSum(t,'mark'),pr=stSum(t,'prot');if(mk)m*=1+mk/100;if(pr)m*=Math.max(.3,1-pr/100);}
- const c=sk.cond20;
- if(c==='brk'&&t.hp<=t.mhp*.5)m*=1.5;
- if(c==='debuff')m*=1+.25*Math.min(3,stsOf(t).filter(s=>!isBuff(s)).length);
- if(c==='lowhp')m*=1+.8*(1-a.hp/a.mhp);
- if(c==='spd')m*=1+clamp((a.spd-t.spd)*.04,0,.4);
- if(c==='poison'&&hasSt(t,'poison'))m*=1.8;
- if(c==='full'&&t.hp>=t.mhp)m*=1.5;
- if(sk._purge)m*=1+.3*sk._purge;
- if(m!==1)r.d=Math.max(1,Math.round(r.d*m));return r;};}
+
 /* 被ダメ：障壁・回避 */
-{const _h=hurt;hurt=function(t,d){const a=B&&B._atk20,sk=B&&B._sk20;
- if(t.alive&&d>0&&a&&a!==t&&!(sk&&sk.k==='heal')){
-  const ev=stSum(t,'evade')+(t.side===0?sumEv(t,'dodge'):0);
-  if(ev>0&&Math.random()*100<ev){setTimeout(()=>pop(t,'MISS','#ffffff',true),50);return 0;}
-  const sh=stsOf(t).find(s=>s.k==='shield'&&s.v>0);if(sh){const ab=Math.min(sh.v,d);sh.v-=ab;d-=ab;setTimeout(()=>pop(t,'障壁 -'+ab,'#9fd8ff',true,'st20 up'),40);if(sh.v<=0)t.sts=t.sts.filter(s=>s!==sh);if(d<=0)return 0;}}
- const r=_h(t,d);
- try{if(a&&a!==t&&r>0){if(t.side===0)each(t,'hurt',a,r,sk);
-  if(hasSt(t,'counter')&&a.alive&&a.side!==t.side&&sk&&!sk._fu){const c=stsOf(t).find(s=>s.k==='counter');(B.cq20=B.cq20||[]).push({a:t,t:a,sk:{n:'反撃',el:t.side===0?(t.atkEl||t.elem||'斬'):'斬',k:'phys',pow:c.v,t:'one',_fu:1}});}}}catch(e){console.error(e);}
- return r;};}
+
 /* 命中：パッシブの発動・スキルの追加効果 */
-{const _hit=hit;hit=async function(a,t,sk){if(!B)return _hit(a,t,sk);const pa=B._atk20,ps=B._sk20;B._atk20=a;B._sk20=sk;LASTC=null;
- let d;try{d=await _hit(a,t,sk);}finally{if(B){B._atk20=pa;B._sk20=ps;}}
- if(!B)return d;
- try{const r=LASTC||{};fixWeak(t);
-  if(a.side===0&&!sk._fu)each(a,'hit',t,sk,r,d);
-  /* 追加効果は1回の行動で、相手1体につき1度だけ */
-  if(sk.fx20&&B){B._fx20=B._fx20||new Set();if(!B._fx20.has(t)){B._fx20.add(t);for(const f of sk.fx20){if(f.on!=='t')continue;if(f.p!=null&&Math.random()>=(typeof RSC!=='undefined'?RSC.ailP(a,t,f):f.p))continue;if(!t.alive)break;
-    addSt(t,f.k,f.v,f.t,f.el?{el:f.el}:{});}}}
-  if(a.side===0&&!t.alive&&!sk._fu)each(a,'kill',t);
- }catch(e){console.error(e);}
- return d;};}
+
 /* calc の直近の結果を控える（パッシブの「会心時」「弱点時」に使う） */
-{const _c=calc;calc=function(a,t,sk){const r=_c(a,t,sk);LASTC=r;return r;};}
 
 /* 追撃・反撃の実行 */
 
@@ -248,11 +209,9 @@ for(const k in EFX)if(EA[k])EA[k].fx20=EFX[k].map(f=>Object.assign({on:'t'},f));
 /* オート：支援技も使う */
 
 /* 状態タグ（味方パネル・敵ラベルに出す） */
-{const _st=stTags;stTags=function(u){const t=_st(u);try{for(const s of stsOf(u)){const b=isBuff(s),nm=s.k==='weak'?s.el+'弱':(STAT5.includes(s.k)||s.k==='crit')?STN[s.k][1]+(s.v>0?'↑':'↓'):STN[s.k][1];t.push([nm+(s.t<50?s.t:''),'s20 '+(b?'bu':'de')]);}}catch(e){}return t;};}
 
 /* 装備カードに武器パッシブを表示 */
 {const _ic=icard;icard=function(it,o={}){const s=_ic(it,o);if(!it||it.unid||!wpOf(it))return s;const w=wpOf(it),ch=`<span class="chp wp">◆${w.n}：${w.d}</span>`,k=o.right?s.lastIndexOf('</div></div><div class="iright">'):s.length-18;return k>0?s.slice(0,k)+ch+s.slice(k):s;};}
 /* 装備の評価：武器パッシブ分を少し加点 */
-{const _sc=score;score=function(it,id){const s=_sc(it,id);return wpOf(it)?s+6*(it.rar||1):s;};}
 
 return{PS,CPS,WPS,LSK,NSK,STN,charPS,wpOf,wpText,unitPS,addSt,clearSt,stsOf,isBuff,tickSts,CP_LV,clrDown,clrAil};})();

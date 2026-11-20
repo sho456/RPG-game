@@ -22,9 +22,4 @@ AREAS.zankyo={name:'星核の残響',lv:[50,54],theme:'void',rec:'推奨Lv50〜5
  crew:[{loot:[54,3]},{gold:15000},{loot:[55,4]}],
  intro:'<b>終章　星核の残響</b>――塔の頂から落ちた先は、星々の記憶が漂う虚の底。<b>3つの残響</b>を辿り、星核の扉を開け。'};
 
-async function zenStrike(u){B.zenUsed=1;const hs=aliveH();const pw=hs.reduce((a,h)=>a+Math.max(st(h,'atk'),st(h,'mag'))*(1+h.ag/100)*(h.aw?1.4:1),0)*1.6;
- hs.forEach(h=>{if(!h.aw)h.ag=0;});B.flashBg=34;B.shake=20;SFX.brk();log(`<b style="color:#ffe27a">全共鳴</b>――${hs.map(h=>h.name).join('・')}の灯が、ひとつの光になる！`);refresh();await wait(900);
- for(const e of aliveE()){await hit(u,e,{n:'全共鳴',k:'phys',el:e.weak[0]||'陽',fixed:pw,pow:1});await wait(150);}
- endAw(u);setCT(u);refresh();await wait(300);}
-
 QS.push({id:'q10',n:'星継ぎの灯',d:'虚神ノクスを倒す',ok:()=>!!G.flags.boss8,pg:()=>G.flags.boss8?'達成':`残響${echoN()}/3`,rw:'50000G・星の雫Ⅱ×5',give:()=>{G.gold+=50000;addItem('drop2',5);}});

@@ -41,21 +41,6 @@ ITYPE.unshift(['砂時計','staff'],['竜剣','gsword']);
 {const _wb=wbase;wbase=function(it,ilv,m){if(it.who==='celes'){it.base={mag:Math.round(5+ilv*2.6)};it.name=m+'の砂時計';return;}if(it.who==='valk'){it.base={atk:Math.round(7+ilv*2.8)};it.name=m+'の竜剣';return;}_wb(it,ilv,m);};}
 
 /* --- 戦闘：刻の円環（巻き戻し）・竜血星臨（自動行動） --- */
-function snapTake(u,msg){if(B.rewound)return;B.snap={};B.heroes.forEach(h=>B.snap[h.id]={hp:h.hp,alive:h.alive,sp:h.sp});B.awUsed.add('snap');if(!u.skills.includes('makimodoshi'))u.skills.push('makimodoshi');pop(u,'刻を記録','#d8c8ff',true);if(msg)log(msg);}
-{const _aw=awaken;awaken=async function(u){await _aw(u);
- if(u.id==='celes')snapTake(u,'<b>刻の円環</b>――今この瞬間が記録された（巻き戻しは1戦闘1回）');
- if(u.id==='valk'){log('<b>竜血星臨</b>――ヴァルクの瞳から理性の色が消えた！（行動は自動）');if(B.res&&!auto)B.res();}};}
-
-{const _da=doAction;doAction=async function(u,sk,t){
- if(sk.k==='rewind'){const S=B.snap||{};B.rewound=1;B.awUsed.delete('snap');u.skills=u.skills.filter(k=>k!=='makimodoshi');B.flashBg=30;B.flashCol='#d8c8ff';SFX.aw();
-  log(`<b>${u.name}の巻き戻し</b>――刻の円環が逆さに回る！`);await wait(500);
-  B.heroes.forEach(h=>{const s=S[h.id];if(!s)return;const was=h.alive;h.alive=s.alive;h.hp=s.alive?Math.max(1,s.hp):0;h.sp=Math.max(h.sp,s.sp);if(h.alive&&!was)setCT(h);pop(h,'REWIND','#d8c8ff',true);});
-  setCT(u);refresh();await wait(500);return;}
- if(sk.k==='tstop'){aliveE().forEach(e=>{e.ct+=(e.boss?60:120)/e.spd;pop(e,'STOP','#d8c8ff',true);});log(`${u.name}の<b>${sk.n}</b>！ 敵の時間が凍りつく`);B.flashBg=16;B.flashCol='#d8c8ff';SFX.warn();setCT(u);refresh();await wait(500);return;}
- if(sk.k==='roar'&&sk.sp)u.sp-=sk.sp;
- return _da(u,sk,t);};}
-
-{const _ca=calc;calc=function(a,t,sk){const r=_ca(a,t,sk);if(a.id==='valk'&&a.aw)r.d=Math.round(r.d*(a.legs&&a.legs.includes('ryuuou')?2:1.5));return r;};}
 
 /* --- 敵：虚ろ化（グレースケール）・竜の巣・回廊の番人 --- */
 const greyPal=rows=>{const o={};rows.join('').split('').forEach(ch=>{if(ch==='.'||o[ch])return;if('exo'.includes(ch)){o[ch]='#e080ff';return;}const n=parseInt((PAL[ch]||'#888888').slice(1),16),l=(n>>16)*.3+(n>>8&255)*.59+(n&255)*.11;

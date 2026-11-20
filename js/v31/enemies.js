@@ -7,10 +7,7 @@
  4. 多段階のボス（stages）は、クエストで指定したレベルで次の形態を出す（以前は Lv58 固定） */
 
 const V31E=(()=>{
-const{INF}=V31;
-const EHP=lv=>lv<=60?1:Math.pow(1.07,lv-60);
-const ESPD=lv=>lv<=60?1:1+(lv-60)*.008;
-const EATK=lv=>lv<=60?1:Math.pow(1.021,lv-60);
+
 /* ---------- 色違いのパレット ---------- */
 const hx=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
 const toH=a=>'#'+a.map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
@@ -88,8 +85,7 @@ try{ED.boss9.xp=6000;}catch(e){}
 try{TERMS.reset();}catch(e){}
 
 /* ---------- 強さの曲線と見た目のキー ---------- */
-{const _en=enemy;enemy=function(kind,lv,x,y,suf=''){const e=_en(kind,lv,x,y,suf);try{const d=ED[kind];if(d&&d.spr)e.spr=d.spr;
- const L=e.lv||lv||1;if(L>60){const m=INF(L),h=EHP(L),a=EATK(L);e.mhp=Math.round(e.mhp*m*h);e.hp=e.mhp;for(const k of['atk','mag'])e[k]=Math.round(e[k]*m*a);for(const k of['def','res'])e[k]=Math.round(e[k]*m);e.spd=+(e.spd*ESPD(L)).toFixed(2);}}catch(x){console.error(x);}return e;};}
+
 /* 多段階ボスの次の形態：クエストで決めたレベルで出す */
 
 /* 図鑑：新しい敵の絵（色違いのキーから） */

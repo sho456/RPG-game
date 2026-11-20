@@ -22,8 +22,6 @@ function normAll(){
 normAll();
 /* 召喚・生成で後から作られる敵（試練の幻影・回廊など）も、戦闘の始めに直す */
 
-{const _en=enemy;enemy=function(...a){const e=_en(...a);try{e.weak=nList(e.weak||[]);}catch(x){}return e;};}
-
 /* ---------- 敵の技：LP を削る攻撃・属性の見直し ---------- */
 const LPATK={curse:1,bell:1,voidslash:1,senju:1,tokiyomi:1,chrono:1};
 for(const k in LPATK)if(EA[k]){EA[k].lp=LPATK[k];EA[k].d=(EA[k].d?EA[k].d+'／':'')+'高難易度のボス（Lv50 以上）が使うと、命中した相手の LP を 1 削る';}

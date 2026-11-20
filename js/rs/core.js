@@ -168,7 +168,6 @@ const abName=(id,i)=>(D.AB[id]&&D.AB[id][i]&&D.AB[id][i].n)||'';
 /* ==================== 星臨：AW を置き換える ==================== */
 for(const id in D.AWX){if(!AW[id])continue;const X=D.AWX[id];AW[id].turns=D.AW_TURNS;AW[id].type='強化型';AW[id].cmds=[X.ou];
  AWD[id]=`星臨アビリティ「${X.n}」：`+[...X.note,...awEffects(id).map(effTxt)].join('／')+`。奥義「${SK[X.ou].n}」を1度だけ使える`;}
-try{GAUGE.length=0;}catch(e){}
 
 /* ==================== 星盤・天星盤のノードを置き換える ==================== */
 try{NCOL.ab='#ffb86b';SHORT.ab1=SHORT.ab2=SHORT.ab3='ア';SHORT.ougiUp='奥';if(typeof NTN!=='undefined')NTN.ab='アビリティ強化';}catch(e){}

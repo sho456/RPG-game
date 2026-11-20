@@ -72,13 +72,6 @@ const UQ={rio:['灯継ぎの剣','星臨中の与ダメ+30%'],gald:['誓約の�
  hakua:['雪華の手甲','連撃技の与ダメ+25%'],jin:['二人の双剣','与ダメ+15%・被ダメ-10%'],celes:['千年目の杖','無属性魔法の与ダメ+30%'],valk:['誓鱗の大剣','HP半分以下の敵への与ダメ+30%']};
 for(const id in UQ)LEG['uq_'+id]={n:UQ[id][0],slot:'w',who:id,uq:1,d:'絆の専用装備：'+UQ[id][1]};
 
-{const _ca=calc;calc=function(a,t,sk){const r=_ca(a,t,sk),al=a.legs||[],tl=t.legs||[];let m=1;
- if(al.length){if(al.includes('uq_rio')&&a.aw)m*=1.3;if(al.includes('uq_mire')&&r.weak&&sk.k==='mag')m*=1.3;if(al.includes('uq_shion')&&t.hp>=t.mhp)m*=1.4;
-  if(al.includes('uq_balza')&&sk.el==='熱')m*=1.25;if(al.includes('uq_erna')&&sk.t==='one')m*=1.25;if(al.includes('uq_crow')&&a.hp<=a.mhp/2)m*=1.4;
-  if(al.includes('uq_hakua')&&(sk.hits>1||sk.k==='rhythm'))m*=1.25;if(al.includes('uq_jin'))m*=1.15;if(al.includes('uq_celes')&&!sk.el&&sk.k==='mag')m*=1.3;if(al.includes('uq_valk')&&t.hp<=t.mhp*.5)m*=1.3;}
- if(t.side===0){if(tl.includes('uq_gald'))m*=.85;if(tl.includes('uq_jin'))m*=.9;if(B&&B.heroes.some(h=>h.alive&&h.legs&&h.legs.includes('uq_noah')))m*=.92;}
- if(m!==1)r.d=Math.max(1,Math.round(r.d*m));return r;};}
-
 /* --- 絆データ --- */
 const bondOf=id=>{G.bond=G.bond||{};return G.bond[id]=G.bond[id]||{p:0,ep:0};};
 const bondIds=()=>G.members.filter(id=>BSTORY[id]);
