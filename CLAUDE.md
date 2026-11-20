@@ -46,6 +46,9 @@
 | **仲間**（ver0.52。一覧＋1 人の詳細で Lv・技の練達・装備・星盤をまとめる。TD の能力を表示） | `js/ui/unit.js`（`UNIT.open(id, 戻り先)`）。TD の能力は `TDD.hero(id, lv, TDD.real(id))`（装備の比・練達・星臨の位階を反映） | `css/ui/unit.css` |
 | デザイントークン（新しい画面はこれ以外の色・角・影を使わない） | — | `css/ui/tokens.css` |
 
+**引き継ぎ（2026-11-20・ver0.53）**：TD 移行の P0〜P4 完了（6 章 28 ステージ・ホーム・仲間画面・旧コマンド戦闘の削除）。次は P5（施設の画面の刷新・旧コードの残りの整理・敵の歩きのコマ・効果音・技の演出・難易度の仕上げ・字を使わない導き）。
+現在地と次の作業の一覧は `docs/TD-DESIGN.md` の「10. 現在地と次の作業」と、引き継ぎページ https://claude.ai/artifact/UEG6zszE5FohwKx6NVDMqf （Artifact の read で読める）。
+
 **方針（2026-11）：コマンドRPG → タワーディフェンスへ移行済み**（縦画面・横スクロールの戦場・灯域・本編 8 章を 6 章に）。旧コマンド戦闘（`startBattle` 系・`js/rs/battle.js`・`js/battle/*` など）は ver0.53 で削除した。戦闘の作業は `js/td/` と `docs/TD-DESIGN.md` に。古い版ファイル（ver16〜v38）には、ホーム・図鑑・持ち物・鑑定・鍛冶・星盤・セーブが使う部分だけが残っている（旧画面の入口は `js/ui/party.js` で仲間画面へ）。
 
 戦闘システムの詳細は `docs/RS-SYSTEM.md`、素材は `docs/ASSETS.md` `docs/PIPELINE.md`、演出は `docs/FX.md`。
