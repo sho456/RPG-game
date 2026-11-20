@@ -1,3 +1,5 @@
+> **旧コマンド戦闘（ver0.53 で削除済み）**：この文書が説明するコード（js/battle/*・js/rs/battle.js・js/rs/ui.js・js/ui/battle-pop.js・js/ui/damage.js など）はもう無い。演出・数値の考え方の記録として残す。新しい戦闘は docs/TD-DESIGN.md。
+
 # 戦闘の流れと表示の決まり（ver0.46 で実装。正本 js/ui/battle-pop.js・js/battle/flow.js）
 
 参考：ロマサガRS の録画（14 秒・60fps）をコマ送りで分析した。時間は「速度 ×1」のときの目安。

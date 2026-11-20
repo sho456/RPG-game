@@ -3,6 +3,8 @@ name: rs-battle-fx
 description: アストラル・ブレイカー（このリポジトリ）の技・術の「演出」を、ロマサガRS の録画の実測をもとに設計して作る。技名の吹き出し→暗転（0.17 秒・明るさ 40〜65%）→溜め→放出→着弾（白い芯→放射の線→輪→漂う粒）→結果（数字の数え上げ・属性の色に染まる・赤く崩れて市松のモザイク）→暗転明け（0.45 秒）の 6 段の時間割、剣の振りの 1 周期（130ms の溜めの止め・70ms の三日月の残像・0.37 秒後に着弾）、術の段取り（足元の渦・跳ぶ・背景を黒く・白い球・柱・召喚）、エフェクトの色（主の色＋補う色＋白の芯）、効果音の重ね方（ノイズの層＋金属音 3 連打＋低いドン＋下がる鈴。WebAudio のレシピ）、背景（高解像度の絵・キャラより暗く彩度を低く）。参考をそのまま写さず、この作品の星のモチーフで「応用・進化」させる決まりつき。参考動画の分析道具 scripts/vref.py（コマの一覧・明るさの時間表・スペクトログラム・金属音の時刻）。Use when the user asks for skill/spell effects, battle presentation, cut-ins, screen darkening, impact bursts, summons, sound effects (SFX), battle backgrounds, or analysing a battle screen recording in this game. ポーズとコマの絵はセレス案1・案2（celes-48・celes-hd）か PixelLab、体の動かし方と台帳は rpg-hero-motion、数字・Weak・HP/BP の表示は rs-battle-flow、エフェクトの絵の部品は pixelfx。
 ---
 
+> 旧コマンド戦闘は ver0.53 で削除。演出の知見は TD の演出に応用する（このスキルが指す js/battle/*・js/rs/*・tools/battle_demo.js などは今は無い。時間割・効果音・色などの考え方だけを使う）。
+
 # 技・術の演出（アストラル・ブレイカー）
 
 根拠：ユーザー提供のロマサガRS の録画 2 本（剣の連続技・水の術と召喚。60fps）の実測 → `references/video-2026-11.md`。

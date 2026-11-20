@@ -1,3 +1,5 @@
+> **旧コマンド戦闘（ver0.53 で削除済み）**：この文書が説明するコード（js/battle/*・js/rs/battle.js・js/rs/ui.js・js/ui/battle-pop.js・js/ui/damage.js など）はもう無い。演出・数値の考え方の記録として残す。新しい戦闘は docs/TD-DESIGN.md。
+
 # 戦闘の仕組み（ロジック・モーション・エフェクト）の見取り図（ver0.34）
 
 戦闘モーション・エフェクトの大型アップデートの前に、今の作りを整理したもの。
@@ -85,39 +87,3 @@ startBattle(list, opts)          敵・味方のユニットを作り（enemy() 
 | 探索マップ | `js/field.js` `ver18-field.js` | ver0.31 でクエスト制になり入口は無い（`enterField` はクエスト一覧へ） |
 | 版ごとの表示・お知らせ | `ver16.js` 〜 `v32.js` の `title` の包み | 版表示を版ごとに上書きしている（`title` は 15 段） |
 
-## 5. 関数の包みの流れ（自動生成：`python3 tools/wrapmap.py`）
-
-<!-- wrapmap:begin -->
-| 関数 | 読み込み順の流れ（**太字**＝定義、（控え）＝V17F に控えた時点、＊＝控えを包む） |
-|---|---|
-| `startBattle` | **engine.js** → ch8.js → ver18-battle.js → ver19.js → v20-battle.js → v21.js → v22.js → v23.js → v24.js → v25.js → battle/seq.js → rs/battle.js → v38/core.js → v38/battle-ui.js |
-| `run` | **engine.js** |
-| `nextActor` | **engine.js** |
-| `heroTurn` | **engine.js** → v20-battle.js → v22.js → v25.js → battle/viewer.js |
-| `enemyTurn` | **engine.js** → ver19-pre.js（控え） → ver19.js＊ → v20-battle.js → v20-ui.js → v25.js → battle/viewer.js |
-| `doAction` | **engine.js** → ch8.js → ver19-pre.js（控え） → ver19.js＊ → v20-battle.js → v20-ui.js → v22.js |
-| `hit` | **engine.js** → ver19-pre.js（控え） → ver19.js＊ → v20-battle.js → rs/battle.js → rs/battle.js |
-| `calc` | **engine.js** → ch8.js → ch9.js → ver19.js → v20-battle.js → v20-battle.js → data/terms.js → v31/core.js → rs/battle.js |
-| `hurt` | **engine.js** → ver19.js → v20-battle.js → rs/battle.js |
-| `kill` | **engine.js** → ver19-pre.js（控え） → ver19.js＊ → rs/battle.js |
-| `pop` | **engine.js** → **ch5.js** → ver19-pre.js（控え） → ver19.js＊ → v25.js＊ |
-| `awaken` | **engine.js** → ch8.js → ver19-pre.js（控え） → ver19.js＊ → v22.js → v23.js → v25.js → battle/viewer.js → rs/battle.js |
-| `endAw` | **engine.js** |
-| `end` | **engine.js** → ver19-pre.js（控え） → ver19.js＊ → v20-ui.js → v31/quests.js → rs/battle.js |
-| `rewards` | **engine.js** → ch8.js → ch9.js → v20-ui.js → v31/core.js → v31/quests.js |
-| `enemy` | **engine.js** → v31/enemies.js → v32.js → v38/core.js |
-| `hero` | **engine.js** → ver18-battle.js → v20-battle.js → v31/items.js → v31/board.js → rs/core.js |
-| `refresh` | **engine.js** → **ch5.js** → v20-ui.js → v22.js → v24.js → v25.js → v31/quests.js |
-| `draw` | **engine.js** → ver16.js → ver17.js → ver19.js → v21.js → v22.js → v23.js → v25.js → sprite/spx.js → v31/quests.js → v38/battle-ui.js |
-| `frameOf` | **sprite/legacy/px.js** → sprite/legacy/px-enemy.js → ver19-art.js → sprite/spx.js |
-
-戦闘以外で 4 回以上包まれている関数：
-
-- `title`（18）：**town.js** → ver16.js → ver18-town.js → ver19.js → v20-ui.js → v21.js → v22.js → v22.js → v23.js → v24.js → v25.js → v30.js → v31/core.js → v31/quests.js → v32.js → v33.js → battle/version.js → v38/menu.js
-- `dvMenu`（15）：**dev.js** → ch9.js → ver16.js → ver17.js → ver18-town.js → v20-ui.js → v21.js → v22.js → v23.js → v24.js → v25.js → v29.js → v30.js → v31/quests.js → battle/viewer.js
-- `show`（11）：**core.js** → ver17.js → ver18-town.js → v20-ui.js → v20-ui.js → v22.js → v23.js → v23.js → v24.js → v25.js → v38/battle-ui.js
-- `migrate`（10）：**items.js** → ch8.js → ch9.js → ver17.js → ver18-field.js → v31/items.js → v31/quests.js → v32.js → rs/core.js → v38/core.js
-- `townMenu`（7）：**town.js** → ch9.js → ver17.js → v21.js → v23.js → v31/quests.js → v38/menu.js
-- `charHTML`（6）：**ver17.js** → v20-ui.js → v22.js → v31/core.js → v31/board.js → rs/ui.js
-- `enterField`（5）：**field.js** → ch8.js → ver17.js → ver18-field.js → v23.js
-<!-- wrapmap:end -->

@@ -1,3 +1,5 @@
+> **旧コマンド戦闘（ver0.53 で削除済み）**：この文書が説明するコード（js/battle/*・js/rs/battle.js・js/rs/ui.js・js/ui/battle-pop.js・js/ui/damage.js など）はもう無い。演出・数値の考え方の記録として残す。新しい戦闘は docs/TD-DESIGN.md。
+
 # 戦闘演出の全面刷新（ver1.0 まで）の計画と作り方
 
 戦闘の仕組みの見取り図は [BATTLE.md](BATTLE.md)。ここは ver0.34 から始めた演出の刷新について、
