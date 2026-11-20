@@ -17,42 +17,17 @@
    登録が無い技は従来の振り付けのまま動く。 */
 const MOTION=(()=>{
 /* 標準モーション：g＝区分（TERMS.SKILL / 状態）、f＝既定の絵（側面）、loop＝待機系 */
-const CATALOG={
- front:{n:'正面',g:'view',f:'front',fm:'front',loop:0,d:'正面の基準画像（動かない）'},
- base:{n:'通常',g:'view',f:'stance',fm:'idle',loop:0,d:'基本姿勢（動かない）'},
- idle:{n:'待機',g:'view',f:'stance',fm:'idle',loop:1,d:'呼吸・しぐさ'},
- seirin:{n:'星臨',g:'seirin',f:'awk',loop:1,d:'星臨の姿'},
- run:{n:'ダッシュ',g:'move',f:'dash'},
- phys_normal:{n:'通常攻撃（物理）',g:'phys_normal',f:'lunge'},
- mag_normal:{n:'通常攻撃（魔法）',g:'mag_normal',f:'cast'},
- guard:{n:'防御',g:'guard',f:'guard'},
- phys_attack:{n:'攻撃スキル',g:'phys_attack',f:'lunge'},
- phys_support:{n:'補助スキル',g:'phys_support',f:'cast'},
- phys_heal:{n:'回復スキル',g:'phys_heal',f:'cast'},
- mag_attack:{n:'攻撃魔法',g:'mag_attack',f:'cast'},
- mag_support:{n:'補助魔法',g:'mag_support',f:'cast'},
- mag_heal:{n:'回復魔法',g:'mag_heal',f:'cast'},
- hit:{n:'被弾',g:'state',f:'hit'},
- low:{n:'瀕死',g:'state',f:'weak'},
- down:{n:'戦闘不能',g:'state',f:'down'},
- win:{n:'勝利',g:'state',f:'win'}};
+
 /* 図鑑に載せる基準画像（ver0.30：正面・待機・星臨の 3 種。同じ縮尺・同じ足元で描く。js/zukan/viewer.js） */
 const ZUKAN=['front','idle','seirin'];
 
 /* ---------- キャラ・技ごとの登録 ---------- */
-const REG={};/* REG[キャラid or '*'][対象]＝定義 */
-function add(who,target,def){(REG[who]=REG[who]||{})[target]=Object.assign({target},def);return def;}
-function remove(who,target){if(REG[who])delete REG[who][target];}
-const charOf=u=>u&&(u.side===0?u.id:String(u.kind||u.spr||'').replace(/^vo_/,''));
+/* REG[キャラid or '*'][対象]＝定義 */
+
 /* 行動に使う専用モーション（無ければ null＝従来の振り付け） */
-function custom(u,sk){if(!u||!sk)return null;const who=charOf(u),key=skKey(sk);let cat=null;try{cat=TERMS.skillCat(sk,u.side===0?u.id:null);}catch(e){}
- for(const w of[who,'*']){const R=REG[w];if(!R)continue;if(key&&R['skill:'+key])return R['skill:'+key];if(cat&&R['cat:'+cat])return R['cat:'+cat];}
- return null;}
-let SKR=null;
-function skKey(sk){if(!SKR||!SKR.has(sk)){SKR=new Map();try{for(const k in SK)SKR.set(SK[k],k);}catch(e){}try{for(const k in EA)SKR.set(EA[k],'ea:'+k);}catch(e){}}return SKR.get(sk)||null;}
+
 /* キーポーズの列を再生する（hitN：何撃目か。keys が関数なら (u,hitN) → 配列） */
-async function play(u,def,hitN=1){const keys=typeof def.keys==='function'?def.keys(u,hitN):def.keys||[];
- for(const k of keys){if(k.move)ANIM.move(u,k.move[0],k.move[1],k.ms,k.ease||'out',k.hop||0);await ANIM.to(u,k.pose||{},k.ms||100,k.ease||'out');if(k.wait)await ANIM.T(k.wait);}}
+
 /* 一覧（開発・図鑑用） */
-function list(who){return Object.assign({},REG['*'],REG[who]);}
-return{CATALOG,ZUKAN,add,remove,custom,play,list,skKey,REG};})();
+
+return{ZUKAN};})();

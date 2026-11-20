@@ -5,7 +5,7 @@
  ・編成カードの立ち位置：陣形のその並び順の補正
  ・アビリティ：名前と段階だけを出し、タップで効果を開く（.x38）
  印：data-h38="種類:引数…"。どの画面（編成・キャラ詳細・探索中のシート）でも同じ吹き出しを使う */
-'use strict';
+
 const V38H=(()=>{
 const D=RSD,C=RSC;
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -72,4 +72,4 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
 {const _s=show;show=function(m){close();return _s(m);};}
 /* アビリティ：タップで効果を開く */
 document.addEventListener('click',e=>{const x=e.target.closest&&e.target.closest('.x38');if(!x||e.target.closest('button,[data-a]'))return;x.classList.toggle('open');try{tone(x.classList.contains('open')?880:660,.03,'square',.02);}catch(er){}});
-return{open,close,build};})();
+return{};})();

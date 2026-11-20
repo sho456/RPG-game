@@ -21,7 +21,6 @@ tools/
   spx_normalize.py         spx-data.js の正規化（向きの焼き込み・重複の除去・背面の補完・星臨の縮尺・一覧用サイズ）。何度実行しても同じ結果
   spx_common.py            縮小・パレット・PNG 化の共通処理
   smoke.js                 全画面の自動点検（Playwright。エラー・読み込み失敗・横はみ出しを集める）：node tools/smoke.js
-  wrapmap.py               関数の包み（ラップ）の流れ → docs/BATTLE.md の 5 章を書き換える
 js/
   data/terms.js            呼称・分類の共通規格（TERMS）
   data/skeleton-overrides.js  骨格の手動修正（SKEL_OVR）

@@ -1,22 +1,14 @@
 /* ===== 戦闘表示（ver0.10） ===== */
-function stTags(u){const t=[];if(u.side===0){if(u.aw)t.push(['星臨','aw']);if(u.ag>=100&&!u.aw)t.push(['AG MAX','ag']);if(u.taunt>0)t.push(['挑発'+u.taunt,'tn']);if(u.guard)t.push(['防御','gd']);
- if(B.domain)t.push(['聖域','dm']);if(B.barrier>0)t.push(['障壁','dm']);if(u.charged)t.push(['充填','ch']);
- if(u.aw){if(u.id==='gald')t.push(['蓄'+Math.round(u.store),'ch']);else if(u.id==='mire')t.push(['対消滅'+(u.stk||0),'ch']);else if(u.id==='balza')t.push(['熱'+u.awT,'ch']);else if(!GAUGE.includes(u.id))t.push(['残'+(awN(u)-u.awT),'ch']);}}
- else{if(u.charging)t.push(['溜め','cg']);if(u.stolen)t.push(['盗済','st']);}return t;}
-const tagH=u=>stTags(u).map(([l,c])=>`<span class="tg ${c}">${l}</span>`).join('');
-function refresh(){}/* 未使用：js/ver17.js が置き換え */
-function pop(u,txt,col='#fff',small,kind='',el){const d=document.createElement('div');const tx=String(txt),dg=!small&&/^[+\-]?\d+$/.test(tx);d.className='pop'+(small?' s':'')+(dg?' dg':'')+(kind?' '+kind:'');
- if(dg){d.style.setProperty('--c',col);d.style.setProperty('--c2',shadeHex(col.length===7?col:'#ffffff',.55));if(el&&ELC[el]){const b=document.createElement('i');b.className='pe';b.textContent=el;b.style.background=ELC[el];d.appendChild(b);}
-  [...tx].forEach((ch,i)=>{const e=document.createElement('span');e.textContent=ch;e.style.animationDelay=i*.035+'s';d.appendChild(e);});}else{d.textContent=tx;d.style.color=col;}
- const n=(u._pn=(u._pn||0)+1);setTimeout(()=>{u._pn=Math.max(0,(u._pn||1)-1);},650);const ox=dg?((n-1)%3-1)*15:0,oy=dg?-((n-1)%4)*7:0;
- d.style.left=(u.x+8*u.sc)*SC+ox+'px';d.style.top=(u.y+(u.side?6:2)*u.sc/2)*SC+oy+'px';$('#pops').appendChild(d);setTimeout(()=>d.remove(),1500);}
-function comboAdd(){}/* 未使用：js/v24.js が置き換え */
-function comboEnd(){B.combo=null;const c=$('#combo');if(c)setTimeout(()=>{if(!B||!B.combo)c.style.display='none';},900);}
+
+/* 未使用：js/ver17.js が置き換え */
+
+/* 未使用：js/v24.js が置き換え */
+
 /* ===== 第5章：沈んだ王都 ===== */
 const SETS={royal:{n:'王家の遺品',b2:{mhpP:10,defP:10},b4:{awDmg:25,startAG:20},d2:'最大HP+10%・防御+10%',d4:'星臨中与ダメ+25%・開始時AG+20'}};
 const ROYAL={head:'王家の冠',body:'王家の鎧',sub:'王家の盾',acc:'王家の指輪'};ITYPE.unshift(['冠','circ'],['盾','shield']);
 function royalItem(){}/* 未使用：js/v31/items.js が置き換え */
-const royalRand=ilv=>royalItem(['head','body','sub','acc'][Math.random()*4|0],ilv);
+
 for(const[k,b,pal]of[['drowned','gald',{a:'#3a6a6a',A:'#1a3a3a',r:'#2a5a7a',R:'#103040',s:'#7a9a9a',d:'#1a3a3a',y:'#6ac0c0',e:'#40ffff'}],['jelly','shroom',{r:'#e070c0',R:'#8a3070',w:'#c0e0ff',e:'#203060'}],
  ['waterslime','slime',{v:'#3a8ad0',V:'#1a4a7a',p:'#8ad0ff'}],['boss6','noah',{w:'#2a4a7a',k:'#a0d0ff',y:'#40e0ff',s:'#a0b8d0',q:'#1a2a4a',e:'#40ffff'}]]){SPR[k]=SPR[b];IMG[k]=mk(SPR[b],pal);IMG[k+'_w']=mk(SPR[b],null,'#ffffff');}
 Object.assign(EA,{deluge:{n:'大海嘯',el:'冷',k:'mag',pow:2.5,t:'all'},tide:{n:'潮の刃',el:'冷',k:'mag',pow:1.2,t:'one'}});
@@ -43,10 +35,6 @@ Object.assign(SK,{tsume:{n:'爪撃',sp:15,el:'斬',k:'phys',pow:1.3,t:'one',d:'�
 AW.jin={name:'獣魂合一',type:'ターン制',turns:4,cmds:['juuou','shippuuga','houkou']};AWD.jin='相棒ポポと合体。攻撃と素早さ+30%、獣王撃は敵の弱点に合わせて属性が変わる';
 BDEF.jin=mkB('獣王座',[['atkP'],['mhpP'],['spd'],['defP'],['crit'],['resP']],['3,-2','-2,-1','-2,3','2,1'],'goga','tatsumaki',[[{atkP:12},'猛獣：攻撃+12%'],[{mhpP:15},'巨躯：最大HP+15%'],[{awDmg:20},'野生：星臨中与ダメ+20%'],[{spd:2},'俊足：素早さ+2']]);
 BOARD.jin=buildBoard('jin');IIS.claw=["","..m...m...m.","..m...m...m.","..mm..mm..mm","...mM..mM..M","....MMMMMMM.","....MbbbbbM.",".....bbbbb..",".....bbbbb.."];ITYPE.unshift(['爪','claw']);
-function jinEvent(){F.pause=true;banner('ジン','#d08030');
- log('月明かりの下、怪我をした小さな獣を抱えた男がいた。<br><b>ジン</b>「おっと、驚かせたか。こいつはポポ、俺の相棒さ。……あんたら、虚蝕を追ってるんだろ？ 夜の森で助けてもらった礼だ、ついて行くよ」');
- menu([{l:'仲間にする',cls:'ready',f:()=>{G.flags.jinMet=1;newMember('jin');SFX.aw();save();fieldMenu('<b>ジンが仲間になった！</b>'+(G.party.includes('jin')?'':'（控えに入った）'));renderPartyStatic();}},
-  {l:'今はやめる',f:()=>{G.flags.jinMet=1;G.declined=[...(G.declined||[]),'jin'];save();fieldMenu('ジン「そうか。酒場で待ってるぜ」');}}]);}
 
 MAP2[19]=MAP2[19].slice(0,18)+'n'+MAP2[19].slice(19);MAP2[20]=MAP2[20].slice(0,17)+'TJ'+MAP2[20].slice(19);
 AREAS.midori.intro+='<br><small>夜になると、月明かりの小道が現れるらしい……</small>';

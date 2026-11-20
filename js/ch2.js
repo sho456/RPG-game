@@ -48,7 +48,4 @@ AREAS.seido={name:'祈りの廃聖堂',map:MAP3,lv:[11,16],groups:[['cursedslime
  intro:'<b>第2章　祈りの廃聖堂</b>――祈りの声が途絶えて久しい聖堂。奥で、星片で動く人形が眠っているという。'};
 const Q2=[{id:'q4',n:'盗まれた鍵',d:'翠の森で翠狼を5体倒し、盗まれた鍵を取り返す',ok:()=>(G.q.jade||0)>=5,pg:()=>`${Math.min(5,G.q.jade||0)}/5`,rw:'？？？',give:()=>{newMember('shion');}},
  {id:'q5',n:'聖堂の闇',d:'虚ろの司祭を倒す',ok:()=>!!G.flags.boss3,pg:()=>G.flags.boss3?'達成':'未達成',rw:'2000G・不死鳥の羽×2',give:()=>{G.gold+=2000;addItem('feather',2);}}];
-function noahEvent(){F.pause=true;banner('ノア','#ffe9a0');
- log('祭壇の脇で、白い人形が眠っている。胸の星片が、リオの星片に呼応して光った。<br><b>ノア</b>「……起動。あなたが、わたしを起こした方ですね。……祈りの続きを、手伝わせてください」');
- menu([{l:'仲間にする',cls:'ready',f:()=>{G.flags.noahMet=1;newMember('noah');SFX.aw();save();fieldMenu('<b>ノアが仲間になった！</b>'+(G.party.includes('noah')?'':'（控えに入った）'));renderPartyStatic();}},
-  {l:'今はやめる',f:()=>{G.flags.noahMet=1;G.declined=[...(G.declined||[]),'noah'];save();fieldMenu('ノアは再び目を閉じた。（酒場で誘える）');}}]);}
+

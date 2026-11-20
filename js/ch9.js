@@ -1,13 +1,11 @@
 /* ===== ver0.15 絆と会話：絆イベント・会話ウィンドウ（表情5種）・専用ユニーク装備・図鑑 ===== */
 /* --- 会話ウィンドウと顔グラの表情（n通常 h笑顔 a怒り s悲しみ o驚き） --- */
 const EXN={n:'通常',h:'笑顔',a:'怒り',s:'悲しみ',o:'驚き'},EXBG={n:'#1a2048',h:'#3a3012',a:'#44141c',s:'#10224a',o:'#2e3a12'};
-const EXC={};
-function eyeOf(id){const r=SPR[id]||[];for(let y=0;y<r.length;y++){const x=r[y].indexOf('e');if(x>=0)return[x,y];}return null;}
+
 function exprFace(){}/* 未使用：js/ver18-art.js が置き換え */
 /* lines: [[話者id|null, 表情, 本文], ...] */
-function talk(){}/* 未使用：js/ver17.js が置き換え */
+/* 未使用：js/ver17.js が置き換え */
 /* 1行＝「話者.表情 本文」 話者：R=リオ C=相手 N=語り */
-const parseEp=(id,s)=>s.split('|').map(l=>{const sp=l[0]==='R'?'rio':l[0]==='C'?id:null;return[sp,sp?l[2]:'n',l.slice(4)];});
 
 /* --- 絆イベント（各キャラ5話） --- */
 const BOND_REQ=[0,10,25,45,70];
@@ -73,46 +71,22 @@ const UQ={rio:['灯継ぎの剣','星臨中の与ダメ+30%'],gald:['誓約の�
  noah:['心灯の杖','ノアが生存中、味方全員の被ダメ-8%'],balza:['炉心の斧','熱属性の与ダメ+25%'],erna:['落ちぬ星の弓','単体攻撃の与ダメ+25%'],crow:['名を刻む大鎌','自分のHP50%以下で与ダメ+40%'],
  hakua:['雪華の手甲','連撃技の与ダメ+25%'],jin:['二人の双剣','与ダメ+15%・被ダメ-10%'],celes:['千年目の杖','無属性魔法の与ダメ+30%'],valk:['誓鱗の大剣','HP半分以下の敵への与ダメ+30%']};
 for(const id in UQ)LEG['uq_'+id]={n:UQ[id][0],slot:'w',who:id,uq:1,d:'絆の専用装備：'+UQ[id][1]};
-function uqItem(id){const ilv=Math.max(30,G.h[id]?G.h[id].lv:30),it=genItem(ilv,0,0,'w',4);it.leg='uq_'+id;it.who=id;wbase(it,ilv,'星鋼');
- for(const k in it.base)it.base[k]=Math.round(it.base[k]*1.25);it.name=UQ[id][0];it.unid=false;it.uq=1;return it;}
-{const _ca=calc;calc=function(a,t,sk){const r=_ca(a,t,sk),al=a.legs||[],tl=t.legs||[];let m=1;
- if(al.length){if(al.includes('uq_rio')&&a.aw)m*=1.3;if(al.includes('uq_mire')&&r.weak&&sk.k==='mag')m*=1.3;if(al.includes('uq_shion')&&t.hp>=t.mhp)m*=1.4;
-  if(al.includes('uq_balza')&&sk.el==='熱')m*=1.25;if(al.includes('uq_erna')&&sk.t==='one')m*=1.25;if(al.includes('uq_crow')&&a.hp<=a.mhp/2)m*=1.4;
-  if(al.includes('uq_hakua')&&(sk.hits>1||sk.k==='rhythm'))m*=1.25;if(al.includes('uq_jin'))m*=1.15;if(al.includes('uq_celes')&&!sk.el&&sk.k==='mag')m*=1.3;if(al.includes('uq_valk')&&t.hp<=t.mhp*.5)m*=1.3;}
- if(t.side===0){if(tl.includes('uq_gald'))m*=.85;if(tl.includes('uq_jin'))m*=.9;if(B&&B.heroes.some(h=>h.alive&&h.legs&&h.legs.includes('uq_noah')))m*=.92;}
- if(m!==1)r.d=Math.max(1,Math.round(r.d*m));return r;};}
 
 /* --- 絆データ --- */
 const bondOf=id=>{G.bond=G.bond||{};return G.bond[id]=G.bond[id]||{p:0,ep:0};};
 const bondIds=()=>G.members.filter(id=>BSTORY[id]);
 const bondNext=id=>{const b=bondOf(id);return b.ep<5&&b.p>=BOND_REQ[b.ep];};
 const bondReadyN=()=>bondIds().filter(bondNext).length;
-const epTotal=()=>bondIds().reduce((a,id)=>a+bondOf(id).ep,0);
+
 {const _bo=bonus;bonus=function(id){const o=_bo(id),ep=(G.bond&&G.bond[id]&&G.bond[id].ep)||0;if(ep)for(const k of['atkP','magP','defP','resP','mhpP'])o[k]=(o[k]||0)+ep;return o;};}
-{const _rw=rewards;rewards=function(es){const r=_rw(es),boss=es.some(e=>ED[e.kind]&&ED[e.kind].boss);
- G.zk=G.zk||{e:{},i:{}};es.forEach(e=>{const k=e.kind.replace(/^vo_/,'');G.zk.e[k]=(G.zk.e[k]||0)+1;});
- const up=[];G.party.filter(id=>BSTORY[id]).forEach(id=>{const was=bondNext(id);bondOf(id).p+=boss?3:1;if(!was&&bondNext(id))up.push(HB[id].name);});
- if(up.length)r.ups.push(`♥ ${up.join('・')}との絆が深まった（酒場で語らえる）`);return r;};}
+
 {const _al=addLoot;addLoot=function(it){zkItem(it);return _al(it);};}
 function zkItem(it){G.zk=G.zk||{e:{},i:{}};if(it.leg)G.zk.i[it.leg]=1;if(it.set)G.zk.i['set:'+it.set+':'+it.slot]=1;}
 {const _mg=migrate;migrate=function(g){_mg(g);g.bond=g.bond||{};if(!g.zk){g.zk={e:{},i:{}};const bk={boss1:'boss',boss2:'boss2',boss3:'boss3',boss4:'boss4',boss5:'boss5',boss6:'boss6',boss7:'boss7',boss9:'boss9'};for(const f in bk)if(g.flags&&g.flags[f]&&ED[bk[f]])g.zk.e[bk[f]]=1;}
  (g.inv||[]).forEach(zkItem);return g;};}
 
 /* --- 絆の語らい（酒場） --- */
-function bondMenu(m){const ids=bondIds();log((m||'<b>絆の語らい</b>　一緒に戦うと絆が深まる（ボス戦は3倍）。1話ごとに全能力+1%、5話目で専用装備')+goldTxt());
- panel(ids.map(id=>{const b=bondOf(id),ok=bondNext(id),nx=BOND_REQ[b.ep],pc=b.ep>=5?100:Math.min(100,b.p/nx*100||100);
-  return`<div class="icard r${b.ep>=5?4:b.ep>=3?2:0}"><img class="iic" src="${exprFace(id,ok?'h':'n')}"><div class="ibody"><div class="inm">${HB[id].name}　<span style="color:#ff8ab0">${'♥'.repeat(b.ep)}${'♡'.repeat(5-b.ep)}</span></div>
-  <div class="isub">${b.ep>=5?'絆MAX：専用装備「'+UQ[id][0]+'」':ok?'第'+(b.ep+1)+'話「'+BSTORY[id][b.ep][0]+'」':'次の話まで 絆'+b.p+'/'+nx}</div><div class="bar sp" style="margin-top:3px"><i style="width:${pc}%"></i><span>絆 ${b.p}</span></div></div>
-  <div class="iright">${b.ep>=5?`<button class="tbtn" style="width:62px;height:40px" data-a="re" data-v="${id}">回想</button>`:`<button class="tbtn ${ok?'gold':''}" style="width:62px;height:40px" data-a="go" data-v="${id}" ${ok?'':'disabled'}>語らう</button>`}</div></div>`;}).join('')+
- (bondIds().length?'':'<div class="emp">まだ仲間がいない</div>')+'<button class="tbtn back wide" data-a="back">戻る</button>',
- {go:id=>bondPlay(id),re:id=>recall(id),back:()=>tavern()});}
-function bondPlay(id){const b=bondOf(id),n=b.ep,[tt,s]=BSTORY[id][n];log(`<b>${HB[id].name}　第${n+1}話「${tt}」</b>`);
- talk(parseEp(id,s),()=>{b.ep=n+1;let msg=`<b>${HB[id].name}との絆が深まった！</b>（♥${b.ep}　全能力+${b.ep}%）`;SFX.aw();
-  if(b.ep===5){const it=uqItem(id);G.inv.push(it);zkItem(it);msg+=`<br>専用装備 ${ihtml(it)} を手に入れた！`;}
-  if(epTotal()>=25&&!(G.flags&&G.flags.uqRio)){G.flags.uqRio=1;const it=uqItem('rio');G.inv.push(it);zkItem(it);msg+=`<br>仲間たちとの絆が、リオの剣に灯った――${ihtml(it)}`;}
-  save();bondMenu(msg);});}
-function recall(id){const b=bondOf(id);log(`<b>${HB[id].name}の回想</b>`);
- menu([...BSTORY[id].slice(0,b.ep).map(([tt,s],i)=>({l:`第${i+1}話「${tt}」`,f:()=>talk(parseEp(id,s),()=>recall(id))})),{l:'戻る',cls:'back',f:()=>bondMenu()}],true);}
+function bondMenu(){}
 
 /* --- 図鑑（敵・装備・仲間） --- */
 const PROF={rio:['17・灯守見習い','星継ぎ／剣／光','まっすぐだが自分の力のなさに悩む','主人公'],gald:['34・元騎士団長','守護騎士／大剣＋盾／地','寡黙で面倒見がいい。過去に部下を失った','序章で加入'],
@@ -124,29 +98,13 @@ const PROF={rio:['17・灯守見習い','星継ぎ／剣／光','まっすぐだ
 const ZIMG={};const zimg=(k,sil)=>{const key=k+(sil?'_w':'');if(ZIMG[key])return ZIMG[key];const c=IMG[key]||IMG[k];return ZIMG[key]=c?c.toDataURL():'';};
 const zkEnemies=()=>Object.keys(ED).filter(k=>!/^(tr_|vo_)/.test(k)&&k!=='valkE'&&IMG[k]);
 const zkEquip=()=>[...Object.keys(LEG).map(k=>({k,n:LEG[k].n,d:LEG[k].d,t:LEG[k].uq?'ユニーク':'レジェンド'})),...Object.keys(ROYAL).map(s=>({k:'set:royal:'+s,n:ROYAL[s],d:SETS.royal.d2+'／'+SETS.royal.d4,t:'セット'}))];
-let ZKT='e';
-function zkMenu(m){G.zk=G.zk||{e:{},i:{}};G.inv.forEach(zkItem);const Z=G.zk,es=zkEnemies(),eq=zkEquip(),hs=Object.keys(PROF);
- const ne=es.filter(k=>Z.e[k]).length,ni=eq.filter(x=>Z.i[x.k]).length,nh=hs.filter(id=>G.members.includes(id)).length;
- log((m||'<b>図鑑</b>　タップで詳細')+`<br><small>敵 ${ne}/${es.length}　装備 ${ni}/${eq.length}　仲間 ${nh}/${hs.length}</small>`);
- let body='';
- if(ZKT==='e')body='<div class="zgrid">'+es.map(k=>{const s=!!Z.e[k];return`<div class="ztile${s?'':' un'}${ED[k].boss?' bs':''}" data-a="e" data-v="${k}"><img src="${zimg(k,!s)}"><span>${s?ED[k].name:'？？？'}</span></div>`;}).join('')+'</div>';
- if(ZKT==='i')body=eq.map(x=>{const s=!!Z.i[x.k],ik=typeof IC21!=='undefined'?(x.k.startsWith('set:')?'S_'+x.k.split(':')[1]+'_'+x.k.split(':')[2]:'L_'+x.k):null;return`<div class="icard r4${s?'':' off'}">${ik?`<img class="iic" src="${s?IC21.render(ik,4):IC21.shadow(ik)}">`:''}<div class="ibody"><div class="inm">${s?x.n:'？？？'}</div><div class="isub"><span class="rb">${x.t}</span></div><div>${s?chips([x.d],'lg'):chips(['未入手'])}</div></div></div>`;}).join('');
- if(ZKT==='h')body=hs.map(id=>{const j=G.members.includes(id),P=PROF[id],b=G.bond&&G.bond[id];return`<div class="icard r${j?2:0}${j?'':' off'}" data-a="h" data-v="${id}"><img class="iic" src="${j?exprFace(id,'n'):zimg(id,1)}"><div class="ibody"><div class="inm">${j?HB[id].name:'？？？'}${j&&BSTORY[id]?`　<span style="color:#ff8ab0">${'♥'.repeat(b?b.ep:0)}</span>`:''}</div><div class="isub">${j?P[0]+'　'+P[1]:'加入条件：'+P[3]}</div><div>${j?chips([P[2]]):''}</div></div></div>`;}).join('');
- panel(`<div class="ftabs" style="grid-template-columns:repeat(3,1fr)">${[['e','敵'],['i','装備'],['h','仲間']].map(([k,n])=>`<button class="${ZKT===k?'on':''}" data-a="tab" data-v="${k}">${n}</button>`).join('')}</div>${body}<button class="tbtn back wide" data-a="back">戻る</button>`,
- {tab:k=>{ZKT=k;zkMenu();},e:k=>zkEnemy(k),h:id=>zkHero(id),back:()=>tavern()});}
+
+function zkMenu(){}
 function zkEnemy(){}/* 未使用：js/zukan/zukan.js が置き換え */
 function zkHero(){}/* 未使用：js/zukan/zukan.js が置き換え */
 
 /* --- 酒場・街への組み込み --- */
-tavern=function(){};/* 未使用：js/ver18-town.js が置き換え */
-{const _tm=townMenu;townMenu=function(m){_tm(m);const n=bondReadyN(),b=$('#cmd').children[2];if(n&&b){b.classList.add('ready');b.insertAdjacentHTML('beforeend','<small>♥絆'+n+'</small>');}};}
+/* 未使用：js/ver18-town.js が置き換え */
 
 /* --- 開発者モード --- */
-function dev15(m){log((m||'<b>ver0.15 絆と会話</b>')+`<br><small>語らった話 ${epTotal()}/${bondIds().length*5}　図鑑：敵${Object.keys((G.zk||{e:{}}).e).length}種</small>`);
- menu([{l:'絆の語らいを開く',cls:'ready',f:()=>bondMenu()},{l:'図鑑を開く',f:()=>zkMenu()},
-  {l:'表情5種の会話テスト',f:()=>talk(['rio','gald','mire','noah','hakua'].filter(i=>HB[i]).flatMap(i=>'nhaso'.split('').map(e=>[i,e,`${HB[i].name}：表情「${EXN[e]}」`])),()=>dev15())},
-  {l:'全員の絆ポイントMAX',f:()=>{bondIds().forEach(id=>bondOf(id).p=99);save();dev15('全員の絆を99にした（全話解放）');}},
-  {l:'絆をリセット',f:()=>{G.bond={};G.flags.uqRio=0;save();dev15('絆を0に戻した');}},
-  {l:'専用装備を全種受け取る',f:()=>{Object.keys(UQ).forEach(id=>{const it=uqItem(id);G.inv.push(it);zkItem(it);});save();dev15('専用ユニーク装備12種を受け取った');}},
-  {l:'図鑑の敵を全登録',f:()=>{zkEnemies().forEach(k=>G.zk.e[k]=G.zk.e[k]||1);save();dev15('敵図鑑を全登録した');}},{l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
-{const _dv=dvMenu;dvMenu=function(m){_dv(m);const c=$('#cmd'),b=document.createElement('button');b.className='c ready';b.innerHTML='ver0.15 絆と会話<small>絆イベント・表情・専用装備・図鑑</small>';b.onclick=()=>{SFX.sel();dev15();};c.insertBefore(b,c.firstChild);c.children[1].classList.remove('ready');};}
+

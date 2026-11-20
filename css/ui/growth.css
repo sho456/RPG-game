@@ -17,3 +17,5 @@
 .gp48 .gb{display:flex;flex-direction:column;gap:4px}
 .gp48 .gb .tbtn{min-width:76px;height:30px;font-size:12px;padding:0 6px}
 .gp48 .tbtn.gd{height:64px;width:44px;font-size:12px;padding:0}
+/* ver0.53：旧戦闘の削除で、編成・依頼掲示板・絆・図鑑・仲間を誘うの欄は使わない（js/ui/growth.js の描画は触らず隠す。ホームの ≡ から図鑑、仲間は仲間画面へ） */
+.gp48~.ftiles,.gp48~.ttl2,.gp48~.icard{display:none}

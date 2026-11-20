@@ -18,11 +18,10 @@
   `docs/CODEMAP.md` は全体の索引（大きいので丸ごと読まない。`grep` で引く）。
 - **画面を見る**：`python3 -m http.server 8765 &` → `node tools/ui_shots.js <出力dir> [画面名…]`（別のポートなら `URL=http://localhost:ポート/index.html`）。
   エージェントを並行で動かすときは、ポートを分ける（例：メイン 8790、エージェントごとに 8791〜）。同じポートだと別のフォルダの画面を見てしまう。
-  画面名：`party party-sw form form-sel form-list detail detail-ab sk-slot sk-put detail-sk detail-aw board board-sel board-up board-up-lock battle-turn battle-cmd battle-pick battle-wk battle-act`。
+  画面名：`home home-sheet td-map td-prep td-battle unit unit-detail unit-sheet board board-sel board-up board-up-lock equip-info smith growth inv zukan`。
   `SCROLL=1` で下の欄を最後までスクロールした画面（`_2.png`）も撮る。
   画像は scratchpad に出し、必要な部分だけ切り抜いて見る（PIL で crop / 横並び）。スクショは 1 枚ずつより、まとめて 1 枚に並べると安い。
-- **壊れていないか**：`node tools/smoke.js --quick`（約 3〜5 分。エラー 0 が合格）。演出を触ったら `--fx` も。
-  長いので `run_in_background` で回して、その間に他の作業をする。
+- **壊れていないか**：`node tools/smoke.js --quick`（TD 向け。タイトル→ホーム→各ボタン→全ステージの `TDS.run`→出撃準備と出撃→仲間画面→図鑑。エラー 0 が合格）。戦闘画面を触ったら `--fx`（TD の戦闘を ×2 で最後まで）も。長いので `run_in_background` で回して、その間に他の作業をする。
 
 ## 2. 画面 → 正本のファイル
 
@@ -30,24 +29,15 @@
 |---|---|---|
 | 星盤・天星盤の画面 | `js/ui/board.js`（`BOARDUI`）。盤面の描画は `ver17.js drawBoard`、天星盤のデータは `v31/board.js`（`V31B`）、ノードの置き換えは `rs/core.js` | `css/ui/board.css` |
 | 装備品の詳細（装備アイコンのタップ） | `js/ui/equip-info.js`（`EQINFO`。アイコンに `data-eqi=uid` を付けると開く） | `css/ui/equip-info.css` |
-| 属性耐性（防具の種類ごとの表・キャラの合計・被ダメージの倍率）と属性の六角の印（弱点＝赤︿・耐性＝青﹀。戦闘の帯・装備・キャラ詳細で共通 `ELR.chip`） | `js/data/resist.js`（`ELR`）。計算は `js/rs/battle.js calc` の最後で `ELR.mul` | `css/ui/equip-info.css`（`.elh` `.elx`） |
+| 属性耐性（防具の種類ごとの表・キャラの合計・被ダメージの倍率）と属性の六角の印（弱点＝赤︿・耐性＝青﹀。装備で共通 `ELR.chip`） | `js/data/resist.js`（`ELR`） | `css/ui/equip-info.css`（`.elh` `.elx`） |
 | 装備の能力影響（基礎ステータスだけ） | `js/data/equip7.js`（`EQ7`） | — |
-| 技・術の練達（3 段階・錬磨石。旧 技Lv） | `js/rs/mastery.js`（`RSM`：データ・強化・詳細の窓の欄） | `css/ui/skill.css`（`.ms47`） |
-| アビリティ（3 段階・段階Ⅲの【固有名の特殊効果】） | データ `js/rs/abilities.js`、処理 `js/rs/battle.js`、説明文 `js/rs/core.js effTxt` | — |
+| 技・術の練達（3 段階・錬磨石。旧 技Lv） | `js/rs/mastery.js`（`RSM`：データ・強化。仲間画面が使う） | `css/ui/skill.css`（`.ms47`） |
 | 用語の緑のハイライト＋タップで説明 | `js/ui/keywords.js`（`KW.mark`） | `css/ui/keywords.css` |
-| 編成画面・陣形と立ち位置（`formOpen`） | `js/ui/party.js`（`V38P`） | `css/ui/party.css`（`.ps41` `.pc41` `.fe41`） |
-| キャラ詳細（能力・技・術・星臨） | 骨組み `ver17.js charHTML / equipMenu` → 技・術のアイコン `js/ui/skill-icons.js`（`SKICON`）／中身 `js/rs/ui.js`（`RSU`：`skCard` `skillsHTML`＋`tapSlot/tapSkill`（技・術セット） `abHTML`（アビリティのタブ） `skIcon`（技のアイコン） `awHTML` `st7HTML`） | `css/rs.css` `css/v38.css` |
-| 戦闘：コマンド欄（2 段階の決定・指のカーソル） | `js/rs/ui.js`（`chooseRoot`）。属性の六角マーク（弱点＝赤・耐性＝青）`elStack`、消費の表示 `costHTML` | `css/v38.css`（`.c38*`）・`css/ui/skill.css`（`.hx43` `.c43`） |
-| 技・術の詳細の窓（ⓘ）・アビリティの詳細の窓 | `js/rs/ui.js`（`info`・`abInfo`） | `css/ui/skill.css`（`.ski43` `.ab44`） |
+| 旧画面の入口（強化メニューのタイルなどが呼ぶ `partyScreen` `openSheet` `board` `bondMenu` `trialMenu` を仲間画面へ向けるだけ） | `js/ui/party.js` | — |
 | 鍛冶屋（品揃え・強化・OP付替・ソケット） | `js/ui/smith.js`（`smith`・`enhance` を置き換え。OP・ソケットの後半は `town.js opSwap / sockMenu`） | `css/ui/smith.css` |
 | タイトル（タップで開始） | `js/v38/menu.js`（`titleTap`） | `css/ui/font.css` |
-| 戦闘：キャラ・敵の表示サイズ | 敵 `js/battle/size.js`（`BSIZE`：ボス以外は `MOB` で同じ大きさ・ボスは種類ごとの倍率 `CLS`。見えている範囲で測る `spx.js boxB`・手下を同じ縮め率で置く `v23.js normMob / placeEnemies`）・味方の背丈 `js/sprite/spx.js heroHgt / regRigs`・味方の倍率 `js/v38/battle-ui.js placeHeroes`・敵の配置（はみ出し防止）`js/v23.js eDims / placeEnemies` | — |
-| 戦闘：配置・スライド・HP/BP 表示（キャラ横の HP・BP の字は `js/v24-text.js STYLE.hp/sp`）・下の帯（戻る・AUTO・リピート＝`js/rs/ui.js bbar`） | `js/v38/battle-ui.js`（`V38B`） | `css/v38.css` |
-| 戦闘：上の帯（対象・弱点/耐性） | `js/v22.js`（`updHud`） | `css/v22.css` `v25.css` `v38.css` |
-| 戦闘の決まり（ターン・BP・LP（全員 7＝`RSD.LP_FIX`））・ダメージの計算式（枠・エクストラフォース・上限 9999万。`docs/RS-SYSTEM.md` 12 章） | `js/rs/battle.js`（`RSB`。計算式は `frames` `xfOf` `dmgFin`）・`js/rs/core.js`（`RSC`）・データ `js/rs/data.js`（`RSD`） | — |
-| 戦闘の行動演出の流れ（戦闘開始・技名の吹き出し・暗転・共通の技の演出・数字・撃破） | `js/battle/flow.js`（`BFLOW`）。見出し・状態・数字の表示の枠（キャラごとに固定の 3 段）は `js/ui/battle-pop.js`（`BPOP`。v24 dmgPop・v25 fxPop を置き換え）、流れの決まりは `docs/BATTLE-FLOW.md`、書式（金属の見出し・筆の属性）は `js/ui/damage.js`、撃破の赤い崩れは `js/ver19.js dissolve` | `css/ui/battle-flow.css`・`css/ui/battle-pop.css`・`css/ui/damage.css` |
-| 演出・モーション（技ごとの専用演出） | `js/battle/*`（`BX*`）・`js/battle/data/fx-heroes-*.js` → スキル `rpg-hero-motion` | — |
-| 文字のフォント（全画面で統一） | 本文＝M PLUS 1p、コマンド（ボタン・技名・名前・見出し・タブ）＝Kaisei Tokumin（`css/ui/font.css` の `--cmd`）。キャンバスの数字・英字＝`js/v24-text.js FONT` | `css/ui/font.css` |
+| 戦闘の数値データ（武器種・技・LP など。TD が武器種を読む） | `js/rs/data.js`（`RSD`）・`js/rs/core.js`（`RSC`：能力値・習得・セーブ）。ターン制の進行 `js/rs/battle.js` は ver0.53 で削除 | — |
+| 文字のフォント（全画面で統一） | 本文＝M PLUS 1p、コマンド（ボタン・技名・名前・見出し・タブ）＝Kaisei Tokumin（`css/ui/font.css` の `--cmd`）。キャンバスの数字・英字は各画面のコード | `css/ui/font.css` |
 | 用語・耐性 | `js/data/terms.js`（`TERMS`） | — |
 | 強化メニュー（経験値のストック・レベルアップ・旧酒場の統合） | `js/ui/growth.js`（`GROW`） | `css/ui/growth.css` |
 | 版表示・お知らせ | `js/v38/menu.js`（`VER` `NEWS`） | — |
@@ -56,7 +46,7 @@
 | **仲間**（ver0.52。一覧＋1 人の詳細で Lv・技の練達・装備・星盤をまとめる。TD の能力を表示） | `js/ui/unit.js`（`UNIT.open(id, 戻り先)`）。TD の能力は `TDD.hero(id, lv, TDD.real(id))`（装備の比・練達・星臨の位階を反映） | `css/ui/unit.css` |
 | デザイントークン（新しい画面はこれ以外の色・角・影を使わない） | — | `css/ui/tokens.css` |
 
-**今後の方針（2026-11）：コマンドRPG → タワーディフェンスへ移行中**（縦画面・横スクロールの戦場・灯域・本編 8 章を 6 章に）。新しい戦闘の作業は `js/td/` と `docs/TD-DESIGN.md` に。`startBattle` 系（ver16〜v38・`js/rs/*`）には新しい機能を足さない（TD が置き換えたあと削除する）。
+**方針（2026-11）：コマンドRPG → タワーディフェンスへ移行済み**（縦画面・横スクロールの戦場・灯域・本編 8 章を 6 章に）。旧コマンド戦闘（`startBattle` 系・`js/rs/battle.js`・`js/battle/*` など）は ver0.53 で削除した。戦闘の作業は `js/td/` と `docs/TD-DESIGN.md` に。古い版ファイル（ver16〜v38）には、ホーム・図鑑・持ち物・鑑定・鍛冶・星盤・セーブが使う部分だけが残っている（旧画面の入口は `js/ui/party.js` で仲間画面へ）。
 
 戦闘システムの詳細は `docs/RS-SYSTEM.md`、素材は `docs/ASSETS.md` `docs/PIPELINE.md`、演出は `docs/FX.md`。
 

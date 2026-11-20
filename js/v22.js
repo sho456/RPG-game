@@ -8,13 +8,13 @@
  6. ミッション：受け取り可能な報酬だけを一括で受け取る
  7. 「覚醒」→「星臨（せいりん）」：星片に宿る星座を、その身に降ろす力。ゲージは「星臨ゲージ（ASTRAL GAUGE）」
  既存の処理は包む（ラップする）か、同じ動作を保ったまま置き換える。セーブデータの形は変えない */
-'use strict';
+
 const VER22='ver0.22';
 const SEIRIN={n:'星臨',kana:'せいりん',en:'ASTRAL ADVENT',g:'星臨ゲージ',ge:'ASTRAL GAUGE',
  lore:'星片に宿る星座を、その身に降ろす力。ゲージが満ちると発動でき、行動を消費しない。位階（Ⅰ〜Ⅲ）が上がるほど長く、強くなる。'};
 const V22=(()=>{
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-const px=v=>parseFloat(v)||0;
+
 const DEV=()=>{try{return!!(G&&G.dev);}catch(e){return false;}};
 const app=$('#app');app.classList.add('v22');
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
@@ -60,13 +60,11 @@ const isHome=()=>scene==='town'&&typeof TSC!=='undefined'&&TSC==='home'&&HM.on;
  if(scene==='battle'||isHome()){const aw=appW();SC=aw/W;const h=Math.round(H*SC);cv.style.width=aw+'px';cv.style.height=h+'px';st.style.width=aw+'px';st.style.height=h+'px';
   app.classList.toggle('home22',isHome());if(scene==='battle'&&B)refresh();return;}
  app.classList.remove('home22');_fit();};}
-{const _sb=startBattle;startBattle=function(list,opts){BL.dy=0;BL.act=0;BL.starting=true;let r;try{r=_sb(list,opts);}finally{BL.starting=false;}
- try{B.rt22=1;ensureHud();if(DEV())devRefill();}catch(e){console.error(e);}return r;};}
+
 addEventListener('resize',()=>{if(isHome())requestAnimationFrame(()=>{try{homeLayout();}catch(e){}});});
 {const _sh=show;show=function(m){_sh(m);app.classList.add('v22');if(m!=='battle'){const h=$('#bt22');if(h)h.style.display='none';}else{const h=$('#bt22');if(h)h.style.display='';}
  if(m!=='town'){HM.on=false;app.classList.remove('home22');}};}
 /* 行動数（ACTIONS）を数える */
-{const _da=doAction;doAction=async function(u,sk,t){try{if(B&&u&&u.side===0)BL.act++;}catch(e){}return _da(u,sk,t);};}
 
 /* ---------- 戦場の上に重ねる表示（左上：対象の情報／右上：メニュー／左下：行動順／右下：星臨） ---------- */
 function ensureHud(){let h=$('#bt22');if(h&&h.isConnected){h.style.display='';return h;}
@@ -80,7 +78,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-b22]');if(
  if(k==='spd'){SFX.sel();$('#spd').click();bbar(true);updHud();}
  else if(k==='cfg'){SFX.sel();try{cfgOpen();}catch(x){}}
  else if(k==='aw'){if(B&&B.pick){au();B.pick.aw();}}});
-const WEAKSYM={w:'▲',u:'?'};
+
 let HK='';
 function updHud(){if(!B||scene!=='battle')return;const h=ensureHud();h.classList.toggle('dev',DEV());
  h.querySelector('.tn').textContent=B.turns;h.querySelector('.ac').textContent=BL.act;const sp=h.querySelector('.rb.sp b');if(sp)sp.textContent='×'+speed;
@@ -116,21 +114,9 @@ function reticle(){const r=$('#rt22');if(!r)return;if(!B||scene!=='battle'||B.ov
 {const _d=draw;draw=function(){_d();try{if(scene==='battle'&&B){reticle();const t=B.tgt&&B.tgt.alive?B.tgt:aliveE()[0],tg=$('#bt22 .b22tg');if(t&&tg)hpBar(t,tg);}}catch(e){if(!draw._e22){draw._e22=1;console.error(e);}}};}
 
 /* ---------- 行動中キャラの帯（名前・星臨ゲージ・立ち絵・HP/SP/状態） ---------- */
-function panel22(){const P=$('#party');if(!B||!P)return;const a=B.cur&&B.cur.side===0?B.cur:(B.lastH&&B.heroes.includes(B.lastH)?B.lastH:B.heroes[0]);if(!a)return;
- const my=B.cur===a,el=elOf(a.id),ec=ELC[el]||'#c8b0ff',lv=G.h[a.id].awLv||1,low=a.hp<a.mhp*.3,dev=DEV(),G2=GAUGE.includes(a.id);
- const gw=a.aw?(G2?a.ag:clamp((1-a.awT/Math.max(1,awN(a)))*100,0,100)):Math.min(100,a.ag),gv=a.aw?(G2?Math.round(a.ag)+'':'残'+Math.max(0,awN(a)-a.awT)):Math.floor(a.ag)+'%';
- const sts=(a.sts||[]).map(s=>{const b=V20.isBuff(s),nm=s.k==='weak'?s.el:(V20.STN[s.k]||['',''])[1];return`<i class="si20 ${b?'bu':'de'}">${nm}${(['atk','def','mag','res','spd','crit'].includes(s.k))?(s.v>0?'▲':'▼'):''}${s.t<50?`<sub>${s.t}</sub>`:''}</i>`;}).join('');
- let tg='';try{tg=tagH(a);}catch(e){}
- const ht=`<i class="ap1" style="display:none"></i><i class="bp20" style="display:none"></i><div class="bp22${a.aw?' awk':''}${my?'':' off'}${a.ag>=100&&!a.aw?' full':''}" style="--ec:${ec}">
-  <div class="pn"><div class="nm">${hx(el,ec,'sm')}<b>${a.name}</b><small>Lv${G.h[a.id].lv}</small><span class="rk" title="${SEIRIN.n}位階">${'<i class="on"></i>'.repeat(lv)}${'<i></i>'.repeat(3-lv)}</span></div>
-   <div class="gg"><em>${a.aw?AW[a.id].name:SEIRIN.ge}</em><div class="bar"><i style="width:${gw}%"></i></div><span>${gv}</span></div></div>
-  <img class="pf" src="${art(a.id,a.aw)}" alt="">
-  <div class="sr"><div class="bx hp${low?' low':''}"><em>HP</em><b>${a.hp}</b><small>/${a.mhp}</small></div><div class="bx sp"><em>SP</em><b>${dev?'∞':a.sp}</b><small>/100</small></div><div class="bx ts">${sts||tg||'<small class="nst">状態異常なし</small>'}</div></div></div>`;
- if(P._h22!==ht||!P.querySelector('.bp22')){P._h22=ht;P.innerHTML=ht;}P.className='act v22';}
+
 /* 味方：足元の右に HP（大きな数字）・SP・星臨ゲージ */
-function heroLabs(){B.heroes.forEach(h=>{const el=h._pl;if(!el)return;let fx,fy;try{[fx,fy]=V19.foot(h);}catch(e){fx=h.x+16;fy=h.y+30;}
- el.style.left=Math.round((fx+4)*SC)+'px';el.style.top=Math.round((fy-15)*SC)+'px';el.classList.add('v22');
- const hs=el.querySelector('.hs span');if(hs)hs.textContent=DEV()?'SP∞':'SP'+h.sp;const em=el.querySelector('.hs em');if(em&&h.ag>=100&&!h.aw)em.textContent=SEIRIN.n+'OK';});}
+
 {const _rf=refresh;refresh=function(){_rf();if(!B||scene!=='battle')return;try{updHud();}catch(e){console.error(e);}};}
 
 /* ---------- 技リスト（ver0.17 の入力処理を引き継ぎ、見た目と開発者モードを追加） ---------- */
@@ -148,19 +134,12 @@ function skInfo(sk,u){const s=sk.basic?Object.assign({},sk,{n:sk.n==='攻撃'?'�
 /* ⓘ：行の選択より先に拾う */
 $('#cmd').addEventListener('click',e=>{const t=e.target.closest('[data-inf]');if(!t||!B||!B.pick||!B.pick.info)return;e.stopPropagation();e.preventDefault();B.pick.info(+t.dataset.inf);},true);
 /* 下のボタン：速度・通常AUTO・全力AUTO・リピート */
-bbar=function(force){const b=$('#bbar');if(!b||!G)return;const p=B&&B.pick,l=p&&repOK(p.u),sg=[l?l.n:'',auto,AM,G.set.autoAw,speed].join();if(!force&&b._s===sg)return;b._s=sg;b.classList.add('v22');
- b.innerHTML=`<button data-b22="spd" class="spd">${ic('fast')}<b>×${speed}</b></button><button data-b="n" class="au${auto&&AM==='n'?' on':''}">通常AUTO<small>${SEIRIN.n}：${AWN[G.set.autoAw]}</small></button><button data-b="f" class="au f${auto&&AM==='f'?' on':''}">全力AUTO<small>${SEIRIN.n}も使う</small></button><button data-b="rep" class="rp" ${l?'':'disabled'}>リピート<small>${l?esc(l.n==='攻撃'?'通常攻撃':l.n):'前回と同じ行動'}</small></button>`;};
+
 /* 星臨の演出：大きな「星臨」の文字と星座の輪 */
-{const _aw=awaken;awaken=async function(u){const p=_aw(u),cut=$('#cut');try{const A=AW[u.id],lv=u.awLv||1,ec=elCol(u.id);cut.classList.add('sr22');cut.style.setProperty('--ec',ec);
-  const tx=[...cut.children].find(x=>x.tagName==='DIV');if(tx)tx.className='sr22t',tx.innerHTML=`<div class="t">${u.name} ― ${SEIRIN.en}${lv>1?'　位階'+ROMAN[lv]:''}</div><div class="b">《${A.name}》</div>`;
-  cut.insertAdjacentHTML('afterbegin',`<div class="sr22bg"><i></i><i></i><i></i></div><div class="sr22k"><b>星</b><b>臨</b></div>`);}catch(e){console.error(e);}
- try{return await p;}finally{cut.classList.remove('sr22');}};}
 
 /* ---------- 開発者モード：戦闘中はSP・ゲージ・星臨が無制限 ---------- */
 /* SP・星臨ゲージを満タンに保つ。星臨の持続（行動回数）は通常どおり減る＝連続行動が止まらなくなることはない。
    解けたらすぐ再発動でき、同時星臨の人数制限もない */
-function devRefill(){if(!DEV()||!B)return;B.heroes.forEach(h=>{if(!h.alive)return;h.sp=100;if(h.aw){if(GAUGE.includes(h.id))h.ag=100;}else h.ag=100;});B.zenUsed=false;}
-{const _ht=heroTurn;heroTurn=async function(u){if(DEV())devRefill();const r=await _ht(u);if(DEV())devRefill();return r;};}
 
 /* ==================== 2. ホーム画面 ==================== */
 const homeHgt=()=>{const sc=appW()/W;return clamp(Math.floor(V21.contentH()/sc),240,460);};
@@ -226,8 +205,7 @@ townMenu=function(m){WMS.on=false;TSC='home';if(scene!=='town')show('town');HM.o
  HM.news=vn;const c=$('#cmd');c.className='home22';c.innerHTML='';
  if(m&&m!==DEFMSG)toast(m+(vn&&/虚蝕/.test(vn)?'':''));else if(warn)toast(warn.replace(/^<br>/,''));
  tip('town');};
-const HGO={quest:()=>missionScreen('home'),menu:()=>saveMenu(),news:()=>newsSheet(),inv:()=>invMenu(),zk:()=>zkMenu(),bond:()=>bondMenu(),dev:()=>devMenu(),trial:()=>trialMenu(),
- home:()=>townMenu(),party:()=>partyScreen(),star:()=>openBoard(G.party[0]),smith:()=>smith(),tavern:()=>tavern(),shop:()=>shop(),appraise:()=>appraise(),go:()=>worldMap()};
+const HGO={menu:()=>saveMenu(),news:()=>newsSheet(),inv:()=>invMenu(),zk:()=>zkMenu(),home:()=>townMenu(),smith:()=>smith(),tavern:()=>tavern(),appraise:()=>appraise()};
 document.addEventListener('click',e=>{const t=e.target.closest('[data-h22]');if(!t||scene!=='town'||t.disabled)return;const f=HGO[t.dataset.h22];if(!f)return;SFX.sel();HM.on=false;app.classList.remove('home22');f();});
 function newsSheet(){const vn=HM.news||'';ovOpen(`<div class="nw22"><div class="nh">${ic('bell')}<b>お知らせ</b></div>${vn||'<div class="nn">新しいお知らせはありません</div>'}
  <div class="nt"><b>ver0.22</b>　戦闘・ホーム・編成の画面を一新。「覚醒」は<b>${SEIRIN.n}（${SEIRIN.kana}）</b>に改めました。<br><small>${SEIRIN.lore}</small></div></div><button class="tbtn back wide" data-a="close">閉じる</button>`,{close:ovClose});}
@@ -235,134 +213,31 @@ function newsSheet(){const vn=HM.news||'';ovOpen(`<div class="nw22"><div class="
 {const _pn=panel;panel=function(html,acts){if(scene==='town'&&HM.on){HM.on=false;app.classList.remove('home22');}_pn(html,acts);};}
 {const _mn=menu;menu=function(items,list,xc){if(scene==='town'&&HM.on){HM.on=false;app.classList.remove('home22');}_mn(items,list,xc);};}
 {const _ro=roomOpen;roomOpen=function(...a){HM.on=false;app.classList.remove('home22');return _ro(...a);};}
-{const _wm=worldMap;worldMap=function(m){HM.on=false;app.classList.remove('home22');return _wm(m);};}
 
 /* ==================== 6. ミッション（一括受け取り） ==================== */
-let MT='rdy',MFROM='home';
-const qOk=q=>{try{return!G.q.done[q.id]&&!!q.ok();}catch(e){return false;}};
-const qPg=q=>{try{return String(q.pg());}catch(e){return'';}};
-function claimQuests(list){const got=[];for(const q of list){if(G.q.done[q.id]||!qOk(q))continue;try{q.give();G.q.done[q.id]=1;got.push(q);}catch(e){console.error(e);}}if(got.length){SFX.aw();save();}return got;}
-function claimedSheet(got){ovOpen(`<div class="cl22"><div class="ch">${ic('gift')}<b>報酬を受け取りました</b><small>${got.length}件</small></div><div class="cs">${got.map((q,i)=>`<div class="ci" style="--d:${i*.06}s"><b>${esc(q.n)}</b><span>${esc(q.rw)}</span></div>`).join('')}</div></div>
- <button class="tbtn gold wide" data-a="close">OK</button>`,{close:()=>{ovClose();missionScreen();}});}
-function missionScreen(from,m){if(from)MFROM=from;if(scene!=='town')show('town');TSC='other';
- const L=QS.map(q=>({q,done:!!G.q.done[q.id],ok:qOk(q)})),rdy=L.filter(x=>x.ok),prog=L.filter(x=>!x.done&&!x.ok),done=L.filter(x=>x.done);
- if(MT==='rdy'&&!rdy.length&&!m)MT=prog.length?'prog':'done';
- const list=MT==='rdy'?rdy:MT==='prog'?prog:done;
- log(m||`<b>ミッション</b>　達成した依頼の報酬を受け取れる。<b>一括受け取り</b>なら、受け取れるものだけをまとめて受け取る`);
- const row=({q,done,ok})=>{const pg=qPg(q),mt=/^(\d+)\/(\d+)$/.exec(pg),pc=done||ok?100:mt?Math.min(100,+mt[1]/+mt[2]*100):0;
-  return`<div class="ms22c${done?' done':ok?' ok':''}"><div class="mh"><span class="ic">${ic(done?'trophy':ok?'gift':'scroll')}</span><b>${esc(q.n)}</b><span class="st">${done?'受取済み':ok?'達成！':esc(pg)}</span></div>
-   <div class="md">${esc(q.d)}</div><div class="mb"><i style="width:${pc}%"></i></div><div class="mr"><em>報酬</em><span>${esc(q.rw)}</span>${ok?`<button class="tbtn gold" data-a="one" data-v="${q.id}">受け取る</button>`:''}</div></div>`;};
- panel(`<div class="ms22"><div class="mt22"><div class="tt">${ic('scroll')}<b>ミッション</b></div><div class="cnt"><b>${done.length}</b>/${QS.length}<small>受取済み</small></div></div>
-  <div class="stabs ms22t">${[['rdy','受け取り可能',rdy.length],['prog','進行中',prog.length],['done','受取済み',done.length]].map(([k,l,n])=>`<button class="${MT===k?'on':''}" data-a="tab" data-v="${k}">${l}<b>${n}</b></button>`).join('')}</div>
-  <div class="ms22l">${list.map(row).join('')||`<div class="emp22">${MT==='rdy'?'受け取れる報酬はありません':MT==='prog'?'進行中の依頼はありません':'まだ受け取った報酬はありません'}</div>`}</div></div>
-  <div class="tbar2"><button class="tbtn gold" data-a="all" ${rdy.length?'':'disabled'}>一括受け取り<small>${rdy.length?rdy.length+'件':'対象なし'}</small></button><button class="tbtn back" data-a="back">${MFROM==='tavern'?'◀ 酒場へ':'◀ ホームへ'}</button></div>`,
- {tab:k=>{MT=k;missionScreen();},one:id=>{const q=QS.find(x=>x.id===id);if(!q)return;const got=claimQuests([q]);if(got.length)claimedSheet(got);else missionScreen(null,'この依頼はまだ受け取れない');},
-  all:()=>{const got=claimQuests(QS.filter(qOk));if(got.length){MT='done';claimedSheet(got);}else missionScreen(null,'受け取れる報酬はありません');},
-  back:()=>{MT='rdy';MFROM==='tavern'?tavern():townMenu();}});}
-board=function(m){missionScreen('tavern',m);};
 
 /* ==================== 3. 編成画面 ==================== */
-const RANKC=['','#9fb4ff','#ffd65a','#ff8af0'];
-partyScreen=function(m){const P=G.party,bench=G.members.filter(id=>!P.includes(id)),tot=P.reduce((a,id)=>a+power(id),0),sel=PSEL&&G.members.includes(PSEL)?PSEL:(PSEL=null);
- log(m||(sel?`<b>${HB[sel].name}</b>を選択中　入れ替える相手をタップ／もう一度タップで詳細`:'<b>編成</b>　カードをタップで選ぶ。前衛は4人まで<br><small>技・星臨は下のボタンから確認できる</small>'));
- const eqs=id=>SLOTS6.map(sl=>{const it=G.h[id].eq[sl]&&findItem(G.h[id].eq[sl]);return it?`<img class="r${it.rar}" src="${itemIcon(it)}" alt="">`:'<i></i>';}).join('');
- const card=(id,i)=>{const h=G.h[id],pl=ptsLeft(id),lv=h.awLv||1,ec=elCol(id);return`<div class="pc22${sel===id?' sel':''}" data-a="c" data-v="${id}" style="--ec:${ec};--rc:${RANKC[lv]}">
-  <div class="rk"><b>${ROMAN[lv]}</b></div><div class="ar"><i class="no">${i+1}</i>${conSvg(id)}<img src="${art(id)}" alt=""></div>
-  <div class="nm">${hx(elOf(id),ec,'sm')}<span>${HB[id].name}</span></div><div class="lv">Lv${h.lv}<small>${clsOf(id)}</small></div>
-  <div class="pw"><small>戦闘力</small><b>${fmt(power(id))}</b></div><div class="eq">${eqs(id)}</div>
-  <button class="bd${pl>0?' rdy':''}" data-a="bd" data-v="${id}">✦ 星盤${pl>0?`<b>${pl}</b>`:''}</button></div>`;};
-
- panel(`<div class="ps22"><div class="ph"><div class="pt">${ic('party')}<b>パーティ編成</b><small>${chapter()}　仲間 ${G.members.length}人</small></div><div class="pp"><small>パーティ戦闘力</small><b>${fmt(tot)}</b></div></div>
-  <div class="pcs">${P.map(card).join('')}${Array.from({length:4-P.length},()=>`<div class="pc22 emp" data-a="e"><b>＋</b><small>空き</small></div>`).join('')}</div>
-  ${sel?`<div class="pact"><button class="tbtn gold" data-a="det">詳細・装備</button><button class="tbtn" data-a="bd" data-v="${sel}">星盤</button><button class="tbtn" data-a="rm" ${P.includes(sel)&&P.length>1?'':'disabled'}>控えへ</button><button class="tbtn back" data-a="x">選択解除</button></div>`:''}
-  <div class="pin22"><button data-a="inf" data-v="sk"><span class="i">${ic('sword')}</span><b>技</b><small>効果・威力・消費</small></button><button data-a="inf" data-v="aw"><span class="i">${ic('star')}</span><b>${SEIRIN.n}</b><small>位階・${SEIRIN.n}技</small></button></div>
-  <div class="ttl2">控え ${bench.length}人</div><div class="pbench">${bench.map(id=>`<div class="pbt${sel===id?' sel':''}" data-a="c" data-v="${id}" style="--ec:${elCol(id)}"><img src="${art(id)}" alt=""><b>${HB[id].name}</b><small>Lv${G.h[id].lv}　${fmt(power(id))}</small></div>`).join('')||'<div class="emp" style="grid-column:1/-1">控えの仲間はいない</div>'}</div></div>
-  <div class="tbar2"><button class="tbtn" data-a="inv">持ち物 <small>${G.inv.length}個</small></button><button class="tbtn back" data-a="back">◀ ホームへ</button></div>`,
- {c:id=>{if(!PSEL){PSEL=id;return partyScreen();}if(PSEL===id){PSEL=null;return equipMenu(id);}
-   const a=PSEL,ia=P.indexOf(a),ib=P.indexOf(id);PSEL=null;if(ia>=0&&ib>=0){P[ia]=id;P[ib]=a;}else if(ia>=0)P[ia]=id;else if(ib>=0)P[ib]=a;else{PSEL=id;return partyScreen();}
-   save();partyScreen(`<b>${HB[a].name}</b>と<b>${HB[id].name}</b>を入れ替えた`);},
-  e:()=>{if(PSEL&&!P.includes(PSEL)){const a=PSEL;PSEL=null;P.push(a);save();partyScreen(`<b>${HB[a].name}</b>を前衛に加えた`);}else partyScreen('空き枠：下の<b>控え</b>から仲間を選んで、もう一度ここをタップ');},
-  det:()=>{const a=PSEL;PSEL=null;equipMenu(a);},bd:id=>{PSEL=null;BFROM='party';BS.sel=null;openBoard(id);},
-  rm:()=>{const a=PSEL;PSEL=null;G.party=P.filter(x=>x!==a);save();partyScreen(`<b>${HB[a].name}</b>を控えに下げた`);},x:()=>{PSEL=null;partyScreen();},
-  inf:k=>{const id=PSEL||G.party[0];PSEL=null;partyInfo(k,id);},inv:()=>invMenu(),back:()=>{PSEL=null;townMenu();}});
- tip('party');};
-formation=function(){partyScreen();};
 
 /* ---------- 技・星臨の専用画面 ---------- */
-function skSrc(id){const o={};(HB[id].skills||[]).forEach(k=>o[k]='初期');const h=G.h[id];(h.board||[]).forEach(k=>{const n=BOARD[id]&&BOARD[id][k];if(n&&n.t==='skill')o[n.v]='星盤';});
- (V20.LSK[id]||[]).forEach(([l,k])=>{if(!o[k])o[k]='Lv'+l;});return o;}
-function skCard(k,o={}){const s=SK[k];if(!s)return'';const[kn,kc]=KINDN(s),[el,ec]=skBadge(s),pw=s.fixed?'固定':s.pow?`${s.pow}${s.hits>1?' ×'+s.hits+'回':''}`:'―',cost=s.sp?'SP '+s.sp:s.gauge?'ゲージ '+s.gauge:s.gaugeAll?'ゲージ全部':'なし';
- return`<div class="sk22 x22${o.lock?' lock':''}${o.cls?' '+o.cls:''}" style="--ec:${ec}"><div class="h">${hx(el,ec,'sm')}<b>${esc(s.n)}</b>${o.tag?`<span class="tg ${o.tc||''}">${o.tag}</span>`:''}<span class="tg ${kc}">${kn}</span>${cost!=='なし'?`<span class="c">${cost}</span>`:''}<i class="ar"></i></div>
-  <div class="d">${esc(s.d||'')}</div><dl class="dl22"><dt>属性</dt><dd>${s.el||'なし'}</dd><dt>種類</dt><dd>${kn}</dd><dt>対象</dt><dd>${TGTN(s)}</dd><dt>威力</dt><dd>${pw}</dd><dt>消費</dt><dd>${cost}</dd>${o.src?`<dt>習得</dt><dd>${o.src}</dd>`:''}${s.req?`<dt>条件</dt><dd>${reqTxt(s.req)}</dd>`:''}${s.delay?'<dt>追加</dt><dd>敵の行動を遅らせる</dd>':''}${s.hpCost?`<dt>代償</dt><dd>HP${Math.round(s.hpCost*100)}%</dd>`:''}</dl></div>`;}
-function skillsHTML(id){const lv=G.h[id].lv,src=skSrc(id),have=skillList(id),cp=V20.charPS(id),w=G.h[id].eq.w&&findItem(G.h[id].eq.w),wp=V20.wpOf(w);
- const later=(V20.LSK[id]||[]).filter(([l,k])=>!have.includes(k));
- return`<div class="sh22">技 <small>${have.length}種　タップで詳細</small></div>${have.map(k=>skCard(k,{src:src[k]})).join('')}
-  ${later.length?`<div class="sh22">習得予定</div>${later.map(([l,k])=>skCard(k,{lock:1,src:'Lv'+l,tag:'Lv'+l,tc:'lk'})).join('')}`:''}
-  <div class="sh22">パッシブ</div>${cp.map(p=>{const P=V20.PS[p.id];return`<div class="sk22 x22 ps${p.on?'':' lock'}"><div class="h"><i class="hx20 sm" style="--c:#c8b0ff">専</i><b>${P.n}</b><span class="tg ${p.on?'sp':'lk'}">${p.on?'習得':'Lv'+p.lv}</span><i class="ar"></i></div><div class="d">${P.d}</div><dl class="dl22"><dt>種類</dt><dd>キャラ専用パッシブ</dd><dt>習得</dt><dd>Lv${p.lv}</dd></dl></div>`;}).join('')}
-  <div class="sk22 x22 ps${wp?'':' lock'}"><div class="h"><i class="hx20 sm" style="--c:#ffd65a">武</i><b>${wp?wp.n:'武器パッシブなし'}</b><span class="tg ${wp?'sp':'lk'}">武器</span><i class="ar"></i></div><div class="d">${wp?wp.d:'アンコモン以上の武器を装備すると、武器ごとの固有パッシブが付く'}</div><dl class="dl22"><dt>種類</dt><dd>武器パッシブ</dd><dt>装備</dt><dd>${w?esc(w.name):'なし'}</dd></dl></div>`;}
-function seirinHTML(id){const h=G.h[id],A=AW[id],lv=h.awLv||1,nx=lv+1,req=nx===2?15:30,ok=lv<3&&h.lv>=req,cmds=A.cmds||[];
- return`<div class="aw22" style="--ec:${elCol(id)}"><div class="ah"><img src="${art(id,true)}" alt=""><div><small>${SEIRIN.n}・${esc(A.type)}</small><b>《${esc(A.name)}》</b><span class="rk">${'<i class="on"></i>'.repeat(lv)}${'<i></i>'.repeat(3-lv)}<em>位階${ROMAN[lv]}</em></span></div></div>
-  <div class="ad">${esc(AWD[id]||'')}</div><div class="al">${SEIRIN.n}（${SEIRIN.kana}）…${SEIRIN.lore}</div>
-  <dl class="dl22"><dt>種類</dt><dd>${esc(A.type)}</dd><dt>持続</dt><dd>${GAUGE.includes(id)?'ゲージが尽きるまで':(A.turns+(lv-1))+'回の行動'}</dd><dt>発動</dt><dd>${SEIRIN.g}100%で発動（行動を消費しない）</dd><dt>位階</dt><dd>${lv>=3?'最高位（極技を習得）':`次：位階${ROMAN[nx]}（Lv${req}以上で試練）`}</dd></dl>
-  ${lv<3?`<button class="tbtn${ok?' gold':''} wide" data-a="tr" ${ok?'':'disabled'}>${SEIRIN.n}の試練へ<small>${ok?'挑戦できる':`Lv${req}で挑戦できる`}</small></button>`:''}</div>
-  <div class="sh22">${SEIRIN.n}技 <small>${SEIRIN.n}中だけ使える</small></div>${cmds.map(k=>skCard(k,{tag:SEIRIN.n,tc:'aw'})).join('')}${SK['goku'+id]?skCard('goku'+id,{lock:lv<3,tag:lv>=3?'極技':'位階Ⅲ',tc:lv>=3?'aw':'lk'}):''}`;}
-let PI={k:'sk',id:null};
-function partyInfo(k,id){if(k)PI.k=k;if(id)PI.id=id;if(!PI.id||!G.members.includes(PI.id))PI.id=G.party[0];const cur=PI.id,ids=[...G.party,...G.members.filter(x=>!G.party.includes(x))];
- log(PI.k==='sk'?`<b>${HB[cur].name}の技</b>　タップで効果・威力・消費を表示`:`<b>${HB[cur].name}の${SEIRIN.n}</b>　位階と${SEIRIN.n}技を確認できる`);
- panel(`<div class="pi22"><div class="stabs pi22t">${[['sk','技','sword'],['aw',SEIRIN.n,'star']].map(([kk,l,i])=>`<button class="${PI.k===kk?'on':''}" data-a="k" data-v="${kk}">${ic(i)}${l}</button>`).join('')}</div>
-  ${1?`<div class="pim">${ids.map(x=>`<button class="${x===cur?'on':''}${G.party.includes(x)?'':' bn'}" data-a="m" data-v="${x}" style="--ec:${elCol(x)}"><img src="${face(x)}" alt=""><small>${HB[x].name}</small></button>`).join('')}</div>`:''}
-  <div class="pib">${PI.k==='sk'?skillsHTML(cur):seirinHTML(cur)}</div></div>
-  <div class="tbar2"><button class="tbtn" data-a="det">${HB[cur].name}の詳細</button><button class="tbtn back" data-a="back">◀ 編成へ</button></div>`,
- {k:v=>partyInfo(v),m:v=>partyInfo(null,v),tr:()=>trialMenu(),det:()=>{CTAB=PI.k==='aw'?'aw':PI.k==='sk'?'sk':'st';equipMenu(PI.id);},back:()=>partyScreen()});}
+
 /* 開閉（.x22 をタップ） */
 document.addEventListener('click',e=>{const x=e.target.closest('.x22');if(!x||e.target.closest('[data-a]:not(.x22)'))return;x.classList.toggle('open');try{tone(x.classList.contains('open')?880:660,.03,'square',.02);}catch(er){}});
 
 /* ---------- キャラ詳細：タブを「能力値・装備・技・星臨・星盤」に ---------- */
-{const _ch=charHTML;charHTML=function(id,tab,ed){const mine=tab==='sk'||tab==='aw';let s=_ch(id,mine?'__':tab,ed);
- try{if(mine)s=s.replace('<div class="cbody"></div>',`<div class="cbody c22">${tab==='sk'?skillsHTML(id):seirinHTML(id)}</div>`);
-  s=s.replace(/<div class="ctabs">[\s\S]*?<\/div>/,`<div class="ctabs c22">${[['st','能力値'],['eq','装備'],['sk','技'],['aw',SEIRIN.n],['bd','星盤']].map(([k,l])=>`<button class="${tab===k?'on':''}" data-a="tab" data-v="${k}">${l}</button>`).join('')}</div>`);}catch(e){console.error(e);}
- return s;};}
+
 /* キャラ詳細から試練へ（tr アクションが無い画面のため） */
-{const _em=equipMenu;equipMenu=function(id,m){_em(id,m);try{if(ACT&&!ACT.tr)ACT.tr=()=>trialMenu();}catch(e){}};}
-{const _os=openSheet;openSheet=function(id,tab){_os(id,tab);try{if(SACT&&!SACT.tr)SACT.tr=()=>{ovClose();trialMenu();};}catch(e){}};}
 
 /* ==================== 5. 開発者モード：全データ開放 ==================== */
 let DEVDONE=false;
-function devUnlockAll(){if(!DEV())return'';const n0={m:G.members.length,inv:G.inv.length};
- for(const id of Object.keys(HB))if(!G.members.includes(id))newMember(id);
- Object.assign(G.flags,{boss1:true,boss2:true,boss3:true,boss4:true,boss5:true,boss6:true,boss7:true,boss8:true,boss9:true,kr30:true,endSeen:1,zenkyo:1,mireMet:1,noahMet:1,ernaMet:1,balzaMet:1,hakuaMet:1,jinMet:1,celesMet:1,valkMet:1,uqRio:1});
- if(!G.flags.crowChoice)G.flags.crowChoice='save';G.declined=[];
- for(const id of G.members){const h=G.h[id];h.lv=Math.max(h.lv||1,55);h.awLv=3;h.hp=null;if(BOARD[id])h.board=[...new Set([...(h.board||[]),...Object.keys(BOARD[id])])];}
- for(const k in G.fac)G.fac[k]=5;G.fac.garden=Math.max(1,G.fac.garden||0);
- G.tower=Object.assign(G.tower||{},{cp:26,max:30});if(typeof kst==='function'){const K=kst();K.cp=Math.max(K.cp||1,31);K.max=Math.max(K.max||0,50);}
- G.gold=Math.max(G.gold,9999999);G.tou=Math.max(G.tou||0,999999);
- for(const k in ITEMS)G.items[k]=Math.max(G.items[k]||0,99);for(const k in MATS)G.mats[k]=Math.max(G.mats[k]||0,999);for(const k in STONES)G.stones[k]=Math.max(G.stones[k]||0,99);
- /* 装備：レジェンド・専用ユニーク・王家セットを、持っていないものだけ追加 */
- const hasLeg=new Set(G.inv.filter(i=>i.leg).map(i=>i.leg));Object.keys(LEG).forEach(k=>{if(hasLeg.has(k))return;let it=null;try{it=LEG[k].uq&&typeof uqItem==='function'?uqItem(k.replace(/^uq_/,'')):devLeg(k);}catch(e){}if(it){it.unid=false;G.inv.push(it);try{zkItem(it);}catch(e){}}});
- const hasSet=new Set(G.inv.filter(i=>i.set==='royal').map(i=>i.slot));if(typeof ROYAL!=='undefined')for(const s in ROYAL)if(!hasSet.has(s)&&!hasSet.has(s==='acc'?'acc':s)){try{const it=royalItem(s,40);it.unid=false;G.inv.push(it);zkItem(it);}catch(e){}}
- G.inv.forEach(i=>{i.unid=false;});
- /* 図鑑・弱点・絆 */
- G.zk=G.zk||{e:{},i:{}};G.known=G.known||{};try{zkEnemies().forEach(k=>{G.zk.e[k]=G.zk.e[k]||1;});}catch(e){}for(const k in ED)if(!/^(tr_|vo_)/.test(k)&&ED[k].weak)G.known[k]=[...ED[k].weak];
- try{bondIds().forEach(id=>{const b=bondOf(id);b.p=Math.max(b.p,99);});}catch(e){}
- G.tut=G.tut||{};if(typeof TIPS!=='undefined')for(const k in TIPS)G.tut[k]=1;
- save();return`仲間 ${n0.m}→${G.members.length}人・装備 ${n0.inv}→${G.inv.length}個`;}
+
 {const _et=enterTown;enterTown=function(m){if(DEV()&&!DEVDONE){DEVDONE=true;try{const r=devUnlockAll();m=(m?m+'<br>':'')+`<small>ver0.22：全データを開放した（${r}）</small>`;}catch(e){console.error(e);}}return _et(m);};}
 {const _t=title;title=function(){DEVDONE=false;return _t();};}
-function dev22(m){log((m||`<b>ver0.22</b>　画面の全面改良・${SEIRIN.n}・ミッション一括受け取り`)+`<br><small>開発者モードの戦闘：SP・ゲージ・使用条件を無視／${SEIRIN.n}は何度でも</small>`);
- menu([{l:'全データを再開放',s:'仲間・装備・道具・ステージ・図鑑・星盤',cls:'ready',f:()=>{const r=devUnlockAll();dev22('全データを開放した（'+r+'）');}},
-  {l:'ボス戦（新しい戦闘画面）',s:'虚ろの番人　HPゲージ'+V21.barsOf({boss:true,mhp:ED.boss.mhp,kind:'boss'})+'本',f:()=>devBattle([{kind:'boss',lv:5}],'haido')},
-  {l:'敵3体と戦う',s:'狙いの輪・WEAK表示',f:()=>devBattle([{kind:'snowwolf',lv:30},{kind:'yukirei',lv:30},{kind:'onimusha',lv:30}],'kouka',{boss:false})},
-  {l:'黒炎竜ヴォルガノン',s:'大型ボス',f:()=>devBattle([{kind:'boss9',lv:68}],'ryuu',{theme:'lava'})},
-  {l:'ミッションを未受取に戻す',s:'一括受け取りの確認用',f:()=>{G.q.done={};save();dev22('ミッションを未受取に戻した（ホームの「依頼ミッション」から一括受け取りを確認）');}},
-  {l:'ミッション画面を開く',f:()=>missionScreen('home')},{l:'編成：技・星臨',f:()=>partyInfo('sk',G.party[0])},
-  {l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
-{const _dv=dvMenu;dvMenu=function(m){_dv(m);try{addCmd('ver0.22 画面刷新・'+SEIRIN.n,'全データ開放・戦闘無制限・ミッション一括',dev22,0,'ready');}catch(e){}};}
 
 /* ==================== 7. 「星臨」に合わせた説明 ==================== */
 try{TIPS.battle=['戦闘のしかた',['自分の番が来たら、下の一覧から<b>技をタップ→もう一度タップ</b>で決定。<b>ⓘ</b>で技の詳しい性能を見られる。','<b>敵をタップ</b>すると狙いが変わる。左上に狙った敵の<b>HP</b>と<b>弱点</b>（▲）が出る。','弱点を突くと <b>1.7倍</b> の大ダメージ。敵が「溜め」たら次の大技に<b>防御</b>で備えよう。','左下が<b>行動順</b>。面倒なら下の<b>通常AUTO</b>、同じ行動を繰り返すなら<b>リピート</b>。']];
  TIPS.awake=[SEIRIN.n+'できる！',[`<b>${SEIRIN.g}（${SEIRIN.ge}／AG）</b>が100%になった。右下の<b>${SEIRIN.n}</b>ボタンで発動――星片に宿る星座をその身に降ろす。<b>行動を消費しない</b>ので、そのまま強力な${SEIRIN.n}技を撃てる。`,`2人が同時に${SEIRIN.n}すると`]];}catch(e){}
 
 /* ==================== 版表示 ==================== */
-{const _t=title;title=function(){_t();const v=$('#verL');if(v)v.textContent=VER22;};const v=$('#verL');if(v)v.textContent=VER22;}
+
 try{document.title='アストラル・ブレイカー '+VER22;}catch(e){}
-return{updHud,panel22,missionScreen,claimQuests,partyInfo,devUnlockAll,homeLayout,HM,BL,skInfo,dev22};})();
+return{skInfo};})();

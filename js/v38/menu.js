@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.52';
+const VER='ver0.53';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,10 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　新しいホームと仲間画面<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　旧コマンド戦闘を削除<br><small>`+
+ `・戦いは防衛（タワーディフェンス）に一本化。ホームの「冒険」と旧戦闘の画面・演出を外した<br>`+
+ `・強化・仲間・鍛冶・持ち物・図鑑・星盤はそのまま</small></div>`+
+ `<div class="nt n38"><b>ver0.52</b>　新しいホームと仲間画面<br><small>`+
  `・ホーム：主役は「防衛」。下のタブは 防衛・仲間・強化・鍛冶、ほかは ≡ に<br>`+
  `・仲間：Lv・技の練達・装備・星盤を 1 つの画面で。装備・練達・星臨の位階が防衛の強さに効く<br>`+
  `・画面の説明の字を減らした。本編でクリアしたクエストは防衛でもクリア済みに</small></div>`+

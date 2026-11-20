@@ -8,7 +8,7 @@
  ・アビリティ：3 つ（Lv1・25・50 で解放、段階 I〜V）。星盤・天星盤のノードで強化
  ・陣形：並び順ごとの立ち位置と能力の補正
  セーブの項目：G.h[id].sset（技セット）・skx（技の熟練）・glim（ひらめいた技）・sseen・lp（今のLP）・G.form（陣形） */
-'use strict';
+
 const RSC=(()=>{
 const D=RSD;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -18,8 +18,7 @@ const INF=lv=>{try{return V31.INF(lv);}catch(e){return 1;}};
 /* ==================== 技・術を登録 ==================== */
 for(const k in D.NEW)SK[k]=D.NEW[k];
 /* 区分（TERMS）：技＝物理、術＝魔法 */
-for(const k in D.NEW){const s=SK[k],g=s.ty==='術'?'mag':'phys';
- s.cat=s.ougi?'seirin':(s.k==='heal'||s.k==='healAll'||s.k==='reviveAll'||s.role==='heal'||s.heal20)?g+'_heal':(s.k==='sup20'||s.k==='rewind')?g+'_support':g+'_attack';}
+
 try{Object.assign(TERMS.GROUP,{phys:'技',mag:'術',seirin:'星臨',passive:'アビリティ'});
  const N={phys_normal:'通常攻撃',phys_attack:'攻撃技',phys_support:'補助技',phys_heal:'回復技',mag_normal:'通常攻撃（術）',mag_attack:'攻撃術',mag_support:'補助術',mag_heal:'回復術',seirin:'奥義',passive:'アビリティ'};
  for(const k in N)if(TERMS.SKILL[k]){TERMS.SKILL[k].n=N[k];TERMS.SKILL[k].s=N[k].replace(/（.*）/,'');}TERMS.reset();}catch(e){console.error(e);}
@@ -169,7 +168,6 @@ const abName=(id,i)=>(D.AB[id]&&D.AB[id][i]&&D.AB[id][i].n)||'';
 /* ==================== 星臨：AW を置き換える ==================== */
 for(const id in D.AWX){if(!AW[id])continue;const X=D.AWX[id];AW[id].turns=D.AW_TURNS;AW[id].type='強化型';AW[id].cmds=[X.ou];
  AWD[id]=`星臨アビリティ「${X.n}」：`+[...X.note,...awEffects(id).map(effTxt)].join('／')+`。奥義「${SK[X.ou].n}」を1度だけ使える`;}
-try{GAUGE.length=0;}catch(e){}
 
 /* ==================== 星盤・天星盤のノードを置き換える ==================== */
 try{NCOL.ab='#ffb86b';SHORT.ab1=SHORT.ab2=SHORT.ab3='ア';SHORT.ougiUp='奥';if(typeof NTN!=='undefined')NTN.ab='アビリティ強化';}catch(e){}
@@ -187,22 +185,9 @@ function fixBoards(){
 fixBoards();
 try{for(const x of['1','2','3','O'])V20.PS['ab_up'+x]={n:x==='O'?'奥義強化':'アビリティ強化',d:x==='O'?'奥義の威力+30%':'アビリティを1段階強化'};}catch(e){}
 /* 天星盤の画面の呼び名（「天星パッシブ」→「アビリティ強化」） */
-{const _bm=boardMenu;boardMenu=function(m){_bm(m);try{for(const el of[$('#cmd'),$('#labels'),$('#msg')]){if(!el)continue;if(/天星パッシブ|パッシブ/.test(el.innerHTML))el.innerHTML=el.innerHTML.replace(/天星パッシブ/g,'アビリティ強化').replace(/パッシブ/g,'アビリティ');}}catch(e){}};}
 
 /* ==================== 戦闘ユニット ==================== */
-{const _h=hero;hero=function(id){const u=_h(id);try{
-  /* 旧キャラ専用パッシブ・天星パッシブ（アビリティに置き換え）を外す */
-  u.ps20=(u.ps20||[]).filter(p=>!/^c_|^tp_|^ab_up/.test(p.id));
-  u.rsSet=setOf(id);u.skills=u.rsSet.slice();
-  u.rsE=abEffects(id);
-  for(const e of u.rsE)if(e.t==='stat')applyStat(u,e);
-  u.awTurn=(u.awTurn||0)+u.rsE.filter(e=>e.t==='awturn').reduce((a,e)=>a+e.v,0);
-  const W=D.WPN[u.rsW]||D.WPN['剣'];u.wpn=u.rsW;u.elem=W.el;
-  u.s7=Object.assign({},u.s7||{});
-  u.bpMax=u.bpMax||D.BP.max;u.sp=u.bp0!=null?u.bp0:D.BP.start;
-  const h=G.h[id];u.lpMax=u.lpMax||D.LP_FIX;u.lp=h&&h.lp!=null?clamp(h.lp,0,u.lpMax):u.lpMax;
-  if(u.lp<=0){u.alive=false;u.hp=0;}
- }catch(e){console.error(e);}return u;};}
+
 function applyStat(u,e){const k=e.k,m=1+e.v/100;if(k==='mhp'){const r=u.mhp?u.hp/u.mhp:1;u.mhp=Math.round(u.mhp*m);u.hp=Math.max(u.alive?1:0,Math.round(u.mhp*r));}else if(k==='spd')u.spd=+(u.spd*m).toFixed(2);else if(u[k]!=null)u[k]=Math.round(u[k]*m);
  if(u._b0&&u._b0[k]!=null)u._b0[k]=k==='spd'?+(u._b0[k]*m).toFixed(2):Math.round(u._b0[k]*m);}
 /* 7 能力の補正（陣形）：内部値にも反映する */

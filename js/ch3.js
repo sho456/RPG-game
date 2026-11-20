@@ -78,24 +78,14 @@ BDEF.erna=mkB('天弓座',[['atkP'],['crit'],['spd'],['weakDmg'],['mhpP'],['defP
 BDEF.balza=mkB('炉心座',[['atkP'],['defP'],['mhpP'],['resP'],['crit'],['spGain']],['2,-3','-2,-1','-3,2','2,1'],'daichi','gouen',[[{atkP:12},'剛腕：攻撃+12%'],[{defP:15},'鉄肌：防御+15%'],[{awDmg:20},'灼熱：星臨中与ダメ+20%'],[{mhpP:15},'頑健：最大HP+15%']]);
 BDEF.crow=mkB('冥府座',[['magP'],['mhpP'],['spd'],['resP'],['awDmg'],['crit']],['3,-1','-1,-2','-2,3','1,2'],'shisen','yamisaki',[[{magP:12},'冥魔：魔力+12%'],[{mhpP:15},'不死：最大HP+15%'],[{awDmg:20},'怨嗟：星臨中与ダメ+20%'],[{weakDmg:20},'呪眼：弱点ダメ+20%']]);
 ['erna','balza','crow'].forEach(k=>BOARD[k]=buildBoard(k));
-const GAUGE=['mire','erna'];
+
 const MAP4=["YYYYYYYYYYYYYYYYYYYY","YrrrrrrYYrrBrrYYrrrY","YrrCrrrYYrrrrrYYrrrY","YrrrrrrrrrrrrrrrrrrY","YYYYrrYYYYYYYYrrYYYY","YrrrrrrrrYYrrrrrrrrY","YrlllllrrYYrrrrrrVrY","YrrrrrlrrrrrrrrrrrrY","YYYrrrlrrYYrrrrrrCrY","YrrrrrlrrYYrrYYYYYYY","YrrrrrrrrrrrrrrrrrrY","YYYYYYYYrrrYYYYYYYYY","TT..R..Y,,,Y..R...TT","T.......,,,.......TT","T..R...,,,...C....TT","TT....,,,.....RR..TT","T....,,,...........T","T...,,,.....T..E...T","TT..,,......TT.....T","T....,,,...........T","T..R...,,,....R...TT","TT......,,,.......TT","T...G....,,,....G..T","T.........,,,......T","TT..RR.....,,,....TT","T...........,,,...TT","T..C........,,,....T","TT.........,,,....TT","TTT.......,,,....TTT","TTTT.....,,,....TTTT","TTTTTT...,S,..TTTTTT","TTTTTTTTTTTTTTTTTTTT"].map(r=>r.padEnd(20,'T').slice(0,20));
 AREAS.raimei={name:'雷鳴高原・黒鉄鉱山',map:MAP4,lv:[17,23],groups:[['raiwolf'],['raiwolf','raiwolf'],['ironslime','raiwolf'],['ironslime','ironslime','raiwolf']],
  libGroups:[['golemkin'],['minerghost','ironslime'],['golemkin','minerghost'],['minerghost','minerghost']],crew:[{gold:2000},{loot:[20,2]},{item:'feather',n:2},{loot:[21,3]}],boss:{kind:'boss4',lv:23},bflag:'boss4',theme:'storm',rec:'推奨Lv17〜23',
  bossKind:()=>G.flags.crowChoice?'boss4b':'boss4',intro:'<b>第3章　雷鳴高原</b>――雷が絶えず落ちる高原。<b>光った場所には落雷</b>する。北の黒鉄鉱山の奥に、虚蝕の呪術師がいるという。'};
 const Q3=[{id:'q6',n:'雷鳴の主',d:'虚蝕のクロウを倒す',ok:()=>!!G.flags.boss4,pg:()=>G.flags.boss4?'達成':'未達成',rw:'4000G・不死鳥の羽×2',give:()=>{G.gold+=4000;addItem('feather',2);}}];
-function ernaEvent(){F.pause=true;banner('エルナ','#ffe14a');
- log('崩れた塔の上から矢が飛んできた。<br><b>エルナ</b>「虚蝕を追ってるの？ ……口だけなら誰でも言える。私に勝てたら、ついて行ってあげる」');
- menu([{l:'決闘する',cls:'ready',f:()=>{F.lock=true;F.pause=false;startBattle([{kind:'ernaE',lv:1}],{event:'erna',onEnd:afterBattle});}},{l:'やめる',f:fieldMenu}]);}
-function balzaEvent(){F.pause=true;banner('バルザ','#ff8030');
- log('<b>バルザ</b>「おい、そこの若いの！ 坑道の奥から黒鉄の巨像が湧いてきやがった。わしの炉を守るのを手伝え！」');
- menu([{l:'助ける',cls:'ready',f:()=>{F.lock=true;F.pause=false;startBattle([{kind:'golemboss',lv:21}],{event:'balza',onEnd:afterBattle});}},{l:'やめる',f:fieldMenu}]);}
-function crowChoice(){F.pause=true;banner('クロウ','#b07cff');
- log('クロウは膝をついた。体から虚蝕が抜けていく。<br><b>クロウ</b>「……とどめを刺せ。虚蝕に家族を喰われ、俺も喰われた。生きる理由なんて、もう――」');
- menu([{l:'救う',cls:'ready',f:()=>{G.flags.crowChoice='save';newMember('crow');SFX.aw();save();fieldMenu('<b>クロウが仲間になった！</b> 「……物好きだな。借りは、虚蝕で返す」');renderPartyStatic();}},
-  {l:'見逃す',f:()=>{G.flags.crowChoice='leave';const s=addLoot(genItem(23,3));save();fieldMenu(`クロウは無言で去っていった。足元に${s}が残されていた。`);}}]);}
 
 /* ===== ステータス画面 ===== */
-let sheetPrev=null;
+
 function openSheet(){}/* 未使用：js/ver17.js が置き換え */
 function fitField(){}/* 未使用：js/v23.js が置き換え */

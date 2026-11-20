@@ -1,9 +1,11 @@
 #!/usr/bin/env node
-/* ゲーム全体の自動点検（ブラウザで画面を巡回し、JavaScript のエラーを集める）
-   使い方：python3 -m http.server 8765 &   →   node tools/smoke.js [--url http://localhost:8765/index.html] [--shots <dir>] [--quick] [--fx] [--no-battle]
-   ・巡回：タイトル → 街 → クエスト（全章・全クエストの情報タブ）→ 編成 → 図鑑（敵・仲間・装備の一覧と全員の詳細・3 形態）
-           → 戦闘（全種類の敵を 3 体ずつ。AUTO・速度×4 で決着まで。星臨も使う）
-   ・--fx：演出ビューアで、味方全員の全技・星臨（通常／短縮／省略）・敵の全行動を 1 回ずつ再生（演出が終わらない・エラーを検出）
+/* ゲーム全体の自動点検（ブラウザで画面を巡回し、JavaScript のエラーを集める）。ver0.53：旧コマンド戦闘の削除に合わせて TD 向けに書き換え
+   使い方：python3 -m http.server 8765 &   →   node tools/smoke.js [--url http://localhost:8765/index.html] [--shots <dir>] [--quick] [--fx]
+   ・巡回：①タイトル → ホーム ②ホームの各ボタン（≡ の各項目・防衛・仲間・強化・鍛冶）を開いて閉じる（開いた画面のボタンも 1 つずつ押す）
+           ③ TDD.ORDER の全ステージを TDS.run で 1 回ずつ（自動の配置） ④各章の最初のステージを 出撃準備（TDM.prep）→ 出撃 → 数秒進める
+           ⑤仲間画面で Lv 上げ・練達・装備の付け替え・星盤 ⑥図鑑（敵・仲間・装備の一覧と詳細・3 形態）
+   ・--quick：短い版（④は最初の 2 章・⑤は 3 人・⑥は敵 8 種・押すボタンは画面ごとに 12 個まで）
+   ・--fx：TD の戦闘を ×2 の速さで最後まで進める（自動の配置。戦闘画面の描画・結果の窓のエラーを拾う。終わらなければ失敗）
    ・結果：エラーの一覧（場面・メッセージ）。1 件でもあれば終了コード 1
    Playwright は環境に入っているものを使う（require('playwright')） */
 'use strict';
@@ -14,7 +16,6 @@ const URL = opt('--url') || 'http://localhost:8765/index.html';
 const SHOTS = opt('--shots');
 const QUICK = args.includes('--quick');
 const FX = args.includes('--fx');
-const NOBATTLE = args.includes('--no-battle');/* 全種類の敵との戦闘を飛ばす（演出だけを点検するとき） */
 const fs = require('fs');
 if (SHOTS) fs.mkdirSync(SHOTS, {recursive: true});
 
@@ -29,43 +30,97 @@ if (SHOTS) fs.mkdirSync(SHOTS, {recursive: true});
   const step = async (name, fn, ms = 250) => {scene = name;try {await p.evaluate(fn);} catch (e) {errs.push([name, 'evaluate: ' + String(e.message).split('\n')[0]]);}await p.waitForTimeout(ms);
     /* 画面の横はみ出し（スマホで横スクロールが出る） */
     try {const o = await p.evaluate(() => {const d = document.documentElement;return d.scrollWidth > innerWidth + 1 ? d.scrollWidth : 0;});if (o) errs.push([name, '横はみ出し: 幅 ' + o + 'px（画面 420px）']);} catch (e) {}};
+  /* 開いている画面を全部閉じてホームへ */
+  const HOME = `(()=>{try{ovClose();}catch(e){}try{const u=document.querySelector('#unit');if(u&&!u.classList.contains('hide'))u.classList.add('hide');}catch(e){}
+    try{TD.hide();}catch(e){}try{const t=document.querySelector('#tdm');if(t)t.classList.add('hide');}catch(e){}townMenu();})()`;
 
   await p.goto(URL);
-  await p.waitForFunction(() => typeof SPX !== 'undefined' && SPX.ready, {timeout: 60000});
+  await p.waitForFunction(() => typeof SPX !== 'undefined' && SPX.ready && typeof TDS !== 'undefined', {timeout: 60000});
   await shot('00_title');
-  /* 全員加入・全クエスト開放の状態を作る */
+  /* ① タイトル → ホーム（タップで始める）。全員加入・全ステージ開放の状態を作る */
+  await step('title-tap', () => {try {titleTap();} catch (e) {}}, 600);
   await step('setup', () => {
     G = migrate(newGame());G.set = Object.assign(G.set || {}, {tut: false});
     for (const id of Object.keys(HB)) if (!G.members.includes(id)) newMember(id);
-    G.party = ['rio', 'gald', 'celes', 'mire'];
     for (const id of G.members) {G.h[id].lv = 40;G.h[id].hp = null;}
-    for (const c of QD.CH) if (c.qs) c.qs.forEach(q => {G.qs.c[q.id] = 1;});
-    Object.assign(G.flags, {boss1: true, boss2: true, boss3: true, boss4: true, boss5: true, boss6: true, boss7: true});
-    G.zk = {e: {}, i: {}};zkEnemies().forEach(k => G.zk.e[k] = 1);
-    document.querySelector('#ov').classList.add('hide');
-  });
-  await step('town', () => townMenu(), 500);await shot('01_town');
-  /* クエスト：全タブ・全章・全クエストの情報タブ */
-  await step('quest-map', () => worldMap(), 500);await shot('02_quests');
-  const tabs = await p.$$eval('#cmd .wtabs button', bs => bs.length);
-  for (let t = 0; t < tabs; t++) {
-    await step('quest-tab' + t, `(()=>{const b=document.querySelectorAll('#cmd .wtabs button')[${t}];b&&b.click();})()`, 300);
-    const chs = await p.$$eval('#cmd .qch31', bs => bs.map(x => x.dataset.v));
-    for (const ch of (QUICK ? chs.slice(0, 2) : chs)) {
-      await step('quest-ch:' + ch, `(()=>{const b=document.querySelector('#cmd .qch31[data-v="${ch}"]');b&&b.click();})()`, 200);
-      const qs = await p.$$eval('#cmd .qrow31', rs => rs.map(r => r.dataset.v));
-      for (const q of (QUICK ? qs.slice(0, 2) : qs)) {
-        await step('quest-info:' + q, `(()=>{const r=document.querySelector('#cmd .qrow31[data-v="${q}"]');r&&r.click();})()`, 250);
-        await step('quest-back:' + q, `(()=>{const b=document.querySelector('#cmd [data-a="list"]');b&&b.click();})()`, 150);
-      }
+    G.td = G.td || {c: {}};G.td.c = G.td.c || {};G.td.v = 1;for (const id of TDD.ORDER) G.td.c[id] = 1;G.xpStock = 99999;G.gold = 99999;
+    for (let i = 0; i < 12; i++) G.inv.push(genItem(40, 1 + (i % 4), 0, null, 2 + (i % 3)));
+    G.zk = {e: {}, i: {}};try {zkEnemies().forEach(k => G.zk.e[k] = 1);} catch (e) {}
+    document.querySelector('#ov').classList.add('hide');townMenu();
+  }, 800);
+  await shot('01_home');
+
+  /* ② ホームの各ボタン：≡ のシート・防衛（地図）・仲間・強化・鍛冶 を開いて閉じる。開いた画面のボタンも 1 つずつ押す */
+  await step('home-sheet', `(()=>{const b=document.querySelector('[data-hm="sheet"]');b&&b.click();})()`, 300);await shot('02_sheet');
+  const sheetItems = await p.$$eval('#labels .hm-sheet [data-h22]', bs => bs.map(x => x.dataset.h22));
+  const screens = [];
+  for (const g of sheetItems) screens.push(['h22-' + g, `(()=>{const b=document.querySelector('#labels [data-h22="${g}"]');b&&b.click();})()`]);
+  screens.push(['hm-map', `(()=>{const b=document.querySelector('[data-hm="map"]');b&&b.click();})()`]);
+  screens.push(['hm-unit', `(()=>{const b=document.querySelector('[data-hm="unit"]');b&&b.click();})()`]);
+  for (const g of ['tavern', 'smith']) screens.push(['h22-' + g, `(()=>{const b=document.querySelector('#labels [data-h22="${g}"]');b&&b.click();})()`]);
+  screens.push(['hm-prep', `(()=>{const b=document.querySelector('[data-hm="prep"]');b&&b.click();})()`]);
+  screens.push(['board', `openBoard('rio')`]);
+  const KEYS = QUICK ? 12 : 40;
+  for (const [name, open] of screens) {
+    await step('home-back', HOME, 350);
+    await step(name, open, 600);await shot('03_' + name.replace(/[^\w-]/g, '_'));
+    /* 開いた画面の [data-a] ボタンを 1 つずつ押す（毎回ホームから開き直す） */
+    const sel = '#cmd [data-a],#ov [data-a],#sheet [data-a],#tdm [data-a],#unit [data-a]';
+    const keys = await p.evaluate(sel => [...new Set([...document.querySelectorAll(sel)].filter(x => x.offsetParent).map(x => x.dataset.a + '|' + (x.dataset.v || '')))].slice(0, 60), sel).catch(() => []);
+    let n = 0;
+    for (const key of keys) {
+      if (n >= KEYS) break;
+      const [a, v] = key.split('|');
+      if (name === 'hm-prep' && a === 'go') continue;/* 出撃は ④ で回す */
+      n++;
+      await step(`${name}:${a}${v ? '=' + v : ''}`, `(()=>{${HOME};${open};const b=[...document.querySelectorAll('${sel}')].find(x=>x.dataset.a==='${a}'&&(x.dataset.v||'')==='${v}');if(b&&!b.disabled)b.click();})()`, 160);
     }
   }
-  await shot('03_quest_last');
-  /* 編成・装備 */
-  await step('party', () => partyScreen(), 500);await shot('04_party');
-  await step('equip', () => equipMenu(G.party[0]), 500);await shot('05_equip');
-  /* 図鑑：一覧（敵の絞り込みも）と全員の詳細・3 形態 */
-  await step('zukan', () => zkMenu(), 400);await shot('06_zukan');
+  await step('home-back', HOME, 400);
+
+  /* ③ 全ステージを自動の配置で 1 回ずつ（画面なし） */
+  scene = 'td-run';
+  const runs = await p.evaluate(() => {
+    const out = [];
+    for (const id of TDD.ORDER) {
+      try {const S = TDD.STAGE[id], deck = TDD.rosterAt(id).slice(0, 8), L = {};deck.forEach(h => L[h] = S.lv);
+        const r = TDS.run(id, deck, L, 7919);out.push([id, !!r.win, r.t | 0, null]);}
+      catch (e) {out.push([id, false, 0, String(e.message).slice(0, 160)]);}
+    }
+    return out;
+  });
+  for (const [id, , , err] of runs) if (err) errs.push(['td-run:' + id, err]);
+  console.log(`TDS.run: ${runs.length} ステージ（勝ち ${runs.filter(r => r[1]).length}）`);
+
+  /* ④ 各章の最初のステージ：出撃準備 → 出撃（会話はとばす）→ 数秒 → 戻る */
+  const firsts = await p.evaluate(() => TDD.CH.filter(c => c.st && c.st.length && !c.soon).map(c => c.st[0]));
+  for (const id of (QUICK ? firsts.slice(0, 2) : firsts)) {
+    await step('td-prep:' + id, `TDM.prep('${id}')`, 500);await shot('04_prep_' + id);
+    await step('td-go:' + id, `(()=>{const b=document.querySelector('#tdm [data-a="go"]');b&&b.click();})()`, 400);
+    await step('td-talk:' + id, `(()=>{for(let i=0;i<30;i++){const k=document.querySelector('#tdm .tdm-talk .skip');if(!k)break;k.click();}})()`, 400);
+    await step('td-bot:' + id, `(()=>{window.__bot=setInterval(()=>{try{if(TD.st&&!TD.st.over)TDS.bot(TD.st);}catch(e){console.error(e);}},500);})()`, QUICK ? 3000 : 5000);
+    await shot('05_td_' + id);
+    await step('td-sheet:' + id, `(()=>{try{TD.sheet('deck');}catch(e){}})()`, 300);
+    await step('td-end:' + id, `(()=>{clearInterval(window.__bot);TD.hide();TDM.map();})()`, 400);
+  }
+  await step('home-back', HOME, 400);
+
+  /* ⑤ 仲間画面：Lv 上げ・練達・装備の付け替え・星盤 */
+  const ids = await p.evaluate(() => (G.members || []).filter(h => TDD.HERO[h]));
+  for (const id of (QUICK ? ids.slice(0, 3) : ids)) {
+    await step('unit-open:' + id, `UNIT.open('${id}')`, 350);await shot('06_unit_' + id);
+    await step('unit-lv:' + id, `(()=>{for(const v of ['1','9999']){const b=document.querySelector('#unit [data-a="lv"][data-v="'+v+'"]');b&&b.click();}const m=document.querySelector('#unit [data-a="mas"]');m&&m.click();})()`, 250);
+    for (const sl of ['w', 'main', 'sub', 'acc1', 'acc2']) {
+      await step(`unit-eq:${id}:${sl}`, `(()=>{const s=document.querySelector('#unit [data-a="slot"][data-v="${sl}"]');s&&s.click();const x=document.querySelector('#unit [data-a="put"]');x&&x.click();})()`, 160);
+      await step(`unit-off:${id}:${sl}`, `(()=>{const s=document.querySelector('#unit [data-a="slot"][data-v="${sl}"]');s&&s.click();const x=document.querySelector('#unit [data-a="off"]');x&&x.click();})()`, 160);
+    }
+    await step('unit-nav:' + id, `(()=>{const n=document.querySelector('#unit [data-a="nav"][data-v="1"]');n&&n.click();const l=document.querySelector('#unit [data-a="list"]');l&&l.click();})()`, 200);
+  }
+  await step('unit-board', `(()=>{UNIT.open('rio');document.querySelector('#unit [data-a="board"]').click();})()`, 600);await shot('07_board');
+  await step('unit-close', HOME, 400);
+
+  /* ⑥ 図鑑：一覧（敵の絞り込みも）と詳細・3 形態 */
+  await step('zukan', () => zkMenu(), 400);await shot('08_zukan');
   for (const [cat, fam] of [['normal', 'all'], ['boss', 'all'], ['all', 'beast'], ['all', 'dragon']])
     await step(`zukan-filter:${cat}/${fam}`, `(()=>{ZUKAN.ZK.cat='${cat}';ZUKAN.ZK.fam='${fam}';ZUKAN.list();})()`, 200);
   for (const t of ['h', 'i', 'e']) await step('zukan-tab:' + t, `(()=>{ZUKAN.ZK.t='${t}';ZUKAN.ZK.cat='all';ZUKAN.ZK.fam='all';ZUKAN.list();})()`, 200);
@@ -75,72 +130,27 @@ if (SHOTS) fs.mkdirSync(SHOTS, {recursive: true});
     await step('zukan-e:' + k, `zkEnemy('${k}')`, 220);
     for (const m of ['front', 'idle']) await step(`zukan-e:${k}:${m}`, `ZVIEW.setMotion('${m}')`, 120);
   }
-  for (const id of heroes) {
+  for (const id of (QUICK ? heroes.slice(0, 4) : heroes)) {
     await step('zukan-h:' + id, `zkHero('${id}')`, 220);
-    for (const m of ['front', 'idle', 'seirin']) await step(`zukan-h:${id}:${m}`, `ZVIEW.setMotion('${m}')`, 150);
+    for (const m of ['front', 'idle']) await step(`zukan-h:${id}:${m}`, `ZVIEW.setMotion('${m}')`, 150);
   }
-  await shot('07_zukan_last');
-  /* 戦闘：全種類の敵を 3 体ずつ。AUTO・速度×4。決着か時間切れまで */
-  const groups = [];
-  for (let i = 0; i < enemies.length; i += 3) groups.push(enemies.slice(i, i + 3));
-  const parties = [['rio', 'gald', 'celes', 'mire'], ['hakua', 'noah', 'erna', 'valk'], ['balza', 'jin', 'shion', 'crow']];
-  for (let gi = 0; gi < (NOBATTLE ? 0 : QUICK ? 3 : groups.length); gi++) {
-    const g = groups[gi], party = parties[gi % parties.length];
-    const name = 'battle:' + g.join(',');
-    await step(name, `(()=>{auto=true;setSpeed(2);speed=4;/* 点検だけの早回し（画面からは選べない） */G.party=${JSON.stringify(party)};for(const id of G.party){G.h[id].hp=null;G.h[id].awLv=3;}
-      const L=${JSON.stringify(g)}.map(k=>({kind:k,lv:ED[k].boss?30:25}));const bs=L.filter(e=>ED[e.kind].boss);
-      startBattle(bs.length?[bs[0]]:L,{boss:!!bs.length,onEnd:()=>{window.__end=1;}});window.__end=0;})()`, 300);
-    /* 星臨：最初の味方を星臨にする（AG を満たす） */
-    await step(name + ':awaken', `(()=>{const h=B&&B.heroes[0];if(h){h.ag=100;}})()`, 100);
-    const t0 = Date.now();
-    while (Date.now() - t0 < (QUICK ? 6000 : 14000)) {
-      const st = await p.evaluate(() => ({over: !!(B && B.over), end: window.__end})).catch(() => ({over: true}));
-      if (st.over || st.end) break;
-      await p.waitForTimeout(400);
-    }
-    if (gi % 6 === 0) await shot(`08_battle_${gi}`);
-    /* 決着しなかった戦闘は打ち切る。進行中の手番が終わるまで待ってから次へ（古い戦闘の処理が次の戦闘に触れないように） */
-    await step(name + ':close', `(()=>{if(B){B.over=true;}auto=false;setSpeed(1);try{document.querySelector('#ov').classList.add('hide');}catch(e){}})()`, 2500);
-  }
-  /* ver0.38：連続戦闘のクエスト（戦闘 2 回以上）を AUTO で回し、ボタンを押さずに最後の戦闘まで進むか */
-  if (!NOBATTLE) {
-    await step('quest-auto', () => {auto = true;AM = 'f';setSpeed(2);speed = 4;G.party = ['rio', 'gald', 'celes', 'mire'];for (const id of G.members) {G.h[id].lv = 40;G.h[id].hp = null;}
-      for (const c of QD.CH) for (const q of c.qs || []) if (q.w.length >= 3 && q.lv <= 20) {window.__q = q.w.length;V31Q.qStart(c, q);return;}}, 500);
-    const t0 = Date.now();let last = -1;
-    while (Date.now() - t0 < 90000) {const st = await p.evaluate(() => ({w: V31Q.QR ? V31Q.QR.wave : -1, ov: !document.querySelector('#ov').classList.contains('hide')})).catch(() => ({w: -1}));
-      last = st.w;if (st.ov) break;await p.waitForTimeout(400);}
-    const n = await p.evaluate(() => window.__q);
-    if (last !== n - 1) errs.push(['quest-auto', `連続戦闘が最後まで自動で進まない（到達 ${last + 1}/${n}）`]);
-    await shot('085_quest_auto');
-    await step('quest-auto:close', () => {auto = false;setSpeed(1);if (B) B.over = true;}, 1500);
-  }
-  await step('town-end', () => {try {enterTown();} catch (e) {townMenu();}}, 600);await shot('09_town_end');
+  await step('home-end', HOME, 600);await shot('09_home_end');
 
-  /* 演出の総当たり（--fx）：演出ビューアで、味方全員の全技・星臨（通常／短縮／省略）・敵の全行動を 1 回ずつ再生する。
-     エラー・時間切れ（演出が終わらない）・粒の出しっぱなしを集める */
+  /* --fx：TD の戦闘を ×2 で最後まで進める（自動の配置）。1 ステージ（--quick）か各章の最初のステージ */
   if (FX) {
-    const run = async (name, r, capMs = 20000) => {scene = name;
-      const res = await Promise.race([p.evaluate(r => BXV.play(r), r).catch(e => 'evaluate: ' + String(e.message).split('\n')[0]), new Promise(z => setTimeout(() => z('no-answer'), capMs + 5000))]);
-      if (res) errs.push([name, '演出が正常に終わらない: ' + res]);};
-    const heroesAll = await p.evaluate(() => Object.keys(HB));
-    for (const id of (QUICK ? heroesAll.slice(0, 2) : heroesAll)) {
-      await step('fx-open:' + id, `(()=>{BXV.open({hero:'${id}',ek:'golemkin',n:2,loop:false});setSpeed(2);speed=4;})()`, 700);
-      const sks = await p.evaluate(id => BXV.heroSkills(id), id);
-      for (const k of sks) await run(`fx:${id}:${k}`, {t: 'sk', id: k});
-      for (const m of ['full', 'short', 'skip']) {await p.evaluate(m => {BX.set().aw = m;}, m);await run(`fx:${id}:seirin:${m}`, {t: 'aw'});await run(`fx:${id}:seirin-off`, {t: 'awoff'});}
-      await p.evaluate(() => {BX.set().aw = 'full';});
-      await run(`fx:${id}:hit`, {t: 'state', v: 'hit'});await run(`fx:${id}:down`, {t: 'state', v: 'down'});
-      if (id === heroesAll[0]) await shot('10_fx_viewer');
+    for (const id of (QUICK ? firsts.slice(0, 1) : firsts)) {
+      await step('fx-prep:' + id, `TDM.prep('${id}')`, 400);
+      await step('fx-go:' + id, `(()=>{const b=document.querySelector('#tdm [data-a="go"]');b&&b.click();})()`, 400);
+      await step('fx-talk:' + id, `(()=>{for(let i=0;i<30;i++){const k=document.querySelector('#tdm .tdm-talk .skip');if(!k)break;k.click();}})()`, 400);
+      await step('fx-x2:' + id, `(()=>{const s=document.querySelector('.td-btn[data-a="spd"]');if(s&&s.textContent.trim()!=='×2')s.click();
+        window.__bot=setInterval(()=>{try{if(TD.st&&!TD.st.over)TDS.bot(TD.st);}catch(e){console.error(e);}},400);})()`, 300);
+      const t0 = Date.now();let over = false;
+      while (Date.now() - t0 < 150000) {over = await p.evaluate(() => !!(TD.st && TD.st.over)).catch(() => false);if (over) break;await p.waitForTimeout(500);}
+      if (!over) errs.push(['fx:' + id, '戦闘が終わらない（×2・150 秒）']);
+      await p.waitForTimeout(2200);await shot('10_fx_result_' + id);
+      await step('fx-end:' + id, `(()=>{clearInterval(window.__bot);TD.hide();TDM.map();})()`, 400);
     }
-    const eas = await p.evaluate(() => Object.keys(EA));
-    const foes = QUICK ? ['slime'] : ['slime', 'wolf', 'golemkin', 'bookghost', 'boss5', 'x_dragon'];
-    for (const ek of foes) {
-      await step('fx-open-e:' + ek, `(()=>{BXV.open({hero:'gald',ek:'${ek}',n:1,loop:false});setSpeed(2);speed=4;})()`, 700);
-      for (const k of eas) await run(`fx:${ek}:ea:${k}`, {t: 'ea', id: k});
-    }
-    const left = await p.evaluate(async () => {await new Promise(r => setTimeout(r, 2500));return BX.count;});
-    if (left.fx > 0 || left.parts > 40) errs.push(['fx-end', `演出が残ったまま: エフェクト ${left.fx}・粒 ${left.parts}`]);
-    await step('fx-close', () => {BXV.close();}, 900);
+    await step('fx-home', HOME, 400);
   }
 
   await b.close();

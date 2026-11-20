@@ -1,5 +1,5 @@
 /* ===== ver0.18 拠点：ホーム画面（灯都ルミナスの街並み）・酒場・依頼掲示板・道具屋・各施設の店内 ===== */
-'use strict';
+
 let TSC='home',RSHOW=0;                 /* 街の画面：home／bar／shop／smith／eye／other */
 const HOME_H=176;
 const homeH=()=>innerHeight<600?128:innerHeight<680?152:HOME_H;
@@ -100,7 +100,7 @@ function roomImg(kind,h){const k=kind+h;if(ROOMC[k])return ROOMC[k];const{b,cy}=
 let TOWN18=null,TOWNP=-1;const WALK=[];
 function townImg(){const p=townP();if(!TOWN18||Math.abs(p-TOWNP)>.001){TOWN18=paintTown18(p);TOWNP=p;}return TOWN18;}
 makeTown=function(p=1){const c=document.createElement('canvas');c.width=W;c.height=128;c.getContext('2d').drawImage(paintTown18(p),0,0);return c;};
-TOWN=makeTown(townP());TBG=null;
+TOWN=makeTown(townP());
 /* タイトル：星空の下の灯都 */
 let TBG18=null;
 function titleBg(){if(TBG18)return TBG18;const top=320-HOME_H,b=new Buf(W,320),R=rng(77);gradB(b,0,top+98,['#03040e','#060822','#0c1440','#1a2866','#343e82','#5c5294','#8c6a96']);
@@ -138,18 +138,11 @@ function drawRoom(){const kind=TSC,r=roomImg(kind,H),npc=ROOMNPC[kind];ctx.drawI
  if(kind==='bar'&&(tick>>5)%2){ctx.fillStyle='#ffffff';ctx.fillRect(54,r.cy-11,1,1);ctx.fillRect(125,r.cy-12,1,1);}}
 drawTown=function(){if(TSC==='home')drawHome();else if(ROOMH[TSC])drawRoom();else{ctx.drawImage(townImg(),0,H-HOME_H);}};
 /* ワールドマップのプレビュー（新しいドット絵で） */
-drawWM=function(){const x0=WMS.cur;if(!x0||!WMS.bg)return;ctx.drawImage(WMS.bg,0,0);if(x0.vd){ctx.fillStyle='rgba(120,60,200,.24)';ctx.fillRect(0,0,W,H);}
- const bk=x0.bk;if(bk){const key=resolveSpr(bk),d=SPDEF[key],known=x0.clear||(G.zk&&G.zk.e&&G.zk.e[bk]),f=frameOf(key,'idle',tick>>4,''),x=44,y=96,flip=!!d.human,dx=flip?x-(f.W-f.ax):x-f.ax,img=known?f.c:tintFrame(f,'#05060f','sil');
-  ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(x-16,y-1,32,3);if(flip){ctx.save();ctx.translate(dx+f.W,y-f.ay);ctx.scale(-1,1);ctx.drawImage(img,0,0);ctx.restore();}else ctx.drawImage(img,dx,y-f.ay);}
- [[112,62],[146,70],[124,86],[158,94]].slice(0,G.party.length).map((p,i)=>[p,G.party[i]]).sort((a,b)=>a[0][1]-b[0][1]).forEach(([[x,y],id],i)=>drawSprite(SPDEF[id]?id:'rio','idle',(tick>>4)+i,heroOpt(id),x,y,false));
- const g=ctx.createLinearGradient(0,96,0,H);g.addColorStop(0,'rgba(5,6,15,0)');g.addColorStop(1,'rgba(5,6,15,.9)');ctx.fillStyle=g;ctx.fillRect(0,96,W,H-96);};
-{const _wm=worldMap;worldMap=function(m){TSC='other';if(H!==128)setH(128);_wm(m);};}
 
 /* ---------- ホーム画面 ---------- */
-const HSPOT=[['bar','酒場',2,84,52,44,'tavern'],['smith','鍛冶屋',126,86,52,42,'smith'],['shop','道具屋',0,134,48,36,'shop'],['eye','鑑定屋',132,134,44,36,'appraise'],['star','星詠みの塔',132,22,44,58,'star'],['door','空中庭園',12,36,52,30,'dev']];
-function goFac(k){({tavern:()=>tavern(),smith:()=>smith(),shop:()=>shop(),appraise:()=>appraise(),star:()=>openBoard(G.party[0]),dev:()=>devMenu(),party:()=>partyScreen(),rec:()=>saveMenu(),go:()=>worldMap()})[k]();}
-townMenu=function(){};/* 未使用：js/v20-ui.js が置き換え */
-document.addEventListener('click',e=>{const t=e.target.closest('[data-go]');if(!t||scene!=='town'||TSC!=='home'||t.disabled)return;if(!t.closest('#cmd.home')&&!t.closest('#labels'))return;SFX.sel();goFac(t.dataset.go);});
+
+/* 未使用：js/v20-ui.js が置き換え */
+
 {const _sh=show;show=function(m){_sh(m);if(m!=='town')TSC='other';};}
 {const _pn=panel;panel=function(html,acts){if(scene==='town'&&TSC==='home')TSC='other';_pn(html,acts);if(scene==='town'){if(RSHOW&&ROOMH[TSC]){$('#stage').style.display='';RSHOW=0;}else if(!ROOMH[TSC])$('#labels').innerHTML='';}};}
 {const _mn=menu;menu=function(items,list,xc){if(scene==='town'){if(TSC==='home')TSC='other';$('#labels').innerHTML='';}_mn(items,list,xc);};}
@@ -159,46 +152,17 @@ function roomOpen(kind,ttl,sub){TSC=kind;if(scene!=='town')show('town'),TSC=kind
 const backBtn=(l='◀ 灯都へ戻る')=>`<button class="tbtn back wide" data-a="back">${l}</button>`;
 
 /* ---------- 酒場「星降り亭」 ---------- */
-tavern=function(m){roomOpen('bar','酒場「星降り亭」',`酒場Lv${G.fac.bar}　戦闘の経験値+${(G.fac.bar-1)*5}%`);const dec=G.declined||[],bn=typeof bondReadyN==='function'?bondReadyN():0,qr=QS.filter(q=>!G.q.done[q.id]&&q.ok()).length,qo=QS.filter(q=>!G.q.done[q.id]).length;
- log(m||'<b>主人</b>「おかえり、灯守さん。仲間はみんな揃ってるよ。今日はどうする？」');
- const mem=id=>{const s=stats(id),h=G.h[id],hp=h.hp??s.mhp,on=G.party.includes(id);return`<div class="tvm${on?' on':''}" data-a="sheet" data-v="${id}"><img src="${face(id)}"><b>${HB[id].name}</b><small>Lv${h.lv}</small><div class="hb"><i style="width:${Math.max(0,hp/s.mhp*100)}%"></i></div><em>${on?'前衛'+(G.party.indexOf(id)+1):'控え'}</em></div>`;};
- const tl=(a,ic,l,s,b)=>`<button class="ftile${b?' on':''}" data-a="${a}"><img src="${ICON[ic]}"><span><b>${l}</b><small>${s}</small></span>${b?`<i>${b}</i>`:''}</button>`;
- panel(`<div class="ttl2">仲間（${G.members.length}人）<small>タップで詳細</small></div><div class="tvms">${[...G.party,...G.members.filter(i=>!G.party.includes(i))].map(mem).join('')}</div>
-  <div class="ftiles">${tl('form','eq','編成','前衛4人・装備・星盤',0)}${tl('board','quest','依頼掲示板',qo?`受注中 ${qo}件`:'すべて報告済み',qr?'報告'+qr:0)}${tl('bond','bond','絆の語らい',bn?`新しい話が${bn}件ある`:'仲間と語り合う',bn?'♥'+bn:0)}${tl('zk','book','図鑑','敵・装備・仲間の記録',0)}</div>
-  ${dec.length?`<div class="ttl2">声をかけられる仲間</div>`+dec.map(id=>`<div class="icard r2"><img class="iic" src="${face(id)}"><div class="ibody"><div class="inm">${HB[id].name}</div><div class="isub">${typeof PROF!=='undefined'&&PROF[id]?PROF[id][1]:'酒場で待っている'}</div></div><div class="iright"><button class="tbtn gold" style="width:76px;height:40px" data-a="join" data-v="${id}">誘う</button></div></div>`).join(''):''}${backBtn()}`,
-  {form:()=>partyScreen(),board:()=>board(),bond:()=>bondMenu(),zk:()=>zkMenu(),sheet:id=>openSheet(id),join:id=>{G.declined=dec.filter(x=>x!==id);newMember(id);SFX.aw();save();tavern(`<b>${HB[id].name}が仲間になった！</b>`);},back:()=>townMenu()});};
+
 /* 依頼掲示板 */
-board=function(){};/* 未使用：js/v22.js が置き換え */
+/* 未使用：js/v22.js が置き換え */
 /* ---------- 道具屋 ---------- */
-let SHT='buy';const SHQ={};
-shop=function(m,tab){if(tab)SHT=tab;roomOpen('shop','道具屋',`道具屋Lv${G.fac.shop}　持ち込みは各9個まで`);log(m||'<b>店番</b>「いらっしゃい！ 出撃の前に、回復薬の数は確かめた？」');
- const its=Object.keys(ITEMS).filter(k=>(ITEMS[k].lv||1)<=G.fac.shop),sell=Object.keys(MATS).reduce((a,k)=>a+(G.mats[k]||0)*MATS[k].p,0);
- const buyRow=k=>{const it=ITEMS[k],have=G.items[k]||0,max=Math.max(0,Math.min(9-have,Math.floor(G.gold/it.p))),q=Math.max(1,Math.min(max||1,SHQ[k]||1)),ok=max>0;SHQ[k]=q;
-  return`<div class="scard${ok?'':' off2'}"><img class="sic" src="${ICON[k]||ICON.potion}"><div class="sb"><b>${it.n}</b><small>${it.d}</small><div class="sm"><span class="hv${have>=9?' mx':''}">所持 ${have}/9</span><span class="pr"><img src="${ICON.coin}">${fmt(it.p)}</span></div></div>
-   <div class="sq"><div class="stp"><button data-a="dec" data-v="${k}" ${q<=1?'disabled':''}>−</button><b>${q}</b><button data-a="inc" data-v="${k}" ${q>=max?'disabled':''}>＋</button></div><button class="tbtn gold sbuy" data-a="buy" data-v="${k}" ${ok?'':'disabled'}>${have>=9?'満杯':ok?`購入<small>${fmt(it.p*q)}G</small>`:'お金不足'}</button></div></div>`;};
- const sellRow=k=>{const n=G.mats[k]||0;return`<div class="scard${n?'':' off2'}"><img class="sic" src="${ICON[k]||ICON.haiseki}"><div class="sb"><b>${MATS[k].n}</b><small>鍛冶屋の強化や街の発展に使う素材</small><div class="sm"><span class="hv">所持 ${n}</span><span class="pr"><img src="${ICON.coin}">${MATS[k].p}／個</span></div></div>
-   <div class="sq"><button class="tbtn sbuy" data-a="s1" data-v="${k}" ${n?'':'disabled'}>1個売る<small>+${MATS[k].p}G</small></button><button class="tbtn sbuy" data-a="sa" data-v="${k}" ${n?'':'disabled'}>全部売る<small>+${fmt(n*MATS[k].p)}G</small></button></div></div>`;};
- panel(`<div class="stabs"><button class="${SHT==='buy'?'on':''}" data-a="tab" data-v="buy">買う</button><button class="${SHT==='sell'?'on':''}" data-a="tab" data-v="sell">売る</button></div>
-  ${SHT==='buy'?its.map(buyRow).join('')+(its.length<Object.keys(ITEMS).length?`<div class="snote">道具屋を発展させると品揃えが増える（街の発展）</div>`:''):Object.keys(MATS).map(sellRow).join('')+`<button class="tbtn wide${sell?' gold':''}" data-a="sall" ${sell?'':'disabled'}>素材をすべて売る<small>${sell?`合計 ${fmt(sell)}G`:'売れる素材がない'}</small></button><div class="snote">素材は鍛冶屋の強化・街の発展にも使う。売りすぎに注意</div>`}${backBtn()}`,
-  {tab:t=>shop(null,t),dec:k=>{SHQ[k]=Math.max(1,(SHQ[k]||1)-1);shop(' ');},inc:k=>{SHQ[k]=(SHQ[k]||1)+1;shop(' ');},
-   buy:k=>{const it=ITEMS[k],have=G.items[k]||0,q=Math.min(SHQ[k]||1,9-have,Math.floor(G.gold/it.p));if(q<=0)return;G.gold-=it.p*q;addItem(k,q);SHQ[k]=1;SFX.heal();save();shop(`<b>${it.n}</b>を${q}個買った（所持 ${G.items[k]}/9）`);},
-   s1:k=>{if(!(G.mats[k]>0))return;G.mats[k]--;G.gold+=MATS[k].p;SFX.sel();save();shop(`${MATS[k].n}を1個売った（+${MATS[k].p}G）`);},
-   sa:k=>{const n=G.mats[k]||0;if(!n)return;G.mats[k]=0;G.gold+=n*MATS[k].p;SFX.heal();save();shop(`${MATS[k].n}を${n}個売って<b>${fmt(n*MATS[k].p)}G</b>を得た`);},
-   sall:()=>{if(!sell)return;G.gold+=sell;for(const k in MATS)G.mats[k]=0;SFX.heal();save();shop(`素材をすべて売って<b>${fmt(sell)}G</b>を得た`);},back:()=>townMenu()});
- if(m===' ')log('<b>店番</b>「個数を選んで、購入を押してね」');};
+
 /* 鍛冶屋・鑑定屋：店内を見せる */
-{const _sm=smith;smith=function(m){_sm(m);roomOpen('smith','鍛冶屋',`鍛冶屋Lv${G.fac.smith}　強化上限+${ecap()}`);RSHOW=0;};}
+
 {const _ap=appraise;appraise=function(m){_ap(m);roomOpen('eye','鑑定屋',`鑑定屋Lv${G.fac.eye}`);RSHOW=0;};}
 {const _et=enterTown;enterTown=function(m){TSC='home';_et(m);};}
 addEventListener('resize',()=>{if(scene==='town'&&TSC==='home'&&G&&homeH()!==H)townMenu();});
 /* タイトル */
-{const _t=title;title=function(){TSC='other';_t();const v=$('#verL');if(v)v.textContent=VER18;};}
-{const v=$('#verL');if(v)v.textContent=VER18;}
+
 /* ---------- 開発者メニュー：ver0.18のドット絵とモーション一覧 ---------- */
-function dev18(){log('<b>ver0.18 ドット絵とモーション</b>　全キャラ・全敵の待機／攻撃／詠唱／被弾／勝利などを順に再生');
- const keys=Object.keys(SPDEF).filter(k=>!/^(vo_|kb|tr_|boss9w)/.test(k)),cw=64,chh=64,cols=5,rows=Math.ceil(keys.length/cols);
- panel(`<canvas id="g18" width="${cols*cw}" height="${rows*chh}" style="width:100%;image-rendering:pixelated;background:#2a3a2e;border-radius:8px"></canvas><button class="tbtn back wide" data-a="back">戻る</button>`,{back:()=>dvMenu()});
- const cvs=$('#g18'),g=cvs.getContext('2d');g.imageSmoothingEnabled=false;let t=0;const seq=['idle','idle','atk','hurt','mag','win','guard','charge'];
- const iv=setInterval(()=>{if(!cvs.isConnected){clearInterval(iv);return;}t++;g.clearRect(0,0,cvs.width,cvs.height);keys.forEach((k,n)=>{const d=SPDEF[k],hum=d.human,an0=seq[(t>>5)%seq.length],an=hum?(an0==='charge'?'awaken':an0):(['atk','hurt','charge'].includes(an0)?an0:'idle'),a=aniOf(d,an),i=a.loop?(t>>2)%a.n:Math.min(a.n-1,(t%32)>>2),f=frameOf(k,an,i,hum&&(t>>8)%2?'{"aw":1}':''),sc=Math.min(1,60/Math.max(f.W,f.H)),x=(n%cols)*cw,y=Math.floor(n/cols)*chh;
-   g.drawImage(f.c,x+((cw-f.W*sc)>>1),y+chh-4-f.H*sc,f.W*sc,f.H*sc);});},50);}
-{const _dv=dvMenu;dvMenu=function(m){_dv(m);const c=$('#cmd'),b=document.createElement('button');b.className='c ready';b.innerHTML='ver0.18 ドット絵と演出<small>全キャラ・全敵のモーション一覧／新マップ・新UI</small>';b.onclick=()=>{SFX.sel();dev18();};c.insertBefore(b,c.firstChild);if(c.children[1])c.children[1].classList.remove('ready');};}
+

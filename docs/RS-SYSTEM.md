@@ -1,3 +1,5 @@
+> **旧コマンド戦闘（ver0.53 で削除済み）**：この文書が説明するコード（js/battle/*・js/rs/battle.js・js/rs/ui.js・js/ui/battle-pop.js・js/ui/damage.js など）はもう無い。演出・数値の考え方の記録として残す。新しい戦闘は docs/TD-DESIGN.md。
+
 # 戦闘システム（ver0.38〜）
 
 ver0.37 で戦闘を『ロマンシング サガ リ・ユニバース』（以下 RS）の仕組みを分析して作り直し、ver0.38 でシステムを整理・統合した。
