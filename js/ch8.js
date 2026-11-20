@@ -60,8 +60,7 @@ function snapTake(u,msg){if(B.rewound)return;B.snap={};B.heroes.forEach(h=>B.sna
 /* --- 敵：虚ろ化（グレースケール）・竜の巣・回廊の番人 --- */
 const greyPal=rows=>{const o={};rows.join('').split('').forEach(ch=>{if(ch==='.'||o[ch])return;if('exo'.includes(ch)){o[ch]='#e080ff';return;}const n=parseInt((PAL[ch]||'#888888').slice(1),16),l=(n>>16)*.3+(n>>8&255)*.59+(n&255)*.11;
  o[ch]='#'+[l*.82+16,l*.78+10,l*.92+34].map(v=>Math.min(255,Math.round(v)).toString(16).padStart(2,'0')).join('');});return o;};
-function desat(src){const c=document.createElement('canvas');c.width=src.width;c.height=src.height;const g=c.getContext('2d');g.drawImage(src,0,0);const d=g.getImageData(0,0,c.width,c.height),p=d.data;
- for(let i=0;i<p.length;i+=4){const l=p[i]*.3+p[i+1]*.59+p[i+2]*.11;p[i]=l*.8+14;p[i+1]=l*.74+8;p[i+2]=Math.min(255,l*.95+30);}g.putImageData(d,0,0);return c;}
+
 function voidKind(k){if(k.startsWith('vo_'))return k;const vk='vo_'+k;if(!ED[vk]){const d=ED[k];SPR[vk]=SPR[k];IMG[vk]=mk(SPR[k],greyPal(SPR[k]));IMG[vk+'_w']=mk(SPR[k],null,'#ffffff');
  ED[vk]=Object.assign({},d,{name:'虚・'+d.name,mhp:Math.round(d.mhp*1.1),xp:Math.round(d.xp*1.4),gold:Math.round(d.gold*1.3),drop:[...d.drop,['kakera',.2]]});}return vk;}
 for(const[k,b,pal]of[['firedrake','wolf',{g:'#c0402a',G:'#5a1a10',w:'#ffd080',x:'#ffe040'}],['lavaslime','slime',{v:'#e0602a',V:'#7a200a',p:'#ffc060'}],

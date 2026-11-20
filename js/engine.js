@@ -77,8 +77,7 @@ const nextXP=l=>Math.round(15*Math.pow(l,1.5));
 function stats(id){const b=HB[id],s=G.h[id],o={},g=gear(id),bo=bonus(id);for(const k in bo)g[k]=(g[k]||0)+bo[k];for(const k of['mhp','atk','def','mag','res','spd']){const v=b[k]*(1+GR[b.g[k]]*(k==='spd'?.3:1)*(s.lv-1))+(g[k]||0);o[k]=k==='spd'?+v.toFixed(2):Math.round(v);}
  for(const k of['atk','def','mag','res','mhp'])if(g[k+'P'])o[k]=Math.round(o[k]*(1+g[k+'P']/100));
  return Object.assign(o,{crit:g.crit||0,weakDmg:g.weakDmg||0,startAG:g.startAG||0,awDmg:g.awDmg||0,spGain:g.spGain||0,drop:g.drop||0,atkEl:g.atkEl||null,legs:g.legs,awTurn:g.awTurn||0,noRecoil:g.noRecoil||0,storeUp:g.storeUp||0,gaugeSave:g.gaugeSave||0});}
-function hero(id){const s=stats(id),b=HB[id],pos={x:0,y:0};const hp=G.h[id].hp==null?s.mhp:Math.min(s.mhp,G.h[id].hp);
- return Object.assign({id,side:0,spr:id,name:b.name,skills:skillList(id),sp:50,ag:Math.min(100,s.startAG+(s.legs.includes('senkou')?50:0)),elem:MAG(id)?null:'斬',alive:hp>0,aw:false,awT:0,store:0,taunt:0,ox:0,tox:0,flash:0,sc:2},s,pos,{hp,awLv:G.h[id].awLv||1,awDmg:s.awDmg+((G.h[id].awLv||1)-1)*10});}
+
 function enemy(kind,lv,x,y,suf=''){const d=ED[kind],L=d.boss?0:lv-1,M={mhp:.7+.17*L,atk:1+.14*L,mag:1+.14*L,def:.8+.1*L,res:.8+.1*L};
  const e={kind,lv,side:1,spr:kind,name:d.name+suf,weak:d.weak,boss:d.boss,known:new Set(G.known[kind]||[]),charging:false,turn:0,x,y,ox:0,tox:0,flash:0,fade:0,sc:d.sc||2,alive:true,spd:d.spd};
  for(const k of['mhp','atk','def','mag','res'])e[k]=Math.round(d[k]*M[k]);e.mhp=Math.max(1,Math.round(e.mhp*(d.boss?.93:.88)));
@@ -208,13 +207,10 @@ async function useItem(u,id,t){G.items[id]--;const nm=ITEMS[id].n;
  SFX.heal();log(`${u.name}は${nm}を使った`);
  refresh();await wait(450);}
 
-function autoPick(){}
-
 /* ===== メニュー ===== */
 function menu(items,list,xc){const c=$('#cmd');if(scene==='town')$('#stage').style.display=xc==='grid9'?'':'none';c.className=(list?'list':'')+(xc?' '+xc:'');c.innerHTML='';
  items.forEach(it=>{const b=document.createElement('button');b.className='c '+(it.cls||'');b.innerHTML=(it.ic?`<img class="ic" src="${ICON[it.ic]}">`:'')+it.l+(it.s?`<small>${it.s}</small>`:'');b.disabled=!!it.dis;
   b.onclick=()=>{SFX.sel();it.f();};c.appendChild(b);});}
-function chooseRoot(){}
 
 /* ===== 敵 ===== */
 function pickHero(){}/* 未使用：js/rs/battle.js が置き換え */

@@ -9,9 +9,6 @@
 const V20=(()=>{
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-const footOf=u=>(typeof V19!=='undefined'&&V19.foot&&u.A&&!u.A.none)?V19.foot(u):[u.x+8*u.sc,u.y+16*u.sc-2];
-const midOf=u=>{try{if(typeof V19!=='undefined'&&V19.mid&&u.A&&!u.A.none)return V19.mid(u);}catch(e){}return[u.x+8*u.sc,u.y+8*u.sc];};
-const fx=(f,...a)=>{try{if(typeof FX19!=='undefined'&&FX19[f])FX19[f](...a);}catch(e){}};
 
 /* ==================== 1. 状態効果 ==================== */
 /* k: atk/def/mag/res/spd/crit（v=％）, regen/poison（v=最大HPに対する割合/ターン）, stun, mark（被ダメ+v%）, prot（被ダメ-v%）,
@@ -196,7 +193,6 @@ for(const k in EFX)if(EA[k])EA[k].fx20=EFX[k].map(f=>Object.assign({on:'t'},f));
 
 /* ==================== 戦闘への組み込み ==================== */
 /* ユニット生成：パッシブを付ける（武器パッシブの能力変化もここで） */
-{const _hero=hero;hero=function(id){const u=_hero(id);try{u.sts=[];u.ps20=unitPS(u);for(const p of u.ps20){const P=PS[p.id];if(P&&P.make)P.make(u,p.v);}}catch(e){console.error(e);}return u;};}
 
 /* 与ダメ・被ダメの倍率（状態効果・パッシブ・スキルの条件） */
 {const _c=calc;calc=function(a,t,sk){let def0=null;
@@ -244,37 +240,8 @@ for(const k in EFX)if(EA[k])EA[k].fx20=EFX[k].map(f=>Object.assign({on:'t'},f));
 {const _c=calc;calc=function(a,t,sk){const r=_c(a,t,sk);LASTC=r;return r;};}
 
 /* 追撃・反撃の実行 */
-async function drain(q){let n=0;while(B&&!B.over&&q&&q.length&&n<6){const{a,t,sk}=q.shift();n++;let tg=t;if(!tg||!tg.alive)tg=(a.side===0?aliveE():aliveH())[0];if(!a.alive||!tg)continue;
-  pop(a,sk.n,'#ffe27a',true,'st20 fu');await wait(160);try{const[x,y]=midOf(tg);fx(sk.k==='mag'?'burst':'slash',x,y,ELC[sk.el]||'#ffffff',{size:1});}catch(e){}
-  await hit(a,tg,sk);await wait(180);if(!aliveE().length||!aliveH().length)break;}}
 
 /* 支援技（sup20）の処理 */
-async function support(u,sk){u.sp-=sk.sp||0;log(`${u.name}の<b>${sk.n}</b>！`);
- try{const A=ANIM.setup(u);if(!A.none){ANIM.to(u,{ta:-.15,hN:[-4,-6],hF:[-3,-4],cr:1,ex:2},180);}}catch(e){}
- const[fx0,fy0]=footOf(u),[mx,my]=midOf(u),col=sk.role==='heal'?'#7dffa8':sk.role==='guard'?'#9fd8ff':'#ffe27a';
- fx('circle',fx0,fy0,col,{dur:700,r:16});fx('gather',mx,my-4,col,14,320);SFX.heal();await wait(420);
- const ps=sk.fx20||[];
- for(const f of ps){const tg=f.on==='self'?[u]:f.on==='allies'?aliveH():f.on==='enemies'?aliveE():[];for(const t of tg){let v=f.v;if(f.k==='shield')v=Math.round(t.mhp*f.v);addSt(t,f.k,v,f.t,f.el?{el:f.el}:{});if(t.side===0){const[x,y]=midOf(t);fx(isBuff({k:f.k,v})?'buff':'ring',x,y,col);}}}
- if(sk.taunt20){u.taunt=Math.max(u.taunt||0,sk.taunt20);}
- if(sk.cleanse20){let n=0;aliveH().forEach(h=>{n+=clearSt(h,s=>!isBuff(s));});if(n)log(`${u.name}の<b>${sk.n}</b>！ 弱体を${n}つ打ち消した`);}
- if(sk.heal20){const hb=1+sumEv(u,'healB')/100;aliveH().forEach(h=>{const v=Math.round(h.mhp*sk.heal20*hb*(h.healRecv||1));h.hp=Math.min(h.mhp,h.hp+v);pop(h,'+'+v,'#7dffa8');each(u,'healed',h);});}
- if(sk.ct20)aliveH().forEach(h=>{if(h!==u)h.ct=Math.max(0,h.ct*(1-sk.ct20));});
- refresh();await wait(380);try{ANIM.idle(u,200);}catch(e){}setCT(u,sk.w||1);}
-
-{const _da=doAction;doAction=async function(u,sk,t){if(!B)return _da(u,sk,t);B._fx20=new Set();B.q20=[];
- if(sk&&sk.k==='sup20'){await support(u,sk);if(u.side===0)each(u,'acted',sk);await drain(B.q20);return;}
- /* 敵の強化を剥がす */
- let s2=sk;if(sk&&sk.purge20&&t&&t.alive){const n=clearSt(t,s=>isBuff(s));if(n){pop(t,`強化解除×${n}`,'#fff3a6',true,'st20 dn');log(`<b>${sk.n}</b>――${t.name}の強化を${n}つ打ち消した！`);s2=Object.assign({},sk,{_purge:n});}}
- /* 回復量アップ（武器パッシブ）：heal 系 */
- let hb=0;if(u.side===0&&sk&&(sk.k==='heal'||sk.k==='healAll'))hb=sumEv(u,'healB');if(hb)s2=Object.assign({},s2,{pow:s2.pow*(1+hb/100)});
- const hp0=u.side===0&&sk&&['heal','healAll','revive','reviveAll'].includes(sk.k)?B.heroes.map(h=>h.hp):null;
- /* ver0.46：攻撃の前にかかる自己強化（selfPre の技）は、行動の前に掛けて表示する */
- if(u.alive&&sk&&sk.self20&&sk.selfPre){for(const f of sk.self20)addSt(u,f.k,f.v,f.t);await wait(260);}
- const r=await _da(u,s2,t);
- try{if(hp0)B.heroes.forEach((h,i)=>{if(h.hp>hp0[i])each(u,'healed',h);});
-  if(u.alive&&sk&&sk.self20&&!sk.selfPre)for(const f of sk.self20)addSt(u,f.k,f.v,f.t);
-  if(u.side===0&&u.alive&&sk)each(u,'acted',sk);}catch(e){console.error(e);}
- await drain(B.q20);await drain(B.cq20);refresh();return r;};}
 
 /* 手番の開始：状態効果の経過・パッシブ */
 

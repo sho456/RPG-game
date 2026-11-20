@@ -85,7 +85,7 @@ const LPS={
  L_enjin:{n:'炉神の斧',d:LEG.enjin.d,out:(a,t,sk)=>sk&&sk.el==='熱'?1.4:1},
  L_juushin:{n:'獣神の爪',d:LEG.juushin.d,out:a=>a.hp<=a.mhp*.5?1.5:1,inc:t=>t.hp<=t.mhp*.5?.8:1}};
 Object.assign(V20.PS,LPS);
-{const _h=hero;hero=function(id){const u=_h(id);try{u.ps20=u.ps20||[];for(const l of u.legs||[])if(LPS['L_'+l]&&!u.ps20.some(p=>p.id==='L_'+l))u.ps20.push({id:'L_'+l,v:0});}catch(e){console.error(e);}return u;};}
+
 /* 能力値に効くレジェンド（画面の数値にも出す） */
 {const _s=stats;stats=function(id){const o=_s(id),L=o.legs||[];
  if(L.includes('tengan')){o.crit+=15;o.critDmg=(o.critDmg||0)+50;}if(L.includes('shuuen'))o.dmgP=(o.dmgP||0)+20;if(L.includes('seishin'))o.skDmg=(o.skDmg||0)+30;
@@ -131,7 +131,6 @@ royalItem=function(slot,ilv){slot=slot==='head'?'crown':NS(slot);const R=ROY[slo
  for(let i=0;i<3;i++){const av=Object.keys(OPS).filter(k=>!LATE.has(k)&&!it.ops.some(o=>o.k===k)),k=pick(av),[,,a,b]=OPS[k];let v=(a+(b-a)*Math.random())*(1+3*.08);it.ops.push({k,v:k==='spd'?+v.toFixed(1):Math.max(1,Math.round(v))});}
  setBase(it,R[1],1.1);inflate(it);it.set='royal';it.name=R[0];return it;};
 try{royalRand=ilv=>royalItem(pick(['main','sub','crown','acc']),ilv);}catch(e){}
-{const _u=uqItem;uqItem=function(id){const it=_u(id);inflate(it);return it;};}
 
 /* ---------- 見た目（アイコン） ---------- */
 const TIER=['星鋼','銅','鉄','鋼'];

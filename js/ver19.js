@@ -80,26 +80,9 @@ function near(u,t){const[tx,ty]=foot(t),[ux,uy]=foot(u),dir=u.side===0?1:-1;retu
 async function dash(u,t,ms){const A=u.A,R=A.rig;if(R.type==='hum'){to(u,RUN,ms*.4);await move(u,...near(u,t),ms,'out');}
  else{const ap=(MA[A.name]||{}).ap||{ms:260,hop:4};await move(u,...near(u,t),ms||ap.ms,'io',ap.hop);if(ap.stomp){B.shake=Math.max(B.shake,5);FX19.smash(foot(u)[0]+A.wx,foot(u)[1]+A.wy,'#b8a888',{size:.7});}}}
 const styleOf=(u,sk)=>{const A=u.A,k=sk.k;if(A.rig.type!=='hum')return k==='mag'?'cast':'melee';if(['mag','reso','zen','release','release2','pct'].includes(k))return'cast';return A.rig.wp==='bow'?'shoot':'melee';};
-const NOHIT=['guard','kenshu','taunt','healAll','guardRegen','item','roar','charge','haste','cheer','grace','scan','reviveAll','barrier','revive','heal','rewind','tstop'];
+
 /* 行動の開始：味方（技は分かっている） */
-async function pre(u,sk,t){const A=setup(u);if(A.none||!u.alive)return;const c=u._act={sk,n:0};
- /* ver0.34：演出の台帳（js/battle/seq.js）に定義があれば、そちらで動かす */
- if(V19.ext){c.bx=V19.ext.find(u,sk)||null;if(c.bx){await V19.ext.pre(u,sk,t,c);return;}}
- if(NOHIT.includes(sk.k)||(sk.k!=='phys'&&sk.k!=='mag'&&!['reso','zen','release','release2','pct','rhythm'].includes(sk.k)&&sk.pow==null)){c.sup=1;
-  const[mx,my]=mid(u),[fx,fy]=foot(u),hs=B.heroes.filter(h=>h.alive);
-  if(sk.k==='guard'||sk.k==='kenshu'){FX19.shield(mx,my,sk.k==='kenshu'?'#ffd65a':'#c8d8ff');return;}
-  const cp=CAST[A.rig.wp]||CAST._;to(u,cp.a,180);const col=sk.k==='taunt'?'#ff8a5a':sk.k==='roar'?'#ffb030':['heal','healAll','revive','reviveAll','guardRegen'].includes(sk.k)?'#7dffa8':'#ffe27a';
-  FX19.circle(fx,fy,col,{dur:650});FX19.gather(mx,my-4,col,10,300);await T(230);to(u,cp.b,90,'in');
-  if(sk.k==='reviveAll')B.heroes.forEach(h=>FX19.pillar(...foot(h)));
-  else if(sk.k==='barrier')hs.forEach(h=>FX19.shield(...mid(h)));else if(sk.k==='taunt'){FX19.ring(mx,my,'#ff8a5a',{r1:18});FX19.ring(mx,my,'#ffffff',{r1:12,delay:90});}
-  else if(sk.k==='roar')aliveE().forEach(e=>FX19.ring(...mid(e),col,{r1:14,dash:1}));else if(sk.k==='rewind')hs.forEach(h=>FX19.ring(...mid(h),'#d8c8ff',{r0:16,r1:2}));
-  return;}
- c.style=sk.k==='rhythm'?'melee':styleOf(u,sk);
- if(c.style==='melee'){const tg=sk.t==='all'?aliveE()[0]:(t&&t.alive?t:aliveE()[0]);if(tg){c.last=tg;c.ready=dash(u,tg,200);}}
- else if(c.style==='shoot'){c.ready=to(u,BOW.aim,160);}
- else{const cp=CAST[A.rig.wp]||CAST._,big=(sk.pow||0)>=2||sk.t==='all'||sk.k!=='mag',col=elCol(sk.el),[fx,fy]=foot(u),[mx,my]=mid(u);c.big=big;
-  to(u,cp.a,200);FX19.circle(fx,fy,col,{dur:big?900:650,r:big?17:13});FX19.gather(mx-4,my-6,col,big?18:10,big?460:300);
-  c.ready=(async()=>{await T(big?430:270);await to(u,cp.b,90,'in');})();}}
+
 /* 1撃ぶんの攻撃動作。戻り値を待ってから命中処理に入る */
 async function strike(a,t,sk){const c=a._act,A=a.A;if(!c||!A||A.none||!a.alive)return;c.n++;const first=c.n===1,R=A.rig,hum=R.type==='hum';c.fx=null;
  if(V19.ext){if(c.bx===undefined){c.bx=V19.ext.find(a,sk)||null;if(c.bx)await V19.ext.pre(a,sk,t,c);}if(c.bx){await V19.ext.strike(a,t,sk,c);return;}}
@@ -125,10 +108,6 @@ async function strike(a,t,sk){const c=a._act,A=a.A;if(!c||!A||A.none||!a.alive)r
   if(big){B.flashBg=Math.max(B.flashBg||0,8);B.flashCol=col;}await T(big?560:330);await to(a,cl.h,100,'in');if(sk.t==='one'){const[tx,ty]=mid(t);await FX19.proj(mx+8,my,tx,ty,'bolt',col,160);}}
  c.fx={type:'elem',big:c.big};}
 /* 行動の終わり：元の位置へ跳んで戻る */
-async function finish(u){const c=u._act;u._act=null;const A=u.A;if(!A||A.none)return;
- if(c&&c.bx&&V19.ext){try{await V19.ext.after(u,c);}catch(e){console.error(e);}}
- if(A.wx||A.wy||A.mv){if(A.rig.type==='hum'&&u.alive)to(u,{ta:-.12,cr:2,fF:[-3,2],fN:[4,3],sw:-2},120);await move(u,0,0,A.rig.type==='hum'?210:280,'io',A.name==='golem'||A.name==='boss'||A.name==='bookghost'?1:6);}
- idle(u,200);}
 
 /* 命中した瞬間：被弾ポーズ・ノックバック・エフェクト・揺れ */
 function onHurt(t,d){const A=t.A;if(!A||A.none)return;const c=CUR&&CUR.a._act,sk=CUR?CUR.sk:{},r=LAST||{},fx=(c&&c.fx)||{type:sk.k==='mag'?'elem':'burst'},away=t.side===0?1:-1,[x,y]=mid(t),[fx0,fy0]=foot(t),D=dims(t),col=elCol(sk.el);
@@ -158,16 +137,12 @@ function onHurt(t,d){const A=t.A;if(!A||A.none)return;const c=CUR&&CUR.a._act,sk
 {const _hit=V17F.hit;hit=async function(a,t,sk){if(!a||!t)return;/* ver0.32：対象が消えた攻撃（戦闘の切り替わり・召喚の入れ替わり）は何もしない */if(!sk._sim)try{await strike(a,t,sk);}catch(e){console.error(e);}/* ver0.46：全体攻撃の 2 体目以降は振りを省く（全員同時に当たる） */
   const n0=B.fx.length,was=t.alive;CUR={a,sk};LAST=null;const pr=_hit(a,t,sk);B.fx.length=Math.min(B.fx.length,n0);const r=LAST||{},c=a._act,big=c&&c.fx&&c.fx.big;CUR=null;
   if(!sk._sim&&!sk._simLead)await stop(a._act&&a._act.n>1&&sk.hits?26:38+(r.crit?70:0)+(r.weak?28:0)+(big?55:0));return pr;};}
-{const _da=V17F.doAction;doAction=async function(u,sk,t){try{await pre(u,sk,t);}catch(e){console.error(e);}try{return await _da(u,sk,t);}finally{try{await finish(u);}catch(e){console.error(e);}}};}
 
 {const _k=V17F.kill;kill=async function(t){const boss=t.side===1&&t.boss,pr=_k(t),A=t.A;if(!t.alive&&A&&!A.none){
    if(t.side===1){A.dead={t0:ANIM.now,dur:(boss?1700:900)*ANIM.SP()};A.dcv=null;const[x,y]=mid(t),D=dims(t);FX19.burst(x,y,'#ffb0a0',{size:1.6,rays:10});FX19.ring(x,y,'#ff5a4a',{r1:20});
     if(boss){/* ボス撃破：連鎖する爆発と長い崩壊（ver0.18 の演出を引き継ぐ） */B.shake=30;B.flashBg=30;B.flashCol='#ffffff';try{SFX.brk();}catch(e){}setTimeout(()=>{try{SFX.brk();}catch(e){}},260*SPD[speed]);
      for(let k=0;k<7;k++){const ex=x+(Math.random()-.5)*D.w*.7,ey=y+(Math.random()-.5)*D.h*.6;FX19.burst(ex,ey,k%2?'#ffb070':'#ffffff',{size:1.7,rays:10,delay:k*150});FX19.ring(ex,ey,'#ff9a40',{r1:17,delay:k*150});}await pr;await wait(900);return;}}
    else{A.hitT=(A.hitT||0)+1;to(t,ANIM.HST.dead(A.rig),420,'in');}}return pr;};}
-{const _aw=V17F.awaken;awaken=async function(u){const pr=_aw(u);B.shake=10;try{const A=setup(u);if(!A.none){const cv2=document.querySelector('#cut canvas');if(cv2)cutArt(cv2,u.spr+'_aw');
-   to(u,AWK,220,'back');const[x,y]=mid(u),[fx,fy]=foot(u);FX19.pillar(fx,fy,'#ffe27a');FX19.circle(fx,fy,'#ffe27a',{dur:1200,r:18});FX19.gather(x,y,'#ffe27a',24,600);FX19.ring(x,y,'#ffffff',{r1:26,dur:420,delay:200});}}catch(e){console.error(e);}
-  try{return await pr;}finally{idle(u,260);}};}
 
 /* 回復・復活・補助などの文字ポップに合わせてエフェクトを出す（ver0.18 の仕組みを新エフェクトで引き継ぐ） */
 pop=function(u,txt,col,small,kind,el){V17F.pop(u,txt,col,small,kind,el);if(!B||!u||u.x==null||!u.A||u.A.none)return;try{const s=String(txt),[x,y]=mid(u);if(V19.ext&&V19.ext.popFx(u,s,kind))return;
@@ -230,7 +205,7 @@ function still(key,N,right){const inf=SPRX.info(key);if(!inf)return null;const k
  g.drawImage(f.cv,Math.round(N/2-f.ax),Math.round(N-2-f.ay));return c;}
 {const _hi=hiImg;hiImg=function(src,N,shade){if(!src)return src;const key=keyOf(src);if(!key||/_w$/.test(key))return _hi(src,N,shade);let m=STILL.get(src);if(!m){m={};STILL.set(src,m);}if(m[N])return m[N];const kd=key.replace(/_aw$/,''),ed=ED[kd];
   const c=still(key,N,ed&&!ed.flip);return m[N]=c||_hi(src,N,shade);};}
-function cutArt(cv2,key){const c=still(IMG[key]?key:key.replace(/_aw$/,''),48,false);if(!c)return;cv2.width=cv2.height=48;const g=cv2.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(c,0,0);}
+
 /* 行動順のアイコン：味方は顔まわり、敵は小さく描き直した全身 */
 const ICO=new Map();
 function icon(u){const key=sprKey(u),A=setup(u);if(A.none)return null;let c=ICO.get(key);if(c)return c;c=document.createElement('canvas');c.width=c.height=18;const g=c.getContext('2d'),R=A.rig,pose=ANIM.base(A);if(pose.y)pose.y=0;

@@ -71,8 +71,7 @@ const UQ={rio:['灯継ぎの剣','星臨中の与ダメ+30%'],gald:['誓約の�
  noah:['心灯の杖','ノアが生存中、味方全員の被ダメ-8%'],balza:['炉心の斧','熱属性の与ダメ+25%'],erna:['落ちぬ星の弓','単体攻撃の与ダメ+25%'],crow:['名を刻む大鎌','自分のHP50%以下で与ダメ+40%'],
  hakua:['雪華の手甲','連撃技の与ダメ+25%'],jin:['二人の双剣','与ダメ+15%・被ダメ-10%'],celes:['千年目の杖','無属性魔法の与ダメ+30%'],valk:['誓鱗の大剣','HP半分以下の敵への与ダメ+30%']};
 for(const id in UQ)LEG['uq_'+id]={n:UQ[id][0],slot:'w',who:id,uq:1,d:'絆の専用装備：'+UQ[id][1]};
-function uqItem(id){const ilv=Math.max(30,G.h[id]?G.h[id].lv:30),it=genItem(ilv,0,0,'w',4);it.leg='uq_'+id;it.who=id;wbase(it,ilv,'星鋼');
- for(const k in it.base)it.base[k]=Math.round(it.base[k]*1.25);it.name=UQ[id][0];it.unid=false;it.uq=1;return it;}
+
 {const _ca=calc;calc=function(a,t,sk){const r=_ca(a,t,sk),al=a.legs||[],tl=t.legs||[];let m=1;
  if(al.length){if(al.includes('uq_rio')&&a.aw)m*=1.3;if(al.includes('uq_mire')&&r.weak&&sk.k==='mag')m*=1.3;if(al.includes('uq_shion')&&t.hp>=t.mhp)m*=1.4;
   if(al.includes('uq_balza')&&sk.el==='熱')m*=1.25;if(al.includes('uq_erna')&&sk.t==='one')m*=1.25;if(al.includes('uq_crow')&&a.hp<=a.mhp/2)m*=1.4;

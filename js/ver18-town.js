@@ -141,9 +141,8 @@ drawTown=function(){if(TSC==='home')drawHome();else if(ROOMH[TSC])drawRoom();els
 
 /* ---------- ホーム画面 ---------- */
 
-function goFac(k){({tavern:()=>tavern(),smith:()=>smith(),shop:()=>shop(),appraise:()=>appraise(),star:()=>openBoard(G.party[0]),dev:()=>devMenu(),party:()=>partyScreen(),rec:()=>saveMenu(),go:()=>worldMap()})[k]();}
 /* 未使用：js/v20-ui.js が置き換え */
-document.addEventListener('click',e=>{const t=e.target.closest('[data-go]');if(!t||scene!=='town'||TSC!=='home'||t.disabled)return;if(!t.closest('#cmd.home')&&!t.closest('#labels'))return;SFX.sel();goFac(t.dataset.go);});
+
 {const _sh=show;show=function(m){_sh(m);if(m!=='town')TSC='other';};}
 {const _pn=panel;panel=function(html,acts){if(scene==='town'&&TSC==='home')TSC='other';_pn(html,acts);if(scene==='town'){if(RSHOW&&ROOMH[TSC]){$('#stage').style.display='';RSHOW=0;}else if(!ROOMH[TSC])$('#labels').innerHTML='';}};}
 {const _mn=menu;menu=function(items,list,xc){if(scene==='town'){if(TSC==='home')TSC='other';$('#labels').innerHTML='';}_mn(items,list,xc);};}
@@ -157,22 +156,7 @@ const backBtn=(l='◀ 灯都へ戻る')=>`<button class="tbtn back wide" data-a=
 /* 依頼掲示板 */
 /* 未使用：js/v22.js が置き換え */
 /* ---------- 道具屋 ---------- */
-let SHT='buy';const SHQ={};
-shop=function(m,tab){if(tab)SHT=tab;roomOpen('shop','道具屋',`道具屋Lv${G.fac.shop}　持ち込みは各9個まで`);log(m||'<b>店番</b>「いらっしゃい！ 出撃の前に、回復薬の数は確かめた？」');
- const its=Object.keys(ITEMS).filter(k=>(ITEMS[k].lv||1)<=G.fac.shop),sell=Object.keys(MATS).reduce((a,k)=>a+(G.mats[k]||0)*MATS[k].p,0);
- const buyRow=k=>{const it=ITEMS[k],have=G.items[k]||0,max=Math.max(0,Math.min(9-have,Math.floor(G.gold/it.p))),q=Math.max(1,Math.min(max||1,SHQ[k]||1)),ok=max>0;SHQ[k]=q;
-  return`<div class="scard${ok?'':' off2'}"><img class="sic" src="${ICON[k]||ICON.potion}"><div class="sb"><b>${it.n}</b><small>${it.d}</small><div class="sm"><span class="hv${have>=9?' mx':''}">所持 ${have}/9</span><span class="pr"><img src="${ICON.coin}">${fmt(it.p)}</span></div></div>
-   <div class="sq"><div class="stp"><button data-a="dec" data-v="${k}" ${q<=1?'disabled':''}>−</button><b>${q}</b><button data-a="inc" data-v="${k}" ${q>=max?'disabled':''}>＋</button></div><button class="tbtn gold sbuy" data-a="buy" data-v="${k}" ${ok?'':'disabled'}>${have>=9?'満杯':ok?`購入<small>${fmt(it.p*q)}G</small>`:'お金不足'}</button></div></div>`;};
- const sellRow=k=>{const n=G.mats[k]||0;return`<div class="scard${n?'':' off2'}"><img class="sic" src="${ICON[k]||ICON.haiseki}"><div class="sb"><b>${MATS[k].n}</b><small>鍛冶屋の強化や街の発展に使う素材</small><div class="sm"><span class="hv">所持 ${n}</span><span class="pr"><img src="${ICON.coin}">${MATS[k].p}／個</span></div></div>
-   <div class="sq"><button class="tbtn sbuy" data-a="s1" data-v="${k}" ${n?'':'disabled'}>1個売る<small>+${MATS[k].p}G</small></button><button class="tbtn sbuy" data-a="sa" data-v="${k}" ${n?'':'disabled'}>全部売る<small>+${fmt(n*MATS[k].p)}G</small></button></div></div>`;};
- panel(`<div class="stabs"><button class="${SHT==='buy'?'on':''}" data-a="tab" data-v="buy">買う</button><button class="${SHT==='sell'?'on':''}" data-a="tab" data-v="sell">売る</button></div>
-  ${SHT==='buy'?its.map(buyRow).join('')+(its.length<Object.keys(ITEMS).length?`<div class="snote">道具屋を発展させると品揃えが増える（街の発展）</div>`:''):Object.keys(MATS).map(sellRow).join('')+`<button class="tbtn wide${sell?' gold':''}" data-a="sall" ${sell?'':'disabled'}>素材をすべて売る<small>${sell?`合計 ${fmt(sell)}G`:'売れる素材がない'}</small></button><div class="snote">素材は鍛冶屋の強化・街の発展にも使う。売りすぎに注意</div>`}${backBtn()}`,
-  {tab:t=>shop(null,t),dec:k=>{SHQ[k]=Math.max(1,(SHQ[k]||1)-1);shop(' ');},inc:k=>{SHQ[k]=(SHQ[k]||1)+1;shop(' ');},
-   buy:k=>{const it=ITEMS[k],have=G.items[k]||0,q=Math.min(SHQ[k]||1,9-have,Math.floor(G.gold/it.p));if(q<=0)return;G.gold-=it.p*q;addItem(k,q);SHQ[k]=1;SFX.heal();save();shop(`<b>${it.n}</b>を${q}個買った（所持 ${G.items[k]}/9）`);},
-   s1:k=>{if(!(G.mats[k]>0))return;G.mats[k]--;G.gold+=MATS[k].p;SFX.sel();save();shop(`${MATS[k].n}を1個売った（+${MATS[k].p}G）`);},
-   sa:k=>{const n=G.mats[k]||0;if(!n)return;G.mats[k]=0;G.gold+=n*MATS[k].p;SFX.heal();save();shop(`${MATS[k].n}を${n}個売って<b>${fmt(n*MATS[k].p)}G</b>を得た`);},
-   sall:()=>{if(!sell)return;G.gold+=sell;for(const k in MATS)G.mats[k]=0;SFX.heal();save();shop(`素材をすべて売って<b>${fmt(sell)}G</b>を得た`);},back:()=>townMenu()});
- if(m===' ')log('<b>店番</b>「個数を選んで、購入を押してね」');};
+
 /* 鍛冶屋・鑑定屋：店内を見せる */
 
 {const _ap=appraise;appraise=function(m){_ap(m);roomOpen('eye','鑑定屋',`鑑定屋Lv${G.fac.eye}`);RSHOW=0;};}

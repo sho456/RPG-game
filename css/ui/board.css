@@ -32,3 +32,4 @@
 .bdi.b39.pg>b small{font-size:11px;color:#aab0d8}
 .bdi.b39.pg p{flex-basis:100%;margin:0}
 .bdb.b39{grid-template-columns:1fr 1fr}
+.b39 [data-a="tr"]{display:none}

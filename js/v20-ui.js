@@ -35,20 +35,13 @@ function decorate(){const c=$('#cmd');if(!c.classList.contains('bcmd'))return;c.
   if(!b.querySelector('.inf20')&&c.querySelector('.btabs')){const i=document.createElement('span');i.className='inf20';i.textContent='i';b.appendChild(i);}});}
 new MutationObserver(()=>{try{decorate();}catch(e){}}).observe($('#cmd'),{childList:true,subtree:false});
 /* 技名の表示と、強力な技の演出 */
-function skillBanner(u,sk){if(!B||scene!=='battle'||typeof BFLOW==='undefined')return;BFLOW.bubble(u,sk.n);}/* ver0.42：技名は行動するキャラの吹き出し（js/battle/flow.js） */
-const BIG=sk=>sk&&((sk.pow||0)*(sk.hits||1)>=2.4||(sk.t==='all'&&(sk.pow||0)*(sk.hits||1)>=1.2)||/^goku/.test(Object.keys(SK).find(x=>SK[x]===sk)||''));
-{const _da=doAction;doAction=async function(u,sk,t){try{if(B&&u&&sk&&sk.n&&!sk.basic&&!['guard','item'].includes(sk.k)&&u.side===0){skillBanner(u,sk);
-  if(BIG(sk)){const st=$('#stage');st.classList.remove('imp20');void st.offsetWidth;st.classList.add('imp20');B.flashBg=Math.max(B.flashBg||0,12);B.flashCol=ELC[sk.el]||'#ffffff';}}}catch(e){}
- return _da(u,sk,t);};}
+/* ver0.42：技名は行動するキャラの吹き出し（js/battle/flow.js） */
+
 /* 敵の溜め技にも技名を出す */
 
 /* ==================== ホーム画面 ==================== */
 
-function goH(k){({rec:()=>saveMenu(),home:()=>townMenu(),quest:()=>board(),inv:()=>invMenu(),zk:()=>zkMenu(),bond:()=>bondMenu(),trial:()=>trialMenu(),dev:()=>devMenu()})[k]?.();}
-
-document.addEventListener('click',e=>{const t=e.target.closest('[data-g20]');if(!t||scene!=='town'||t.disabled)return;SFX.sel();goH(t.dataset.g20);});
 /* 下部ナビの data-go を #cmd.home20 でも効くようにする（既存の処理は #cmd.home のみ） */
-document.addEventListener('click',e=>{const t=e.target.closest('[data-go]');if(!t||scene!=='town'||TSC!=='home'||t.disabled)return;if(!t.closest('#cmd.home20'))return;SFX.sel();goFac(t.dataset.go);});
 
 /* ==================== メニュー画面：操作ボタンを下に固定 ==================== */
 const FOOTSEL=':scope > .tbar2, :scope > .tbar3, :scope > .cbtn, :scope > .bdb, :scope > .tbtn.back.wide, :scope > .tbtn.wide';

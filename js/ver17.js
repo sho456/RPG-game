@@ -36,11 +36,11 @@ let WMS={on:false,tab:0,sel:null,cur:null,bgs:{}};
 /* ==================== 戦闘画面 ==================== */
 /* 味方は右側に縦一列。HP・星臨ゲージは各キャラの横に、行動中のキャラは下の大きなパネルに表示 */
 
-let AM='n';const LASTA={};
-const awPolicy=()=>{const p=G.set.autoAw||'save';return p==='any'||(p==='boss'&&!!(B.opts.boss||B.opts.trial));};
+let AM='n';
+
 /* 通常AUTOは設定どおりに星臨を温存、全力AUTOは星臨もすぐ使う */
 
-function repOK(){}/* 未使用：js/rs/battle.js が置き換え */
+/* 未使用：js/rs/battle.js が置き換え */
 function bbar(){}/* 未使用：js/v22.js が置き換え */
 const skBadge=s=>{const heal=['heal','healAll','revive','reviveAll','item'].includes(s.k);const el=s.el||(heal?'癒':['phys','mag','rhythm'].includes(s.k)?'無':'補');return[el,ELC[el]||(heal?'#7dffa8':el==='無'?'#d8d8e8':'#9fb4ff')];};
 $('#cmd').addEventListener('click',e=>{const c=$('#cmd');if(!c.classList.contains('bcmd')||!B||!B.pick)return;const tb=e.target.closest('[data-t]'),rw=e.target.closest('[data-i]');if(tb)B.pick.tab(tb.dataset.t);else if(rw&&!rw.disabled)B.pick.row(+rw.dataset.i);});

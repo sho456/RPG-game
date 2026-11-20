@@ -16,4 +16,3 @@ const LEGCOL={tenkyuu:'#ffe14a',meikai:'#b07cff',hyouga:'#bff4ff',taiyou:'#ff9a4
 
 /* ボス戦の導入：暗転→ボスが姿を現す→名乗り */
 
-{const _hero=hero;hero=function(id){const h=_hero(id);h.an={k:'idle',t0:(id.length*17)|0};return h;};}

@@ -65,7 +65,6 @@ addEventListener('resize',()=>{if(isHome())requestAnimationFrame(()=>{try{homeLa
 {const _sh=show;show=function(m){_sh(m);app.classList.add('v22');if(m!=='battle'){const h=$('#bt22');if(h)h.style.display='none';}else{const h=$('#bt22');if(h)h.style.display='';}
  if(m!=='town'){HM.on=false;app.classList.remove('home22');}};}
 /* 行動数（ACTIONS）を数える */
-{const _da=doAction;doAction=async function(u,sk,t){try{if(B&&u&&u.side===0)BL.act++;}catch(e){}return _da(u,sk,t);};}
 
 /* ---------- 戦場の上に重ねる表示（左上：対象の情報／右上：メニュー／左下：行動順／右下：星臨） ---------- */
 function ensureHud(){let h=$('#bt22');if(h&&h.isConnected){h.style.display='';return h;}
@@ -137,10 +136,6 @@ $('#cmd').addEventListener('click',e=>{const t=e.target.closest('[data-inf]');if
 /* 下のボタン：速度・通常AUTO・全力AUTO・リピート */
 
 /* 星臨の演出：大きな「星臨」の文字と星座の輪 */
-{const _aw=awaken;awaken=async function(u){const p=_aw(u),cut=$('#cut');try{const A=AW[u.id],lv=u.awLv||1,ec=elCol(u.id);cut.classList.add('sr22');cut.style.setProperty('--ec',ec);
-  const tx=[...cut.children].find(x=>x.tagName==='DIV');if(tx)tx.className='sr22t',tx.innerHTML=`<div class="t">${u.name} ― ${SEIRIN.en}${lv>1?'　位階'+ROMAN[lv]:''}</div><div class="b">《${A.name}》</div>`;
-  cut.insertAdjacentHTML('afterbegin',`<div class="sr22bg"><i></i><i></i><i></i></div><div class="sr22k"><b>星</b><b>臨</b></div>`);}catch(e){console.error(e);}
- try{return await p;}finally{cut.classList.remove('sr22');}};}
 
 /* ---------- 開発者モード：戦闘中はSP・ゲージ・星臨が無制限 ---------- */
 /* SP・星臨ゲージを満タンに保つ。星臨の持続（行動回数）は通常どおり減る＝連続行動が止まらなくなることはない。
@@ -210,8 +205,7 @@ townMenu=function(m){WMS.on=false;TSC='home';if(scene!=='town')show('town');HM.o
  HM.news=vn;const c=$('#cmd');c.className='home22';c.innerHTML='';
  if(m&&m!==DEFMSG)toast(m+(vn&&/虚蝕/.test(vn)?'':''));else if(warn)toast(warn.replace(/^<br>/,''));
  tip('town');};
-const HGO={quest:()=>missionScreen('home'),menu:()=>saveMenu(),news:()=>newsSheet(),inv:()=>invMenu(),zk:()=>zkMenu(),bond:()=>bondMenu(),dev:()=>devMenu(),trial:()=>trialMenu(),
- home:()=>townMenu(),party:()=>partyScreen(),star:()=>openBoard(G.party[0]),smith:()=>smith(),tavern:()=>tavern(),shop:()=>shop(),appraise:()=>appraise(),go:()=>worldMap()};
+const HGO={menu:()=>saveMenu(),news:()=>newsSheet(),inv:()=>invMenu(),zk:()=>zkMenu(),home:()=>townMenu(),smith:()=>smith(),tavern:()=>tavern(),appraise:()=>appraise()};
 document.addEventListener('click',e=>{const t=e.target.closest('[data-h22]');if(!t||scene!=='town'||t.disabled)return;const f=HGO[t.dataset.h22];if(!f)return;SFX.sel();HM.on=false;app.classList.remove('home22');f();});
 function newsSheet(){const vn=HM.news||'';ovOpen(`<div class="nw22"><div class="nh">${ic('bell')}<b>お知らせ</b></div>${vn||'<div class="nn">新しいお知らせはありません</div>'}
  <div class="nt"><b>ver0.22</b>　戦闘・ホーム・編成の画面を一新。「覚醒」は<b>${SEIRIN.n}（${SEIRIN.kana}）</b>に改めました。<br><small>${SEIRIN.lore}</small></div></div><button class="tbtn back wide" data-a="close">閉じる</button>`,{close:ovClose});}
@@ -221,27 +215,6 @@ function newsSheet(){const vn=HM.news||'';ovOpen(`<div class="nw22"><div class="
 {const _ro=roomOpen;roomOpen=function(...a){HM.on=false;app.classList.remove('home22');return _ro(...a);};}
 
 /* ==================== 6. ミッション（一括受け取り） ==================== */
-let MT='rdy',MFROM='home';
-const qOk=q=>{try{return!G.q.done[q.id]&&!!q.ok();}catch(e){return false;}};
-const qPg=q=>{try{return String(q.pg());}catch(e){return'';}};
-function claimQuests(list){const got=[];for(const q of list){if(G.q.done[q.id]||!qOk(q))continue;try{q.give();G.q.done[q.id]=1;got.push(q);}catch(e){console.error(e);}}if(got.length){SFX.aw();save();}return got;}
-function claimedSheet(got){ovOpen(`<div class="cl22"><div class="ch">${ic('gift')}<b>報酬を受け取りました</b><small>${got.length}件</small></div><div class="cs">${got.map((q,i)=>`<div class="ci" style="--d:${i*.06}s"><b>${esc(q.n)}</b><span>${esc(q.rw)}</span></div>`).join('')}</div></div>
- <button class="tbtn gold wide" data-a="close">OK</button>`,{close:()=>{ovClose();missionScreen();}});}
-function missionScreen(from,m){if(from)MFROM=from;if(scene!=='town')show('town');TSC='other';
- const L=QS.map(q=>({q,done:!!G.q.done[q.id],ok:qOk(q)})),rdy=L.filter(x=>x.ok),prog=L.filter(x=>!x.done&&!x.ok),done=L.filter(x=>x.done);
- if(MT==='rdy'&&!rdy.length&&!m)MT=prog.length?'prog':'done';
- const list=MT==='rdy'?rdy:MT==='prog'?prog:done;
- log(m||`<b>ミッション</b>　達成した依頼の報酬を受け取れる。<b>一括受け取り</b>なら、受け取れるものだけをまとめて受け取る`);
- const row=({q,done,ok})=>{const pg=qPg(q),mt=/^(\d+)\/(\d+)$/.exec(pg),pc=done||ok?100:mt?Math.min(100,+mt[1]/+mt[2]*100):0;
-  return`<div class="ms22c${done?' done':ok?' ok':''}"><div class="mh"><span class="ic">${ic(done?'trophy':ok?'gift':'scroll')}</span><b>${esc(q.n)}</b><span class="st">${done?'受取済み':ok?'達成！':esc(pg)}</span></div>
-   <div class="md">${esc(q.d)}</div><div class="mb"><i style="width:${pc}%"></i></div><div class="mr"><em>報酬</em><span>${esc(q.rw)}</span>${ok?`<button class="tbtn gold" data-a="one" data-v="${q.id}">受け取る</button>`:''}</div></div>`;};
- panel(`<div class="ms22"><div class="mt22"><div class="tt">${ic('scroll')}<b>ミッション</b></div><div class="cnt"><b>${done.length}</b>/${QS.length}<small>受取済み</small></div></div>
-  <div class="stabs ms22t">${[['rdy','受け取り可能',rdy.length],['prog','進行中',prog.length],['done','受取済み',done.length]].map(([k,l,n])=>`<button class="${MT===k?'on':''}" data-a="tab" data-v="${k}">${l}<b>${n}</b></button>`).join('')}</div>
-  <div class="ms22l">${list.map(row).join('')||`<div class="emp22">${MT==='rdy'?'受け取れる報酬はありません':MT==='prog'?'進行中の依頼はありません':'まだ受け取った報酬はありません'}</div>`}</div></div>
-  <div class="tbar2"><button class="tbtn gold" data-a="all" ${rdy.length?'':'disabled'}>一括受け取り<small>${rdy.length?rdy.length+'件':'対象なし'}</small></button><button class="tbtn back" data-a="back">${MFROM==='tavern'?'◀ 酒場へ':'◀ ホームへ'}</button></div>`,
- {tab:k=>{MT=k;missionScreen();},one:id=>{const q=QS.find(x=>x.id===id);if(!q)return;const got=claimQuests([q]);if(got.length)claimedSheet(got);else missionScreen(null,'この依頼はまだ受け取れない');},
-  all:()=>{const got=claimQuests(QS.filter(qOk));if(got.length){MT='done';claimedSheet(got);}else missionScreen(null,'受け取れる報酬はありません');},
-  back:()=>{MT='rdy';MFROM==='tavern'?tavern():townMenu();}});}
 
 /* ==================== 3. 編成画面 ==================== */
 
@@ -256,24 +229,7 @@ document.addEventListener('click',e=>{const x=e.target.closest('.x22');if(!x||e.
 
 /* ==================== 5. 開発者モード：全データ開放 ==================== */
 let DEVDONE=false;
-function devUnlockAll(){if(!DEV())return'';const n0={m:G.members.length,inv:G.inv.length};
- for(const id of Object.keys(HB))if(!G.members.includes(id))newMember(id);
- Object.assign(G.flags,{boss1:true,boss2:true,boss3:true,boss4:true,boss5:true,boss6:true,boss7:true,boss8:true,boss9:true,kr30:true,endSeen:1,zenkyo:1,mireMet:1,noahMet:1,ernaMet:1,balzaMet:1,hakuaMet:1,jinMet:1,celesMet:1,valkMet:1,uqRio:1});
- if(!G.flags.crowChoice)G.flags.crowChoice='save';G.declined=[];
- for(const id of G.members){const h=G.h[id];h.lv=Math.max(h.lv||1,55);h.awLv=3;h.hp=null;if(BOARD[id])h.board=[...new Set([...(h.board||[]),...Object.keys(BOARD[id])])];}
- for(const k in G.fac)G.fac[k]=5;G.fac.garden=Math.max(1,G.fac.garden||0);
- G.tower=Object.assign(G.tower||{},{cp:26,max:30});if(typeof kst==='function'){const K=kst();K.cp=Math.max(K.cp||1,31);K.max=Math.max(K.max||0,50);}
- G.gold=Math.max(G.gold,9999999);G.tou=Math.max(G.tou||0,999999);
- for(const k in ITEMS)G.items[k]=Math.max(G.items[k]||0,99);for(const k in MATS)G.mats[k]=Math.max(G.mats[k]||0,999);for(const k in STONES)G.stones[k]=Math.max(G.stones[k]||0,99);
- /* 装備：レジェンド・専用ユニーク・王家セットを、持っていないものだけ追加 */
- const hasLeg=new Set(G.inv.filter(i=>i.leg).map(i=>i.leg));Object.keys(LEG).forEach(k=>{if(hasLeg.has(k))return;let it=null;try{it=LEG[k].uq&&typeof uqItem==='function'?uqItem(k.replace(/^uq_/,'')):devLeg(k);}catch(e){}if(it){it.unid=false;G.inv.push(it);try{zkItem(it);}catch(e){}}});
- const hasSet=new Set(G.inv.filter(i=>i.set==='royal').map(i=>i.slot));if(typeof ROYAL!=='undefined')for(const s in ROYAL)if(!hasSet.has(s)&&!hasSet.has(s==='acc'?'acc':s)){try{const it=royalItem(s,40);it.unid=false;G.inv.push(it);zkItem(it);}catch(e){}}
- G.inv.forEach(i=>{i.unid=false;});
- /* 図鑑・弱点・絆 */
- G.zk=G.zk||{e:{},i:{}};G.known=G.known||{};try{zkEnemies().forEach(k=>{G.zk.e[k]=G.zk.e[k]||1;});}catch(e){}for(const k in ED)if(!/^(tr_|vo_)/.test(k)&&ED[k].weak)G.known[k]=[...ED[k].weak];
- try{bondIds().forEach(id=>{const b=bondOf(id);b.p=Math.max(b.p,99);});}catch(e){}
- G.tut=G.tut||{};if(typeof TIPS!=='undefined')for(const k in TIPS)G.tut[k]=1;
- save();return`仲間 ${n0.m}→${G.members.length}人・装備 ${n0.inv}→${G.inv.length}個`;}
+
 {const _et=enterTown;enterTown=function(m){if(DEV()&&!DEVDONE){DEVDONE=true;try{const r=devUnlockAll();m=(m?m+'<br>':'')+`<small>ver0.22：全データを開放した（${r}）</small>`;}catch(e){console.error(e);}}return _et(m);};}
 {const _t=title;title=function(){DEVDONE=false;return _t();};}
 
@@ -284,4 +240,4 @@ try{TIPS.battle=['戦闘のしかた',['自分の番が来たら、下の一覧�
 /* ==================== 版表示 ==================== */
 
 try{document.title='アストラル・ブレイカー '+VER22;}catch(e){}
-return{HM,BL,skInfo};})();
+return{skInfo};})();

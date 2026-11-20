@@ -125,7 +125,7 @@ function auto2(id){let n=0;for(;;){const c=Object.keys(BOARD2[id]).filter(k=>can
 {const _bo=bonus;bonus=function(id){const o=_bo(id);try{const N=BOARD2[id];if(N&&G.h[id].board2)for(const k of G.h[id].board2){const n=N[k];if(n&&n.v&&(n.t==='stat'||n.t==='ex'||n.t==='aw'))for(const x in n.v)o[x]=(o[x]||0)+n.v[x];}}catch(e){console.error(e);}return o;};}
 
 const psOf=id=>{const N=BOARD2[id],o=[];if(N&&G.h[id]&&G.h[id].board2)for(const k of G.h[id].board2){const n=N[k];if(n&&n.t==='ps')o.push(n.v.ps);}return o;};
-{const _h=hero;hero=function(id){const u=_h(id);try{u.ps20=u.ps20||[];for(const p of psOf(id))if(!u.ps20.some(x=>x.id===p)){u.ps20.push({id:p,v:0});const P=V20.PS[p];if(P&&P.make)P.make(u,0);}}catch(e){console.error(e);}return u;};}
+
 {const _pw=power;power=function(id){const s=stats(id);return Math.round(_pw(id)*(1+(s.dmgP||0)/100)*(1+(s.skDmg||0)/250)*(1+(s.dmgCut||0)/100)+psOf(id).length*400);};}
 
 /* ---------- 天星盤の画面 ---------- */

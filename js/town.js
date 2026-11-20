@@ -5,7 +5,7 @@ const QS=[{id:'q1',n:'灰狼退治',d:'灰狼を3体倒す',ok:()=>G.q.wolf>=3,p
  {id:'q2',n:'灰石の納品',d:'灰石を3個納める',ok:()=>G.mats.haiseki>=3,pg:()=>`${G.mats.haiseki}/3`,rw:'星の雫×1',give:()=>{G.mats.haiseki-=3;addItem('drop',1);}},
  {id:'q3',n:'街道の番人',d:'虚ろの番人を倒す',ok:()=>G.flags.boss1,pg:()=>G.flags.boss1?'達成':'未達成',rw:'500G・不死鳥の羽',give:()=>{G.gold+=500;addItem('feather',1);}}];
 function board(){}/* 未使用：js/ver18-town.js が置き換え */
-function shop(){}/* 未使用：js/ver18-town.js が置き換え */
+/* 未使用：js/ver18-town.js が置き換え */
 function townMenu(){}
 
 function tavern(){}/* 未使用：js/ch9.js が置き換え */

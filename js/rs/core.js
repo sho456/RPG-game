@@ -188,19 +188,7 @@ try{for(const x of['1','2','3','O'])V20.PS['ab_up'+x]={n:x==='O'?'奥義強化':
 /* 天星盤の画面の呼び名（「天星パッシブ」→「アビリティ強化」） */
 
 /* ==================== 戦闘ユニット ==================== */
-{const _h=hero;hero=function(id){const u=_h(id);try{
-  /* 旧キャラ専用パッシブ・天星パッシブ（アビリティに置き換え）を外す */
-  u.ps20=(u.ps20||[]).filter(p=>!/^c_|^tp_|^ab_up/.test(p.id));
-  u.rsSet=setOf(id);u.skills=u.rsSet.slice();
-  u.rsE=abEffects(id);
-  for(const e of u.rsE)if(e.t==='stat')applyStat(u,e);
-  u.awTurn=(u.awTurn||0)+u.rsE.filter(e=>e.t==='awturn').reduce((a,e)=>a+e.v,0);
-  const W=D.WPN[u.rsW]||D.WPN['剣'];u.wpn=u.rsW;u.elem=W.el;
-  u.s7=Object.assign({},u.s7||{});
-  u.bpMax=u.bpMax||D.BP.max;u.sp=u.bp0!=null?u.bp0:D.BP.start;
-  const h=G.h[id];u.lpMax=u.lpMax||D.LP_FIX;u.lp=h&&h.lp!=null?clamp(h.lp,0,u.lpMax):u.lpMax;
-  if(u.lp<=0){u.alive=false;u.hp=0;}
- }catch(e){console.error(e);}return u;};}
+
 function applyStat(u,e){const k=e.k,m=1+e.v/100;if(k==='mhp'){const r=u.mhp?u.hp/u.mhp:1;u.mhp=Math.round(u.mhp*m);u.hp=Math.max(u.alive?1:0,Math.round(u.mhp*r));}else if(k==='spd')u.spd=+(u.spd*m).toFixed(2);else if(u[k]!=null)u[k]=Math.round(u[k]*m);
  if(u._b0&&u._b0[k]!=null)u._b0[k]=k==='spd'?+(u._b0[k]*m).toFixed(2):Math.round(u._b0[k]*m);}
 /* 7 能力の補正（陣形）：内部値にも反映する */

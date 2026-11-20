@@ -36,9 +36,8 @@ ATK=u=>{if(!u||u.side!==0)return _ATK(u);const W=D.WPN[u.wpn]||D.WPN['剣'];
  if(W.mag||MAG(u.id))return{n:'魔弾',bn:u.wpn||'杖',el:nel(u.atkEl)||elOf(u.id)||'打',k:'mag',pow:.8,t:'one',basic:true};
  return{n:'攻撃',bn:u.wpn,el:u.aw&&u.id==='rio'?'陽':(nel(u.atkEl)||W.el),k:'phys',pow:1,t:'one',basic:true};};
 /* 2 つ目の通常攻撃（クロウの鎌杖：杖の魔弾に加えて、大鎌の斬撃） */
-ALTATK=u=>{const X=u&&u.side===0&&D.HERO[u.id]&&D.HERO[u.id].alt;if(!X)return null;return{n:X.n,bn:X.bn,el:X.el,k:'phys',pow:1,t:'one',basic:true,drain:X.drain,d:X.d};};
+
 /* 通常攻撃の一覧 */
-basicsOf=u=>[ATK(u),ALTATK(u)].filter(Boolean);
 
 /* ---------- 属性の色（旧名の色をそのまま新しい名前へ） ---------- */
 try{for(const[o,n]of Object.entries(NORM))if(ELC[o]&&!ELC[n])ELC[n]=ELC[o];}catch(e){}
