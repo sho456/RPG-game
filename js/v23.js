@@ -10,7 +10,7 @@
  6. 探索：テキスト表示の切り替え。非表示のときはマップを広げ、新しい知らせは地図の下に短く流す
  7. 星臨：演出テキスト（カットイン）が終わってから、星臨のアニメーション（光の柱・ポーズ）を再生する
  既存の処理は包む（ラップする）か、同じ動作を保ったまま置き換える。セーブデータの形は変えない（設定に1項目追加のみ） */
-'use strict';
+
 const VER23='ver0.23';
 const V23=(()=>{
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -97,7 +97,7 @@ function placeEnemies(full){const x0=3,x1=Math.max(60,LY.heroL-10),EB=LY.ebot!=n
 function layout(full=true){if(scene!=='battle'||!B)return;const nh=battleH();if(nh!==H){setH(nh);try{BG=makeBg(V22.BL.th,V22.BL.boss);if(typeof VOIDED!=='undefined'&&VOIDED&&typeof desat==='function')BG=desat(BG);}catch(e){}}else fit();
  LY.hudPx=(HK23.hudPx||hudPx)();LY.botPx=(HK23.botPx||botPx)();LY.top=(LY.hudPx+6)/SC;LY.bot=H-(LY.botPx+3)/SC;if(LY.bot-LY.top<44)LY.bot=LY.top+44;
  placeHeroes();placeEnemies(full);app.style.setProperty('--hud23',LY.hudPx+'px');app.style.setProperty('--bot23',LY.botPx+'px');refresh();}
-{const _sb=startBattle;startBattle=function(list,opts){const r=_sb(list,opts);try{layout(true);requestAnimationFrame(()=>{try{layout(true);}catch(e){}});}catch(e){console.error(e);}return r;};}
+
 addEventListener('resize',()=>{if(scene==='battle')requestAnimationFrame(()=>requestAnimationFrame(()=>{try{layout(true);}catch(e){}}));});
 /* 召喚・形態変化で後から出た敵も、重ならない位置へ置く。縮めた敵の大きさを保つ */
 {const _d=draw;draw=function(){_d();if(scene!=='battle'||!B)return;try{for(const e of B.enemies){if(e._cap23&&e.A&&e.A.sc>e._cap23+1e-6)e.A.sc=e._cap23;}if(B.enemies.some(e=>!e._p23))placeEnemies(false);}catch(e){if(!draw._e23){draw._e23=1;console.error(e);}}};}
@@ -174,17 +174,8 @@ document.addEventListener('click',e=>{const t=e.target.closest('.h22toast');if(t
 /* ==================== お知らせ・開発者メニュー ==================== */
 const NEWS23=`<div class="nt"><b>${VER23}</b>　戦闘画面を作り直しました。<br><small>・HP／SP／${SEIRIN.g}は画面下の<b>パーティ情報欄</b>に（タップで状態の詳細）。敵の名前・HP・弱点は画面上の固定帯に。<br>・ダメージ表示を一新（Critical／Weak／Guard／Miss／BREAK）。<br>・${SEIRIN.n}は、演出テキストのあとにアニメーションが流れます。<br>・図鑑：タップで専用の詳細画面。ドット絵の動きを再生できます。<br>・探索：右下の「文」でテキストの表示／非表示を切り替え。</small></div>`;
 /* お知らせの表示は ver0.24（v24.js）で最新版の内容と合わせて行う（以前は版ごとに別々に開き、二重に開いていた） */
-function dev23(m){log((m||`<b>${VER23}</b>　戦闘画面・ダメージ表示・${SEIRIN.n}演出・図鑑・探索の確認`));
- menu([{l:'戦闘：ボス＋手下',s:'配置・パーティ情報欄・ダメージ表示',cls:'ready',f:()=>devBattle([{kind:'boss2',lv:10},{kind:'moss',lv:8},{kind:'jadewolf',lv:8}],'midori',{theme:'forest'})},
-  {l:'戦闘：大型ボス',s:'演技エリアに収まるか',f:()=>devBattle([{kind:'boss9',lv:60}],'ryuu',{theme:'lava'})},
-  {l:'ダメージ表示の見本',s:'Critical・Weak・Guard・Miss',f:()=>{devBattle([{kind:'boss',lv:5},{kind:'slime',lv:5}],'haido');setTimeout(sample,1400);}},
-  {l:'図鑑（モーション再生）',f:()=>zkMenu()},{l:'探索（テキスト切り替え）',f:()=>enterField('midori')},{l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
-function sample(){if(!B)return;const e=B.enemies[0],s=B.enemies[1],h=B.heroes;let i=0;const q=[()=>pop(e,128,'#fff',false,''),()=>pop(e,864,'#fff',false,'weak','陽'),()=>pop(e,2480,'#fff',false,'crit weak','打'),
-  ()=>{h[1].guard=true;pop(h[1],412,'#f88',false,'hurt');setTimeout(()=>pop(h[1],'スタン','#ffe14a',true,'st20 dn'),40);},()=>pop(h[2],'MISS','#fff',true),()=>pop(h[3],'+640','#7dffa8'),()=>{h[1].guard=false;}];
- const go=()=>{if(i<q.length){try{q[i++]();}catch(x){}setTimeout(go,520);}};go();}
-{const _dv=dvMenu;dvMenu=function(m){_dv(m);try{addCmd(VER23+' 戦闘画面・図鑑','配置・ダメージ表示・'+SEIRIN.n+'演出・図鑑',dev23,0,'ready');}catch(e){}};}
 
 /* 版表示 */
-{const _t=title;title=function(){_t();const v=$('#verL');if(v)v.textContent=VER23;};const v=$('#verL');if(v)v.textContent=VER23;}
+
 try{document.title='アストラル・ブレイカー '+VER23;}catch(e){}
 return{HK23,NEWS23,homeFix,applyFieldMsg,layout,LY,seirinText,fadeIn,placeEnemies,placeHeroes,battleH,esc,clamp,appW,oh,sleep,DEV};})();

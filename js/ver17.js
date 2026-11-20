@@ -1,26 +1,19 @@
 /* ===== ver0.17 快適さ＋UI再構築 =====
  1. 画面の作り替え：編成／キャラ詳細（装備）／星盤／マップ選択／戦闘
  2. 快適さ：チュートリアル・セーブ3スロット・拾う前フィルター拡張・オートの星臨設定・テキスト速度 */
-const VER='ver0.18';
+
 const ELS10=['斬','打','突','熱','冷','雷','陽','陰'];
-let elOf=id=>OWNEL[id]||({valk:'熱'})[id]||null;
+
 const elCol=id=>ELC[elOf(id)]||'#c8b0ff';
 const clsOf=id=>(PROF[id]?PROF[id][1].split('／')[0]:'');
 const fmt=n=>Math.round(n).toLocaleString('en-US');
-const lsGet=k=>{try{return localStorage.getItem(k);}catch(e){return null;}};
-const lsSet=(k,v)=>{try{localStorage.setItem(k,v);}catch(e){}};
+
 /* 立ち絵（48×48ドットを拡大表示） */
-const ARTC={};
+
 function art(){}/* 未使用：js/ver18-art.js が置き換え */
 /* 戦闘力：能力・星臨位階・技の数から算出する目安 */
 function power(id){const s=stats(id),h=G.h[id];return Math.round(s.mhp*.6+Math.max(s.atk,s.mag)*7+Math.min(s.atk,s.mag)*1.5+(s.def+s.res)*3.5+s.spd*18+s.crit*6+s.weakDmg*3+s.awDmg*3+s.startAG*2+(h.awLv||1)*120+skillList(id).length*25);}
 /* 星盤を星座として描く（解放した星が光り、線でつながる） */
-function conSvg(id){const N=BOARD[id],U=G.h[id].board,P=n=>[50+7.4*Math.sqrt(3)*(n.q+n.r/2),50+7.4*1.5*n.r];let ln='',dt='';
- for(const k in N){const n=N[k],[x,y]=P(n),on=U.includes(k);dt+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${on?1.7:.8}"${on?' class="on"':''}/>`;
-  if(on)for(const[dq,dr]of HEXD){const k2=(n.q+dq)+','+(n.r+dr);if(!N[k2]||k2<k||!U.includes(k2))continue;const[x2,y2]=P(N[k2]);ln+=`<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"/>`;}}
- return`<svg class="con" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">${ln}${dt}</svg>`;}
-const rankH=id=>{const l=G.h[id].awLv||1;return`<div class="rk rk${l}"><b>${ROMAN[l]}</b></div>`;};
-function addCmd(l,s,f,idx,cls){const c=$('#cmd'),b=document.createElement('button');b.className='c '+(cls||'');b.innerHTML=l+(s?`<small>${s}</small>`:'');b.onclick=()=>{SFX.sel();f();};c.insertBefore(b,c.children[idx]||null);return b;}
 
 /* ---------- 設定の初期値 ---------- */
 const AWN={save:'温存',boss:'ボス戦のみ',any:'いつでも'};
@@ -42,13 +35,11 @@ let WMS={on:false,tab:0,sel:null,cur:null,bgs:{}};
 
 /* ==================== 戦闘画面 ==================== */
 /* 味方は右側に縦一列。HP・星臨ゲージは各キャラの横に、行動中のキャラは下の大きなパネルに表示 */
-Object.assign(HPOS,{1:[[112,46]],2:[[114,24],[108,68]],3:[[114,8],[108,44],[114,80]],4:[[114,1],[108,31],[114,61],[108,91]]});
+
 let AM='n';const LASTA={};
 const awPolicy=()=>{const p=G.set.autoAw||'save';return p==='any'||(p==='boss'&&!!(B.opts.boss||B.opts.trial));};
 /* 通常AUTOは設定どおりに星臨を温存、全力AUTOは星臨もすぐ使う */
-{const _ap=autoPick;autoPick=function(u){if(auto&&AM==='n'&&!u.aw&&u.ag>=100&&!awPolicy()){const ag=u.ag;u.ag=99;try{return _ap(u);}finally{u.ag=ag;}}return _ap(u);};}
-const skDis=(u,s)=>{const lock=s.req==='charged'?!u.charged:s.req==='lowhp'?u.hp>u.mhp*.25:s.req==='stk3'?(u.stk||0)<3:s.req&&!B.awUsed.has(s.req);
- return!!((s.sp||0)>u.sp||lock||(s.k==='zen'&&B.zenUsed)||(s.revive&&!B.heroes.some(h=>!h.alive)));};
+
 function repOK(){}/* 未使用：js/rs/battle.js が置き換え */
 function bbar(){}/* 未使用：js/v22.js が置き換え */
 const skBadge=s=>{const heal=['heal','healAll','revive','reviveAll','item'].includes(s.k);const el=s.el||(heal?'癒':['phys','mag','rhythm'].includes(s.k)?'無':'補');return[el,ELC[el]||(heal?'#7dffa8':el==='無'?'#d8d8e8':'#9fb4ff')];};
@@ -72,57 +63,16 @@ refresh=function(){if(!B||scene!=='battle')return;if(!B.tgt||!B.tgt.alive||!B.en
 
 /* ==================== 編成画面 ==================== */
 let PSEL=null,CTAB='st',BFROM='town';
-function partyScreen(m){const P=G.party,bench=G.members.filter(id=>!P.includes(id)),tot=P.reduce((a,id)=>a+power(id),0),sel=PSEL&&G.members.includes(PSEL)?PSEL:(PSEL=null);
- log(m||(sel?`<b>${HB[sel].name}</b>を選択中　入れ替えたい相手をタップ／もう一度タップで詳細`:'<b>編成</b>　カードをタップで選ぶ。前衛は4人まで、左から順に並ぶ<br><small>控えにも経験値が100%入る</small>'));
- const eqs=id=>SLOTS6.map(sl=>{const it=G.h[id].eq[sl]&&findItem(G.h[id].eq[sl]);return it?`<img class="r${it.rar}" src="${itemIcon(it)}">`:'<i></i>';}).join('');
- const card=(id,i)=>{const h=G.h[id],pl=ptsLeft(id);return`<div class="pcd${sel===id?' sel':''}" data-a="c" data-v="${id}" style="--ec:${elCol(id)}">${rankH(id)}<div class="pno">${i+1}</div>
-  <div class="part">${conSvg(id)}<img src="${art(id)}"></div><div class="pnm"><i class="elc">${elOf(id)||'無'}</i>${HB[id].name}</div><div class="plv">Lv${h.lv}　${clsOf(id)}</div>
-  <div class="ppw"><small>戦闘力</small><b>${fmt(power(id))}</b></div><div class="peq">${eqs(id)}</div>
-  <div class="pbd${pl>0?' rdy':''}" data-a="bd" data-v="${id}"><b>✦</b><small>${pl>0?'星盤 残'+pl:'星盤'}</small></div></div>`;};
- panel(`<div class="pshd"><div class="pst"><b>✦ パーティ編成</b><small>${chapter()}　仲間 ${G.members.length}人</small></div><div class="psp"><small>パーティ戦闘力</small><b>${fmt(tot)}</b></div></div>
- <div class="pcards">${P.map(card).join('')}${Array.from({length:4-P.length},()=>`<div class="pcd emp" data-a="e"><b>＋</b><small>空き</small></div>`).join('')}</div>
- ${sel?`<div class="pact"><button class="tbtn gold" data-a="det">詳細・装備</button><button class="tbtn" data-a="bd" data-v="${sel}">星盤</button><button class="tbtn" data-a="rm" ${P.includes(sel)&&P.length>1?'':'disabled'}>控えへ</button><button class="tbtn back" data-a="x">選択解除</button></div>`:''}
- <div class="ttl2">控え ${bench.length}人</div><div class="pbench">${bench.map(id=>`<div class="pbt${sel===id?' sel':''}" data-a="c" data-v="${id}" style="--ec:${elCol(id)}"><img src="${art(id)}"><b>${HB[id].name}</b><small>Lv${G.h[id].lv}　${fmt(power(id))}</small></div>`).join('')||'<div class="emp" style="grid-column:1/-1">控えの仲間はいない</div>'}</div>
- <div class="tbar2"><button class="tbtn" data-a="inv">持ち物 <small>${G.inv.length}個</small></button><button class="tbtn back" data-a="back">戻る</button></div>`,
- {c:id=>{if(!PSEL){PSEL=id;return partyScreen();}if(PSEL===id){PSEL=null;return equipMenu(id);}
-   const a=PSEL,ia=P.indexOf(a),ib=P.indexOf(id);PSEL=null;if(ia>=0&&ib>=0){P[ia]=id;P[ib]=a;}else if(ia>=0)P[ia]=id;else if(ib>=0)P[ib]=a;else{PSEL=id;return partyScreen();}
-   save();partyScreen(`<b>${HB[a].name}</b>と<b>${HB[id].name}</b>を入れ替えた`);},
-  e:()=>{if(PSEL&&!P.includes(PSEL)){const a=PSEL;PSEL=null;P.push(a);save();partyScreen(`<b>${HB[a].name}</b>を前衛に加えた`);}else partyScreen('空き枠：下の<b>控え</b>から仲間を選んで、もう一度ここをタップ');},
-  det:()=>{const a=PSEL;PSEL=null;equipMenu(a);},bd:id=>{PSEL=null;BFROM='party';BS.sel=null;openBoard(id);},
-  rm:()=>{const a=PSEL;PSEL=null;G.party=P.filter(x=>x!==a);save();partyScreen(`<b>${HB[a].name}</b>を控えに下げた`);},x:()=>{PSEL=null;partyScreen();},inv:()=>invMenu(),back:()=>{PSEL=null;townMenu();}});
- tip('party');}
-formation=function(){};/* 未使用：js/v22.js が置き換え */
+function partyScreen(){}
+/* 未使用：js/v22.js が置き換え */
 
 /* ==================== キャラ詳細（装備・能力・技・星盤） ==================== */
-function charHTML(id,tab,ed){const s=stats(id),h=G.h[id],b=HB[id],A2=AW[id],lv=h.awLv||1,hp=h.hp??s.mhp;
- const slot=sl=>{const it=h.eq[sl]&&findItem(h.eq[sl]);return`<div class="cslot ${it?'r'+it.rar:'emp'}" data-a="pick" data-v="${sl}">${it?`<img src="${itemIcon(it)}" data-eqi="${it.uid}"><u class="eqi-b" data-eqi="${it.uid}">ⓘ</u>${it.plus?`<b>+${it.plus}</b>`:''}`:'<i>＋</i>'}<small>${SLOTN[sl]}</small></div>`;};
- const row=(k,v,g)=>`<div class="sr"><span>${g?`<i class="g${g}">${g}</i>`:'<i class="gn">◆</i>'}${k}</span><b>${v}</b></div>`;let body='';
- if(tab==='st')body=`<div class="cst"><div class="cl"><div class="cpw"><small>戦闘力</small><b>${fmt(power(id))}</b></div>
-   <div class="cbx">${row('Lv',h.lv)}${row('次のLvまで',nextXP(h.lv)-h.xp)}${row('星臨位階','<span style="color:#ffe27a">'+'★'.repeat(lv)+'☆'.repeat(3-lv)+'</span>')}</div>
-   <div class="cbx">${row('HP',hp+' / '+s.mhp)}${row('LP',(h.lp??s.lpMax)+' / '+s.lpMax)}${row('開始時AG',s.startAG)}</div></div>
-  <div class="cr cbx">${row('最大HP',s.mhp,b.g.mhp)}${row('技の威力',s.atk,b.g.atk)}${row('術の威力',s.mag,b.g.mag)}${row('会心率',(6+s.crit)+'%')}${row('弱点ダメ','+'+s.weakDmg+'%')}${row('星臨中与ダメ','+'+s.awDmg+'%')}${row('ドロップ率','+'+s.drop+'%')}</div></div>
-  <div class="cnote">S〜D は成長のしやすさ${s.atkEl?'　通常攻撃：'+s.atkEl+'属性（装備）':''}</div>`;
- if(tab==='eq')body=`<div class="slots">${SLOTS6.map(sl=>{const it=h.eq[sl]&&findItem(h.eq[sl]);return`<div class="slot ${it?'r'+it.rar:''}" data-a="pick" data-v="${sl}"><div class="sln">${SLOTN[sl]}</div>${it?`<img class="iic" src="${itemIcon(it)}" data-eqi="${it.uid}"><div class="sit">${iname(it)}<br><small>${mainTxt(it)}</small></div>`:'<div class="sit emp">― なし ―</div>'}</div>`;}).join('')}</div>`;
- if(tab==='sk')body=`<div class="sh2">星臨「${A2.name}」<small>（${A2.type}・位階${ROMAN[lv]}）</small></div><div class="stx">${AWD[id]||''}<br>${[...A2.cmds,...(lv>=3?['goku'+id]:[])].map(k=>`<b>${SK[k].n}</b>：${SK[k].d||''}`).join('<br>')}</div>
-  <div class="sh2">技</div><div class="stx">${skillList(id).map(k=>`<b>${SK[k].n}</b> <small>SP${SK[k].sp||0}</small>：${SK[k].d||''}`).join('<br>')}</div>`;
- if(tab==='bd')body=`<div class="sh2">星盤「${BDEF[id].star}」</div><div class="stx">解放した星 ${h.board.length-1}／${Object.keys(BOARD[id]).length-1}　残りポイント <b>${ptsLeft(id)}</b></div>
-  <i class="tsb-anchor" hidden></i>
-  ${PROF[id]?`<div class="sh2">人物</div><div class="stx">${PROF[id][0]}　${PROF[id][1]}<br>${PROF[id][2]}</div>`:''}`;
- return`<div class="chd" style="--ec:${elCol(id)}">${rankH(id)}<div class="chn"><small>［${A2.name}］${G.party.includes(id)?'前衛':'控え'}</small><b>${b.name}</b></div><div class="chc"><i class="elc">${elOf(id)||'無'}</i>${clsOf(id)}</div>${ed?'':'<button class="sx" data-a="close">✕</button>'}</div>
- <div class="cart" style="--ec:${elCol(id)}"><div class="ceq l">${SLOTS6.slice(0,3).map(slot).join('')}</div><div class="ceq r">${SLOTS6.slice(3).map(slot).join('')}</div>
-  <div class="cped"></div><img class="cspr" src="${art(id)}"><button class="cnav l" data-a="prev">◀</button><button class="cnav r" data-a="next">▶</button></div>
- <div class="ctabs">${[['st','能力値'],['eq','装備'],['sk','技・星臨'],['bd','星盤']].map(([k,l])=>`<button class="${tab===k?'on':''}" data-a="tab" data-v="${k}">${l}</button>`).join('')}</div><div class="cbody">${body}</div>`;}
-equipMenu=function(id,m){if(!G.members.includes(id))id=G.party[0];const ids=G.members,i=ids.indexOf(id),n=bondReadyN();log((m||`<b>${HB[id].name}</b>　装備の枠をタップで着替え`)+goldTxt());
- panel(charHTML(id,CTAB,true)+`<div class="cbtn"><button class="tbtn gold" data-a="best">最強装備</button><button class="tbtn" data-a="inv">持ち物<small>${G.inv.length}個</small></button><button class="tbtn${ptsLeft(id)>0?' gold':''}" data-a="bd">星盤<small>残${ptsLeft(id)}</small></button><button class="tbtn back" data-a="back">戻る</button></div>`,
- {tab:k=>{CTAB=k;equipMenu(id);},pick:sl=>pickEq(id,sl),prev:()=>equipMenu(ids[(i-1+ids.length)%ids.length]),next:()=>equipMenu(ids[(i+1)%ids.length]),
-  best:()=>{bestEquip(id);SFX.aw();save();equipMenu(id,'おすすめの装備にした');},inv:()=>invMenu(),bd:()=>{BFROM='party';BS.sel=null;openBoard(id);},tr:()=>trialMenu(),bond:()=>bondMenu(),back:()=>partyScreen()});};
+
 /* 探索中のステータス（同じ画面を読み取り専用で開く） */
 let SACT={},SHP=null;
 function ovOpen(html,acts){const sh=$('#sheet');if(sh.style.display!=='flex'&&scene==='field'&&F){SHP=F.pause;F.pause=true;}SACT=acts||{};sh.innerHTML=`<div class="swin v17">${html}</div>`;sh.style.display='flex';}
 function ovClose(){$('#sheet').style.display='none';if(scene==='field'&&F&&SHP!==null){F.pause=SHP;}SHP=null;}
 $('#sheet').addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t||t.disabled)return;const f=SACT[t.dataset.a];if(f){SFX.sel();f(t.dataset.v);}});
-openSheet=function(id,tab){if(tab)CTAB=tab;if(!G.members.includes(id))id=G.party[0];const ids=G.members,i=ids.indexOf(id);
- ovOpen(charHTML(id,CTAB,false)+'<button class="tbtn back wide" data-a="close">閉じる</button>',{tab:k=>{CTAB=k;openSheet(id);},prev:()=>openSheet(ids[(i-1+ids.length)%ids.length]),next:()=>openSheet(ids[(i+1)%ids.length]),close:ovClose});};
 
 /* ==================== 星盤 ==================== */
 drawBoard=function(){const c=bctx,cw=W*SC,ch=BCH(),id=BS.id,N=BOARD[id],U=G.h[id].board,col=elCol(id),cx=cw/2,cy=bpos({q:0,r:0})[1];
@@ -145,19 +95,6 @@ drawBoard=function(){const c=bctx,cw=W*SC,ch=BCH(),id=BS.id,N=BOARD[id],U=G.h[id
   c.fillStyle=on?'#10142e':av?nc:'#4a5288';c.font=`bold ${Math.round(s*.42)}px "M PLUS 1p","Hiragino Sans",sans-serif`;c.fillText(lab,x,y+1);}
  c.textAlign='left';c.textBaseline='alphabetic';};
 const NTN={core:'星片',stat:'能力',skill:'技',aw:'星臨強化',fork:'分岐'};
-boardMenu=function(m){const id=BS.id,n=BS.sel&&BOARD[id][BS.sel],U=G.h[id].board,pl=ptsLeft(id),tot=Object.keys(BOARD[id]).length-1,can=n&&canUnlock(id,n.k)&&n.cost<=pl;
- $('#labels').innerHTML=`<div class="bdh" style="--ec:${elCol(id)}"><img src="${art(id)}"><div class="bdn"><small>星盤「${BDEF[id].star}」</small><b>${HB[id].name}</b><span>Lv${G.h[id].lv}　解放 ${U.length-1}/${tot}</span></div><div class="bdp${pl>0?' rdy':''}"><small>星ポイント</small><b>${pl}</b></div></div>
-  <div class="bdl">${Object.keys(NTN).filter(k=>k!=='core').map(k=>`<span><i style="background:${NCOL[k]}"></i>${NTN[k]}</span>`).join('')}</div>`;
- log(m||(n?`星を選択中。光る輪の星は解放できる`:'星をタップで詳細。<b>光る輪の星</b>が解放できる'));
- const st=n?(U.includes(n.k)?['解放済み','on']:canUnlock(id,n.k)?(n.cost<=pl?['解放できる','ok']:['ポイント不足','ng']):['未接続（隣の星を先に解放）','ng']):null;
- panel(`<div class="bdm">${G.members.map(x=>`<div class="bdf${x===id?' on':''}${ptsLeft(x)>0?' rdy':''}" data-a="m" data-v="${x}" style="--ec:${elCol(x)}"><img src="${art(x)}"><small>${HB[x].name}</small></div>`).join('')}</div>
- <div class="bdi"${n?` style="--nc:${NCOL[n.t]}"`:''}>${n?`<div class="bdt"><i>${NTN[n.t]}${n.t==='fork'?'（どちらか1つ）':''}</i><em class="${st[1]}">${st[0]}</em></div><b>${n.d}</b><small>必要ポイント ${n.cost}</small>`:'<div class="bdt"><i style="--nc:#8890c0">星を選ぶ</i></div><small>盤面の星をタップすると、効果と必要ポイントが表示される。中心の星片からつながる星だけ解放できる。</small>'}</div>
- <div class="bdb"><button class="tbtn gold" data-a="un" ${can?'':'disabled'}>解放${n?`<small>ポイント${n.cost}</small>`:''}</button><button class="tbtn" data-a="auto" ${pl>0?'':'disabled'}>おまかせ<small>自動で振り分け</small></button><button class="tbtn" data-a="rs">リセット<small>無料</small></button></div>
- <div class="bdb"><button class="tbtn" data-a="tr">星臨の試練<small>位階${ROMAN[G.h[id].awLv||1]}</small></button><button class="tbtn back" data-a="back">戻る</button></div>`,
- {m:x=>{BS.sel=null;BS.id=x;boardMenu();},un:()=>{U.push(n.k);SFX.aw();save();boardMenu(`<b>${n.d}</b> を解放した！`);},
-  auto:()=>{const c=autoUnlock(id);if(c)SFX.aw();save();boardMenu(c?`${c}個の星を解放した`:'解放できる星がない（ポイント不足）');},rs:()=>{G.h[id].board=['0,0'];BS.sel=null;save();boardMenu('星盤をリセットした（ポイントは全て戻る）');},
-  tr:()=>{enterTown();trialMenu();},back:()=>{const f=BFROM;BFROM='town';enterTown();if(f==='party')partyScreen();}});
- tip('board');};
 
 /* ==================== マップ選択 ==================== */
 const WAREAS=[{id:'haido',ch:'序章',need:()=>true},{id:'midori',ch:'第1章',need:()=>G.flags.boss1,un:'灰の街道のボスを倒すと解放'},{id:'seido',ch:'第2章',need:()=>G.flags.boss2,un:'図書遺跡のボスを倒すと解放'},
@@ -166,37 +103,15 @@ const WAREAS=[{id:'haido',ch:'序章',need:()=>true},{id:'midori',ch:'第1章',n
  {id:'zankyo',ch:'終章',need:()=>G.flags.boss7,un:'天への塔の頂上を制すると解放'},
  {id:'kairou',ch:'深層',t:1,nm:'虚の回廊',bf:'kr30',bk:()=>kBoss(10),need:()=>G.flags.boss8,un:'？？？',rec:()=>`最深到達 ${kst().max||0}層`,intro:'<b>虚の回廊</b>――果てのない回廊。10層ごとに番人がいて、倒した先の層が中継地点になる。'},
  {id:'ryuu',ch:'深層',t:1,need:()=>G.flags.boss8,un:'？？？'}];
-const WTHEME={midori:'lib',seido:'chapel',raimei:'mine',kouka:'shrine',ouito:'ruin',tower:'tower',zankyo:'void',kairou:'void',ryuu:'lava'};
+
 const SILC=new WeakMap();function silOf(src){let c=SILC.get(src);if(c)return c;c=document.createElement('canvas');c.width=src.width;c.height=src.height;const g=c.getContext('2d');g.drawImage(src,0,0);g.globalCompositeOperation='source-in';g.fillStyle='#05060f';g.fillRect(0,0,c.width,c.height);SILC.set(src,c);return c;}
-function wInfo(a){const A2=AREAS[a.id],st=AREAS[a.id]&&!['tower','kairou'].includes(a.id),open=!!a.need(),bf=a.bf||(A2&&A2.bflag);let bk=null;try{bk=a.bk?a.bk():A2.boss.kind;}catch(e){}
- const ds=new Set();[...(st?A2.groups.flat():[]),bk].forEach(k=>{((ED[k]&&ED[k].drop)||[]).forEach(([m])=>MATS[m]&&ds.add(m));});
- return{a,open,bk,clear:!!G.flags[bf],name:a.nm||A2.name,rec:a.rec?a.rec():A2.rec,intro:a.intro||A2.intro,drops:[...ds].slice(0,3),vd:voidArea(G.sorties+1)===a.id};}
-worldMap=function(m){if(scene!=='town')show('town');if(WMS.tab&&!G.flags.boss8)WMS.tab=0;const list=WAREAS.filter(a=>(a.t||0)===WMS.tab).map(wInfo),deep=!!G.flags.boss8;
- if(!list.some(x=>x.a.id===WMS.sel&&x.open)){const op=list.filter(x=>x.open);WMS.sel=(op.find(x=>!x.clear)||op[op.length-1]||list[0]).a.id;}
- const cur=list.find(x=>x.a.id===WMS.sel);WMS.cur=cur;WMS.on=true;const th=WTHEME[cur.a.id]||'ash';if(!WMS.bgs[th])WMS.bgs[th]=makeBg(th,true);WMS.bg=WMS.bgs[th];
- $('#stage').style.display='';hud('');devBtn(false);
- $('#labels').innerHTML=`<div class="wmr"><span class="g">${fmt(G.gold)} G</span><span class="t">灯力 ${fmt(G.tou||0)}</span><span>出撃 ${G.sorties}回</span></div>
-  <div class="wmt${cur.vd?' vd':''}"><small>${cur.a.ch}${cur.vd?'　◆虚蝕化':''}</small><b>${cur.name}</b><span>${cur.rec}</span></div>`;
- log((m?m+'<br>':'')+cur.intro);
- const floors=cur.a.id==='tower'?(()=>{const o=[];for(let f=1;f<=G.tower.cp;f+=5)o.push(f);return o.map(f=>[f,`${f}階`,`Lv${38+Math.floor(f*.4)}`]);})():cur.a.id==='kairou'?(()=>{const o=[];for(let f=1;f<=kst().cp;f+=10)o.push(f);return o.slice(-7).map(f=>[f,`${f}層`,`Lv${kLv(f)}`]);})():null;
- const row=x=>{const s=x.a.id===WMS.sel&&x.open;return`<div class="wrow${s?' sel':''}${x.open?'':' lock'}${x.vd?' vd':''}" data-a="sel" data-v="${x.a.id}">${x.clear?'<div class="wcl">CLEAR</div>':''}
-  <div class="wch">${x.a.ch}</div><div class="wnm">${x.open||x.a.un!=='？？？'?x.name:'？？？'}</div><div class="wrec">${x.open?x.rec+(x.vd?'　<b>◆虚蝕化中</b>':''):'🔒 '+x.a.un}</div>
-  <div class="wdr">${x.open?x.drops.map(k=>`<img src="${ICON[k]}">`).join('')+'<img src="'+ICON.eq+'">':''}</div>
-  ${s?`<div class="wdet">${x.bk&&ED[x.bk]?`<span class="chp">ボス：${x.clear||G.zk&&G.zk.e&&G.zk.e[x.bk]?ED[x.bk].name:'？？？'}</span>`:''}${x.drops.map(k=>`<span class="chp">${MATS[k].n}</span>`).join('')}${x.vd?'<span class="chp sk">敵が強化・ドロップと灯力が増加</span>':''}
-   ${floors?`<div class="wfl">${floors.map(([f,l,r],i)=>`<button class="tbtn${i===floors.length-1?' gold':''}" data-a="fl" data-v="${f}">${l}<small>${r}</small></button>`).join('')}</div>`:`<button class="tbtn gold wgo" data-a="go" data-v="${x.a.id}">▼ 出 撃 ▼</button>`}</div>`:''}</div>`;};
- const c=$('#cmd');c.className='panel wmap';ACT={tab:k=>{if(+k&&!deep)return;WMS.tab=+k;WMS.sel=null;worldMap();},sel:id=>{const x=list.find(v=>v.a.id===id);if(!x.open){log('🔒 '+(x.a.un==='？？？'?'まだ行くことができない':x.a.un));return;}if(WMS.sel!==id){WMS.sel=id;worldMap();}},
-  go:id=>enterField(id),fl:f=>WMS.sel==='tower'?enterTower(+f):enterKairou(+f),back:()=>townMenu()};
- c.innerHTML=`<div class="wtabs"><button class="${WMS.tab===0?'on':''}" data-a="tab" data-v="0">本編</button><button class="${WMS.tab===1?'on':''}${deep?'':' lock'}" data-a="tab" data-v="1">${deep?'深層（クリア後）':'🔒 ？？？'}</button></div>
-  <div class="wlist">${list.map(row).join('')}</div><div class="wfoot"><button class="tbtn back" data-a="back">◀ 戻る</button><div class="wfp">${G.party.map(id=>`<img src="${face(id)}">`).join('')}<small>パーティ戦闘力 <b>${fmt(G.party.reduce((s,id)=>s+power(id),0))}</b></small></div></div>`;
- const sr=c.querySelector('.wrow.sel');if(sr&&sr.scrollIntoView)sr.scrollIntoView({block:'nearest'});tip('map');};
+
 /* プレビュー：選んだエリアの戦場にボスとパーティを並べる */
-function drawWM(){}/* 未使用：js/ver18-town.js が置き換え */
+/* 未使用：js/ver18-town.js が置き換え */
 {const _d=draw;draw=function(){if(WMS.on&&scene==='town'){tick++;const k=bK();if(cv.width!==W*k||cv.height!==H*k){cv.width=W*k;cv.height=H*k;}ctx.setTransform(k,0,0,k,0,0);ctx.imageSmoothingEnabled=false;drawWM();requestAnimationFrame(draw);return;}_d();};}
 
 /* ==================== 街メニューへの組み込み ==================== */
-{const _tm=townMenu;townMenu=function(m){WMS.on=false;_tm(m);const c=$('#cmd'),b=c.children[1],r=c.children[8];
- if(b){b.innerHTML=`<img class="ic" src="${ICON.eq}">編成<small>装備・星盤</small>`;b.onclick=()=>{SFX.sel();partyScreen();};if(G.members.some(i=>ptsLeft(i)>0))b.classList.add('ready');}
- if(r)r.innerHTML=`<img class="ic" src="${ICON.rec}">記録・設定`;tip('town');};}
+
 {const _inv=invMenu;invMenu=function(m){_inv(m);const b=$('#cmd').querySelector('[data-a="auto"]'),f=G.set.flt;if(b){b.className='tbtn'+(f.rar>=0?' gold':'');b.innerHTML=`拾う前フィルター<small>${f.rar>=0?FLN[f.rar+1]+'を'+(f.mode==='dism'?'分解':'売却'):'OFF'}</small>`;}ACT.auto=()=>cfgOpen(()=>invMenu());ACT.back=()=>partyScreen();};}
 
 /* ==================== 拾う前フィルター拡張 ==================== */
@@ -226,14 +141,6 @@ ${typeof CFGX!=='undefined'?CFGX.html(seg):''}
   bgm:v=>{if(BGM.on!==!!+v)bgmToggle();re();},tut:v=>{s.tut=!!+v;re();},trs:()=>{G.tut={};s.tut=true;save();cfgOpen(back);tipShow('how');},how:()=>tipShow('how'),close:()=>{ovClose();if(typeof back==='function')back();}}));}
 
 /* ==================== テキスト速度 ==================== */
-talk=function(lines,done){const d=document.createElement('div');d.id='talk';
- d.innerHTML='<div class="tkw"><div class="tkp"><img></div><div class="tkb"><div class="tkn"></div><div class="tkt"></div><div class="tkx">▼</div></div></div><button class="tksk">スキップ ▶▶</button>';
- $('#app').appendChild(d);let i=-1,tm=null,full='';const im=d.querySelector('.tkp img'),pp=d.querySelector('.tkp'),nm=d.querySelector('.tkn'),tx=d.querySelector('.tkt');
- const fin=()=>{clearInterval(tm);tm=null;tx.innerHTML=full;};
- const next=()=>{i++;if(i>=lines.length){d.remove();if(done)done();return;}const[sp,ex,t]=lines[i];full=t;
-  if(sp&&HB[sp]){pp.style.display='';im.src=exprFace(sp,ex);nm.textContent=HB[sp].name;nm.style.display='';d.classList.remove('nar');}else{pp.style.display='none';nm.style.display='none';d.classList.add('nar');}
-  const ms=TXS[G&&G.set&&G.set.txt!=null?G.set.txt:1][1];tx.textContent='';clearInterval(tm);tm=null;if(!ms)return fin();let n=0;const cs=[...t];tm=setInterval(()=>{n++;tx.textContent=cs.slice(0,n).join('');if(n>=cs.length)fin();},ms);};
- d.onclick=e=>{if(e.target.closest('.tksk')){SFX.sel();i=lines.length-1;fin();next();return;}if(tm)fin();else{SFX.sel();next();}};next();};
 
 /* ==================== チュートリアル ==================== */
 const TIPS={
@@ -254,38 +161,9 @@ function tipShow(key){const[t,pg]=TIPS[key],old=$('#tip');if(old)old.remove();le
  d.onclick=e=>{const b=e.target.closest('[data-k]');if(!b)return;SFX.sel();if(b.dataset.k==='off'){if(G&&G.set){G.set.tut=false;save();}return close();}if(++i>=pg.length)return close();r();};r();}
 
 /* ==================== セーブ3スロット ==================== */
-const SLOTK=['astral_save_v1','astral_save_s2','astral_save_s3'];
-const slotGet=i=>{try{const s=localStorage.getItem(SLOTK[i]);return s?JSON.parse(s):null;}catch(e){return null;}};
-const slotCur=()=>Math.max(0,SLOTK.indexOf(SAVE));
-const chapOf=f=>f.boss8?'クリア後':f.boss7?'終章':f.boss6?'第6章':f.boss5?'第5章':f.boss4?'第4章':f.boss3?'第3章':f.boss2?'第2章':f.boss1?'第1章':'序章';
-const slotTxt=s=>{if(!s)return'― 記録なし ―';const ps=(s.party||['rio']).filter(id=>s.h&&s.h[id]);return`${chapOf(s.flags||{})}　Lv${Math.max(1,...ps.map(id=>s.h[id].lv))}　${ps.map(id=>HB[id]?HB[id].name:'').join('・')}<small>${fmt(s.gold||0)}G　出撃${s.sorties||0}回</small>`;};
-title=function(){const last=Math.min(2,Math.max(0,+(lsGet('astral_slot')||0)));SAVE=SLOTK[last];show('title');const ov=$('#ov');ov.classList.remove('hide');ov.classList.add('ttl');
- ov.innerHTML=`<canvas id="tcv" width="180" height="320"></canvas><div class="tlogo">ASTRAL<br>BREAKER</div><div class="tsub">〜 星継ぎの灯 〜</div><div class="tmenu" id="tm"></div>
- <div class="note" id="hw" style="display:none"><b>遊び方</b><br>・灯都で準備→「出撃」で各地へ。タップした場所へ歩く。<br>・魔物に<b>自分からぶつかると先制攻撃</b>。宝箱・採取ポイントを探そう。<br>・戦闘：技を2回タップで決定。弱点を突いて大ダメージ、ゲージ100%で<b>星臨</b>（行動を消費しない）。<br>・街に戻るとHP全回復＆自動セーブ。<b>編成</b>で装備と星盤。セーブは3スロット。</div>
- <div class="tfoot"><button id="devg">開発者モード</button><div class="ver" id="verL">${VER}</div></div>`;
- const tm=$('#tm'),has=()=>SLOTK.some((k,i)=>slotGet(i));
- const main=()=>{tm.className='tmenu';tm.innerHTML=`<button class="big" id="newg">はじめから</button><button class="big gold" id="cont" ${has()?'':'disabled style="opacity:.35"'}>つづきから</button><button class="big" id="howto" style="height:40px;font-size:13px">遊び方</button>`;
-  $('#howto').onclick=()=>{const h=$('#hw');h.style.display=h.style.display==='none'?'block':'none';};$('#newg').onclick=()=>{au();SFX.sel();pick(true);};$('#cont').onclick=()=>{au();SFX.sel();pick(false);};};
- const pick=nw=>{$('#hw').style.display='none';let warn=-1;tm.className='tmenu sl';
-  const r=()=>{tm.innerHTML=`<div class="slh">${nw?'はじめから：使うスロットを選ぶ':'つづきから：スロットを選ぶ'}</div>`+SLOTK.map((k,i)=>{const s=slotGet(i);return`<button class="slc${s?'':' emp'}${i===last&&s?' last':''}" data-s="${i}" ${!nw&&!s?'disabled':''}><b>スロット${i+1}${warn===i?'　<span style="color:#ff9a9a">もう一度押すと上書きして開始</span>':''}</b><span>${slotTxt(s)}</span></button>`;}).join('')+'<button class="big" id="slb" style="height:38px;font-size:13px">戻る</button>';
-   $('#slb').onclick=()=>{SFX.sel();main();};tm.querySelectorAll('.slc').forEach(b=>b.onclick=()=>{au();const i=+b.dataset.s,s=slotGet(i);
-    if(nw){if(s&&warn!==i){warn=i;SFX.sel();return r();}SAVE=SLOTK[i];lsSet('astral_slot',i);migrate(newGame());setSpeed(1);SFX.aw();enterTown('<b>序章</b>――大灯が揺らぎ、虚蝕が街に迫る。灯守見習いのリオは、元騎士団長ガルドと共に灰の街道へ向かう。');}
-    else if(s){SAVE=SLOTK[i];lsSet('astral_slot',i);migrate(Object.assign(newGame(),s));setSpeed(G.speed||1);enterTown('おかえりなさい。');}});};r();};
- $('#devg').onclick=()=>{au();devStart();};main();deco16();const v=$('#verL');if(v)v.textContent=VER;};
+
 /* 記録メニュー：今のスロット表示・別スロットへの複製・設定 */
-{const _sm=saveMenu;saveMenu=function(m){_sm(m);if(SAVE===DEVKEY){addCmd('設定','テキスト速度・オート・フィルター',()=>cfgOpen(),3);return;}const cur=slotCur();
- $('#msg').insertAdjacentHTML('afterbegin',`<div class="slnow">使用中：<b>スロット${cur+1}</b>　${slotTxt(G).replace(/<small>.*/,'')}</div>`);
- addCmd('設定','テキスト速度・オート・フィルター',()=>cfgOpen(),0,'ready');
- addCmd('別のスロットへ複製','今の記録を他のスロットに写す',()=>{let warn=-1;const r=()=>{log('<b>別のスロットへ複製</b>　今の記録をそのまま写す（遊ぶスロットは変わらない）');
-  menu([...SLOTK.map((k,i)=>({i,s:slotGet(i)})).filter(x=>x.i!==cur).map(x=>({l:`スロット${x.i+1}へ複製`+(warn===x.i?'　⚠もう一度押すと上書き':''),s:slotTxt(x.s).replace(/<\/?small>/g,'　'),cls:x.s?'':'ready',f:()=>{if(x.s&&warn!==x.i){warn=x.i;return r();}
-    let ok=true;try{localStorage.setItem(SLOTK[x.i],JSON.stringify(G));}catch(e){ok=false;}saveMenu(ok?`スロット${x.i+1}に複製しました。`:'この環境では保存できませんでした。');}})),{l:'戻る',cls:'back',f:()=>saveMenu()}],true);};r();},3);};}
 
 /* ==================== 開発者メニュー ==================== */
-function dev17(m){log((m||'<b>ver0.17 快適さ＋UI再構築</b>')+`<br><small>スロット：${SAVE===DEVKEY?'開発用':slotCur()+1}　星臨AUTO：${AWN[G.set.autoAw]}　フィルター：${FLN[G.set.flt.rar+1]}</small>`);
- menu([{l:'編成画面を開く',cls:'ready',s:'カード・戦闘力・控え',f:()=>partyScreen()},{l:'マップ選択を開く',s:'プレビュー・CLEAR・ドロップ',f:()=>worldMap()},
-  {l:'新しい戦闘画面（3体）',s:'狙い・2タップ決定・リピート・AUTO',f:()=>devBattle([{kind:'snowwolf',lv:30},{kind:'yukirei',lv:30},{kind:'onimusha',lv:30}],'kouka',{boss:false})},
-  {l:'新しい戦闘画面（ボス）',s:'禁書の守護像',f:()=>devBattle([{kind:'boss2',lv:10}],'midori')},{l:'設定を開く',s:'テキスト速度・オート・フィルター',f:()=>cfgOpen()},
-  {l:'チュートリアルを全て見る',s:'全9種を順番に表示',f:()=>{const ks=Object.keys(TIPS);let i=0;const nx=()=>{if(i>=ks.length)return;tipShow(ks[i++]);const t=setInterval(()=>{if(!$('#tip')){clearInterval(t);nx();}},200);};nx();}},
-  {l:'フィルターの動作テスト',s:'装備を10個拾って結果を見る',f:()=>{const o=[];for(let i=0;i<10;i++)o.push(addLoot(genItem(30,0)));save();dev17('拾った結果：<br><small>'+o.join('、')+'</small>');}},{l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
-{const _dv=dvMenu;dvMenu=function(m){_dv(m);const c=$('#cmd'),b=document.createElement('button');b.className='c ready';b.innerHTML='ver0.17 快適さ＋UI再構築<small>編成・マップ選択・戦闘画面・3スロット・設定・チュートリアル</small>';b.onclick=()=>{SFX.sel();dev17();};c.insertBefore(b,c.children[0]);if(c.children[1])c.children[1].classList.remove('ready');};}
+
 if(scene==='title')title();

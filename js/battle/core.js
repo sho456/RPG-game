@@ -9,15 +9,15 @@
  ・残像      ：BX.ghost(u, {col,n,gap})
  描画は FX19（js/motion/fx19.js）と同じ「ドットの格子」に乗せる（FX19.D / FX19.R）。時計は ANIM（ヒットストップで止まる）。
  絵はすべてコードで描いている（画像生成は使っていない） */
-'use strict';
+
 const BX=(()=>{
 /* ---------- 設定 ---------- */
 const DEF={q:'auto',aw:'full',shake:2,flash:1};
 function set(){try{if(typeof G!=='undefined'&&G&&G.set){if(!G.set.fx)G.set.fx=Object.assign({},DEF);for(const k in DEF)if(G.set.fx[k]==null)G.set.fx[k]=DEF[k];return G.set.fx;}}catch(e){}return DEF;}
 
 /* ---------- 時間の倍率（SPD を「基準×倍率」にする） ---------- */
-const BASE={1:SPD[1],2:SPD[2],4:SPD[4]};let TS=1;
-for(const k in BASE)Object.defineProperty(SPD,k,{get:()=>BASE[k]*TS,enumerable:true,configurable:true});
+let TS=1;
+
 async function scaled(ts,fn){const t0=TS;TS=ts;try{return await fn();}finally{TS=t0;}}
 
 /* ---------- 品質 ---------- */

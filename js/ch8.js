@@ -34,9 +34,7 @@ AWD.valk='竜化して与ダメ1.5倍。全体攻撃のみで、行動は自動�
 BDEF.celes=mkB('刻輪座',[['magP'],['resP'],['spd'],['mhpP'],['defP'],['awDmg','crit']],['3,-2','-1,-2','-3,1','2,1'],'ryuusa','shuuen',[[{magP:12},'刻魔：魔力+12%'],[{spd:2},'早鐘：素早さ+2'],[{awDmg:20},'円環：星臨中与ダメ+20%'],[{resP:15},'悠久：精神+15%']]);
 BDEF.valk=mkB('竜血座',[['atkP'],['mhpP'],['crit'],['defP'],['awDmg'],['spd']],['2,-3','-2,-1','-3,2','1,2'],'gouka','ryuumetsu',[[{atkP:12},'竜爪：攻撃+12%'],[{mhpP:15},'竜鱗：最大HP+15%'],[{awDmg:20},'逆鱗：星臨中与ダメ+20%'],[{crit:10},'竜眼：会心率+10%']]);
 BOARD.celes=buildBoard('celes');BOARD.valk=buildBoard('valk');
-Object.assign(TRIAL,{celes:['止まった時計の群れが、ひとりきりの千年を囁く。','「ひとりは慣れておる。……だが、もう数えなくてよいのじゃな」'],
- valk:['竜の血が、仲間ごと焼き尽くせと吠える。','「この炎は喰うためじゃない。並んで燃やすためのものだ」']});
-OWNEL.valk='熱';
+
 LEG.kokuyomi={n:'刻詠みの砂時計',slot:'w',who:'celes',d:'戦闘開始の瞬間を刻の円環に記録する（巻き戻しが最初から使える）'};
 LEG.ryuuou={n:'竜王の大剣',slot:'w',who:'valk',d:'竜血星臨中の与ダメが2倍になる（通常1.5倍）'};
 ITYPE.unshift(['砂時計','staff'],['竜剣','gsword']);
@@ -47,8 +45,7 @@ function snapTake(u,msg){if(B.rewound)return;B.snap={};B.heroes.forEach(h=>B.sna
 {const _aw=awaken;awaken=async function(u){await _aw(u);
  if(u.id==='celes')snapTake(u,'<b>刻の円環</b>――今この瞬間が記録された（巻き戻しは1戦闘1回）');
  if(u.id==='valk'){log('<b>竜血星臨</b>――ヴァルクの瞳から理性の色が消えた！（行動は自動）');if(B.res&&!auto)B.res();}};}
-{const _sb=startBattle;startBattle=function(list,opts={}){_sb(list,opts);if(VOIDED)BG=desat(BG);
- B.heroes.forEach(h=>{if(h.id==='celes'&&h.legs.includes('kokuyomi'))snapTake(h);});};}
+
 {const _da=doAction;doAction=async function(u,sk,t){
  if(sk.k==='rewind'){const S=B.snap||{};B.rewound=1;B.awUsed.delete('snap');u.skills=u.skills.filter(k=>k!=='makimodoshi');B.flashBg=30;B.flashCol='#d8c8ff';SFX.aw();
   log(`<b>${u.name}の巻き戻し</b>――刻の円環が逆さに回る！`);await wait(500);
@@ -57,11 +54,7 @@ function snapTake(u,msg){if(B.rewound)return;B.snap={};B.heroes.forEach(h=>B.sna
  if(sk.k==='tstop'){aliveE().forEach(e=>{e.ct+=(e.boss?60:120)/e.spd;pop(e,'STOP','#d8c8ff',true);});log(`${u.name}の<b>${sk.n}</b>！ 敵の時間が凍りつく`);B.flashBg=16;B.flashCol='#d8c8ff';SFX.warn();setCT(u);refresh();await wait(500);return;}
  if(sk.k==='roar'&&sk.sp)u.sp-=sk.sp;
  return _da(u,sk,t);};}
-{const _ap=autoPick;autoPick=function(u){
- if(u.id==='valk'&&u.aw){const es=aliveE().sort((a,b)=>a.hp-b.hp);if((u.awLv||1)>=3&&!u._gk){u._gk=1;return{sk:SK.gokuvalk,t:es[0]};}return{sk:SK[Math.random()<.5?'ryuuen':'meiryuu'],t:es[0]};}
- if(u.id==='celes'&&B.awUsed.has('snap')&&B.snap){let lost=0,was=0;B.heroes.forEach(h=>{const s=B.snap[h.id];if(!s)return;was+=s.alive?s.hp:0;lost+=s.alive&&!h.alive?1:0;});const now=aliveH().reduce((a,h)=>a+h.hp,0);if(lost||now<was*.45)return{sk:SK.makimodoshi};}
- return _ap(u);};}
-{const _cr=chooseRoot;chooseRoot=async function(u){if(u.id==='valk'&&u.aw){log('竜血が暴れる――<b>ヴァルクは止まらない！</b>');await wait(450);return autoPick(u);}return _cr(u);};}
+
 {const _ca=calc;calc=function(a,t,sk){const r=_ca(a,t,sk);if(a.id==='valk'&&a.aw)r.d=Math.round(r.d*(a.legs&&a.legs.includes('ryuuou')?2:1.5));return r;};}
 
 /* --- 敵：虚ろ化（グレースケール）・竜の巣・回廊の番人 --- */
@@ -106,15 +99,8 @@ function makeKairouArea(f){const lv=kLv(f),boss=f%10===0,pool=KMOBS.map(voidKind
  return{name:`虚の回廊 ${f}層`,map:genVoidFloor(f),lv:[lv,lv],groups:[0,1,2,3,4].map(i=>{const n=1+((f+i)%3);return Array.from({length:n},(_,j)=>pool[(f*5+i*3+j*7)%pool.length]);}),
   crew:[{loot:[lv,3]},{gold:5000+f*400},{loot:[lv,3]},{item:'drop2',n:1}],boss:boss?{kind:kBoss(f),lv}:null,bossKind:boss?()=>kBoss(f):null,bflag:boss?'kr'+f:'',theme:'void',rec:`Lv${lv}`,
   intro:`<b>虚の回廊 ${f}層</b>――色を失った星の記憶が、果てなく積み重なる回廊。${f%10===1?'（中継地点）':''}${boss?'<b>この層には番人がいる</b>。倒すと階段が開く。':'光る階段から、さらに深い層へ。'}`};}
-function kairouMenu(){const K=kst(),cps=[];for(let f=1;f<=K.cp;f+=10)cps.push(f);
- log(`<b>虚の回廊</b>　果てのない回廊。10層ごとに番人がいて、倒した先の層が中継地点になる（最深到達：${K.max||0}層）`+goldTxt());
- menu([...cps.slice(-7).map(f=>({l:`${f}層から`,s:`推奨Lv${kLv(f)}`,cls:f===cps[cps.length-1]?'ready':'',f:()=>enterKairou(f)})),{l:'戻る',cls:'back',f:worldMap}],true);}
-function enterKairou(){}/* 未使用：js/v31/quests.js が置き換え */
-function kairouBossWin(){const f=kst().cur;banner('番人が崩れ、階段が開いた','#c8b0ff');if(f+1>kst().cp&&(f+1)%10===1)kst().cp=f+1;save();if(f===30&&!G.flags.celesMet)setTimeout(celesEvent,300);}
-function celesEvent(){F.pause=true;banner('セレス','#e0d0ff');
- log('番人が砂のように崩れ、止まっていた時計の音が戻った。瓦礫の玉座に、砂時計の杖を抱えた少女が腰かけている。<br><b>セレス</b>「……ようやく来たか、灯守。千年ぶんの退屈を数えておったところじゃ」<br>「勘違いするでないぞ。寂しかったわけではない。……おぬしらの旅、わらわが見届けてやろう」');
- menu([{l:'仲間にする',cls:'ready',f:()=>{G.flags.celesMet=1;newMember('celes');SFX.aw();save();fieldMenu('<b>セレスが仲間になった！</b>'+(G.party.includes('celes')?'':'（控えに入った）'));renderPartyStatic();}},
-  {l:'今はやめる',f:()=>{G.flags.celesMet=1;G.declined=[...(G.declined||[]),'celes'];save();fieldMenu('セレス「ふん、好きにせい。……酒場で待っておるからな」');}}]);}
+
+/* 未使用：js/v31/quests.js が置き換え */
 
 /* --- 竜の巣 --- */
 AREAS.ryuu={name:'竜の巣',lv:[60,68],theme:'lava',rec:'推奨Lv60〜68',bflag:'boss9',boss:{kind:'boss9',lv:68},
@@ -124,10 +110,6 @@ AREAS.ryuu={name:'竜の巣',lv:[60,68],theme:'lava',rec:'推奨Lv60〜68',bflag
  groups:[['firedrake'],['lavaslime','firedrake'],['dragonewt'],['ember','lavaslime'],['dragonewt','firedrake'],['dragonewt','ember','firedrake']],
  crew:[{loot:[64,3]},{gold:20000},{item:'tail',n:2},{loot:[66,3]}],
  intro:'<b>竜の巣</b>――星核が砕けた夜、竜たちが逃げ込んだ火山の洞。<b>溶岩の上を歩くとやけど</b>する（HP-4%）。奥で、竜人の剣士が強者を待っているという。'};
-function lavaBurn(){G.party.forEach(id=>{const m=stats(id).mhp;G.h[id].hp=Math.max(1,(G.h[id].hp??m)-Math.round(m*.04));});F.flash=Math.max(F.flash||0,3);if(!(F.burnT>performance.now())){banner('溶岩でやけど！（HP-4%）','#ff7a30');F.burnT=performance.now()+2500;}renderPartyStatic();}
-function valkEvent(){F.pause=true;banner('ヴァルク','#ff6030');
- log('溶岩の照り返しの中、大剣を担いだ竜人が振り返った。<br><b>ヴァルク</b>「……星核を鎮めた灯守か。噂より小さいな」<br>「強い灯なら、喰らってみたい。剣を抜け。俺に勝てたら、その旅に付き合ってやる」');
- menu([{l:'決闘する',cls:'ready',f:()=>{F.lock=true;F.pause=false;startBattle([{kind:'valkE',lv:1}],{event:'valk',onEnd:afterBattle});}},{l:'やめる',f:fieldMenu}]);}
 
 /* --- 虚蝕化エリア（出撃3回ごとに入れ替わる周回イベント） --- */
 let VOIDED=false;
@@ -136,17 +118,8 @@ function voidArea(s=G.sorties){if(!G.flags.boss8)return null;if(G.voidOv!==undef
  const R=rng(Math.floor(s/3)*131+7);return R()<.75?ok[R()*ok.length|0]:null;}
 function voidNews(){const n=G.sorties+1,a=voidArea(n),left=3-n%3;
  return a?`<div class="vnews">◆<b>虚蝕化</b>：${AREAS[a].name}（あと${left}回の出撃）　敵が強いぶん、ドロップと灯力が増える</div>`:`<div class="vnews">◆虚蝕化しているエリアはない（あと${left}回の出撃で変化）</div>`;}
-const voidify=e=>{e.kinds=e.kinds.map(voidKind);e.lv=Math.max(e.lv+18,56);};
+
 {const _et=enterTown;enterTown=function(m){VOIDED=false;_et(m);};}
-{const _rw=rewards;rewards=function(es){const r=_rw(es);
- if(VOIDED){es.forEach(e=>{if(!ED[e.kind].boss){G.q.voidK=(G.q.voidK||0)+1;if(Math.random()<.3)r.loot.push(addLoot(genItem(e.lv,1,1)));}});
-  const ex=Math.round(r.gold*.5);G.gold+=ex;r.gold+=ex;G.tou+=r.tou;r.tou*=2;for(const k in r.drops){G.mats[k]+=r.drops[k];r.drops[k]*=2;}}
- if(AREA==='kairou'&&A===AREAS.kairou)es.forEach(e=>{if(ED[e.kind].boss)r.loot.push(addLoot(genItem(ED[e.kind].ilv||e.lv,0,0,null,4)));else if(Math.random()<.12)r.loot.push(addLoot(genItem(e.lv,2,.5)));});
- return r;};}
-FXHOOK.push(()=>{if(F.voided){ctx.save();ctx.globalCompositeOperation='saturation';ctx.globalAlpha=.88;ctx.fillStyle='#808080';ctx.fillRect(0,0,W,H);ctx.restore();ctx.fillStyle='rgba(60,20,110,.18)';ctx.fillRect(0,0,W,H);
-  for(let i=0;i<18;i++){ctx.fillStyle=['#c8b0ff','#ffffff','#8a6aff'][i%3];ctx.fillRect((i*67+Math.sin(tick/50+i)*10+300)%W|0,(H-((i*83+tick*(.15+i%3*.1))%H))|0,1,1);}}
- if(A&&A.theme==='lava'){ctx.fillStyle='rgba(255,90,20,.07)';ctx.fillRect(0,0,W,H);for(let i=0;i<22;i++){ctx.fillStyle=i%2?'#ffb040':'#ff6020';ctx.fillRect((i*59+Math.sin(tick/30+i)*6+400)%W|0,(H-((i*71+tick*(.3+i%4*.12))%H))|0,1,1);}}
- if(AREA==='kairou'){ctx.fillStyle='rgba(20,0,40,.18)';ctx.fillRect(0,0,W,H);}});
 
 /* --- セーブ互換・依頼 --- */
 {const _mg=migrate;migrate=function(g){_mg(g);g.kairou=g.kairou||{cp:1,cur:1,max:0};g.q=g.q||{wolf:0,done:{}};return g;};}

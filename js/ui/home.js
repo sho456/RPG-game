@@ -31,7 +31,7 @@ function build(){
  return `<div class="h22 hm">
   <div class="hm-top"><span class="hm-res"><img src="${ICON.coin}" alt=""><b>${f(G.gold||0)}</b></span><span class="hm-res"><i class="hm-xp">${ic('up')}</i><b>${f(G.xpStock||0)}</b></span>
    <button class="hm-bt" data-hm="sheet" aria-label="menu">${ic('menu')}</button></div>
-  <div class="hm-sheet" hidden>${[['news','bell','お知らせ'],['inv','bag','持ち物'],['zk','book','図鑑'],['appraise','eye','鑑定'],['menu','save','セーブ'],['go','sword','冒険']].map(([g,k,l])=>`<button data-h22="${g}">${ic(k)}<b>${l}</b></button>`).join('')}</div>
+  <div class="hm-sheet" hidden>${[['news','bell','お知らせ'],['inv','bag','持ち物'],['zk','book','図鑑'],['appraise','eye','鑑定'],['menu','save','セーブ']].map(([g,k,l])=>`<button data-h22="${g}">${ic(k)}<b>${l}</b></button>`).join('')}</div>
   <div class="hm-main"><button class="hm-go" data-hm="prep" data-id="${id}">${ic('def')}<b>${String(S.name||"防衛").replace(/[<>&]/g,"")}</b><small>Lv${S.lv||''}</small></button>
    <button class="hm-map" data-hm="map" aria-label="map">${ic('map')}</button></div>
   <nav class="hm-nav">${tabs.map(([k,l,a])=>`<button ${a}>${ic(k)}<b>${l}</b>${k==='up'?dot(ready>0):''}</button>`).join('')}</nav></div>`;}

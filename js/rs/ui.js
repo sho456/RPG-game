@@ -4,7 +4,7 @@
  2. 下のボタン：通常AUTO・全力AUTO・リピート（速度は画面上のボタンだけ）
  3. キャラ詳細：能力（7 能力値＋アビリティ）・技・術（技セット）・星臨（星臨アビリティと奥義）・星盤
  戦場の配置・スライド演出・上の帯は js/v38/battle-ui.js、編成画面は js/v38/party.js */
-'use strict';
+
 const RSU=(()=>{
 const D=RSD,C=RSC,X=RSB,esc=C.esc,clamp=C.clamp;
 const DEV=()=>{try{return!!(G&&G.dev);}catch(e){return false;}};
@@ -108,8 +108,7 @@ bbar=function(){const b=$('#bbar');if(!b||!G)return;const p=B&&B.pick,l=p&&repOK
  b.innerHTML=`<button data-b="back" class="bk" ${cb?'':'disabled'} aria-label="戻る">${GL.back}<small>戻る</small></button><button data-b="n" class="au${auto&&AM==='n'?' on':''}"><i class="ai">${AUI}</i><span class="t"><span class="lt">AUTO</span><b>通常</b></span><small>${SEIRIN.n}：${AWN[G.set.autoAw]}</small></button><button data-b="f" class="au f${auto&&AM==='f'?' on':''}"><i class="ai">${AUI}</i><span class="t"><span class="lt">AUTO</span><b>全力</b></span><small>${SEIRIN.n}も使う</small></button><button data-b="rep" class="rp" ${l?'':'disabled'}>リピート<small>${l?esc(l.basic?'通常攻撃':l.n):'前回と同じ行動'}</small></button>`;};
 
 /* ==================== キャラ詳細 ==================== */
-const RK=['','Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ'];
-function stars(r){return`<span class="rsst">${[1,2,3].map(i=>`<i class="${i<=r?'on':''}"></i>`).join('')}</span>`;}
+
 /* 技・術の行（ver0.41：ロマサガRS の技一覧のように「アイコン＋名前＋Rank＋属性」だけ。説明は ⓘ で出す）
    アイコン：js/ui/skill-icons.js（SKICON）の白いシルエット（技の内容ごと）。色は種類（技＝赤・術＝青・回復＝緑・補助＝金・奥義＝虹）
    練達＝錬磨石で 3 段階まで強くする（ver0.47。旧 Rank＝技Lv） */
@@ -127,75 +126,21 @@ function skIcon(id,s,sm){const t=tyCls(s),[el]=badge(s);let g='';
  try{g=SKICON.html(s);}catch(e){}
  if(!g)g=`<b>${esc(el||'術')}</b>`;
  return`<span class="ski ${t}${sm?' sm':''}">${g}</span>`;}
-function elBadges(s){const L=[...new Set([s.el,s.el2].filter(x=>x&&ELN[x]))];return L.map(e=>`<i class="hx43" style="--c:${ELN[e]}">${e}</i>`).join('');}
-function skCard(id,k,o={}){const s=SK[k];if(!s)return'';const on=o.set,pl=C.profLv(id,k),u={id,side:0},lp=C.lpCost(s);
- return`<div class="sk41${o.lock?' lock':''}${on?' on':''}${o.pend?' pend':''}${o.info?' tapi':''}"${o.btn?` data-a="rsk" data-v="${k}"`:o.info?` data-a="rsinfo" data-v="${k}"`:''}>
-  ${skIcon(id,s)}${on?`<i class="sno">${o.i+1}</i>`:''}
-  <div class="m"><b class="n">${esc(s.n)}</b><div class="r">${o.lock?`<small class="how">${esc(o.how||'')}</small>`:`<span class="rank ms"><small>練達</small><b>${pl?RSM.RK[pl]:'-'}</b></span>`}${elBadges(s)}</div></div>
-  ${s.ougi?'<span class="c43"><span><b class="tx">奥義</b></span></span>':costHTML('BP '+C.costOf(u,s),lp)}
-  ${o.btn||o.lock||o.info?`<button class="sinf" data-a="rsinfo" data-v="${k}" aria-label="詳細">i</button>`:''}</div>`;}
+
 /* 技・術セット（ver0.40）：枠をタップ → 技をタップで入れる／技をタップでセット・外す／枠どうしをタップで並べ替え。
    選択中の枠・技は SPK に持つ（画面を描き直しても残る） */
-const SPK={id:null,slot:null,sk:null};
-function skillsHTML(id){if(SPK.id!==id){SPK.id=id;SPK.slot=SPK.sk=null;}
- const set=C.setOf(id),L=C.learned(id),all=(D.LEARN[id]||[]).map(x=>x[0]),lock=all.filter(k=>!L.includes(k)),pend=SPK.slot!=null||SPK.sk!=null;
- return`<div class="sh22">技・術セット <small>${set.length}/4　タップで付け外し</small></div>
-  <div class="rsset s41${pend?' pend':''}">${[0,1,2,3].map(i=>{const k=set[i],s=k&&SK[k],sel=SPK.slot===i?' sel':'';return s?`<button class="sl on${sel}" data-a="rsslot" data-v="${i}">${skIcon(id,s,1)}<b>${esc(s.n)}</b></button>`:`<button class="sl${sel}" data-a="rsslot" data-v="${i}"><span class="ski em">＋</span><b>&nbsp;</b></button>`;}).join('')}</div>
-  <div class="sh22">覚えている技・術 <small>${L.length}種</small></div><div class="skl40 skl41${pend?' pend':''}">${L.map(k=>skCard(id,k,{set:set.includes(k),i:set.indexOf(k),btn:1,pend:SPK.sk===k,how:C.howTxt(id,k)})).join('')}</div>
-  ${lock.length?`<div class="sh22">まだ覚えていない</div><div class="skl41">${lock.map(k=>skCard(id,k,{lock:1,how:C.howTxt(id,k)})).join('')}</div>`:''}`;}
+
 /* 枠 i に技 k を入れる（k が別の枠にあれば入れ替え） */
-function putSet(id,i,k){const h=G.h[id],a=C.setOf(id).slice(),j=a.indexOf(k);
- if(j>=0){if(i<a.length){[a[i],a[j]]=[a[j],a[i]];}else{a.splice(j,1);a.push(k);}}else if(i<a.length)a[i]=k;else a.push(k);h.sset=a.slice(0,4);}
-function tapSlot(id,i){const a=C.setOf(id);
- if(SPK.sk){putSet(id,i,SPK.sk);SPK.sk=SPK.slot=null;return;}
- if(SPK.slot===i){if(a[i])G.h[id].sset=a.filter((_,j)=>j!==i);SPK.slot=null;return;}
- if(SPK.slot!=null&&a[SPK.slot]&&a[i]){const b=a.slice();[b[SPK.slot],b[i]]=[b[i],b[SPK.slot]];G.h[id].sset=b;SPK.slot=null;return;}
- SPK.slot=i;}
-function tapSkill(id,k){const a=C.setOf(id);
- if(SPK.slot!=null){putSet(id,SPK.slot,k);SPK.slot=SPK.sk=null;return;}
- if(SPK.sk===k){SPK.sk=null;return;}
- if(a.includes(k)){G.h[id].sset=a.filter(x=>x!==k);return;}
- if(a.length<4){G.h[id].sset=a.concat(k);return;}
- SPK.sk=k;}
+
 /* アビリティのタブ（ver0.44）：名前と段階だけを並べ、タップで別の窓に詳細（abInfo） */
-function abHTML(id){const h=G.h[id];let wp=null,w=null;try{w=h.eq.w&&findItem(h.eq.w);wp=V20.wpOf(w);}catch(e){}
- return`${(D.AB[id]||[]).map((A,i)=>{const r=C.abRank(id,i),lv0=D.ABL[i];
-   return`<div class="rsab a44${r?'':' lock'}" data-a="rsab" data-v="${i}"><div class="h"><i class="n">${i+1}</i><b>${esc(A.n)}</b>${stars(r)}<em>${r?'段階'+RK[r]:'Lv'+lv0+'で解放'}</em><i class="ar44">›</i></div></div>`;}).join('')}
-  <div class="rsab a44${wp?'':' lock'}" data-a="rsab" data-v="w"><div class="h"><i class="n">武</i><b>${wp?esc(wp.n):'武器アビリティなし'}</b><i class="ar44">›</i></div></div>`;}
+
 /* アビリティの詳細（ver0.45：3 段階。いまの効果・次の段階で増えるもの・段階Ⅲの固有名の特殊効果【…】。用語は緑でタップできる） */
-function abInfo(id,v,back){const h=G.h[id];let top,list,sub='',nx=[],spb='';
- if(v==='w'){let wp=null;try{wp=V20.wpOf(h.eq.w&&findItem(h.eq.w));}catch(e){}top=`<i class="n">武</i><b>${wp?esc(wp.n):'武器アビリティなし'}</b>`;list=[wp?wp.d:'アンコモン以上の武器に付く'];}
- else{const i=+v,A=D.AB[id][i],r=C.abRank(id,i),lv0=D.ABL[i],ups=C.abUps(id);top=`<i class="n">${i+1}</i><b>${esc(A.n)}</b>${stars(r)}<em>${r?'段階'+RK[r]:'未解放'}</em>`;
-  list=C.abDesc(id,i,Math.max(1,r));nx=r&&r<3?C.abNext(id,i,r):[];
-  if(A.sp)spb=`<div class="sp45${r>=3?' on':''}"><div class="t"><em>段階Ⅲ</em>${r>=3?'':'<small>未解放</small>'}</div><p>${KW.mark('【'+esc(A.sp.n)+'】')}を付与</p></div>`;
-  sub=`Lv${lv0}でⅠ・Lv${lv0+20}でⅡ・Lv${lv0+40}でⅢ（星盤・天星盤の強化で早まる）${ups[i+1]?`　強化 +${ups[i+1]}`:''}`;}
- ovOpen(`<div class="ski43 ab44"><div class="abh">${top}</div><div class="dsc"><ul>${list.map(t=>`<li>${KW.markT(t)}</li>`).join('')}</ul>
-  ${nx.length?`<div class="nx45"><em>次の段階</em><ul>${nx.map(t=>`<li>${KW.markT(t)}</li>`).join('')}</ul></div>`:''}${spb}${sub?`<p class="sub">${sub}</p>`:''}</div></div>
-  <button class="tbtn back wide" data-a="close">閉じる</button>`,{close:()=>{ovClose();if(back)back();}});}
-function awHTML(id){const h=G.h[id],A=AW[id],Xw=D.AWX[id],lv=h.awLv||1,nx=lv+1,req=nx===2?15:30,ok=lv<3&&h.lv>=req,ou=Xw&&SK[Xw.ou],ef=C.awEffects(id);
- return`<div class="aw22" style="--ec:${elCol(id)}"><div class="ah"><img src="${art(id,true)}" alt=""><div><small>${SEIRIN.n}</small><b>《${esc(A.name)}》</b><span class="rk">${'<i class="on"></i>'.repeat(lv)}${'<i></i>'.repeat(3-lv)}<em>位階${ROMAN[lv]}</em></span></div></div>
-  <ul class="rsaw">${(Xw?Xw.note:[]).map(t=>`<li>${KW.markT(t)}</li>`).join('')}${ef.map(e=>`<li>${KW.markT(C.effTxt(e))}</li>`).join('')}</ul>
-  <dl class="dl22"><dt>持続</dt><dd>${awN({id,awTurn:(stats(id).awTurn||0),awLv:lv})}ターン</dd><dt>発動</dt><dd>${SEIRIN.g}100%（行動を消費しない）</dd></dl>
-  ${lv<3?`<button class="tbtn${ok?' gold':''} wide" data-a="tr" ${ok?'':'disabled'}>${SEIRIN.n}の試練<small>${ok?'挑戦できる':`Lv${req}で挑戦できる`}</small></button>`:''}</div>
-  <div class="sh22">奥義 <small>${SEIRIN.n}中に1度・BP 0　タップで詳細</small></div>${ou?skCard(id,Xw.ou,{info:1}):''}`;}
+
 /* 能力：7 能力値（役割つき）＋ HP・LP・BP ＋ アビリティ */
 /* 能力：7 能力値・武器種・LP・BP。説明は出さず、タップで詳細（V38H の吹き出し） */
-function st7HTML(id){const s=stats(id),r=s.s7;if(!r)return'';const P=C.pf(id),H=D.HERO[id]||{};
- return`<div class="st38"><button class="w" data-h38="wp:${id}"><b>${esc(P.wp)}${H.shape?`<small>（形：${esc(H.shape)}）</small>`:''}</b><small>武器種</small><i class="q"></i></button>
-  <div class="lb"><button data-h38="lp:${id}"><em>LP</em><b>${s.lpMax}</b><i class="q"></i></button><button data-h38="bp:${id}"><em>BP</em><b>${s.bp0}<small>初期</small></b><b>${s.bpMax}<small>最大</small></b><b>+${s.bpReg+Math.min(2,Math.floor((s.spGain||0)/5))}<small>回復</small></b><i class="q"></i></button></div>
-  <div class="g7">${D.ST7.map(k=>`<button class="r${P.w[k]?' wp':''}" data-h38="st:${id}:${k}"><span><i class="g${P.base[k][1]}">${P.base[k][1]}</i>${D.ST7N[k]}</span><b>${r[k]}</b></button>`).join('')}</div>${ELR.row(id)}</div>`;}
-/* キャラ詳細のタブ：能力（能力値＋人物）・アビリティ（ver0.41 で別タブ）・技・術・星臨（装備は上の枠）。星盤は下の「星盤」ボタンで開く（ver0.39 でタブを統合） */
-const TABS=[['st','能力'],['ab','アビリティ'],['sk','技・術'],['aw',SEIRIN.n]];
-{const _ch=charHTML;charHTML=function(id,tab,ed){if(tab==='eq'||tab==='bd')tab='st';const mine=tab==='sk'||tab==='aw'||tab==='ab';let s=_ch(id,mine?'__':tab,ed);
- try{if(mine)s=s.replace('<div class="cbody"></div>',`<div class="cbody c22 rs37">${tab==='sk'?skillsHTML(id):tab==='ab'?abHTML(id):awHTML(id)}</div>`);
-  if(tab==='st'){const i=s.indexOf('<div class="cnote">');const add=st7HTML(id);/* 人物の紹介は図鑑に（ver0.43） */s=i>=0?s.slice(0,i)+add+s.slice(i):s+add;}
-  s=s.replace(/<div class="ctabs[^"]*">[\s\S]*?<\/div>/,`<div class="ctabs c22 rs37 t38">${TABS.map(([k,l])=>`<button class="${tab===k?'on':''}" data-a="tab" data-v="${k}">${l}</button>`).join('')}</div>`);
-  s=s.replace(/パッシブ/g,'アビリティ');}catch(e){console.error(e);}
- return s;};}
-function acts(o,id,re,back){o.rsab=v=>abInfo(id,v,back);o.rsslot=i=>{tapSlot(id,+i);save();re();};o.rsk=k=>{tapSkill(id,k);save();re();};o.rsinfo=k=>info(SK[k],{id,side:0});}
-/* 描き直しても、下の欄のスクロール位置を保つ */
-const keepScroll=(sel,f)=>{const el=$(sel),y=el?el.scrollTop:0;f();const e2=$(sel);if(e2)e2.scrollTop=y;};
-{const _em=equipMenu;equipMenu=function(id,m){if(CTAB==='eq')CTAB='st';_em(id,m);try{const cid=G.members.includes(id)?id:G.party[0];acts(ACT,cid,mm=>keepScroll('#cmd',()=>equipMenu(cid,mm)));}catch(e){console.error(e);}};}
-{const _os=openSheet;openSheet=function(id,tab){_os(id,tab);try{const cid=G.members.includes(id)?id:G.party[0];acts(SACT,cid,()=>keepScroll('#sheet .swin',()=>openSheet(cid)),()=>openSheet(cid));}catch(e){console.error(e);}};}
 
-return{info,skillsHTML,abHTML,awHTML,st7HTML,canAw,basicName};})();
+/* キャラ詳細のタブ：能力（能力値＋人物）・アビリティ（ver0.41 で別タブ）・技・術・星臨（装備は上の枠）。星盤は下の「星盤」ボタンで開く（ver0.39 でタブを統合） */
+
+/* 描き直しても、下の欄のスクロール位置を保つ */
+
+return{};})();

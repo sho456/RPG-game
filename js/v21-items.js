@@ -5,7 +5,7 @@
  ・輪郭線は隣の色の最暗部（ver0.18 のドット絵エンジン準拠）。レアリティが高いほど光の縁取りときらめきが増える
  ・アイテムの判定は「レジェンド／専用（leg）→セット（set）→名前の種類＋素材（銅・鉄・鋼・星鋼）」の順。
    データ（名前・ID・性能）は一切書き換えない */
-'use strict';
+
 const IC21=(()=>{
 const N=24;
 /* 色の指定：スロットk（0〜5）ごとに 明・中・暗 の3文字。大文字A〜Fは最暗。w=白 s=淡い白 x=黒 */
@@ -42,7 +42,7 @@ function render(key,rar=0){const ck=key+'|'+rar;let u=CACHE.get(ck);if(u)return 
  const ns=Math.max(d.sp||0,rar>=4?2:rar>=3?2:rar>=2?1:0);if(ns)sparks(b,ns,d.spc||RARC[Math.max(2,rar)]||'#ffe27a',rar>=4||d.sp>=2);
  u=b.canvas().toDataURL();CACHE.set(ck,u);return u;}
 /* ---------- 名前 → デザインの対応 ---------- */
-const TIERS=['銅','鉄','鋼','星鋼'];
+
 const tierOf=it=>{const n=it.name||'';for(const t of['星鋼','銅','鉄','鋼'])if(n.startsWith(t+'の'))return t;return MATL(it.ilv||1);};
 const WT=[['竜剣','dsword'],['大剣','gsword'],['双剣','dual'],['魔導書','tome'],['大鎌','scythe'],['砂時計','glass'],['手甲','fist'],['爪','claw'],['剣','sword'],['杖','staff'],['弓','bow'],['斧','axe']];
 const NAMED={'灯の護符':'charm','生命の指輪':'ring_life','疾風の指輪':'ring_wind','魔石の首飾り':'neck_mag','星砂の首飾り':'neck_sand'};

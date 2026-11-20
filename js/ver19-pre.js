@@ -4,6 +4,6 @@
  （ver0.18 側の待ち時間と二重にならないようにするため） */
 const V17F={hit,doAction,enemyTurn,pop,kill,awaken,end};
 DOT.snapAll();
-{const _te=trialEnemy;trialEnemy=function(id,tier){const k=_te(id,tier);DOT.snap(k);return k;};}
+
 {const _vk=voidKind;voidKind=function(k){const vk=_vk(k);DOT.snap(vk);return vk;};}
 {const _kb=kBoss;kBoss=function(f){const k=_kb(f);DOT.snap(k);return k;};}

@@ -5,7 +5,7 @@
  3. 向き：出撃前の画面（クエストの上の場面）も戦闘と同じ原画・同じ向き（FACING）。戦闘の見た目のキー（tr_○○）でも図鑑の向きが効く
  4. 対峙：味方は左・敵は右を向き、必ず向かい合う。原画の差し替えで古くなった「戦闘の向き」の設定は一度だけ消す（G.zdirV）
  5. クエスト：選ぶと専用の「クエスト情報」タブに移る（js/v31/quests.js の renderInfo） */
-'use strict';
+
 const V32=(()=>{
 const VER='ver0.32';
 /* ---------- 2. 通常敵の大きさ ---------- */
@@ -28,6 +28,6 @@ const NEWS=`<div class="nt"><b>${VER}</b><br><small>・<b>原画</b>：${TERMS.C
  `・<b>図鑑</b>：絵を枠の中央に。敵は「通常敵／ボス」と系統で絞り込める<br>・<b>戦闘</b>：通常敵の大きさが極端に違わないように<br>`+
  `・<b>出撃前</b>：クエストを選ぶと「クエスト情報」タブへ。出現する敵とパーティが向かい合う（図鑑で設定した向きも反映）</small></div>`;
 document.addEventListener('click',()=>{setTimeout(()=>{try{const o=document.querySelector('.nw22');if(o&&!o.querySelector('.n32')){const d=document.createElement('div');d.className='n32';d.innerHTML=NEWS;const h=o.querySelector('.nh');h?h.after(d):o.prepend(d);}}catch(e){}},0);},true);
-{const _t=title;title=function(){_t();const v=$('#verL');if(v)v.textContent=VER;};const v=$('#verL');if(v)v.textContent=VER;}
+
 try{document.title='アストラル・ブレイカー '+VER;}catch(e){}
-return{VER,S0,EXP,sizeK,SIZE};})();
+return{};})();

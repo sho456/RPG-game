@@ -8,7 +8,7 @@
  ・アビリティ：3 つ（Lv1・25・50 で解放、段階 I〜V）。星盤・天星盤のノードで強化
  ・陣形：並び順ごとの立ち位置と能力の補正
  セーブの項目：G.h[id].sset（技セット）・skx（技の熟練）・glim（ひらめいた技）・sseen・lp（今のLP）・G.form（陣形） */
-'use strict';
+
 const RSC=(()=>{
 const D=RSD;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -18,8 +18,7 @@ const INF=lv=>{try{return V31.INF(lv);}catch(e){return 1;}};
 /* ==================== 技・術を登録 ==================== */
 for(const k in D.NEW)SK[k]=D.NEW[k];
 /* 区分（TERMS）：技＝物理、術＝魔法 */
-for(const k in D.NEW){const s=SK[k],g=s.ty==='術'?'mag':'phys';
- s.cat=s.ougi?'seirin':(s.k==='heal'||s.k==='healAll'||s.k==='reviveAll'||s.role==='heal'||s.heal20)?g+'_heal':(s.k==='sup20'||s.k==='rewind')?g+'_support':g+'_attack';}
+
 try{Object.assign(TERMS.GROUP,{phys:'技',mag:'術',seirin:'星臨',passive:'アビリティ'});
  const N={phys_normal:'通常攻撃',phys_attack:'攻撃技',phys_support:'補助技',phys_heal:'回復技',mag_normal:'通常攻撃（術）',mag_attack:'攻撃術',mag_support:'補助術',mag_heal:'回復術',seirin:'奥義',passive:'アビリティ'};
  for(const k in N)if(TERMS.SKILL[k]){TERMS.SKILL[k].n=N[k];TERMS.SKILL[k].s=N[k].replace(/（.*）/,'');}TERMS.reset();}catch(e){console.error(e);}
@@ -187,7 +186,6 @@ function fixBoards(){
 fixBoards();
 try{for(const x of['1','2','3','O'])V20.PS['ab_up'+x]={n:x==='O'?'奥義強化':'アビリティ強化',d:x==='O'?'奥義の威力+30%':'アビリティを1段階強化'};}catch(e){}
 /* 天星盤の画面の呼び名（「天星パッシブ」→「アビリティ強化」） */
-{const _bm=boardMenu;boardMenu=function(m){_bm(m);try{for(const el of[$('#cmd'),$('#labels'),$('#msg')]){if(!el)continue;if(/天星パッシブ|パッシブ/.test(el.innerHTML))el.innerHTML=el.innerHTML.replace(/天星パッシブ/g,'アビリティ強化').replace(/パッシブ/g,'アビリティ');}}catch(e){}};}
 
 /* ==================== 戦闘ユニット ==================== */
 {const _h=hero;hero=function(id){const u=_h(id);try{

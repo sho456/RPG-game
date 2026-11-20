@@ -5,9 +5,9 @@
  3. 新しいアクティブスキル・魔法（各キャラ2種・Lv8／Lv28で習得）
  4. 敵の新戦術（ボスの激昂・攻撃に付く弱体化・一部の敵の鼓舞）
  を追加する。セーブデータには新しい項目を書き込まない（武器パッシブは装備のuidから決まる）。 */
-'use strict';
+
 const V20=(()=>{
-const R=(a,b)=>a+Math.random()*(b-a);
+
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const footOf=u=>(typeof V19!=='undefined'&&V19.foot&&u.A&&!u.A.none)?V19.foot(u):[u.x+8*u.sc,u.y+16*u.sc-2];
 const midOf=u=>{try{if(typeof V19!=='undefined'&&V19.mid&&u.A&&!u.A.none)return V19.mid(u);}catch(e){}return[u.x+8*u.sc,u.y+8*u.sc];};
@@ -185,7 +185,6 @@ Object.assign(SK,NSK);
 const LSK={rio:[[8,'kobu'],[28,'torirensan']],gald:[[8,'saigan'],[28,'teppekikamae']],mire:[[8,'prism'],[28,'meteor']],shion:[[8,'dokujin'],[28,'genei']],
  noah:[[8,'regene'],[28,'dispel']],erna:[[8,'ashidome'],[28,'senkou']],balza:[[8,'kaentanda'],[28,'daichiwari']],crow:[[8,'fushoku'],[28,'tamakurai']],
  hakua:[[8,'hyouketsu'],[28,'hyakuretsu']],jin:[[8,'popototsu'],[28,'kemonohoko']],celes:[[8,'chronoslow'],[28,'hastearea']],valk:[[8,'ryurinkamae'],[28,'kokuryu']]};
-{const _sl=skillList;skillList=function(id){const s=_sl(id),lv=(G.h[id]&&G.h[id].lv)||1;for(const[l,k]of(LSK[id]||[]))if(lv>=l&&!s.includes(k))s.push(k);return s;};}
 
 /* ==================== 4. 敵の新戦術 ==================== */
 /* 敵の攻撃に弱体化を付ける */
@@ -194,13 +193,11 @@ const EFX={spore:[{k:'poison',v:.03,t:3,p:.3}],curse:[{k:'res',v:-15,t:2,p:.4}],
  deluge:[{k:'spd',v:-15,t:2,p:.5}],dfire:[{k:'poison',v:.03,t:2,p:.25}],tide:[{k:'def',v:-15,t:2,p:.3}],slash2:[{k:'def',v:-10,t:2,p:.25}]};
 for(const k in EFX)if(EA[k])EA[k].fx20=EFX[k].map(f=>Object.assign({on:'t'},f));
 /* 一部の敵は仲間を鼓舞する（攻撃+20%・3ターン） */
-const RALLY=['darkknight','onimusha','shade','yukirei','bookghost'];
 
 /* ==================== 戦闘への組み込み ==================== */
 /* ユニット生成：パッシブを付ける（武器パッシブの能力変化もここで） */
 {const _hero=hero;hero=function(id){const u=_hero(id);try{u.sts=[];u.ps20=unitPS(u);for(const p of u.ps20){const P=PS[p.id];if(P&&P.make)P.make(u,p.v);}}catch(e){console.error(e);}return u;};}
-{const _sb=startBattle;startBattle=function(list,opts={}){const r=_sb(list,opts);try{if(B){B.q20=[];B.cq20=[];B.round20=1;B.heroes.forEach(h=>{h.sts=h.sts||[];base0(h);});B.enemies.forEach(e=>{e.sts=[];base0(e);});
-  setTimeout(()=>{if(!B||B.over)return;B.heroes.forEach(h=>{if(h.alive)each(h,'start');});refresh();},380);}}catch(e){console.error(e);}return r;};}
+
 /* 与ダメ・被ダメの倍率（状態効果・パッシブ・スキルの条件） */
 {const _c=calc;calc=function(a,t,sk){let def0=null;
  if(sk.pierce20){def0=[t.def,t.res];t.def=Math.round(t.def*(1-sk.pierce20));t.res=Math.round(t.res*(1-sk.pierce20));}
@@ -280,26 +277,8 @@ async function support(u,sk){u.sp-=sk.sp||0;log(`${u.name}の<b>${sk.n}</b>！`)
  await drain(B.q20);await drain(B.cq20);refresh();return r;};}
 
 /* 手番の開始：状態効果の経過・パッシブ */
-{const _ht=heroTurn;heroTurn=async function(u){if(!B||B.over)return _ht(u);
- try{each(u,'turn');}catch(e){}
- const stun=await tickSts(u);if(!u.alive||!aliveE().length)return;
- if(stun){u.guard=false;setCT(u);refresh();return;}
- return _ht(u);};}
-{const _et=enemyTurn;enemyTurn=async function(e){if(!B||B.over)return _et(e);B.cq20=[];
- const stun=await tickSts(e);if(!e.alive)return;if(stun){setCT(e);refresh();return;}
- /* ボスの激昂：HP40%を切ると一度だけ攻撃・魔力+25% */
- if(e.boss&&!e._rage&&e.hp<e.mhp*.4){e._rage=1;addSt(e,'enrage',25,99);B.shake=10;log(`${e.name}は<b>激昂した</b>！ 攻撃と魔力が上がった（ノアのディスペル・ライトで消せる）`);SFX.warn();try{const[x,y]=midOf(e);fx('ring',x,y,'#ff5a3a',{r1:26,dur:420,thick:2});}catch(x){}refresh();await wait(650);}
- /* 一部の敵は仲間を鼓舞する */
- if(!e.boss&&RALLY.includes(e.kind)&&!e.charging&&Math.random()<.18&&!aliveE().every(x=>hasSt(x,'atk'))){e.turn++;log(`${e.name}は<b>仲間を鼓舞した</b>！（攻撃+20%）`);
-  try{const[x,y]=midOf(e);fx('ring',x,y,'#ff8a5a',{r1:18});}catch(x){}aliveE().forEach(x=>addSt(x,'atk',20,3));SFX.warn();setCT(e);refresh();await wait(600);return;}
- B._fx20=new Set();const r=await _et(e);await drain(B.cq20);return r;};}
 
 /* オート：支援技も使う */
-{const _ap=autoPick;autoPick=function(u){const r=_ap(u);try{if(!r||r.aw||!r.sk||u.aw)return r;
-  const own=(u.skills||[]).map(k=>SK[k]).filter(s=>s&&s.k==='sup20'&&(s.sp||0)<=u.sp);
-  const heal=own.find(s=>s.role==='heal'&&aliveH().some(h=>h.hp<h.mhp*.5));if(heal)return{sk:heal};
-  const bf=own.find(s=>s.role!=='heal'&&!(s.fx20||[]).every(f=>f.on==='enemies'||(f.on==='self'?hasSt(u,f.k):aliveH().every(h=>hasSt(h,f.k)))));if(bf&&Math.random()<.35)return{sk:bf};
-  if(r.sk.basic){const nv=Object.values(NSK),at=(u.skills||[]).map(k=>SK[k]).filter(s=>s&&nv.includes(s)&&(s.k==='phys'||s.k==='mag')&&(s.sp||0)<=u.sp-10);if(at.length&&Math.random()<.4){const s=at[Math.random()*at.length|0];return{sk:s,t:r.t||aliveE()[0]};}}}catch(e){}return r;};}
 
 /* 状態タグ（味方パネル・敵ラベルに出す） */
 {const _st=stTags;stTags=function(u){const t=_st(u);try{for(const s of stsOf(u)){const b=isBuff(s),nm=s.k==='weak'?s.el+'弱':(STAT5.includes(s.k)||s.k==='crit')?STN[s.k][1]+(s.v>0?'↑':'↓'):STN[s.k][1];t.push([nm+(s.t<50?s.t:''),'s20 '+(b?'bu':'de')]);}}catch(e){}return t;};}

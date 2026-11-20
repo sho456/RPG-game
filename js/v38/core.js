@@ -4,8 +4,7 @@
  ・武器種：剣・短剣・大剣・斧・体術・弓・杖・双剣（RSD.WPN）。武器種は「通常攻撃の属性」と「技の威力の能力配分」を決める
  ・LP：クエストの間は引き継ぎ、灯都に戻る（全回復）と最大値に戻る
  ・オーバードライブ・連携・共鳴技・ジョブは ver0.38 で廃止（関連する処理・画面・データは削除済み） */
-'use strict';
-let ALTATK=()=>null,basicsOf=u=>[ATK(u)];
+
 const V38=(()=>{
 const D=RSD;
 const NORM={'炎':'熱','氷':'冷','光':'陽','闇':'陰','風':'斬','地':'打'};
@@ -22,7 +21,7 @@ function normAll(){
  try{for(const k in ED){const d=ED[k];if(!d)continue;d.weak=nList(d.weak||[]);if(d.res)d.res=nList(d.res);if(d.el)d.el=nel(d.el);}}catch(e){console.error(e);}}
 normAll();
 /* 召喚・生成で後から作られる敵（試練の幻影・回廊など）も、戦闘の始めに直す */
-{const _sb=startBattle;startBattle=function(list,opts){try{for(const e of list||[]){const d=ED[e.kind];if(d){d.weak=nList(d.weak||[]);}}}catch(x){}return _sb(list,opts);};}
+
 {const _en=enemy;enemy=function(...a){const e=_en(...a);try{e.weak=nList(e.weak||[]);}catch(x){}return e;};}
 
 /* ---------- 敵の技：LP を削る攻撃・属性の見直し ---------- */
@@ -60,4 +59,4 @@ function migItem(it){if(!it)return;
 /* ---------- LP：灯都で全回復 ---------- */
 {const _h=healAll;healAll=function(...a){const r=_h(...a);try{for(const id of G.members)if(G.h[id])G.h[id].lp=null;}catch(e){}return r;};}
 
-return{NORM,nel,nList,normAll,migItem};})();
+return{};})();

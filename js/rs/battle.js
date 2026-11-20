@@ -13,12 +13,11 @@
   ・LP はクエストの間は引き継ぎ、灯都に戻ると全回復する
  命中：技は器用さ・素早さ 対 素早さ、術は知力 対 精神（RSC.hitRate）。外れると MISS
  演出（ver0.19〜0.36 の振り付け・エフェクト）は既存の doAction / hit / enemyTurn をそのまま通す */
-'use strict';
+
 const RSB=(()=>{
 const D=RSD,C=RSC;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const DEV=()=>{try{return!!(G&&G.dev);}catch(e){return false;}};
-const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
 /* ==================== 効果（アビリティ・陣形・星臨アビリティ） ==================== */
 function effs(u){if(!u||u.side!==0)return[];const L=u.rsE||[];return u.aw?L.concat(u._awE||(u._awE=C.awEffects(u.id))):L;}
@@ -147,8 +146,6 @@ function onKill(a,t){for(const e of effs(a))if(e.t==='kill'){if(e.bp)a._rsBpGain
 async function strikeBack(a,t,nm,pow,el){if(!a.alive||!B)return;let tg=t&&t.alive?t:aliveE().sort((x,y)=>x.hp-y.hp)[0];if(!tg)return;
  pop(a,nm,'#ffe27a',true,'st20 fu');await wait(140);try{const[x,y]=V19.mid(tg);FX19.slash(x,y,ELC[el]||'#ffffff',{size:1});}catch(e){}
  await hit(a,tg,{n:nm,el:el||a.atkEl||a.elem||'斬',k:MAG(a.id)?'mag':'phys',pow,t:'one',_fu:1});await wait(160);}
-async function drainCounters(){const q=B&&B.rs?B.rs.cq:[];let n=0;while(q.length&&n<4&&B&&!B.over&&aliveE().length){const c=q.shift();n++;if(!c.a.alive||!c.t.alive)continue;await strikeBack(c.a,c.t,c.nm||'反撃',c.pow);
-  for(const e of effs(c.a))if(e.t==='ctst'&&c.t.alive&&Math.random()<C.ailP(c.a,c.t,{k:e.k,p:e.v})){abPop(c.a,e.src);V20.addSt(c.t,e.k,1,1);}}if(B&&B.rs)B.rs.cq=[];}
 
 /* ==================== 敵の狙い ==================== */
 pickHero=function(){const hs=aliveH();const g=hs.find(h=>h.id==='gald'&&h.aw);if(g)return g;
@@ -189,38 +186,17 @@ function banner(t,s,cls){let b=$('#rsban');if(!b){b=document.createElement('div'
 /* ==================== 1 ターン ==================== */
 const bpReg=h=>(h.bpReg!=null?h.bpReg:D.BP.regen)+sumE(h,'bpr')+Math.min(2,Math.floor((h.spGain||0)/5))+B.heroes.filter(x=>x.alive).reduce((a,x)=>a+sumE(x,'allybpr'),0);
 function bpStart(u){return clamp((u.bp0!=null?u.bp0:D.BP.start)+sumE(u,'bp0')+B.heroes.reduce((a,h)=>a+sumE(h,'allybp0'),0),0,u.bpMax);}
-function roundStart(){const R=B.rs.round;
- for(const h of aliveH()){h.bpMax=(h.bpMax0||h.bpMax)+0;
-  if(R>1)h.sp=clamp(h.sp+bpReg(h),0,h.bpMax);
-  if(DEV())h.sp=h.bpMax;}
- refresh();}
+
 /* ターンの始めの効果（ver0.46d：ロマサガRS と同じく、コマンドを決めて全画面になったあと＝HP・BP を見せたあとに出す） */
-function roundFx(){const R=B.rs.round;
- for(const h of aliveH())for(const e of effs(h)){
-  if(e.t==='tstart'){const tg=e.on==='allies'?aliveH():[h];for(const x of tg)V20.addSt(x,e.k,e.k==='shield'?Math.round(x.mhp*e.v/100):e.v,e.k==='shield'?99:2);}
-  if(e.t==='autorev'&&!h._rsAR){const d=B.heroes.find(x=>!x.alive&&(x.lp||0)>0);if(d){h._rsAR=1;d.alive=true;d.hp=Math.max(1,Math.round(d.mhp*e.v/100));abPop(h,e.src);setTimeout(()=>{try{pop(d,'REVIVE','#7dffa8',true);setCT(d);}catch(x){}},200);log(`${h.name}の「${e.src}」――${d.name}が立ち上がった`);}}}
- if(R>1)for(const h of aliveH()){for(const e of effs(h)){
-   if(e.t==='regen'){const tg=e.on==='allies'?aliveH():e.on==='lowest'?[aliveH().filter(x=>x.hp<x.mhp).sort((a,b)=>a.hp/a.mhp-b.hp/b.mhp)[0]].filter(Boolean):[h];
-    /* 回復アビリティ：持ち主の魅力と、受ける側の魅力で量が変わる */
-    for(const x of tg){if(x.hp>=x.mhp)continue;const v=Math.max(1,Math.round(x.mhp*e.v/100*(h.healAb||1)*(x.healRecv||1)));x.hp=Math.min(x.mhp,x.hp+v);pop(x,'+'+v,'#7dffa8',true);}}
-   if(e.t==='cleanse'&&Math.random()<(e.p||0)){const s=(h.sts||[]).find(s=>!V20.isBuff(s));if(s){V20.clearSt(h,x=>x===s);pop(h,'弱体解除','#8ff0a8',true);}}}}
- refresh();}
+
 /* 解癒（練達の効果）：ターン終了時に 1 回だけ、状態異常・能力ダウンを解除し、HP を少し回復する（効果極小＝最大HPの5%） */
-function kaiyuEnd(){for(const h of aliveH()){const s=(h.sts||[]).find(x=>x.k==='kaiyu');if(!s)continue;V20.clearSt(h,x=>x===s);
-  const a=V20.clrAil(h),d=V20.clrDown(h);abPop(h,'解癒');if(h.hp<h.mhp){const n=Math.max(1,Math.round(h.mhp*.05));h.hp=Math.min(h.mhp,h.hp+n);pop(h,'+'+n,'#7dffa8');}
-  if(a||d)log(`${h.name}の「解癒」――状態異常・能力ダウンを解除した`);}}
-function roundEnd(){try{kaiyuEnd();}catch(e){console.error(e);}for(const h of B.heroes){if(h.taunt>0)h.taunt--;
-  if(h.aw&&h.alive){h.awT=(h.awT||0)+1;if(h.awT>=awN(h)){endAw(h,true);h._awE=null;log(`${h.name}の星臨が解けた`);}}}
- refresh();}
+
 /* 行動順 */
 function buildOrder(cmds){const L=[],hs=aliveH(),avg=hs.reduce((a,h)=>a+spdOf(h),0)/Math.max(1,hs.length);
  for(const[u,c]of cmds){if(!u.alive)continue;const pr=sumE(u,'prio'),sp=(c&&c.sk&&c.sk.prio?c.sk.prio*1000:0)+(B.rs.round===1&&sumE(u,'prio1')>0?5000:0);
   L.push({u,c,v:spdOf(u)*(.9+Math.random()*.2)*(1+pr/100)+sp-(u._rsLate?3000:0)});u._rsLate=0;}
  for(const e of aliveE()){const n=e.boss&&e.spd>avg*1.35?2:1;for(let k=0;k<n;k++){L.push({u:e,v:e.spd*(.9+Math.random()*.2)*(k?.55:1)-(e._rsLate?3000:0)});}e._rsLate=0;}
  return L.sort((a,b)=>b.v-a.v);}
-const ctSnap=()=>{const m=new Map();for(const x of[...B.heroes,...B.enemies])m.set(x,{ct:x.ct||0,alive:x.alive});return m;};
-function ctApply(m,actor,q){for(const[x,s]of m){if(x===actor||!s.alive||!x.alive)continue;const d=(x.ct||0)-s.ct;if(Math.abs(d)<1e-6)continue;const i=q.findIndex(e=>e.u===x);
- if(d>0){if(i>=0){const[e]=q.splice(i,1);q.push(e);}else x._rsLate=1;}else if(i>=0){const[e]=q.splice(i,1);q.unshift(e);}x.ct=s.ct;}}
 
 /* 入力（味方全員の行動を先に決める）。B.rs.phase：'input'（コマンド入力中）／'act'（行動中） */
 async function inputPhase(myB){const cmds=new Map();let list=B.heroes.filter(h=>h.alive),i=0;B.rs.phase='input';B.rs.cmds=cmds;
@@ -235,9 +211,6 @@ async function inputPhase(myB){const cmds=new Map();let list=B.heroes.filter(h=>
    try{V20.STN&&(nh.sts=[]);}catch(e){}C.applyForm(nh,idx);nh.sp=bpStart(nh);log(`${u.name}と${nh.name}が入れ替わった！`);SFX.sel();list[i]=nh;refresh();await wait(250);continue;}
   cmds.set(u,ch);i++;}
  B.cur=null;B.rs.phase='act';refresh();return cmds;}
-async function opening(myB){await sleep(350);let n=0;while(B===myB&&!B.over&&(B.intro>0||document.querySelector('#stage .bossin')||BFLOW.bannerOn())&&n<240){await sleep(50);n++;}
- /* ver0.46c：HP・BP が消え、開始時の強化・弱体を見せ終えてからコマンドへ */
- n=0;while(B===myB&&!B.over&&performance.now()<V38B.hpEnd()+1400&&n<120){await sleep(50);n++;}try{BPOP.cut();}catch(e){}await sleep(260);}
 
 /* 味方の行動 */
 async function heroExec(u,c){if(!c||!c.sk)return;try{BPOP.cut();}catch(x){}/* 行動ごとの区切り：前の行動の表示を消す */
@@ -305,50 +278,17 @@ function prep(u,sk,t){const s=Object.assign({},sk);s.sp=0;/* 旧来の SP の消
   if(M.drain)s.drain=(s.drain||0)+M.drain;if(M.hits&&s.hits>1)s.hits+=M.hits;else if(M.hits&&s.pow){s.hits=1+M.hits;s.pow*=.55;}if(M.fu)s.fu3=M.fu;}catch(e){console.error(e);}
  return s;}
 /* 敵の行動。全体攻撃は、倒れている味方（LP が残っている）にも追い打ちになる */
-async function enemyExec(e){try{BPOP.cut();}catch(x){}B.rs.cq=[];B.rs.eSk=null;const down=B.heroes.filter(h=>!h.alive&&(h.lp||0)>0);
- const ch0=e.charging;await enemyTurn(e);
-
- if(B&&!B.over&&e.alive&&e.charging&&!ch0)log(`${e.name}は<b>力を溜めている</b>…！ 次の行動で強力な攻撃が来る`);
- await drainCounters();}
 
 /* 戦闘の進行 */
-const oldRun=run;
-run=async function(){if(!B)return;if(B.opts&&B.opts.viewer)return oldRun();const myB=B;
- try{await opening(myB);
-  while(B===myB&&!B.over){
-   B.rs.round++;B.turns=B.rs.round;roundStart();
-   const cmds=await inputPhase(myB);if(!cmds||B!==myB||B.over)return;
-   const q=buildOrder(cmds);B.rs.q=q;refresh();
-   /* コマンドを決め終えたら戦場を全面に。全員の HP・BP を少しだけ出し、最初の攻撃の前に全員分まとめて消す（ver0.46） */
-   /* ver0.46d：ターンの始め＝コマンドを決めて全画面になったあと。HP・BP を 1 度だけ出して消し、ターンの始めの効果を出してから行動へ */
-   /* 全画面に戻るスライド（約 0.5 秒）が終わってから HP・BP を出す（途中で出すと位置がずれて見える。ver0.46e） */
-   try{BPOP.cut();}catch(e){}{let n=0;while($('#app').classList.contains('in38')&&n<40){await sleep(30);n++;}}await wait(520);
-   try{V38B.hpFlash(900);}catch(e){}await wait(950);try{V38B.hpHide();}catch(e){}await wait(200);
-   roundFx();if(document.querySelector('#bp46 .bp46.on:not(.out)'))await wait(900);
-   while(q.length){if(B!==myB||B.over)return;const it=q.shift(),u=it.u;
-    if(!u.alive)continue;if(u.side===1&&!B.enemies.includes(u))continue;if(u.side===0&&!B.heroes.includes(u))continue;
-    const snap=ctSnap();B.cur=u;refresh();
-    if(u.side===0)await heroExec(u,it.c);else await enemyExec(u);
-    if(B!==myB||B.over)return;B.cur=null;ctApply(snap,u,q);lpGuard();refresh();
-    if(!aliveE().length){if(B.opts.stages&&(B.stage||0)<B.opts.stages.length-1){await nextStage();break;}await wait(500);return end(true);}
-    if(!aliveH().length){await wait(500);return end(false);}}
-   roundEnd();try{BPOP.cut();}catch(e){}await wait(speed<=1?750:260);}/* 1 倍速はターンの変わり目に少し間をおく（ver0.47） *//* ターンの終わり：表示を全部消してからコマンド入力へ */
- }catch(e){console.error(e);}};
+
 /* 行動順の表示（入力中は予想、行動中は残りの列） */
-preview=function(){if(!B||!B.rs)return[...aliveH(),...aliveE()];if(B.rs.q&&B.rs.q.length)return B.rs.q.map(x=>x.u).filter(u=>u.alive);return[...aliveH(),...aliveE()].sort((a,b)=>spdOf(b)-spdOf(a));};
 
 /* 開始：BP・LP・陣形 */
-{const _sb=startBattle;startBattle=function(list,opts={}){const r=_sb(list,opts);try{if(B){
-  B.rs={round:0,cur:null,cq:[],q:[],phase:'input',eSk:null,missed:false};
-  B.heroes.forEach((h,i)=>{C.applyForm(h,i);h.bpMax0=h.bpMax=(h.bpMax||D.BP.max)+sumE(h,'bpmax');h._rsGuts=0;h._rsRage=0;h._rsHeat=0;h._rsAR=0;h._rsHB=0;});
-  B.heroes.forEach(h=>{h.sp=bpStart(h);if((h.lp||0)<=0){h.alive=false;h.hp=0;}});
-  setTimeout(()=>{try{if(!B||!B.rs)return;for(const h of B.heroes){if(!h.alive)continue;for(const e of effs(h))if(e.t==='start'){const tg=e.on==='allies'?aliveH():e.on==='enemies'?aliveE():[h];
-    for(const x of tg)V20.addSt(x,e.k,e.k==='shield'?Math.round(x.mhp*e.v/100):e.v,e.d||3);}h.sp=clamp(h.sp,0,h.bpMax);}refresh();}catch(e){console.error(e);}},420);}}catch(e){console.error(e);}return r;};}
+
 /* 戦闘の終わり：LP を控える（クエスト中は引き継ぐ）。LP 0 の味方は HP 0 のまま */
-{const _e=end;end=async function(win){try{if(B&&B.rs)for(const h of B.heroes){if(G.h[h.id])G.h[h.id].lp=h.lp;}}catch(e){}
- const r=await _e(win);try{if(B&&B.rs)for(const h of B.heroes){const g=G.h[h.id];if(g&&(h.lp||0)<=0)g.hp=0;}}catch(e){}return r;};}
+
 /* 武器パッシブ「知識の泉」：BP+2 */
-try{const P=V20.PS.w_wisdom;if(P){P.v=2;P.d='戦闘開始時のBP+{v}';P.start=(u,v)=>{u.sp=Math.min(u.bpMax||20,u.sp+Math.round(v));};}}catch(e){}
+
 /* 星臨ゲージの溜まり方（アビリティ） */
 {const _hit2=hit;hit=async function(a,t,sk){const ag0=a&&a.side===0&&!a.aw?a.ag:null;const d=await _hit2(a,t,sk);try{if(ag0!=null&&a.ag>ag0){const m=sumE(a,'ag');if(m)a.ag=Math.min(100,ag0+(a.ag-ag0)*(1+m/100));}}catch(e){}return d;};}
 

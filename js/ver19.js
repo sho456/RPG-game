@@ -159,7 +159,7 @@ function onHurt(t,d){const A=t.A;if(!A||A.none)return;const c=CUR&&CUR.a._act,sk
   const n0=B.fx.length,was=t.alive;CUR={a,sk};LAST=null;const pr=_hit(a,t,sk);B.fx.length=Math.min(B.fx.length,n0);const r=LAST||{},c=a._act,big=c&&c.fx&&c.fx.big;CUR=null;
   if(!sk._sim&&!sk._simLead)await stop(a._act&&a._act.n>1&&sk.hits?26:38+(r.crit?70:0)+(r.weak?28:0)+(big?55:0));return pr;};}
 {const _da=V17F.doAction;doAction=async function(u,sk,t){try{await pre(u,sk,t);}catch(e){console.error(e);}try{return await _da(u,sk,t);}finally{try{await finish(u);}catch(e){console.error(e);}}};}
-{const _et=V17F.enemyTurn;enemyTurn=async function(e){setup(e);e._act={n:0};const ch0=e.charging;try{const pr=_et(e);if(!ch0&&e.charging&&e.A&&!e.A.none){const[x,y]=mid(e);FX19.gather(x,y,'#ffb030',20,500);FX19.ring(x,y,'#ffb030',{r0:20,r1:3,dur:420});}return await pr;}finally{try{await finish(e);}catch(x){console.error(x);}}};}
+
 {const _k=V17F.kill;kill=async function(t){const boss=t.side===1&&t.boss,pr=_k(t),A=t.A;if(!t.alive&&A&&!A.none){
    if(t.side===1){A.dead={t0:ANIM.now,dur:(boss?1700:900)*ANIM.SP()};A.dcv=null;const[x,y]=mid(t),D=dims(t);FX19.burst(x,y,'#ffb0a0',{size:1.6,rays:10});FX19.ring(x,y,'#ff5a4a',{r1:20});
     if(boss){/* ボス撃破：連鎖する爆発と長い崩壊（ver0.18 の演出を引き継ぐ） */B.shake=30;B.flashBg=30;B.flashCol='#ffffff';try{SFX.brk();}catch(e){}setTimeout(()=>{try{SFX.brk();}catch(e){}},260*SPD[speed]);
@@ -168,15 +168,14 @@ function onHurt(t,d){const A=t.A;if(!A||A.none)return;const c=CUR&&CUR.a._act,sk
 {const _aw=V17F.awaken;awaken=async function(u){const pr=_aw(u);B.shake=10;try{const A=setup(u);if(!A.none){const cv2=document.querySelector('#cut canvas');if(cv2)cutArt(cv2,u.spr+'_aw');
    to(u,AWK,220,'back');const[x,y]=mid(u),[fx,fy]=foot(u);FX19.pillar(fx,fy,'#ffe27a');FX19.circle(fx,fy,'#ffe27a',{dur:1200,r:18});FX19.gather(x,y,'#ffe27a',24,600);FX19.ring(x,y,'#ffffff',{r1:26,dur:420,delay:200});}}catch(e){console.error(e);}
   try{return await pr;}finally{idle(u,260);}};}
-{const _end=V17F.end;end=async function(win){if(win&&B){try{B.heroes.forEach((h,i)=>{if(!h.alive||!h.A||h.A.none)return;setTimeout(async()=>{if(V19.ext&&V19.ext.victory&&V19.ext.victory(h,i))return;/* ver0.35：キャラごとの勝利の動き */move(h,0,0,380,'lin',7);await to(h,VIC.a,180,'out');await to(h,VIC.b,200,'in');},i*90);});await T(820);}catch(e){console.error(e);}}const r=await _end(win);try{if(win&&B&&/レベルアップ/.test($('#ov').innerHTML))B.heroes.forEach(h=>{if(h.alive&&h.A&&!h.A.none)FX19.buff(...mid(h));});}catch(e){}return r;};}
+
 /* 回復・復活・補助などの文字ポップに合わせてエフェクトを出す（ver0.18 の仕組みを新エフェクトで引き継ぐ） */
 pop=function(u,txt,col,small,kind,el){V17F.pop(u,txt,col,small,kind,el);if(!B||!u||u.x==null||!u.A||u.A.none)return;try{const s=String(txt),[x,y]=mid(u);if(V19.ext&&V19.ext.popFx(u,s,kind))return;
   if(/^\+\d+$/.test(s))FX19.heal(x,y);else if(s==='REVIVE'||s==='奇跡！')FX19.pillar(...foot(u));else if(/^AG\+|^SP\+|HASTE|充填/.test(s))FX19.buff(x,y,/SP/.test(s)?'#6fb2ff':/HASTE/.test(s)?'#8ff0a8':'#ffe27a');
   else if(s==='DELAY'||s==='凍結'||s==='STOP')FX19.ring(x,y,'#7fd6ff',{r0:15,r1:3,dash:1,dur:340});else if(s==='MISS')FX19.spray(x,y,7,['#ffffff','#c8ffd8'],1.3,0,14);else if(s==='SCAN')FX19.ring(x,y,'#7fd6ff',{r1:15,dash:1});}catch(e){}};
-{const _sb=startBattle;startBattle=function(list,opts={}){FX19.clear();return _sb(list,opts);};}
 
 /* ---------- 描画 ---------- */
-const hash=(x,y,s)=>{let h=(x*374761393+y*668265263+s*1274126177)|0;h=(h^(h>>>13))*1274126177|0;return((h^(h>>>16))>>>0)/4294967296;};
+
 const BY4=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
 /* 撃破：白く光ったあと、網点のパターンで下から上へ溶けていく */
 /* 赤く染めた絵（元の陰影は少し残す） */
@@ -241,5 +240,5 @@ function icon(u){const key=sprKey(u),A=setup(u);if(A.none)return null;let c=ICO.
 /* 図鑑：新しいドット絵（未発見はシルエット） */
 try{for(const k in IMG){if(/_(w|aw)$/.test(k)||!SPRX.info(k))continue;for(const sil of[0,1])Object.defineProperty(ZIMG,k+(sil?'_w':''),{configurable:true,enumerable:true,get(){const ed=ED[k],c=still(k,48,ed&&!ed.flip);const v=c?(sil?PX.whiteOf(c):c).toDataURL():'';Object.defineProperty(ZIMG,k+(sil?'_w':''),{value:v,writable:true,configurable:true,enumerable:true});return v;}});}}catch(e){}
 /* 版表示 */
-const VER19='ver0.19';{const _t=title;title=function(){_t();const v=$('#verL');if(v)v.textContent=VER19;};const v=$('#verL');if(v)v.textContent=VER19;}
+
 return{foot,mid,dims,near,dash,WP,MA,CAST,BOW,VIC,AWK,still,icon,drawBattle,ext:null};})();

@@ -7,7 +7,7 @@
     与ダメ（dmgP）・技の威力（skDmg）・会心ダメ（critDmg）・被ダメ軽減（dmgCut、最大60%）
     さらに Lv60 を超えると、技（通常攻撃以外）の威力が Lv ごとに +1.5% 上がる
  セーブに増える項目：G.h[id].cap（レベル上限）・G.h[id].board2（天星盤）・G.mats.seishou（天極の星晶）・G.qs（クエスト） */
-'use strict';
+
 const V31=(()=>{
 const VER='ver0.31';
 const INF=lv=>lv<=60?1:Math.pow(1.035,lv-60);
@@ -34,8 +34,7 @@ let XPF=1;
 gainXP=function(id,x){x=Math.round(x*XPF);const s=G.h[id];s.xp+=x;let n=0;const cap=capOf(id);
  while(s.lv<cap&&s.xp>=xpNeed(s.lv)){s.xp-=xpNeed(s.lv);s.lv++;n++;}
  if(s.lv>=cap)s.xp=Math.min(s.xp,xpNeed(s.lv));return n;};
-{const _rw=rewards;rewards=function(es){XPF=1;try{if(!(B&&B.opts&&B.opts.event)){const pl=G.party.reduce((a,i)=>a+G.h[i].lv,0)/Math.max(1,G.party.length),el=Math.max(...es.map(e=>e.lv||1)),gap=pl-el-5;if(gap>0)XPF=Math.max(.2,1-gap*.06);}}catch(e){XPF=1;}
- let r;try{r=_rw(es);}finally{if(r&&XPF!==1)r.xp=Math.round(r.xp*XPF);XPF=1;}return r;};}
+
 /* 限界突破：成功なら null、できなければ理由を返す */
 function lbCheck(id){const st=LBS[lbStage(id)],h=G.h[id];if(!st)return'これ以上は突破できない（Lv120）';
  if(h.lv<capOf(id))return`Lv${capOf(id)}に達すると突破できる`;if((G.mats.seishou||0)<st.n)return`${MATS.seishou.n}が足りない（${G.mats.seishou||0}/${st.n}）`;if(G.gold<st.g)return'お金が足りない';return null;}
@@ -57,9 +56,6 @@ const XK=['dmgP','skDmg','critDmg','dmgCut'];
 
 /* ---------- 表示の補助 ---------- */
 /* キャラ詳細の「次のLvまで」を新しい経験値曲線に合わせ、Lv に上限を添える */
-{const _ch=charHTML;charHTML=function(id,tab,ed){let s=_ch(id,tab,ed);try{const h=G.h[id],need=Math.max(0,xpNeed(h.lv)-h.xp),old=Math.max(0,nextXP(h.lv)-h.xp);
- s=s.replace(new RegExp(`(次のLvまで</span><b>)${old}(</b>)`),`$1${h.lv>=capOf(id)?'上限（限界突破で解放）':fm(need)}$2`);
- s=s.replace(/(<span><i class="gn">◆<\/i>Lv<\/span><b>)(\d+)(<\/b>)/,`$1$2<small class="cap31">/${capOf(id)}</small>$3`);}catch(e){console.error(e);}return s;};}
 
 /* ---------- 限界突破の画面 ---------- */
 let LBFROM=null;
@@ -79,7 +75,7 @@ function lbScreen(from,msg){if(from)LBFROM=from;if(scene!=='town'){show('town');
 const NEWS=`<div class="nt"><b>${VER}</b>　大型アップデート<br><small>・<b>クエスト制</b>：マップ探索を廃止し、章ごとのクエストに。区切りで<b>中ボス・大ボス</b>、複数の戦闘が続くクエストも。宝箱は敵が落とす。<br>・<b>レベル上限120</b>：Lv99から先は「限界突破」（素材：天極の星晶）。<br>・<b>天星盤</b>：星盤の上位版（Lv60から）。強力な技・パッシブ・新しい能力値。<br>・<b>装備枠</b>：武器・主防具・副防具・装飾品×2 に再編。新しい装備を各レアリティに追加。<br>・<b>エンドコンテンツ</b>：天極の門・星海の深淵・終焉の星域・極限の星闘。</small></div>`;
 document.addEventListener('click',e=>{const t=e.target.closest('[data-h22="news"]');if(!t||scene!=='town')return;
  setTimeout(()=>{try{const o=document.querySelector('.nw22');if(o&&!o.querySelector('.n31')){const d=document.createElement('div');d.className='n31';d.innerHTML=NEWS;const h=o.querySelector('.nh');h?h.after(d):o.prepend(d);}}catch(e){}},0);},true);
-{const _t=title;title=function(){_t();const v=$('#verL');if(v)v.textContent=VER;};const v=$('#verL');if(v)v.textContent=VER;}
+
 try{document.title='アストラル・ブレイカー '+VER;}catch(e){}
 
 return{VER,INF,GINF,xpNeed,BASECAP,MAXLV,LBS,capOf,lbStage,lbCheck,limitBreak,lbScreen,XK,esc,fm};})();
