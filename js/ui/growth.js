@@ -3,7 +3,7 @@
  ・強化メニューで、ストックを使って好きなキャラを好きなだけレベルアップ（+1・+10・上限まで）。上限は V31.capOf（限界突破）
  ・旧「酒場」（town.js / ch9.js / ver18-town.js の tavern）の中身（編成・依頼掲示板・絆の語らい・図鑑・仲間を誘う）をここに統合し、tavern をこの画面で置き換える
  ・下のタブの「酒場」は「強化」に（v22.js townMenu の h22nav・v20-ui.js HNAV）。レベルアップできる仲間がいると「!」
- クエストの完了ボーナスの経験値（v31/quests.js qClear）もストックへ */
+ ver0.54：画面を全画面の #grow に作り直し（仲間画面と同じ文法・字なし）。旧酒場のタイル・依頼掲示板・声かけは廃止 */
 'use strict';
 const GROW=(()=>{
 const LVUP=gainXP;/* v31/core.js の gainXP（実際に Lv を上げる処理）。メニューからだけ呼ぶ */
@@ -25,29 +25,31 @@ gainXP=function(){return 0;};
 const add=x=>{G.xpStock=stock()+Math.max(0,Math.round(x||0));};
 const readyN=()=>{try{return(G.members||[]).filter(can).length;}catch(e){return 0;}};
 
-/* ---------- 画面 ---------- */
-let SEL=null;
-function open(m){if(!SEL||!G.members.includes(SEL))SEL=G.party[0];
- const dec=G.declined||[],bn=typeof bondReadyN==='function'?bondReadyN():0,qr=QS.filter(q=>!G.q.done[q.id]&&q.ok()).length,qo=QS.filter(q=>!G.q.done[q.id]).length;
- roomOpen('bar','強化',`ストック経験値 ${fm(stock())}`);
- log(m||'<b>主人</b>「おかえり、灯守さん。戦いで得た経験は預かってあるよ。誰を鍛える？」');
- const sv=stock();
- const card=id=>{const h=G.h[id],on=G.party.includes(id),mx=h.lv>=cap(id),nd=need(id),pc=mx?100:Math.min(100,(h.xp||0)/Math.max(1,(h.xp||0)+nd)*100);
-  return`<button class="tvm gr48${id===SEL?' sel':''}${on?' on':''}" data-a="sel" data-v="${id}"><img src="${face(id)}"><b>${HB[id].name}</b><small>Lv${h.lv}</small><div class="gx"><i style="width:${pc}%"></i></div>${can(id)?'<i class="gu">▲</i>':''}</button>`;};
- const h=G.h[SEL],mx=h.lv>=cap(SEL),nd=need(SEL);
- const btn=(n,l)=>{const ok=!mx&&sv>=nd;return`<button class="tbtn${ok?' gold':''}" data-a="up" data-v="${n}" ${ok?'':'disabled'}>${l}</button>`;};
- const tl=(a,ic,l,s,b)=>`<button class="ftile${b?' on':''}" data-a="${a}"><img src="${ICON[ic]}"><span><b>${l}</b><small>${s}</small></span>${b?`<i>${b}</i>`:''}</button>`;
- panel(`<div class="gs48"><em>ストック経験値</em><b>${fm(sv)}</b><small>EXP</small></div>
-  <div class="tvms">${[...G.party,...G.members.filter(i=>!G.party.includes(i))].map(card).join('')}</div>
-  <div class="gp48"><img src="${face(SEL)}"><div class="gi"><b>${HB[SEL].name}</b><span>Lv <strong>${h.lv}</strong><small>/${cap(SEL)}</small></span>
-   <small>${mx?'レベル上限（限界突破で解放）':`次のLvまで ${fm(nd)}`}</small></div>
-   <div class="gb">${btn(1,'Lv+1')}${btn(10,'+10')}${btn(999,'上限まで')}</div>
-   <button class="tbtn gd" data-a="sheet" data-v="${SEL}">詳細</button></div>
-  <div class="ftiles">${tl('form','eq','編成','前衛4人・装備・星盤',0)}${tl('board','quest','依頼掲示板',qo?`受注中 ${qo}件`:'すべて報告済み',qr?'報告'+qr:0)}${tl('bond','bond','絆の語らい',bn?`新しい話が${bn}件ある`:'仲間と語り合う',bn?'♥'+bn:0)}${tl('zk','book','図鑑','敵・装備・仲間の記録',0)}</div>
-  ${dec.length?`<div class="ttl2">声をかけられる仲間</div>`+dec.map(id=>`<div class="icard r2"><img class="iic" src="${face(id)}"><div class="ibody"><div class="inm">${HB[id].name}</div><div class="isub">${typeof PROF!=='undefined'&&PROF[id]?PROF[id][1]:'酒場で待っている'}</div></div><div class="iright"><button class="tbtn gold" style="width:76px;height:40px" data-a="join" data-v="${id}">誘う</button></div></div>`).join(''):''}${backBtn()}`,
-  {sel:id=>{SEL=id;SFX.sel();open(' ');},
-   up:n=>{const lv0=G.h[SEL].lv,k=lvUp(SEL,+n||1);if(!k)return;SFX.aw();save();open(`<b>${HB[SEL].name}</b>　Lv${lv0} → <b>Lv${G.h[SEL].lv}</b>（星ポイント+${k*3}）`);},
-   sheet:id=>openSheet(id),form:()=>partyScreen(),board:()=>board(),bond:()=>bondMenu(),zk:()=>zkMenu(),
-   join:id=>{G.declined=dec.filter(x=>x!==id);newMember(id);SFX.aw();save();open(`<b>${HB[id].name}が仲間になった！</b>`);},back:()=>townMenu()});}
+/* ---------- 画面（全画面の #grow。仲間画面 #unit と同じ文法） ---------- */
+let SEL=null,root=null;
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const IMG={};
+function pic(id,h){const k=id+h;if(IMG[k])return IMG[k];let f=null;try{f=SPX.unitCv(id,id,0,h);}catch(e){}if(!f)return'';
+ const c=document.createElement('canvas');c.width=f.w;c.height=f.h;c.getContext('2d').drawImage(f.cv,0,0);return IMG[k]=c.toDataURL();}
+const xpI='<i class="gr-xp"></i>';
+const order=()=>{const o=Object.keys(TDD.ROLE);return(G.members||[]).filter(id=>TDD.HERO[id]&&G.h[id]).sort((a,b)=>o.indexOf(TDD.HERO[a].role)-o.indexOf(TDD.HERO[b].role));};
+/* n レベル上げるのに要る経験値 */
+function costN(id,n){const h=G.h[id];let s=need(id);if(h.lv>=cap(id))return 0;try{for(let l=h.lv+1;l<Math.min(cap(id),h.lv+n);l++)s+=V31.xpNeed(l);}catch(e){}return s;}
+function build(){if(root)return;root=document.createElement('div');root.id='grow';root.className='hide';document.body.appendChild(root);root.addEventListener('click',onClick);}
+function open(){build();const L=order();if(!SEL||!L.includes(SEL))SEL=L.find(i=>can(i))||G.party[0]||L[0];root.classList.remove('hide');draw();root.scrollTop=0;}
+function close(){if(root)root.classList.add('hide');try{townMenu();}catch(e){}}
+function draw(){if(!root)return;const L=order(),id=SEL,h=G.h[id],d=TDD.HERO[id],R=TDD.ROLE[d.role],mx=h.lv>=cap(id),nd=need(id),sv=stock();
+ const pc=mx?100:Math.min(100,(h.xp||0)/Math.max(1,(h.xp||0)+nd)*100);
+ const btn=(n,l)=>{const c=mx?0:costN(id,n),ok=!mx&&sv>=nd;return`<button class="gr-up${ok?' ok':''}" data-a="up" data-v="${n}" ${ok?'':'aria-disabled="true"'}><b>${l}</b><span>${mx?'':xpI+fm(c)}</span></button>`;};
+ root.innerHTML=`<header class="gr-h"><button class="gr-b" data-a="home" aria-label="戻る">◀</button><b>強化</b><span class="gr-sum">${xpI}${fm(sv)}</span></header>
+ <section class="gr-hero"><span class="gr-role" style="background:${R.col}"></span><div class="gr-pv"><img src="${pic(id,110)}" alt=""></div>
+  <div class="gr-id"><b>${esc(HB[id].name)}</b><span class="gr-lv">Lv <strong>${h.lv}</strong><em>/${cap(id)}</em></span><div class="gr-bar"><i style="width:${pc}%"></i></div></div></section>
+ <div class="gr-ups">${btn(1,'+1')}${btn(10,'+10')}${btn(9999,'MAX')}</div>
+ <ul class="gr-grid">${L.map(i=>{const hh=G.h[i],r=TDD.ROLE[TDD.HERO[i].role];
+  return`<li><button class="${i===id?'sel':''}" data-a="sel" data-v="${i}"><span class="r" style="background:${r.col}"></span><img src="${pic(i,52)}" alt=""><b>${esc(HB[i].name)}</b><em>Lv${hh.lv}</em>${can(i)?'<i class="gr-dot"></i>':''}</button></li>`;}).join('')}</ul>`;}
+function onClick(e){const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,v=b.dataset.v;
+ if(a==='home')return close();
+ if(a==='sel'){SEL=v;try{SFX.sel();}catch(x){}draw();return;}
+ if(a==='up'){if(b.getAttribute('aria-disabled'))return;const k=lvUp(SEL,+v||1);if(k){try{SFX.aw();}catch(x){}save();}draw();}}
 tavern=open;
 return{open,stock,add,lvUp,need,can,readyN,toCap};})();
