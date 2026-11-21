@@ -1,5 +1,5 @@
 /* ===== 図鑑（一覧・詳細） ver0.30 =====
- 一覧：敵・仲間・装備 → タップで詳細。
+ 一覧：js/ui/zukan.js（ZKUI。ver0.54 で全画面に作り直し）。タップで詳細。
  詳細：キャラクタービューア（js/zukan/viewer.js）に「正面」「待機」「星臨」の 3 種だけを載せる（敵は 星臨 なし）。
   3 種は同じ縮尺・同じ足元・同じキャンバスで描き、デザイン・配色・体格・シルエットの公式な基準画像として扱う。
   （ver0.29 の 回転・正面/側面/背面の切り替え・自動回転・骨格表示・表情差分 は廃止）
@@ -25,22 +25,9 @@ const eqSlot=x=>x.k.startsWith('set:')?x.k.split(':')[2]:(LEG[x.k]&&LEG[x.k].slo
 function back(){ZVIEW.stop();if(ZK.from==='bar')tavern();else townMenu();}
 
 /* ---------- 一覧 ---------- */
-function list(m){if(typeof TSC!=='undefined'&&(TSC==='home'||TSC==='bar'))ZK.from=TSC==='home'?'home':'bar';ZVIEW.stop();G.zk=G.zk||{e:{},i:{}};G.inv.forEach(zkItem);
- const L=zkList(),ne=L.e.filter(seenE).length,nh=L.h.filter(joined).length,ni=L.i.filter(seenI).length,t=ZK.t;
- log((m||'<b>図鑑</b>　タップで詳細（正面・待機・星臨の基準画像）')+`<br><small>敵 ${ne}/${L.e.length}　${TERMS.CHAR.playable} ${nh}/${L.h.length}　装備 ${ni}/${L.i.length}</small>`);
- let body='';
- if(t==='e'){/* ver0.32：区分（通常敵／ボス）と系統で絞り込む。番号は全体の通し番号のまま */
-  const inCat=k=>ZK.cat==='all'||(ZK.cat==='normal'?TERMS.charCat(k)==='normal':TERMS.charCat(k)!=='normal'),inFam=k=>ZK.fam==='all'||famOf(k)===ZK.fam;
-  const fams=FAMS.filter(([f])=>L.e.some(k=>inCat(k)&&famOf(k)===f));if(ZK.fam!=='all'&&!fams.some(([f])=>f===ZK.fam))ZK.fam='all';
-  const cnt=fn=>L.e.filter(fn).length;
-  body=`<div class="zf32"><div class="zfc32">${[['all','すべて'],['normal','通常敵'],['boss','ボス']].map(([k,n])=>`<button class="${ZK.cat===k?'on':''}" data-a="cat" data-v="${k}">${n}<small>${cnt(x=>k==='all'||(k==='normal'?TERMS.charCat(x)==='normal':TERMS.charCat(x)!=='normal'))}</small></button>`).join('')}</div>
-   <div class="zff32"><button class="${ZK.fam==='all'?'on':''}" data-a="fam" data-v="all">全系統</button>${fams.map(([f,n])=>`<button class="${ZK.fam===f?'on':''}" data-a="fam" data-v="${f}">${n}<small>${cnt(x=>inCat(x)&&famOf(x)===f)}</small></button>`).join('')}</div></div>`;
-  const vis=L.e.map((k,i)=>[k,i]).filter(([k])=>inCat(k)&&inFam(k));
-  body+='<div class="zgrid z23">'+vis.map(([k,i])=>{const s=seenE(k),c=TERMS.charCat(k);return`<button class="ztile${s?'':' un'}${c!=='normal'?' bs':''} zc-${c}" data-a="e" data-v="${k}"><em>${String(i+1).padStart(2,'0')}</em><img src="${zimg(k,!s)}" alt=""><span>${s?esc(ED[k].name):'？？？'}</span></button>`;}).join('')+'</div>'+(vis.length?'':'<div class="zn32">該当する敵がいない</div>');}
- if(t==='h')body='<div class="zhg">'+L.h.map(id=>{const j=joined(id);return`<button class="zhc${j?'':' un'}" data-a="h" data-v="${id}" style="--ec:${elCol(id)}"><img src="${j?art(id):zimg(id,1)}" alt=""><b>${j?esc(HB[id].name):'？？？'}</b><small>${j?esc(clsOf(id)):'未加入'}</small></button>`;}).join('')+'</div>';
- if(t==='i')body='<div class="zig">'+L.i.map((x,i)=>{const s=seenI(x),ik=icKey(x);return`<button class="zic${s?'':' un'}" data-a="i" data-v="${i}">${ik?`<img src="${s?IC21.render(ik,4):IC21.shadow(ik)}" alt="">`:''}<b>${s?esc(x.n):'？？？'}</b><small>${esc(TERMS.equipName(eqSlot(x)))}・${esc(x.t)}</small></button>`;}).join('')+'</div>';
- panel(`<div class="ftabs zt23" style="grid-template-columns:repeat(3,1fr)">${[['e','敵'],['h','仲間'],['i','装備']].map(([k,n])=>`<button class="${t===k?'on':''}" data-a="tab" data-v="${k}">${n}</button>`).join('')}</div>${body}<button class="tbtn back wide" data-a="back">戻る</button>`,
-  {tab:k=>{ZK.t=k;list();},cat:k=>{ZK.cat=k;list();},fam:k=>{ZK.fam=k;list();},e:k=>detail('e',k,'prof'),h:id=>detail('h',id,'prof'),i:i=>detail('i',+i),back});}
+function list(){if(typeof TSC!=='undefined'&&(TSC==='home'||TSC==='bar'))ZK.from=TSC==='home'?'home':'bar';ZVIEW.stop();G.zk=G.zk||{e:{},i:{}};G.inv.forEach(zkItem);ZKUI.open();}
+/* 一覧の画面は js/ui/zukan.js（ZKUI）。ここは詳細と、一覧に渡すデータだけ */
+const data={zkList,seenE,seenI,joined,icKey,eqSlot,esc,ZK,famOf,FAMS,detail:(t,k)=>detail(t,k,'prof'),back};
 
 /* ---------- 詳細 ---------- */
 function detail(type,key,dt){const L=zkList()[type],idx=type==='i'?key:L.indexOf(key);if(idx<0)return;if(dt)ZK.dt=dt;
@@ -119,4 +106,4 @@ function equipHTML(x){const s=seenI(x)||DEV(),ik=icKey(x),L0=x.k.startsWith('set
 
 /* 入口（ホーム・酒場・開発者メニューから呼ばれる関数を差し替える） */
 zkMenu=list;zkEnemy=k=>detail('e',k,'prof');zkHero=id=>detail('h',id,'prof');
-return{famOf,FAMS,list,detail,ZK};})();
+return{famOf,FAMS,list,detail,ZK,data};})();

@@ -33,3 +33,24 @@
 .bdi.b39.pg p{flex-basis:100%;margin:0}
 .bdb.b39{grid-template-columns:1fr 1fr}
 .b39 [data-a="tr"]{display:none}
+/* ver0.54：見出しと下のボタン列を他の画面（仲間・強化・図鑑）の文法に合わせる。盤面の描画は触らない */
+#app[data-sc="board"] .bdh.b39{border:0;border-radius:var(--tk-r);background:var(--tk-night-2);box-shadow:var(--tk-frame)}
+#app[data-sc="board"] .bdh.b39 .bdn b{font-family:var(--tk-disp);font-size:var(--tk-fs-l)}
+#app[data-sc="board"] .bdh.b39 .bdn small{color:var(--tk-ink-2)}
+#app[data-sc="board"] .bdp{display:flex;align-items:center;gap:5px;border:0;border-radius:var(--tk-r);background:var(--tk-night)}
+#app[data-sc="board"] .bdp b{font-size:var(--tk-fs-xxl);color:var(--tk-ink-2)}
+#app[data-sc="board"] .bdp.rdy{box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp)}
+#app[data-sc="board"] .bdp.rdy b{color:var(--tk-star)}
+.bd-st{display:inline-block;width:10px;height:12px;background:var(--tk-star);clip-path:polygon(50% 0,100% 45%,64% 45%,64% 100%,36% 100%,36% 45%,0 45%)}
+#app[data-sc="board"] .bdb{grid-template-columns:repeat(3,1fr)}
+#app[data-sc="board"] .bdb .tbtn{height:44px;border:0;border-radius:var(--tk-r);background:var(--tk-night-3);box-shadow:var(--tk-frame);text-shadow:none;color:var(--tk-ink);font-size:var(--tk-fs-m);font-weight:700}
+#app[data-sc="board"] .bdb .tbtn.gold{background:var(--tk-lamp);color:var(--tk-shade);box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp-deep)}
+#app[data-sc="board"] .bdb .tbtn:disabled{opacity:1;background:transparent;color:var(--tk-void);box-shadow:0 0 0 1px var(--tk-void)}
+#app[data-sc="board"] .bdb .tbtn small{color:inherit;display:inline;margin-left:4px}
+#app[data-sc="board"] .bdb.b39{grid-template-columns:56px 1fr}
+#app[data-sc="board"] .bdb.b39 .tbtn.back{font-size:var(--tk-fs-l)}
+#app[data-sc="board"] .bdtab{border:0;border-radius:0;gap:8px}
+#app[data-sc="board"] .bdtab button{border-radius:var(--tk-r);background:transparent;color:var(--tk-ink-2);box-shadow:0 0 0 1px var(--tk-void);font-family:var(--tk-disp)}
+#app[data-sc="board"] .bdtab button.on,#app[data-sc="board"] .bdtab button+button.on{background:var(--tk-night-3);color:var(--tk-ink);box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp)}
+#app[data-sc="board"] .bdtab button+button{border-left:0}
+#app[data-sc="board"] .bdtab em{background:var(--tk-notice);color:var(--tk-ink);border-radius:var(--tk-r-round)}

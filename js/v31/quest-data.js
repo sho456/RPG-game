@@ -113,3 +113,15 @@ const POST={
  celes:{who:'celes',flag:'celesMet',lines:[T(null,'n','番人が砂のように崩れ、止まっていた時計の音が戻った。瓦礫の玉座に、砂時計の杖を抱えた少女が腰かけている。'),T('celes','n','……ようやく来たか、灯守。千年ぶんの退屈を数えておったところじゃ'),T('celes','a','勘違いするでないぞ。寂しかったわけではない。……おぬしらの旅、わらわが見届けてやろう')],decline:'セレス「ふん、好きにせい。……酒場で待っておるからな」'},
  xenos:{lines:[T(null,'n','終焉の星神が光の粒となって散っていく。'),T('rio','n','終わりの先にも、星はまた生まれる。……そうだろ？'),T('celes','h','うむ。千年待った甲斐があったわ'),T(null,'n','天極の果てに、まだ強い星の影が残っている――<b>極限の星闘</b>が開いた。')]}};
 return{CH,POST,Q,T};})();
+
+/* ---------- 旧セーブの互換（旧クエスト画面 v31/quests.js は ver0.54 で削除。クリア済みの判定 G.qs.c と、旧い進行の旗からの補完だけ残す。TD の初回移行 td/menu.js が qCleared を読む） ---------- */
+function qCleared(id){return!!(G&&G.qs&&G.qs.c&&G.qs.c[id]);}
+{const chById=id=>QD.CH.find(c=>c.id===id);
+function migQ(){if(!G)return;const S=G.qs||(G.qs={c:{},seen:{}}),done=id=>{if(!S.c[id])S.c[id]=1;};const F=G.flags||{};
+ const FC={boss1:'c0',boss2:'c1',boss3:'c2',boss4:'c3',boss5:'c4',boss6:'c5',boss7:'c6',boss8:'c7',boss9:'d1'};
+ for(const f in FC)if(F[f]&&chById(FC[f]))chById(FC[f]).qs.forEach(q=>done(q.id));
+ for(const[f,q]of[['mireMet','q1_3'],['jinMet','q1_5'],['noahMet','q2_3'],['ernaMet','q3_2'],['balzaMet','q3_4'],['hakuaMet','q4_3'],['valkMet','d1_3']])if(F[f])done(q);
+ const tm=(G.tower&&G.tower.max)||0;if(chById('c6'))chById('c6').qs.forEach(q=>{if(q.tw&&(tm>q.tw||(tm>=q.tw&&q.tw%10)))done(q.id);});
+ const en=Object.keys(F.echo||{}).length;if(en)done('q7_1');['q7_2','q7_3','q7_4'].slice(0,en).forEach(done);
+ for(const c of QD.CH){const L=c.qs||[];let last=-1;L.forEach((q,i)=>{if(S.c[q.id])last=i;});for(let i=0;i<last;i++)done(L[i].id);}}
+{const _mg=migrate;migrate=function(g){const r=_mg(g);try{migQ();}catch(e){console.error(e);}return r;};}}

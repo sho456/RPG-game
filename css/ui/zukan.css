@@ -1,0 +1,25 @@
+/* ===== 図鑑の一覧（js/ui/zukan.js の #zk）。色・角・影は tokens.css の値だけ ===== */
+#zk{position:fixed;inset:0;z-index:902;display:flex;flex-direction:column;background:var(--tk-night);color:var(--tk-ink);font-family:var(--tk-font);
+ padding-top:env(safe-area-inset-top,0px);font-variant-numeric:tabular-nums}
+#zk.hide{display:none}
+#zk button{font-family:inherit;color:inherit;cursor:pointer;border:0}
+.zk-h{display:flex;align-items:center;gap:8px;padding:6px 10px;height:48px;background:var(--tk-night-2);box-shadow:var(--tk-drop);flex:none}
+.zk-b{min-width:40px;height:32px;border-radius:var(--tk-r);background:var(--tk-night-3);box-shadow:var(--tk-frame);font-size:var(--tk-fs-m);font-weight:700}
+.zk-tabs{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.zk-tabs button{height:36px;display:flex;align-items:center;justify-content:center;gap:6px;border-radius:var(--tk-r);background:transparent;box-shadow:0 0 0 1px var(--tk-void);color:var(--tk-ink-2)}
+.zk-tabs button.on{background:var(--tk-night-3);color:var(--tk-ink);box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp)}
+.zk-tabs img{height:24px;width:24px;object-fit:contain;image-rendering:pixelated}
+.zk-tabs b{font-size:var(--tk-fs-m)}.zk-tabs i{font-style:normal;font-size:var(--tk-fs-xs);color:var(--tk-ink-2)}
+.zk-chips{display:flex;gap:6px;padding:8px 10px;overflow-x:auto;flex:none;scrollbar-width:none}
+.zk-chips button{flex:none;height:28px;padding:0 10px;border-radius:var(--tk-r);background:var(--tk-night-2);box-shadow:var(--tk-frame);font-size:var(--tk-fs-s)}
+.zk-chips button.on{background:var(--tk-lamp);color:var(--tk-shade);box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp-deep)}
+.zk-body{flex:1;overflow-y:auto;padding:8px 10px calc(env(safe-area-inset-bottom,0px) + 16px)}
+.zk-grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.zk-grid.h{grid-template-columns:repeat(3,1fr)}
+.zk-grid button{position:relative;width:100%;aspect-ratio:1/1.1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px;border-radius:var(--tk-r);background:var(--tk-night-2);box-shadow:var(--tk-frame);overflow:hidden}
+.zk-grid.h button{aspect-ratio:1/1.3}
+.zk-grid img{flex:1;min-height:0;max-width:100%;object-fit:contain;image-rendering:pixelated}
+.zk-grid b{font-family:var(--tk-disp);font-size:var(--tk-fs-xs);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;min-height:12px}
+.zk-grid .bs{box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp-deep)}
+.zk-grid .un{background:var(--tk-night)}
+.zk-grid .un img{opacity:.55}

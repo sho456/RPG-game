@@ -27,8 +27,8 @@ const left2=x=>G.h[x].lv>=X.OPEN_LV?X.tenLeft(x):0;
 
 boardMenu=function(m){const id=BS.id,h=G.h[id],M=mode(id),n=BS.sel&&M.N[BS.sel],tot=Object.keys(M.N).length-1,got=M.U.length-1;
  const can=!M.lock&&n&&M.can(n.k)&&n.cost<=M.left,st=n&&stateOf(id,M,n),ten=h.lv>=X.OPEN_LV;
- $('#labels').innerHTML=`<div class="bdh b39${BS.up?' up31':''}" style="--ec:${elCol(id)}"><img src="${art(id)}" alt=""><div class="bdn"><b>${esc(HB[id].name)}</b><small>「${esc(M.star)}」　Lv${h.lv}</small></div>
-  <div class="bdp${M.left>0&&!M.lock?' rdy':''}"><b>${M.lock?'—':M.left}</b><small>pt</small></div></div>
+ $('#labels').innerHTML=`<div class="bdh b39${BS.up?' up31':''}" style="--ec:${elCol(id)}"><img src="${art(id)}" alt=""><div class="bdn"><b>${esc(HB[id].name)}</b><small>Lv${h.lv}</small></div>
+  <div class="bdp${M.left>0&&!M.lock?' rdy':''}"><i class="bd-st"></i><b>${M.lock?'—':M.left}</b></div></div>
   ${M.lock?`<div class="lk31">Lv${X.OPEN_LV}で開放<small>あと Lv${X.OPEN_LV-h.lv}</small></div>`:''}`;
  log(m||'');
  const card=n?`<div class="bdi b39" style="--nc:${NCOL[n.t]||'#8890c0'}"><div class="bdt"><i>${n.t==='skill'?M.skill:TN[n.t]||''}${n.t==='fork'||n.t==='ps'?'<small>どちらか1つ</small>':''}</i><em class="${st[1]}">${st[0]}</em></div><b>${esc(n.d)}</b>${m?`<p>${m}</p>`:''}<span class="cs"><small>必要</small>${n.cost}<small>pt</small></span></div>`
@@ -38,7 +38,7 @@ boardMenu=function(m){const id=BS.id,h=G.h[id],M=mode(id),n=BS.sel&&M.N[BS.sel],
  <div class="bdm">${G.members.map(x=>{const r=BS.up?left2(x)>0:ptsLeft(x)>0;return`<div class="bdf${x===id?' on':''}${r?' rdy':''}" data-a="m" data-v="${x}" style="--ec:${elCol(x)}"><img src="${art(x)}" alt=""><small>${esc(HB[x].name)}</small></div>`;}).join('')}</div>
  ${card}
  <div class="bdb"><button class="tbtn gold" data-a="un" ${can?'':'disabled'}>解放</button><button class="tbtn" data-a="auto" ${M.left>0&&!M.lock?'':'disabled'}>おまかせ</button><button class="tbtn" data-a="rs" ${got>0?'':'disabled'}>リセット</button></div>
- <div class="bdb b39">${BS.up?`<button class="tbtn${lbOn?' gold':''}" data-a="lb">限界突破<small>上限 ${V31.capOf(id)}</small></button>`:`<button class="tbtn" data-a="tr">${SEIRIN.n}の試練<small>位階${ROMAN[h.awLv||1]}</small></button>`}<button class="tbtn back" data-a="back">戻る</button></div>`,
+ <div class="bdb b39"><button class="tbtn back" data-a="back" aria-label="戻る">◀</button>${BS.up?`<button class="tbtn${lbOn?' gold':''}" data-a="lb">限界突破<small>${V31.capOf(id)}</small></button>`:`<button class="tbtn" data-a="tr">${SEIRIN.n}の試練</button>`}</div>`,
  {m:x=>{BS.sel=null;BS.id=x;boardMenu();},
   t0:()=>{if(!BS.up)return;BS.up=false;BS.sel=null;boardMenu();},t1:()=>{if(BS.up)return;BS.up=true;BS.sel=null;boardMenu();},
   un:()=>{M.U.push(n.k);SFX.aw();save();boardMenu('解放した！');},
