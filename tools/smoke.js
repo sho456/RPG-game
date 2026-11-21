@@ -16,6 +16,7 @@ const URL = opt('--url') || 'http://localhost:8765/index.html';
 const SHOTS = opt('--shots');
 const QUICK = args.includes('--quick');
 const FX = args.includes('--fx');
+const COV = opt('--cov'); /* --cov <out.json>：巡回中に一度も呼ばれなかった名前つき関数を集める（旧コード整理の候補探し。tools/deadcode.py で読む） */
 const fs = require('fs');
 if (SHOTS) fs.mkdirSync(SHOTS, {recursive: true});
 
@@ -34,6 +35,7 @@ if (SHOTS) fs.mkdirSync(SHOTS, {recursive: true});
   const HOME = `(()=>{try{ovClose();}catch(e){}try{const u=document.querySelector('#unit');if(u&&!u.classList.contains('hide'))u.classList.add('hide');}catch(e){}
     try{TD.hide();}catch(e){}try{const t=document.querySelector('#tdm');if(t)t.classList.add('hide');}catch(e){}townMenu();})()`;
 
+  if (COV) await p.coverage.startJSCoverage({resetOnNavigation: false});
   await p.goto(URL);
   await p.waitForFunction(() => typeof SPX !== 'undefined' && SPX.ready && typeof TDS !== 'undefined', {timeout: 60000});
   await shot('00_title');
@@ -153,6 +155,15 @@ if (SHOTS) fs.mkdirSync(SHOTS, {recursive: true});
     await step('fx-home', HOME, 400);
   }
 
+  if (COV) {
+    const cov = await p.coverage.stopJSCoverage(), out = {};
+    for (const e of cov) {const m = e.url.match(/\/(js\/.*\.js)$/);if (!m || /sprite\/data\//.test(m[1])) continue;
+      const src = e.source || '', fns = [];
+      for (const f of e.functions) {if (!f.functionName || !f.ranges.length) continue;const r = f.ranges[0];
+        fns.push([f.functionName, src.slice(0, r.startOffset).split('\n').length, r.endOffset - r.startOffset, r.count]);}
+      out[m[1]] = fns;}
+    fs.writeFileSync(COV, JSON.stringify(out));
+  }
   await b.close();
   const uniq = new Map();
   for (const [s, m] of errs) {const k = m;if (!uniq.has(k)) uniq.set(k, [s, 1]);else uniq.get(k)[1]++;}
