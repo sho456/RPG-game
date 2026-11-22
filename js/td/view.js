@@ -19,7 +19,7 @@ function face(id){if(IMG[id])return IMG[id];const f=spr(id,id,0);if(!f)return'';
 /* ---------- 画面を作る ---------- */
 function build(){if(root)return;root=document.createElement('div');root.id='td';root.className='hide';
  root.innerHTML=`<div class="td-top"><div class="td-wave"><small>WAVE</small><b class="wv">-</b></div><div class="td-life"><span>灯火</span></div>
- <button class="td-btn" data-a="spd" aria-label="速度">×1</button><button class="td-btn" data-a="pause" aria-label="一時停止">Ⅱ</button><button class="td-btn" data-a="menu" aria-label="やめる">≡</button></div>
+ <button class="td-btn td-snd" data-a="snd" aria-label="音">${TDSFX.icon()}</button><button class="td-btn" data-a="spd" aria-label="速度">×1</button><button class="td-btn" data-a="pause" aria-label="一時停止">Ⅱ</button><button class="td-btn" data-a="menu" aria-label="やめる">≡</button></div>
  <div class="td-field"><canvas></canvas><button class="td-call" data-a="call" hidden></button><div class="td-banner"></div><div class="td-unit" hidden></div><div class="td-tip"></div>
  <div class="td-sheet" hidden><div class="td-panel"></div></div></div>
  <div class="td-bar"><div class="td-costw"><div class="td-cost"><i class="ic-lamp"></i><b>0</b></div><i class="cb"></i></div><button class="td-btn td-lampb" data-a="lamp"></button><div class="td-star"><i class="ic-star"></i><div class="g"><i></i></div></div></div>
@@ -45,7 +45,7 @@ function loop(now){raf=requestAnimationFrame(loop);const dt=Math.min(.1,(now-las
  take();draw(now/1000,dt);hud();
  if(st.over&&!ended){ended=true;setTimeout(result,1100);}}
 /* 出来事 → 演出 */
-function take(){for(const e of st.ev){
+function take(){for(const e of st.ev){TDSFX.ev(e);
  if(e.k==='hit'){const far=e.u.h.rng>60;if(far&&!e.sk)fx.push({t:0,d:.16,k:'shot',x0:e.u.x,y0:e.u.y-20,x1:e.f.x,y1:e.f.y-12,c:ELC[e.el]||'#fff'});
   else if(!far)fx.push({t:0,d:.14,k:'slash',x:e.f.x,y:e.f.y-14,c:ELC[e.el]||'#fff',dir:e.u.face});
   if(nums.length<24)nums.push({t:0,x:e.f.x+(Math.random()*8-4),y:e.f.y-34,v:e.v,c:e.weak?'#f2b347':e.res?'#8f89a8':'#efeaf8',big:e.cr||e.big,weak:e.weak});}
@@ -208,7 +208,7 @@ function open(id,deck){build();sid=id;cancelAnimationFrame(raf);
  const dk=deck||TDD.deckOf(),rl={};for(const h of dk)rl[h]=TDD.real(h);
  st=TDS.create(sid,dk,{lv:lvMap(),real:rl,seed:(Date.now()%100000)+1});speed=1;paused=false;sel=null;selU=null;fx=[];nums=[];ended=false;acc=0;for(const k in memo)delete memo[k];
  root.classList.remove('hide');sheet(null);unitPanel(null);$('.td-deck').innerHTML=deckHTML();const sb=$('[data-a="spd"]');sb.textContent='×1';sb.classList.remove('on');
- const pb=$('[data-a="pause"]');pb.textContent='Ⅱ';pb.classList.remove('on');
+ const sn=$('[data-a="snd"]');sn.innerHTML=TDSFX.icon();sn.classList.toggle('off',!TDSFX.on);const pb=$('[data-a="pause"]');pb.textContent='Ⅱ';pb.classList.remove('on');
  requestAnimationFrame(()=>{fit();setCam(st.S.W);last=performance.now();raf=requestAnimationFrame(loop);banner(st.S.name,'',1600);
   });}
 function show(){build();root.classList.remove('hide');}

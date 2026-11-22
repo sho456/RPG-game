@@ -207,3 +207,7 @@
 .tdm-tags button.lv{border:0;border-radius:var(--tk-r);font:inherit;font-size:var(--tk-fs-xs);font-weight:800;padding:2px 8px;cursor:pointer}
 .tdm-end .ic-star{width:48px;height:48px}
 .tdm-end .tdm-sum{font-size:var(--tk-fs-l)}
+/* 音の切り替え（js/td/sfx.js のアイコン）。切ると虚蝕の灰紫 */
+.td-snd{min-width:32px;padding:0 6px;display:inline-flex;align-items:center;justify-content:center}
+.td-snd svg{display:block}
+.td-snd.off{color:var(--tk-void)}
