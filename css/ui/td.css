@@ -37,7 +37,8 @@
 .td-unit h4 em{font-style:normal;font-family:var(--tk-font);font-size:var(--tk-fs-xs);color:var(--tk-ink-2)}
 .td-unit p{margin:2px 0 6px;color:var(--tk-ink-2);line-height:1.5}
 .td-unit .row{display:flex;gap:6px}
-.td-unit .row .td-btn{flex:1;height:30px;font-size:var(--tk-fs-s)}
+.td-unit .row .td-btn{flex:1;height:30px;font-size:var(--tk-fs-s);white-space:nowrap;padding:0 8px}
+.td-unit .row .ult{flex:2}
 .td-unit .ult:disabled{opacity:.4}
 /* 下の帯 */
 .td-bar{display:flex;align-items:center;gap:10px;padding:6px 10px 4px;flex:none}

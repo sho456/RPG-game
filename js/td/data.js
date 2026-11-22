@@ -5,13 +5,14 @@
 const TDD=(()=>{
 /* ---------- 定数 ---------- */
 const K={FH:420,STEP:1/30,LIVES:7,COST0:10,COST_EVERY:.9,STAR_MAX:10,DARK:.6/*光の外の攻撃の倍率*/,GAP:8/*WAVE の間の秒*/};
-/* 役割：台座の種類（f＝道の上で止める／b＝段の間）・射程・攻撃間隔・止める数・コスト・攻撃の形 */
+/* 役割：line＝隊列（f＝前衛：道の上で敵を止める／b＝後衛：前衛の後ろ・道の脇）・射程・攻撃間隔・止める数・コスト・攻撃の形
+ mv＝歩く速さ（px/秒）・chase＝斬るが持ち場から敵へ詰め寄る間合い・off＝後衛が一番前の前衛から下がる間合い */
 const ROLE={
- guard:{n:'守る',pad:'f',rng:42,iv:1.3,blk:3,cost:16,col:'#7fa6d9'},
- blade:{n:'斬る',pad:'f',rng:40,iv:1.0,blk:1,cost:10,col:'#e0a050'},
- shot: {n:'射る',pad:'b',rng:150,iv:1.1,blk:0,cost:12,col:'#9fd36a'},
- spell:{n:'術',  pad:'b',rng:112,iv:1.6,blk:0,cost:14,col:'#d070d0',splash:32},
- aid:  {n:'支える',pad:'b',rng:108,iv:1.5,blk:0,cost:12,col:'#80d8c8'}};
+ guard:{n:'守る',line:'f',rng:42,iv:1.3,blk:3,cost:16,col:'#7fa6d9',mv:46},
+ blade:{n:'斬る',line:'f',rng:40,iv:1.0,blk:1,cost:10,col:'#e0a050',mv:68,chase:80},
+ shot: {n:'射る',line:'b',rng:150,iv:1.1,blk:0,cost:12,col:'#9fd36a',mv:52,off:72},
+ spell:{n:'術',  line:'b',rng:112,iv:1.6,blk:0,cost:14,col:'#d070d0',splash:32,mv:50,off:56},
+ aid:  {n:'支える',line:'b',rng:108,iv:1.5,blk:0,cost:12,col:'#80d8c8',mv:54,off:40}};
 /* 仲間 12 人。sk＝技（RPG 版の技のキー。名前は SK から引く）、k＝技の働き、ch＝チャージ秒、lt＝自分の周りに出す光の半径 */
 const HERO={
  rio:  {role:'blade',el:'陽',lt:120,sk:'koujin',  k:'strike',m:2.6,ch:8},
@@ -46,7 +47,7 @@ function hero(id,lv=1,o){const h=HB[id],d=HERO[id],R=ROLE[d.role];if(!h||!d)retu
  const prim=mag?h.mag:h.atk,k=lvK(lv),gk=(o&&o.gear)||{},q=x=>Math.max(.8,Math.min(3,x||1)),mas=Math.min(3,(o&&o.mas)||0),aw=Math.max(1,Math.min(3,(o&&o.aw)||1));
  const sk=Object.assign({id:d.sk,n:skName(d.sk)},d,{mas});if(sk.m&&sk.k!=='heal'&&sk.k!=='slow')sk.m=+(sk.m*(1+.15*mas)).toFixed(2);if(sk.k==='heal')sk.m=+(sk.m*(1+.1*mas)).toFixed(2);sk.ch=+(d.ch*(1-.08*mas)).toFixed(1);
  const ult=Object.assign({n:awName(id),k:'unova',m:7,r:92},ULT[id]||{},{aw});if(ult.m)ult.m=+(ult.m*(1+.25*(aw-1))).toFixed(2);
- return{id,name:h.name,role:d.role,pad:R.pad,el:d.el,dmgK:mag||d.role==='spell'?'mag':'phys',
+ return{id,name:h.name,role:d.role,line:R.line,mv:R.mv,chase:R.chase||0,off:R.off||0,el:d.el,dmgK:mag||d.role==='spell'?'mag':'phys',
   hp:Math.round((200+h.mhp*2.2)*k*q(gk.hp)),atk:Math.round((20+prim*1.6)*k*(d.atkK||1)*q(gk.atk)),def:Math.round(h.def*1.5*k*q(gk.def)),res:Math.round(h.res*1.5*k*q(gk.res)),
   iv:+((d.iv||R.iv)*(1-(h.spd-10)*.015)).toFixed(2),rng:d.rng||R.rng,blk:d.blk!=null?d.blk:R.blk,cost:d.cost||R.cost,splash:R.splash||0,
   lt:d.lt||0,sk,ult,redeploy:Math.round(22+(14-Math.min(14,h.spd))*1.5),lv};}

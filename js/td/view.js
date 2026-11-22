@@ -6,7 +6,7 @@
 'use strict';
 const TD=(()=>{
 const K=TDD.K,FH=K.FH;
-let root=null,cv=null,g=null,st=null,S=1,DPR=1,VW=300,cam=0,raf=0,last=0,acc=0,speed=1,paused=false,sel=null,selU=null,nm=[],nums=[],shake=0,bg=null,lt=null,sid=null,ended=false,baseHit=0;
+let root=null,cv=null,g=null,st=null,S=1,DPR=1,VW=300,cam=0,raf=0,last=0,acc=0,speed=1,paused=false,sel=null,selU=null,mvU=null,nm=[],nums=[],shake=0,bg=null,lt=null,sid=null,ended=false,baseHit=0;
 const $=q=>root.querySelector(q);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const MINI={x:8,y:6,h:16};
@@ -33,11 +33,13 @@ const setCam=x=>{cam=Math.max(0,Math.min(st.S.W-VW,x));};
 function drawLight(t){if(!lt||lt.width!==Math.ceil(VW)){lt=document.createElement('canvas');lt.width=Math.ceil(VW);lt.height=FH;}const l=lt.getContext('2d');
  l.globalCompositeOperation='source-over';l.clearRect(0,0,lt.width,FH);l.fillStyle='rgba(16,10,34,.62)';l.fillRect(0,0,lt.width,FH);l.globalCompositeOperation='destination-out';
  const hole=(x,y,r)=>{x-=cam;const gr=l.createRadialGradient(x,y,r*.8,x,y,r);gr.addColorStop(0,'rgba(0,0,0,1)');gr.addColorStop(1,'rgba(0,0,0,0)');l.fillStyle=gr;l.beginPath();l.arc(x,y,r,0,7);l.fill();};
- const[bx,by]=st.S.base;hole(bx,by,st.lightR+Math.sin(t*2)*2);for(const u of st.units)if(u.h.lt&&u.lit)hole(u.x,u.y,u.h.lt);
+ const[bx,by]=st.S.base;hole(bx,by,st.lightR+Math.sin(t*2)*2);for(const u of st.lsrc)hole(u.x,u.y,u.h.lt);
  g.drawImage(lt,cam,0);
  g.strokeStyle='rgba(242,179,71,.55)';g.lineWidth=1;g.setLineDash([4,4]);g.lineDashOffset=-t*6;g.beginPath();g.arc(bx,by,st.lightR,0,7);g.stroke();
- for(const u of st.units)if(u.h.lt&&u.lit){g.beginPath();g.arc(u.x,u.y,u.h.lt,0,7);g.stroke();}g.setLineDash([]);
- for(const p of st.pads)if(p.lit&&!p.unit){g.fillStyle='rgba(242,179,71,.85)';g.fillRect(p.x-1,p.y+(p.k==='f'?8:5),2,2);}}
+ for(const u of st.lsrc){g.beginPath();g.arc(u.x,u.y,u.h.lt,0,7);g.stroke();}g.setLineDash([]);}
+/* 置ける・動かせる場所：光の届く道を灯の色の帯で示す（前衛は道の上、後衛は道の奥の脇） */
+function drawSpots(t,line){g.globalAlpha=.35+.2*Math.sin(t*6);g.fillStyle='#f2b347';
+ st.Ps.forEach((P,li)=>{const yo=TDS.yo(st,li,line);for(let s=0;s<P.L;s+=4){const a=TDS.at(P,s);if(a.x<cam-8||a.x>cam+VW+8||!TDS.litAt(st,a.x,a.y))continue;g.fillRect(a.x-1.5,a.y+yo-1,3,2);}});g.globalAlpha=1;}
 /* ---------- 毎コマ ---------- */
 function loop(now){raf=requestAnimationFrame(loop);const dt=Math.min(.1,(now-last)/1000||0);last=now;
  if(!paused&&!st.over){acc+=dt*speed;let n=0;while(acc>=K.STEP&&n<10){TDS.tick(st);acc-=K.STEP;n++;}}else if(st.over)TDS.tick(st);
@@ -68,9 +70,9 @@ function draw(t,dt){TDFX.step(dt);g.setTransform(1,0,0,1,0,0);g.imageSmoothingEn
  for(const z of st.fields){g.strokeStyle='rgba(176,122,255,.7)';g.lineWidth=1;g.setLineDash([3,3]);g.beginPath();g.ellipse(z.x,z.y,z.r,z.r*.5,0,0,7);g.stroke();g.setLineDash([]);
   g.fillStyle='rgba(176,122,255,.12)';g.beginPath();g.ellipse(z.x,z.y,z.r,z.r*.5,0,0,7);g.fill();const a=-Math.PI/2+(t*2%6.283);g.strokeStyle='#e9d8ff';g.beginPath();g.moveTo(z.x,z.y);g.lineTo(z.x+Math.cos(a)*z.r*.5,z.y+Math.sin(a)*z.r*.25);g.stroke();}
  drawLight(t);TDFX.back(g);TDFX.dim(g);
- /* 台座の案内（手札を選んでいるとき） */
- if(sel){const c=st.deck.find(c=>c.id===sel);for(const p of st.pads){if(p.k!==c.h.pad)continue;const ok=!p.unit&&p.lit;g.strokeStyle=ok?'#f2b347':'rgba(111,104,136,.8)';g.lineWidth=ok?2:1;
-  g.strokeRect(p.x-13,p.y-7,26,14);if(ok){g.globalAlpha=.18+.12*Math.sin(t*6);g.fillStyle='#f2b347';g.fillRect(p.x-13,p.y-7,26,14);g.globalAlpha=1;g.strokeStyle='rgba(242,179,71,.25)';g.beginPath();g.arc(p.x,p.y,c.h.rng,0,7);g.stroke();}}}
+ /* 置ける場所の案内（手札を選んでいるとき・移動の指示のとき） */
+ if(sel){const c=st.deck.find(c=>c.id===sel);if(c)drawSpots(t,c.h.line);}
+ if(mvU&&st.units.includes(mvU)){drawSpots(t,mvU.h.line);g.strokeStyle='#f2b347';g.lineWidth=1.5;g.beginPath();g.ellipse(mvU.x,mvU.y,13,4,0,0,7);g.stroke();}
  if(selU&&st.units.includes(selU)){g.strokeStyle='rgba(242,179,71,.6)';g.lineWidth=1;g.beginPath();g.arc(selU.x,selU.y,selU.h.rng,0,7);g.stroke();}
  /* キャラ（奥から） */
  const L=[...st.foes.map(f=>({y:f.y,f})),...st.units.map(u=>({y:u.y,u}))].sort((a,b)=>a.y-b.y);
@@ -110,9 +112,9 @@ function drawFoe(f,t){const o=TDFX.pose(f,t,st),F=spr(f.spr,f.kind,1),sw=(f.boss
  if(f.gim&&f.gim.ch>0){const T=f.by&&f.by.hp>0?{x:f.by.x,y:f.by.y-20}:{x:st.S.base[0],y:st.S.base[1]-110},p=1-f.gim.ch/3;
   g.strokeStyle=`rgba(255,106,74,${.35+.4*Math.abs(Math.sin(t*10))})`;g.lineWidth=1+p*2;g.setLineDash([5,4]);g.beginPath();g.moveTo(f.x,f.y-30);g.lineTo(T.x,T.y);g.stroke();g.setLineDash([]);
   g.strokeStyle='#ff6a4a';g.lineWidth=2;g.beginPath();g.arc(f.x,f.y-30,20,-Math.PI/2,-Math.PI/2+p*6.283);g.stroke();}}
-function drawUnit(u,t){const fl=st.t-(u.hitT||-9)<.08,lg=st.t-u.actT<.12?u.face*3:0,F=spr(u.id,u.id,0),c=st.deck.find(c=>c.on===u);
+function drawUnit(u,t){const fl=st.t-(u.hitT||-9)<.08,lg=st.t-u.actT<.12?u.face*3:0,F=spr(u.id,u.id,0),c=st.deck.find(c=>c.on===u),bob=u.mv?-Math.abs(Math.sin(t*11+u.uid))*2.5:0;
  g.fillStyle=TDD.ROLE[u.h.role].col;g.globalAlpha=.85;g.fillRect(u.x-10,u.y+3,20,2);g.globalAlpha=1;
- sprite(F,u.x+lg,u.y,u.face>0,48,fl,u.lit?1:.55);
+ sprite(F,u.x+lg,u.y+bob,u.face>0,48,fl,u.lit?1:.55);
  if(!u.lit){g.fillStyle='rgba(169,165,196,.95)';g.font='700 8px "M PLUS 1p",sans-serif';g.textAlign='center';g.fillText('光の外',u.x,u.y+13);}
  if(u.hp<u.h.hp)bar(u.x,u.y-54,22,u.hp/u.h.hp,'#9fe8b8');
  const r=Math.min(1,u.ch/u.h.sk.ch);g.strokeStyle=r>=1?'#f2b347':'rgba(242,179,71,.45)';g.lineWidth=1.5;g.beginPath();g.arc(u.x+14,u.y-50,3.5,-Math.PI/2,-Math.PI/2+r*6.283);g.stroke();
@@ -139,7 +141,7 @@ let tT=0;function tip(s,ms=1600){const e=$('.td-tip');e.textContent=s;e.classLis
 /* ---------- ユニットの窓 ---------- */
 function unitPanel(u){selU=u;const p=$('.td-unit');if(!u){p.hidden=true;return;}const h=u.h,c=st.deck.find(c=>c.on===u),can=TDS.canUlt(st,u.uid);
  p.innerHTML=`<h4>${esc(h.name)}<em>Lv${h.lv}</em></h4><p>${esc(h.sk.n)}</p>
- <div class="row"><button class="td-btn ult${can?' on':''}" data-a="ult" ${can?'':'disabled'}>${esc(h.ult.n)}</button><button class="td-btn" data-a="ret">撤退</button></div>`;
+ <div class="row"><button class="td-btn ult${can?' on':''}" data-a="ult" ${can?'':'disabled'}>${esc(h.ult.n)}</button><button class="td-btn" data-a="mv">移動</button><button class="td-btn" data-a="ret">撤退</button></div>`;
  p.hidden=false;unitPanelPos();if(c&&c.ult)p.querySelector('.ult').textContent='星臨済み';}
 function unitPanelPos(){const p=$('.td-unit'),f=$('.td-field'),r=cv.getBoundingClientRect(),fr=f.getBoundingClientRect(),sx=(selU.x-cam)*S,sy=selU.y*S;
  let x=r.left-fr.left+sx-p.offsetWidth/2,y=r.top-fr.top+sy+10;if(y+p.offsetHeight>fr.height-4)y=r.top-fr.top+sy-70-p.offsetHeight;
@@ -151,21 +153,27 @@ function pMove(ev){if(!drag)return;const dx=ev.clientX-drag.x;if(Math.abs(dx)>6)
 function pUp(ev){const d=drag;drag=null;if(!d||d.moved||!st||st.over)return;const r=cv.getBoundingClientRect(),sx=(ev.clientX-r.left)/S,sy=(ev.clientY-r.top)/S;
  if(sy<=MINI.y+MINI.h+4&&sx>=MINI.x&&sx<=VW-MINI.x){setCam((sx-MINI.x)/(VW-MINI.x*2)*st.S.W-VW/2);return;}
  const x=sx+cam,y=sy,u=st.units.find(u=>Math.abs(u.x-x)<16&&y>u.y-54&&y<u.y+10);
- if(sel){const c=st.deck.find(c=>c.id===sel);let best=null,bd=28;for(const p of st.pads){if(p.k!==c.h.pad)continue;const dd=Math.hypot(p.x-x,(p.y-y)*1.4);if(dd<bd){bd=dd;best=p;}}
-  if(best){const why=TDS.deploy(st,sel,best.id);if(why){if(/灯力/.test(why))nope('.td-cost');else if(/上限/.test(why))nope('.td-deck');else{TDFX.add({k:'gring',x:best.x,y:best.y,r:16,c:'#ff6a4a',c2:'#ff6a4a',d:.35});}}else sel=null;return;}
+ /* 置く・動かす：道（後衛は道の奥の脇）の近くをタップ。遠すぎるタップは取り消し */
+ const near=line=>{let b=null,bd=40;st.Ps.forEach((P,li)=>{const a=TDS.at(P,TDS.sOf(P,x)),d=Math.abs(a.y+TDS.yo(st,li,line)-y);if(d<bd){bd=d;b={x:a.x,y:a.y,yo:TDS.yo(st,li,line)};}});return b;};
+ const bad=(why,a)=>{if(/灯力/.test(why))nope('.td-cost');else if(/上限/.test(why))nope('.td-deck');else TDFX.add({k:'gring',x:a.x,y:a.y,r:16,c:'#ff6a4a',c2:'#ff6a4a',d:.35});};
+ if(mvU){const m=mvU;mvU=null;if(!st.units.includes(m)||u)return;const a=near(m.h.line);if(!a)return;const why=TDS.move(st,m.uid,x,a.y);if(why)bad(why,a);else TDFX.add({k:'gring',x:a.x,y:a.y+a.yo,r:12,c:'#f2b347',c2:'#fff0b8',d:.35});return;}
+ if(sel){const c=st.deck.find(c=>c.id===sel),a=!u&&near(c.h.line);
+  if(a){const why=TDS.deploy(st,sel,x,a.y);if(why)bad(why,a);else sel=null;return;}
   if(!u){sel=null;return;}}
  if(u){sel=null;unitPanel(u===selU?null:u);return;}unitPanel(null);}
 function onClick(ev){const b=ev.target.closest('[data-a],.td-card');if(!b)return;const a=b.dataset.a;
  if(b.classList.contains('td-card')){if(!st||st.over)return;const c=st.deck.find(c=>c.id===b.dataset.id);unitPanel(null);
   if(c.on){setCam(c.on.x-VW/2);unitPanel(c.on);return;}const why=c.cd>0||st.cost<c.h.cost;
-  if(why){nope(b);if(st.cost<c.h.cost)nope('.td-cost');return;}sel=sel===c.id?null:c.id;if(sel){
-   const P=st.pads.filter(p=>p.k===c.h.pad&&p.lit&&!p.unit);if(P.length&&!P.some(p=>p.x>cam&&p.x<cam+VW))setCam(P[P.length-1].x-VW/2);}return;}
+  if(why){nope(b);if(st.cost<c.h.cost)nope('.td-cost');return;}mvU=null;sel=sel===c.id?null:c.id;if(sel){
+   /* 光の届く一番前の場所が画面の外なら、そこへ寄る */
+   const fx=Math.min(...st.Ps.map((P,i)=>TDS.at(P,TDS.frontier(st,i)).x));if(fx<cam||fx>cam+VW)setCam(fx-VW/3);}return;}
  if(a==='spd'){speed=speed===1?2:1;b.textContent='×'+speed;b.classList.toggle('on',speed===2);}
  else if(a==='pause'){paused=!paused;b.classList.toggle('on',paused);b.textContent=paused?'▶':'Ⅱ';if(paused)banner('Ⅱ','',99999);else $('.td-banner').classList.remove('show');}
  else if(a==='call')TDS.callWave(st);
  else if(a==='lamp'){if(!st||st.over)return;const why=TDS.lampUp(st);if(why){nope(b);if(/灯力/.test(why))nope('.td-cost');}}
  else if(a==='ult'){if(selU&&TDS.ult(st,selU.uid))unitPanel(null);}
  else if(a==='ret'){if(selU){TDS.retreat(st,selU.uid);unitPanel(null);}}
+ else if(a==='mv'){if(selU){mvU=selU;sel=null;unitPanel(null);}}
  else if(a==='menu'){paused=true;sheet(`<h3>防衛をやめる</h3><div class="sub">ここまでの報酬は得られない</div><div class="td-acts"><button class="td-btn" data-a="resume">続ける</button><button class="td-btn" data-a="quit">やめる</button></div>`);}
  else if(a==='resume'){sheet(null);paused=false;}
  else if(a==='quit'){stop();TDM.map();}
@@ -188,7 +196,7 @@ function lvMap(){const o={};try{for(const id in G.h)o[id]=G.h[id].lv||1;}catch(e
 function stop(){cancelAnimationFrame(raf);st=null;try{GUIDE.stop();}catch(e){}}
 function open(id,deck){build();sid=id;cancelAnimationFrame(raf);
  const dk=deck||TDD.deckOf(),rl={};for(const h of dk)rl[h]=TDD.real(h);
- st=TDS.create(sid,dk,{lv:lvMap(),real:rl,seed:(Date.now()%100000)+1});speed=1;paused=false;sel=null;selU=null;nm=[];nums=[];TDFX.reset();ended=false;acc=0;for(const k in memo)delete memo[k];
+ st=TDS.create(sid,dk,{lv:lvMap(),real:rl,seed:(Date.now()%100000)+1});speed=1;paused=false;sel=null;selU=null;mvU=null;nm=[];nums=[];TDFX.reset();ended=false;acc=0;for(const k in memo)delete memo[k];
  root.classList.remove('hide');sheet(null);unitPanel(null);$('.td-deck').innerHTML=deckHTML();const sb=$('[data-a="spd"]');sb.textContent='×1';sb.classList.remove('on');
  const sn=$('[data-a="snd"]');sn.innerHTML=TDSFX.icon();sn.classList.toggle('off',!TDSFX.on);const pb=$('[data-a="pause"]');pb.textContent='Ⅱ';pb.classList.remove('on');
  requestAnimationFrame(()=>{fit();setCam(st.S.W);last=performance.now();raf=requestAnimationFrame(loop);banner(st.S.name,'',1600);try{GUIDE.start(sid);}catch(e){console.error(e);}

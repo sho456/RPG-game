@@ -6,15 +6,12 @@
 const GY=300;/* 灯の足元の高さ */
 /* 道：lanes は道の高さの列。どの道も最後は灯へ斜めに合流する */
 function lanePath(W,y){return[[-30,y],[W-150,y],[W-70,GY]];}
-/* 地図を作る：f＝[道の番号, x]（道の上の台座）・b＝[x, y]（道の外の台座） */
-function map(W,lanes,f,b,r){return{W,base:[W-46,GY],light:{r:r||Math.round(W*.33)},paths:lanes.map(y=>lanePath(W,y)),
- pads:[...f.map(([l,x],i)=>({id:'f'+(i+1),k:'f',lane:l,x})),...b.map(([x,y],i)=>({id:'b'+(i+1),k:'b',x,y}))]};}
-/* 1 本道（高さ 300）と 2 本道（262・338）の型 */
-const ONE=W=>map(W,[GY],[[0,W*.42],[0,W*.58],[0,W*.72],[0,W*.84]],[[W*.3,244],[W*.48,244],[W*.64,244],[W*.78,244],[W*.42,356],[W*.6,356],[W*.76,356],[W*.88,356]]);
-const TWO=W=>map(W,[262,338],[[0,W*.4],[0,W*.62],[0,W*.8],[1,W*.45],[1,W*.66],[1,W*.82]],
- [[W*.34,214],[W*.56,214],[W*.74,214],[W*.3,300],[W*.5,300],[W*.68,300],[W*.86,300],[W*.4,384],[W*.6,384],[W*.78,384]]);
-const THREE=W=>map(W,[244,300,356],[[0,W*.45],[0,W*.66],[0,W*.8],[1,W*.5],[1,W*.7],[1,W*.84],[2,W*.45],[2,W*.66],[2,W*.8]],
- [[W*.4,206],[W*.6,206],[W*.76,206],[W*.36,272],[W*.56,272],[W*.72,272],[W*.88,272],[W*.42,330],[W*.62,330],[W*.78,330],[W*.5,392],[W*.7,392]]);
+/* 地図を作る：道の高さの列 lanes と灯の光の半径 r（既定は幅の 33%）。台座は無い（ver0.55：仲間は置いた場所の近くの道で、役割の隊形を組む） */
+function map(W,lanes,r){return{W,base:[W-46,GY],light:{r:r||Math.round(W*.33)},paths:lanes.map(y=>lanePath(W,y))};}
+/* 1 本道（高さ 300）・2 本道（262・338）・3 本道（244・300・356）の型 */
+const ONE=W=>map(W,[GY]);
+const TWO=W=>map(W,[262,338]);
+const THREE=W=>map(W,[244,300,356]);
 const q=id=>{try{for(const c of QD.CH)for(const x of c.qs)if(x.id===id)return x;}catch(e){}return null;};
 const pre=id=>{const x=q(id);return x&&x.pre?x.pre:null;};
 const post=who=>{try{return QD.POST[who].lines;}catch(e){return null;}};
@@ -24,12 +21,12 @@ const L={
  /* ---------- 序章 灰の街道 ---------- */
  td0_1:S('td0_1',{hk:2.0,star:{time:145},q:'q0_1',name:'灰色の街道',lv:1,th:'ash',cap:4,cost0:14,pre:pre('q0_1'),tut:1,
   waves:[{e:[[2,'slime',4,2.4]]},{e:[[1,'slime',6,1.8]]},{e:[[1,'slime',5,1.6],[6,'wolf',4,1.8]]}]},ONE(860)),
- td0_2:S('td0_2',{hk:1.62,star:{time:130},q:'q0_2',name:'灰狼の遠吠え',lv:2,th:'ash',cap:4,join:'shion',
+ td0_2:S('td0_2',{hk:1.28,star:{time:130},q:'q0_2',name:'灰狼の遠吠え',lv:2,th:'ash',cap:4,join:'shion',
   join_lines:[[null,'n','狼の群れが散ったあと、物陰から少年が顔を出した。'],['shion','h','へえ、やるじゃん。灯守ってのは口だけじゃないんだな'],['shion','n','俺はシオン。街の孤児の面倒を見てる。……虚蝕を追うなら、足の速い奴がいた方がいいだろ？']],
   waves:[{e:[[2,'wolf',5,1.6]]},{e:[[1,'slime',6,1.3],[5,'wolf',5,1.3]]},{e:[[1,'wolf',8,1.1],[4,'slime',6,1.2]]}]},ONE(920)),
  td0_3:S('td0_3',{hk:1.8,bk:0.8,star:{time:155},q:'q0_4',name:'灰狼の頭目',lv:3,th:'ash',cap:5,pre:pre('q0_4'),
   waves:[{e:[[2,'slime',4,1.8],[7,'wolf',3,1.4]]},{e:[[1,'wolf',6,1.1],[4,'slime',5,1.3]]},{e:[[2,'m_wolf',1,1,0],[4,'slime',5,1.3],[8,'wolf',6,1.1]]}]},ONE(1000)),
- td0_4:S('td0_4',{hk:1.22,bk:0.36,star:{time:155},q:'q0_5',name:'虚ろの番人',lv:4,th:'ash',cap:5,boss:1,pre:pre('q0_5'),
+ td0_4:S('td0_4',{hk:0.85,bk:0.36,star:{time:155},q:'q0_5',name:'虚ろの番人',lv:4,th:'ash',cap:5,boss:1,pre:pre('q0_5'),
   waves:[{e:[[2,'slime',6,1.4],[6,'wolf',4,1.3]]},{e:[[1,'wolf',8,1],[3,'slime',6,1.2]]},{e:[[2,'boss',1,1,1],[5,'wolf',6,1.2],[10,'slime',6,1.2]]}]},TWO(1040)),
  /* ---------- 第1章 翠の森・沈黙の図書遺跡 ---------- */
  td1_1:S('td1_1',{hk:2.12,star:{time:165},q:'q1_1',name:'翠の森へ',lv:6,th:'forest',pre:pre('q1_1'),
@@ -38,7 +35,7 @@ const L={
   waves:[{e:[[2,'shroom',5,1.5]]},{e:[[1,'bookghost',5,1.6],[5,'shroom',4,1.5]]},{e:[[1,'bookghost',6,1.2],[4,'moss',6,1.2],[9,'jadewolf',4,1.2]]}]},TWO(1060)),
  td1_3:S('td1_3',{hk:0.77,bk:1.51,star:{time:150},q:'q1_4',name:'翠狼の主',lv:8,th:'forest',
   waves:[{e:[[2,'jadewolf',6,1.1]]},{e:[[1,'moss',6,1.2],[4,'shroom',5,1.3]]},{e:[[2,'m_jade',1,1,0],[4,'jadewolf',8,.9],[10,'moss',5,1.2]]}]},TWO(1080)),
- td1_4:S('td1_4',{hk:2.05,star:{time:150},q:'q1_5',name:'月夜の小道',lv:9,th:'forest',join:'jin',join_lines:post('jin'),
+ td1_4:S('td1_4',{hk:1.71,star:{time:150},q:'q1_5',name:'月夜の小道',lv:9,th:'forest',join:'jin',join_lines:post('jin'),
   waves:[{e:[[2,'moss',6,1.2],[5,'jadewolf',4,1]]},{e:[[1,'shroom',6,1.1],[3,'bookghost',5,1.3]]},{e:[[1,'jadewolf',8,.8],[4,'moss',6,1],[8,'bookghost',5,1.1]]}]},TWO(1080)),
  td1_5:S('td1_5',{gim:{k:'drain',every:12},hk:0.89,bk:0.67,star:{time:155},q:'q1_7',name:'禁書の守護像',lv:10,th:'forest',boss:1,pre:pre('q1_7'),
   waves:[{e:[[2,'bookghost',6,1.2],[5,'shroom',5,1.2]]},{e:[[1,'jadewolf',8,.9],[4,'moss',6,1.1]]},{e:[[2,'boss2',1,1,1],[4,'bookghost',8,1.1],[9,'jadewolf',6,1]]}]},TWO(1120)),
@@ -72,7 +69,7 @@ const L={
   waves:[{e:[[2,'drowned',7,1.2]]},{e:[[1,'jelly',9,.9],[4,'drowned',6,1.1]]},{e:[[2,'m_guard',1,1,1],[4,'drowned',7,1.1],[9,'waterslime',8,1]]}]},THREE(1180)),
  td4_3:S('td4_3',{hk:0.21,bk:0.15,star:{time:115},q:'q5_6',name:'沈みし女王',lv:37,th:'ruin',boss:1,pre:pre('q5_6'),gim:{k:'drain',every:9},
   waves:[{e:[[2,'drowned',8,1],[5,'jelly',7,.9]]},{e:[[1,'waterslime',10,.8],[4,'drowned',7,1]]},{e:[[2,'boss6',1,1,1],[4,'jelly',10,.8],[9,'drowned',7,1]]}]},THREE(1200)),
- td4_4:S('td4_4',{hk:0.65,bk:0.42,star:{time:155},q:'q6_2',name:'塔の番兵',lv:42,th:'tower',boss:1,join:'celes',join_lines:post('celes'),gim:{k:'charge',every:10},
+ td4_4:S('td4_4',{hk:0.49,bk:0.33,star:{time:155},q:'q6_2',name:'塔の番兵',lv:42,th:'tower',boss:1,join:'celes',join_lines:post('celes'),gim:{k:'charge',every:10},
   waves:[{e:[[2,'minerghost',8,1],[5,'jelly',8,.9]]},{e:[[1,'yukirei',10,.8],[4,'drowned',7,1]]},{e:[[2,'tower10',1,1,1],[4,'golemkin',7,1.2],[9,'minerghost',8,.9]]}]},THREE(1200)),
  td4_5:S('td4_5',{hk:0.35,bk:0.205,star:{time:125},q:'q6_4',name:'天狐の残照',lv:46,th:'tower',boss:1,join:'valk',join_lines:post('valk'),gim:{k:'shift',every:8},
   waves:[{e:[[2,'snowwolf',10,.8],[5,'iceslime',8,1]]},{e:[[1,'onimusha',8,1],[4,'jelly',9,.8]]},{e:[[2,'tower20',1,1,1],[4,'yukirei',10,.8],[9,'onimusha',7,1]]}]},THREE(1220)),

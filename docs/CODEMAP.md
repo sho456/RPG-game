@@ -43,7 +43,7 @@
 | 37 | `js/v21-items.js` | 6 | ver0.21 装備・アイテムのドット絵（24×24）を全面刷新 | IC21 |
 | 38 | `js/v21-art.js` | 53 | ver0.21 装備・アイテムのデザイン定義 |  |
 | 39 | `js/v21.js` | 8 | ver0.21 表示の改善 | V21 |
-| 40 | `js/v22.js` | 28 | ver0.22 画面の全面改良・「星臨」・ミッション一括受け取り・開発者モード拡張 | V22 |
+| 40 | `js/v22.js` | 27 | ver0.22 画面の全面改良・「星臨」・ミッション一括受け取り・開発者モード拡張 | V22 |
 | 41 | `js/v24-text.js` | 3 | ver0.24 演出文字レンダラー（TX24） | TX24 |
 | 42 | `js/data/terms.js` | 9 | ver0.29 呼称・分類の共通規格（TERMS） | TERMS |
 | 43 | `js/motion/registry.js` | 2 | ver0.29 モーション台帳（MOTION） | MOTION |
@@ -76,7 +76,7 @@
 | 70 | `js/data/equip7.js` | 4 | 装備の能力影響（EQ7：装備が上げるのは基礎ステータスだけ。ver0.45 新規の正本） | EQ7 |
 | 71 | `js/rs/mastery.js` | 17 | 技・術の練達（RSM。ver0.47 新規の正本。旧「技Lv（熟練）」を置き換え） | RSM |
 | 72 | `js/v38/core.js` | 4 | ver0.38 土台：攻撃属性 8 種・武器種 8 種・セーブの移行・LP | V38 |
-| 73 | `js/v38/menu.js` | 16 | ver0.38 画面全体の整理 | V38M |
+| 73 | `js/v38/menu.js` | 17 | ver0.38 画面全体の整理 | V38M |
 | 74 | `js/v38/help.js` | 8 | ver0.38 タップで詳細（V38H） | V38H |
 | 75 | `js/ui/skill-icons.js` | 3 | 技・術のアイコン（SKICON：白いシルエットの絵柄 27 種＋技 → 絵柄の対応。js/rs/ui.js の skIcon が使う） |  |
 | 76 | `js/ui/board.js` | 5 | 星盤・天星盤の画面（ver0.39 で 1 ファイルにまとめた。画面の正本はここ） | BOARDUI |
@@ -87,17 +87,18 @@
 | 81 | `js/ui/keywords.js` | 8 | 用語のハイライト（KW：効果の説明文の用語を緑で示し、タップで詳しい説明を出す正本。ver0.45 新規） | KW |
 | 82 | `js/ui/growth.js` | 5 | 強化メニュー（経験値のストックとレベルアップ・旧「酒場」を統合した正本。ver0.48 新規） | GROW |
 | 83 | `js/td/data.js` | 8 | TD のデータ（仲間・敵の変換・数値の定数・報酬。ステージは js/td/stages.js）。設計は docs/TD-DESIGN.md | TDD |
-| 84 | `js/td/stages.js` | 13 | TD のステージと章（TDD.STAGE・TDD.CH・TDD.ORDER の正本）。書式は docs/TD-DESIGN.md 6 章・スキル td-stage-author |  |
-| 85 | `js/td/sim.js` | 17 | TD の戦闘シミュレーション（TDS）。DOM・時計・描画に触れない純粋なロジック | TDS |
+| 84 | `js/td/stages.js` | 12 | TD のステージと章（TDD.STAGE・TDD.CH・TDD.ORDER の正本）。書式は docs/TD-DESIGN.md 6 章・スキル td-stage-author |  |
+| 85 | `js/td/sim.js` | 21 | TD の戦闘シミュレーション（TDS）。DOM・時計・描画に触れない純粋なロジック | TDS |
 | 86 | `js/td/bg.js` | 9 | TD の戦場の背景（TDBG）：章ごとの空・遠景・中景・地面と道・灯（拠点）。横スクロールの奥行き（遠いほどゆっくり動く） | TDBG |
 | 87 | `js/td/sfx.js` | 10 | TD の音（TDSFX）：WebAudio で合成する効果音と、章ごとの短い BGM。音源ファイルなし | TDSFX |
 | 88 | `js/td/fx.js` | 21 | TD の戦闘の演出（TDFX）：技ごとのエフェクト・星臨の短い暗転・粒・敵の歩き/被弾/崩れ。描くだけで、ロジック（TDS）の結果に触れない | TDFX |
-| 89 | `js/td/view.js` | 22 | TD の戦闘画面（TD）：横スクロールの戦場・上下の帯・手札・ユニットの窓・リザルト。ロジックは js/td/sim.js（TDS） | TD |
-| 90 | `js/td/guide.js` | 5 | TD の字を使わない導き（GUIDE）の正本：最初の 1〜2 面で、光る指・脈打つ輪・矢印だけで操作を順に示す | GUIDE |
+| 89 | `js/td/view.js` | 23 | TD の戦闘画面（TD）：横スクロールの戦場・上下の帯・手札・ユニットの窓・リザルト。ロジックは js/td/sim.js（TDS） | TD |
+| 90 | `js/td/guide.js` | 6 | TD の字を使わない導き（GUIDE）の正本：最初の 1〜2 面で、光る指・脈打つ輪・矢印だけで操作を順に示す | GUIDE |
 | 91 | `js/td/menu.js` | 15 | TD の章の地図・出撃準備・会話・仲間の加入（TDM）。戦闘画面は js/td/view.js（TD） | TDM |
 | 92 | `js/ui/home.js` | 4 | ホーム画面（灯都ルミナス）の正本：TD「防衛」を主役にした重ね表示 | HOME |
 | 93 | `js/ui/unit.js` | 6 | 仲間の画面（UNIT）：TD 用の一覧＋1 人の詳細。Lv・装備・技の練達・星臨・星盤をここにまとめる | UNIT |
 | 94 | `js/ui/zukan.js` | 3 | 図鑑の一覧（ZKUI）：敵・仲間・装備の全画面の一覧。ver0.54 新規 | ZKUI |
+| 95 | `js/ui/dev.js` | 4 | 開発者モードの正本（タイトルの「開発者モード」・ホームの ≡ の DEV） | DEVUI |
 
 ## 上書きの連鎖（2 ファイル以上で定義・上書きされる関数）
 
@@ -105,22 +106,21 @@
 
 | 関数 | 定義 → 上書き（読み込み順） |
 |---|---|
-| `draw` | engine.js → ver16.js → ver17.js → sprite/legacy/dot-rig.js → ver19.js → v21.js → v22.js → sprite/spx.js → zukan/viewer.js → ui/inv.js → ui/growth.js → td/fx.js → td/view.js → ui/unit.js → ui/zukan.js |
+| `draw` | engine.js → ver16.js → ver17.js → sprite/legacy/dot-rig.js → ver19.js → v21.js → v22.js → sprite/spx.js → zukan/viewer.js → ui/inv.js → ui/growth.js → td/fx.js → td/view.js → ui/unit.js → ui/zukan.js → ui/dev.js |
 | `migrate` | items.js → ch8.js → ch9.js → ver17.js → ver18-field.js → v31/items.js → data/resist.js → v31/quest-data.js → v32.js → rs/core.js → data/equip7.js → v38/core.js |
 | `build` | motion/skeleton.js → items/icons36.js → v38/help.js → ui/growth.js → td/view.js → td/guide.js → td/menu.js → ui/home.js → ui/unit.js → ui/zukan.js |
 | `show` | core.js → ver17.js → ver18-town.js → v20-ui.js → v22.js → v38/help.js → ui/inv.js → ui/keywords.js → td/view.js → td/menu.js |
-| `close` | ver17.js → v38/help.js → ui/equip-info.js → ui/keywords.js → ui/growth.js → td/menu.js → ui/unit.js → ui/zukan.js |
-| `open` | v38/help.js → ui/equip-info.js → ui/growth.js → td/view.js → td/menu.js → ui/unit.js → ui/zukan.js |
+| `close` | ver17.js → v38/help.js → ui/equip-info.js → ui/keywords.js → ui/growth.js → td/menu.js → ui/unit.js → ui/zukan.js → ui/dev.js |
+| `open` | v38/help.js → ui/equip-info.js → ui/growth.js → td/view.js → td/menu.js → ui/unit.js → ui/zukan.js → ui/dev.js |
+| `onClick` | ui/growth.js → td/view.js → td/menu.js → ui/unit.js → ui/zukan.js → ui/dev.js |
 | `stats` | engine.js → v31/core.js → v31/items.js → rs/core.js → data/equip7.js → ui/unit.js |
 | `townMenu` | town.js → v22.js → v38/menu.js → ui/inv.js → td/menu.js → ui/home.js |
 | `face` | ui-assets.js → sprite/legacy/dot-rig.js → ver19-art.js → sprite/spx.js → td/view.js |
 | `frameOf` | sprite/legacy/px.js → sprite/legacy/px-enemy.js → ver19-art.js → sprite/spx.js → zukan/viewer.js |
 | `keyOf` | sprite/legacy/dot-rig.js → ver19.js → v21-items.js → v31/items.js → rs/core.js |
-| `onClick` | ui/growth.js → td/view.js → td/menu.js → ui/unit.js → ui/zukan.js |
 | `panel` | town.js → ver18-town.js → v20-ui.js → v22.js → v38/help.js |
 | `addLoot` | items.js → ch9.js → ver17.js → v20-ui.js |
 | `drawUnit` | engine.js → ver16.js → ver17.js → td/view.js |
-| `enterTown` | town.js → ch8.js → ver18-town.js → v22.js |
 | `fit` | core.js → v21.js → v22.js → td/view.js |
 | `genItem` | items.js → v31/items.js → data/resist.js → data/equip7.js |
 | `kBoss` | ch8.js → ver19-pre.js → sprite/spx.js → v31/enemies.js |
@@ -134,6 +134,7 @@
 | `bonus` | items.js → ch9.js → v31/board.js |
 | `cap` | sprite/legacy/dot-rig.js → ui/inv.js → ui/growth.js |
 | `drawBoard` | items.js → ver17.js → v31/board.js |
+| `enterTown` | town.js → ch8.js → ver18-town.js |
 | `exprFace` | ch9.js → ver19-art.js → sprite/spx.js |
 | `frame` | sprite/legacy/dot-rig.js → ver19-art.js → v21.js |
 | `gainXP` | engine.js → v31/core.js → ui/growth.js |
@@ -151,7 +152,6 @@
 | `ring` | v21-art.js → td/sfx.js → td/guide.js |
 | `royalItem` | ch5.js → v31/items.js → data/resist.js |
 | `step` | td/fx.js → td/guide.js → td/menu.js |
-| `title` | town.js → v22.js → v38/menu.js |
 | `ATK` | engine.js → v38/core.js |
 | `BCH` | items.js → v21.js |
 | `INF` | v31/core.js → rs/core.js |
@@ -201,6 +201,8 @@
 | `makeTown` | field.js → ver18-town.js |
 | `map` | td/stages.js → td/menu.js |
 | `mark` | zukan/zukan.js → ui/keywords.js |
+| `move` | motion/anim.js → td/sim.js |
+| `near` | ver19.js → td/view.js |
 | `need` | ui/smith.js → ui/growth.js |
 | `newMember` | ch1.js → v31/items.js |
 | `openSheet` | ch3.js → ui/party.js |
@@ -231,6 +233,7 @@
 | `tick` | motion/anim.js → td/sim.js |
 | `tierOf` | v21-items.js → v31/items.js |
 | `tip` | ver17.js → td/view.js |
+| `title` | town.js → v38/menu.js |
 | `toast` | v22.js → ui/smith.js |
 | `toggle` | sprite/facing.js → td/sfx.js |
 | `ult` | td/sim.js → td/fx.js |

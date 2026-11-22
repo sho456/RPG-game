@@ -45,7 +45,7 @@ function infMap(){const S=TDD.STAGE[TDD.INF],b=best();
  try{skyArt(root.querySelector('.tdm-sky'),S.th);}catch(e){}tabSee();}
 /* 選んでいるタブ（塔が開いていれば塔のタブ）を横スクロールの中で見える位置へ */
 function tabSee(){try{const n=root.querySelector('.tdm-tabs'),b=n.querySelector('.inf')||n.querySelector('.on');if(b)n.scrollLeft=Math.max(0,b.offsetLeft-n.clientWidth+b.offsetWidth+10);}catch(e){}}
-function skyArt(c,th){const st={S:{W:900,th,base:[870,300],paths:[[[-30,262],[900,262]],[[-30,338],[900,338]]],pads:[]},pads:[]};st.Ps=[];
+function skyArt(c,th){const st={S:{W:900,th,base:[870,300],paths:[[[-30,262],[900,262]],[[-30,338],[900,338]]]}};st.Ps=[];
  const b=TDBG.make(st,360),g=c.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(b.sky,40,0,360,236,0,0,360,236);g.drawImage(b.far,-40,-70);g.drawImage(b.mid,-20,-60);
  const gr=g.createLinearGradient(0,40,0,96);gr.addColorStop(0,'rgba(18,19,42,0)');gr.addColorStop(1,'rgba(18,19,42,1)');g.fillStyle=gr;g.fillRect(0,0,360,96);}
 /* ---------- 出撃準備 ---------- */
@@ -65,7 +65,7 @@ function prep(id){const S=TDD.STAGE[id];if(!S||(S.inf?!infOpen():!open(id)))retu
 function prevArt(c,id){const st=TDS.create(id,['rio'],{}),b=TDBG.make(st,360),g=c.getContext('2d'),W=st.S.W,kx=360/W,ky=90/240,Y=y=>(y-180)*ky;g.imageSmoothingEnabled=false;
  g.drawImage(b.ground,0,180,W,240,0,0,360,90);const[bx,by]=st.S.base;
  g.fillStyle='rgba(242,179,71,.2)';g.beginPath();g.ellipse(bx*kx,Y(by),st.lightR*kx,st.lightR*ky,0,0,7);g.fill();
- for(const p of st.pads){g.fillStyle=p.lit?'#f2b347':'#6f6888';g.fillRect(p.x*kx-1.5,Y(p.y)-1.5,3,3);}
+ for(const P of st.Ps)for(let s=0;s<P.L;s+=10){const a=TDS.at(P,s);if(TDS.litAt(st,a.x,a.y)){g.fillStyle='#f2b347';g.fillRect(a.x*kx-1,Y(a.y)-1,2,2);}}
  g.fillStyle='#ffe2a0';g.fillRect(bx*kx-2,Y(by)-12,4,12);g.fillStyle='#e86a6a';for(const P of st.S.paths){g.beginPath();g.moveTo(2,Y(P[0][1])-4);g.lineTo(8,Y(P[0][1]));g.lineTo(2,Y(P[0][1])+4);g.fill();}}
 /* ---------- 会話 ---------- */
 function talk(lines,done){if(!lines||!lines.length)return done();let i=0;build();

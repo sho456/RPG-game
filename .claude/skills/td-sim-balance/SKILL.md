@@ -28,7 +28,7 @@ node tools/td_sim.js --stage td0_4 --lv 1,4,8 --deck rio,gald,mire,celes,noah,er
 ## 3. 1 戦を覗く（原因を探す）
 
 ページで `TDS.create(id,deck,{lv,seed,prep:3})` を作り、`TDS.bot` と `TDS.tick` を回しながら `st.ev` の `deploy` `leak` `fall` `hit` `hurt` を数える。
-`leak` の敵の種類と、その時刻の `st.units`・`p.lit`（光の中の台座）を見れば、ほぼ原因が分かる。調べる用の一時ファイルは `tools/_tmp_*.js` に作り、終わったら消す。
+`leak` の敵の種類と、その時刻の `st.units`・`u.lit`（光の中か）・`u.x`（どこまで歩いたか）を見れば、ほぼ原因が分かる。調べる用の一時ファイルは `tools/_tmp_*.js` に作り、終わったら消す。
 
 ## 4. つまみ（効きの強い順）
 
@@ -38,5 +38,5 @@ node tools/td_sim.js --stage td0_4 --lv 1,4,8 --deck rio,gald,mire,celes,noah,er
 4. 敵の基本の係数（`TDD.foe`：`mhp×2.3`・`atk×1.15`・ボス ×0.9）と仲間の Lv の効き（`lvK`：+5%/Lv）
 5. 光の削り（1 体 1.5/秒・下限 60%・倒すと +10・虚蝕がいないと +4/秒）
 
-自動の配置（`TDS.bot`）は、置ける台座が無いとき・上限のときに灯を強める。人より下手なので、人は 1 段易しく感じる。
+自動の配置（`TDS.bot`）は、上限まで置いたときに灯を強める。人より下手なので、人は 1 段易しく感じる。
 数値を変えたら `docs/TD-DESIGN.md` の該当の行も直す。計測の表はコミットメッセージに貼る。

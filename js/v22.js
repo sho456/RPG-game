@@ -227,11 +227,7 @@ document.addEventListener('click',e=>{const x=e.target.closest('.x22');if(!x||e.
 
 /* キャラ詳細から試練へ（tr アクションが無い画面のため） */
 
-/* ==================== 5. 開発者モード：全データ開放 ==================== */
-let DEVDONE=false;
-
-{const _et=enterTown;enterTown=function(m){if(DEV()&&!DEVDONE){DEVDONE=true;try{const r=devUnlockAll();m=(m?m+'<br>':'')+`<small>ver0.22：全データを開放した（${r}）</small>`;}catch(e){console.error(e);}}return _et(m);};}
-{const _t=title;title=function(){DEVDONE=false;return _t();};}
+/* 5. 開発者モード：js/ui/dev.js へ移した */
 
 /* ==================== 7. 「星臨」に合わせた説明 ==================== */
 try{TIPS.battle=['戦闘のしかた',['自分の番が来たら、下の一覧から<b>技をタップ→もう一度タップ</b>で決定。<b>ⓘ</b>で技の詳しい性能を見られる。','<b>敵をタップ</b>すると狙いが変わる。左上に狙った敵の<b>HP</b>と<b>弱点</b>（▲）が出る。','弱点を突くと <b>1.7倍</b> の大ダメージ。敵が「溜め」たら次の大技に<b>防御</b>で備えよう。','左下が<b>行動順</b>。面倒なら下の<b>通常AUTO</b>、同じ行動を繰り返すなら<b>リピート</b>。']];

@@ -59,9 +59,6 @@ function ground(P,st,R){const W=st.S.W,c=cv(W,H),g=c.getContext('2d');
   for(let s=0;s<L.L;s+=7){const a=TDS.at(L,s);g.fillStyle=R()>.5?P.roadE:P.edge;g.fillRect(Math.round(a.x),Math.round(a.y-12+R()*24),3,2);}}
  for(let i=0;i<W/14;i++){const x=Math.floor(R()*W),y=GT+8+Math.floor(R()*(H-GT-12));if(st.Ps.some(L=>Math.abs(TDS.at(L,Math.max(0,Math.min(L.L,x+30))).y-y)<20))continue;
   g.fillStyle=P.tuft;g.fillRect(x,y,1,3);g.fillRect(x+2,y-1,1,4);g.fillRect(x+4,y+1,1,2);}
- /* 台座 */
- for(const p of st.pads){if(p.k==='f'){g.fillStyle=P.edge;g.fillRect(p.x-12,p.y-6,24,13);g.fillStyle=mix(P.road,'#ffffff',.1);g.fillRect(p.x-11,p.y-5,22,10);g.fillStyle=P.roadE;g.fillRect(p.x-11,p.y-5,22,1);}
-  else{g.fillStyle=P.prop;g.fillRect(p.x-13,p.y-4,26,11);g.fillStyle=mix(P.ground[2],'#8080c0',.25);g.fillRect(p.x-12,p.y-6,24,9);g.fillStyle=mix(P.ground[2],'#c0c0ff',.35);g.fillRect(p.x-12,p.y-6,24,2);g.fillStyle='#8a6a2a';g.fillRect(p.x-12,p.y+2,24,1);}}
  /* 入口の虚蝕の霧 */
  const gr=g.createLinearGradient(0,0,90,0);gr.addColorStop(0,'rgba(90,60,130,.75)');gr.addColorStop(1,'rgba(90,60,130,0)');g.fillStyle=gr;g.fillRect(0,GT,90,H-GT);
  return c;}

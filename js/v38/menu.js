@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.54';
+const VER='ver0.55';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,11 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　音・技の演出・天への塔<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　隊形と歩く仲間<br><small>`+
+ `・台座をなくし、光の中の道の近くへ置く形に。守る・斬るは前衛、射る・術・支えるは前衛の後ろの後衛に並ぶ<br>`+
+ `・斬るは近づく敵へ詰め寄り、後衛は寄られると下がる。仲間を選んで「移動」で好きな場所へ歩かせられる<br>`+
+ `・開発者モードが押しても反応しなかったのを修正<br></small></div>`+
+ `<div class="nt n38"><b>ver0.54</b>　音・技の演出・天への塔<br><small>`+
  `・防衛に効果音と章ごとの BGM（上の帯のスピーカーで消せる）<br>`+
  `・仲間の技に一人ずつの演出、星臨は暗転と溜めつき。敵が歩き、倒れると崩れて消える<br>`+
  `・天への塔：全章クリア後、地図の ∞ から。負けるまで続く WAVE と最高記録<br>`+

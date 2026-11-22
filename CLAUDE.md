@@ -94,7 +94,7 @@
 | `rpg-hero-motion` | 戦闘モーション・技の演出 |
 | `rpg-equipment-icon` | 装備アイコン |
 | `rs-battle-fx` | 技・術の演出の設計（録画の実測：吹き出し→暗転→溜め→放出→着弾→明けの時間割・剣の振りの周期・術の段取り・エフェクトの色・効果音のレシピ・背景）と、参考を写さず応用・進化させる決まり。録画の分析 `scripts/vref.py` |
-| `td-stage-author` | TD のステージ・WAVE・道と台座・灯域・敵の型・仲間の加入と会話（`js/td/stages.js`） |
+| `td-stage-author` | TD のステージ・WAVE・道と隊形・灯域・敵の型・仲間の加入と会話（`js/td/stages.js`） |
 | `td-sim-balance` | TD の難易度の計測と調整（`tools/td_sim.js`。自動の配置で何十回も戦わせる・`--tune` で敵の HP 倍率を自動で探す） |
 | `rs-battle-flow` | ロマサガRS風の戦闘の流れと表示（HP/BP のタイミング・Critical/Weak・強化弱体・数字・区切り）。デモ `tools/battle_demo.js`・コマの一覧 `tools/frame_grid.py` |
 

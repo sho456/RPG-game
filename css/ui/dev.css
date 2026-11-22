@@ -1,0 +1,11 @@
+/* ===== 開発者モードの窓（js/ui/dev.js の DEVUI）===== */
+.dvp{position:fixed;inset:0;z-index:90;background:rgba(7,7,26,.72);display:flex;align-items:flex-end;justify-content:center;font-family:var(--tk-font)}
+.dvp-in{width:min(420px,100%);max-height:86vh;overflow-y:auto;background:var(--tk-night);box-shadow:var(--tk-frame);padding:var(--tk-pad);color:var(--tk-ink);box-sizing:border-box}
+.dvp h3{display:flex;justify-content:space-between;align-items:center;margin:0 0 var(--tk-gap);font:800 var(--tk-fs-l) var(--tk-disp);color:var(--tk-lamp)}
+.dvp h4{margin:var(--tk-pad) 0 6px;font:700 var(--tk-fs-s) var(--tk-disp);color:var(--tk-ink-2)}
+.dvp button{font:700 var(--tk-fs-s) var(--tk-font);color:var(--tk-ink);background:var(--tk-night-3);border:0;border-radius:var(--tk-r);box-shadow:var(--tk-drop);padding:8px 6px;cursor:pointer}
+.dvp button.ok{background:var(--tk-lamp);color:var(--tk-shade)}
+.dvp .dvp-x{background:none;box-shadow:none;font-size:var(--tk-fs-l);padding:0 6px}
+.dvp-g,.dvp-s{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.dvp-s button{display:flex;flex-direction:column;align-items:flex-start;text-align:left}
+.dvp-s small{color:var(--tk-ink-2);font-weight:500;font-size:var(--tk-fs-xs)}

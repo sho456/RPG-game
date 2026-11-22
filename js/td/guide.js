@@ -32,10 +32,11 @@ function loop(){raf=requestAnimationFrame(loop);const st=TD.st;if(!st||!ov){retu
  if(s===0){/* ①② 手札を選ぶ → 光る台座に置く */
   const need=Math.min(2,st.deck.length);if(st.units.length>=need){setStep(1);return;}
   const selEl=root.querySelector('.td-card.sel'),sel=selEl&&st.deck.find(c=>c.id===selEl.dataset.id);
-  if(sel){const P=st.pads.filter(p=>p.k===sel.h.pad&&p.lit&&!p.unit);let best=null;
-   for(const p of P){const q=scr(st,p.x,p.y);ring(n++,q.x,q.y,13*q.S,'pad');if(q.x>q.L&&q.x<q.R&&(!best||p.x>best.p.x))best={p,q};}
-   clearRings(n);if(best)point(best.q.x,best.q.y);else{point(null);edge(st,P[0]);}return;}
-  const c=st.deck.find(c=>!c.on&&c.cd<=0&&st.cost>=c.h.cost&&st.pads.some(p=>p.k===c.h.pad&&p.lit&&!p.unit));
+  if(sel){/* 光の届く一番前（後衛はその少し後ろの道の脇）を指す */
+   const P=st.Ps.map((L,i)=>{const a=TDS.at(L,TDS.frontier(st,i)+(sel.h.line==='b'?40:20));return{x:a.x,y:a.y+TDS.yo(st,i,sel.h.line)};});
+   P.forEach(p=>{const q=scr(st,p.x,p.y);ring(n++,q.x,q.y,13*q.S,'pad');});clearRings(n);
+   const best=P.map(p=>({p,q:scr(st,p.x,p.y)})).find(o=>o.q.x>o.q.L&&o.q.x<o.q.R);if(best)point(best.q.x,best.q.y);else{point(null);edge(st,P[0]);}return;}
+  const c=st.deck.find(c=>!c.on&&c.cd<=0&&st.cost>=c.h.cost&&st.units.length<st.cap);
   const m=c&&mid(root.querySelector(`.td-card[data-id="${c.id}"]`));clearRings(0);
   if(m){ring(0,m.x,m.y,m.w/2+4,'card',m.h/2+4);point(m.x,m.y-m.h*.1);}else point(null);return;}
  if(s===1){/* ③ 灯を強める（灯力が足りるときだけ指す） */
