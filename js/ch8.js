@@ -18,7 +18,6 @@ Object.assign(SK,{
  kokuha:{n:'刻破',k:'mag',el:null,pow:1.9,t:'all',d:'無属性の全体大魔法'},
  tokitome:{n:'時止め',k:'tstop',t:'all',d:'敵全体の時間を止め、行動を大きく遅らせる'},
  makimodoshi:{n:'巻き戻し',k:'rewind',t:'self',req:'snap',d:'円環に記録した瞬間まで味方のHP・SP・戦闘不能を巻き戻す（1戦闘1回・星臨が解けても使える）'},
- gokuceles:{n:'永劫の円環',k:'mag',el:null,pow:3.2,t:'all',d:'星臨Ⅲ：無属性の全体大魔法'},
  ryuuga:{n:'竜牙斬',sp:15,el:'熱',k:'phys',pow:1.5,t:'one',d:'炎の斬撃・単体'},
  kokuen:{n:'黒炎薙ぎ',sp:30,el:'陰',k:'phys',pow:.95,t:'all',d:'闇の斬撃・敵全体'},
  ryuuhou:{n:'竜の咆哮',sp:25,k:'roar',t:'all',d:'敵全体の行動を遅らせ、味方のAG+15'},

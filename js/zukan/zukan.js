@@ -96,8 +96,8 @@ function heroHTML(id){const j=joined(id)||DEV(),P=PROF[id],hb=HB[id];if(!['prof'
   ${grp('phys').length?`<div class="zsh">${TERMS.GROUP.phys}</div><div class="zsl">${grp('phys').map(row).join('')}</div>`:''}
   ${grp('mag').length?`<div class="zsh">${TERMS.GROUP.mag}</div><div class="zsl">${grp('mag').map(row).join('')}</div>`:''}
   ${ps?`<div class="zsh">${TERMS.SKILL.passive.n}</div><div class="zsl">${ps}</div>`:''}`;}
- if(ZK.dt==='aw'){const A=AW[id],lv=(G.h[id]&&G.h[id].awLv)||1,cm=[...(A.cmds||[]),'goku'+id].filter(k=>SK[k]);
-  body=`<div class="zaw"><b>「${esc(A.name)}」</b><small>${esc(A.type||'')}　位階${ROMAN[lv]}　${'★'.repeat(lv)}${'☆'.repeat(3-lv)}</small><p>${esc(SEIRIN.lore)}</p></div><div class="zsl">${cm.map(k=>skRow(k,SK[k],/^goku/.test(k)?'位階Ⅲ':SK[k].gauge?'ゲージ'+SK[k].gauge:'',id)).join('')}</div>`;}
+ if(ZK.dt==='aw'){const A=AW[id],lv=(G.h[id]&&G.h[id].awLv)||1,cm=(A.cmds||[]).filter(k=>SK[k]);
+  body=`<div class="zaw"><b>「${esc(A.name)}」</b><small>${esc(A.type||'')}　位階${ROMAN[lv]}　${'★'.repeat(lv)}${'☆'.repeat(3-lv)}</small><p>${esc(SEIRIN.lore)}</p></div><div class="zsl">${cm.map(k=>skRow(k,SK[k],'',id)).join('')}</div>`;}
  return head+viewH(elCol(id),!!AW[id])+tabsH([['prof','人物'],['sk','技'],['aw',SEIRIN.n]])+`<div class="zbody">${body}</div>`;}
 
 function equipHTML(x){const s=seenI(x)||DEV(),ik=icKey(x),L0=x.k.startsWith('set:')?null:LEG[x.k],who=L0&&L0.who&&HB[L0.who]?HB[L0.who].name:'',sl=eqSlot(x);

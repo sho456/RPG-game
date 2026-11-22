@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.55';
+const VER='ver0.56';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,12 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　隊形と歩く仲間<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　技 5 つ・奥義・装備・戦闘画面<br><small>`+
+ `・技と術は 1 人 5 つに。仲間の画面で戦闘で使う技を選べる。星臨の奥義は 1 つにまとめた<br>`+
+ `・技・奥義・アビリティはタップで専用の窓。アビリティは防衛でも効くように<br>`+
+ `・装備は名前と能力の増減を見て選べる。「おまかせ」で一番良い物を付ける<br>`+
+ `・戦闘画面を見やすく。仲間の歩く先や戦う相手が分かるように<br></small></div>`+
+ `<div class="nt n38"><b>ver0.55</b>　隊形と歩く仲間<br><small>`+
  `・台座をなくし、光の中の道の近くへ置く形に。守る・斬るは前衛、射る・術・支えるは前衛の後ろの後衛に並ぶ<br>`+
  `・斬るは近づく敵へ詰め寄り、後衛は寄られると下がる。仲間を選んで「移動」で好きな場所へ歩かせられる<br>`+
  `・開発者モードが押しても反応しなかったのを修正<br></small></div>`+

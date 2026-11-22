@@ -57,7 +57,7 @@ const SUPPORT=new Set(['taunt','kenshu','guardRegen','barrier','haste','cheer','
 const isKana=n=>/^[゠-ヿ・ー\s]+$/.test(String(n||''));
 let SEIRIN_SET=null;
 function seirinSet(){if(SEIRIN_SET)return SEIRIN_SET;const s=new Set();try{for(const id in AW)(AW[id].cmds||[]).forEach(k=>s.add(k));}catch(e){}
- try{for(const k in SK)if(/^goku/.test(k)||['zen','reso','release','release2','kenshu'].includes(SK[k].k))s.add(k);}catch(e){}return SEIRIN_SET=s;}
+ try{for(const k in SK)if(SK[k].ougi||['zen','reso','release','release2','kenshu'].includes(SK[k].k))s.add(k);}catch(e){}return SEIRIN_SET=s;}
 /* 技を使えるキャラ（初期・Lv習得・星盤） */
 let OWN=null;
 function owners(){if(OWN)return OWN;OWN={};const add=(k,id)=>{(OWN[k]=OWN[k]||new Set()).add(id);};

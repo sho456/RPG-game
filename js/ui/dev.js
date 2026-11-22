@@ -9,6 +9,8 @@ function devUnlockAll(){if(!G||!G.dev)return'';let n=0;
  for(const id of Object.keys(TDD.HERO))if(typeof HB!=='undefined'&&HB[id]&&!(G.members||[]).includes(id)){try{newMember(id);n++;}catch(e){console.error(e);}}
  for(const id of G.members||[]){const h=G.h[id];if(!h)continue;h.lv=Math.max(h.lv||1,40);h.xp=0;h.hp=null;h.awLv=3;}
  G.td=G.td||{c:{}};G.td.c=G.td.c||{};G.td.v=1;for(const id of TDD.ORDER)if(!TDD.STAGE[id].inf)G.td.c[id]=3;
+ /* 装備：枠ごとに 6 つ（装備の画面を試せるように・1 度だけ） */
+ try{if(!G.devGear){G.devGear=1;for(const sl of['w','main','sub','acc1'])for(let i=0;i<6;i++){const it=genItem(30+i*4,1+(i>3?1:0),0,grp(sl));if(it){it.unid=false;G.inv.push(it);}}}}catch(e){console.error(e);}
  G.gold=Math.max(G.gold||0,999999);G.xpStock=Math.max(G.xpStock||0,999999);G.mats=G.mats||{};G.mats[TDD.STONE]=Math.max(G.mats[TDD.STONE]||0,99);
  try{save();}catch(e){}return`仲間 +${n}・全ステージ`;}
 function devGame(){SAVE=DEVKEY;migrate(newGame());G.dev=1;devUnlockAll();}

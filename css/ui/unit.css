@@ -31,23 +31,67 @@
 .un-stats li{display:flex;align-items:baseline;justify-content:space-between;padding:6px 10px;background:var(--tk-night-2);box-shadow:var(--tk-frame)}
 .un-stats i{font-style:normal;font-size:var(--tk-fs-xs);color:var(--tk-ink-2)}
 .un-stats b{font-size:var(--tk-fs-m)}
-.un-row{display:flex;align-items:center;gap:8px;margin:10px;padding:6px 10px;background:var(--tk-night-2);box-shadow:var(--tk-frame)}
-.un-row .k{font-style:normal;font-size:var(--tk-fs-xs);color:var(--tk-lamp);width:14px}
-.un-row .nm{flex:1;font-family:var(--tk-disp);font-size:var(--tk-fs-m)}
 .un-dots{display:flex;gap:4px}
 .un-dots i{width:8px;height:8px;background:var(--tk-void)}
 .un-dots i.on{background:var(--tk-star)}
-.un-eqs{display:flex;gap:6px;margin:10px}
-.un-eq{position:relative;flex:1;height:52px;border:0;border-radius:var(--tk-r);background:var(--tk-night-2);box-shadow:var(--tk-frame);padding:0;display:flex;align-items:center;justify-content:center}
-.un-eq.on{box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp)}
+.un-k{display:flex;align-items:center;justify-content:space-between;margin:14px 10px 6px;font-family:var(--tk-disp);font-size:var(--tk-fs-s);color:var(--tk-ink-2);font-weight:700}
+#unit .un-k .td-btn{height:26px;font-size:var(--tk-fs-xs)}
+/* 技 5 つ：選んでいる技＝灯の枠、まだ＝虚蝕の灰紫 */
+.un-sks{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:0 10px}
+.un-sk,.un-ab,.un-ou{border:0;border-radius:var(--tk-r);background:var(--tk-night-2);box-shadow:var(--tk-frame);display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 2px 6px;min-width:0}
+.un-sk .i,.un-ou .i,.un-ph .i{width:26px;height:26px;display:inline-flex}
+.un-sk .i svg,.un-ou .i svg,.un-ph .i svg{width:100%;height:100%}
+.un-sk b,.un-ab b{font-family:var(--tk-disp);font-size:var(--tk-fs-xs);line-height:1.25;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.un-sk.sel{box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp);background:var(--tk-night-3)}
+.un-sk.sel .i{filter:drop-shadow(0 0 3px var(--tk-lamp))}
+.un-sk.lock,.un-ab.lock{opacity:.55}.un-sk.lock .i{opacity:.4}
+.un-sk .lv,.un-ab .lv{color:var(--tk-void);font-family:var(--tk-font)}
+.un-ou{flex-direction:row;justify-content:flex-start;gap:10px;margin:8px 10px 0;width:calc(100% - 20px);padding:8px 12px}
+.un-ou b{flex:1;text-align:left;font-family:var(--tk-disp);font-size:var(--tk-fs-m);color:var(--tk-star)}
+.un-abs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 10px}
+.un-ab{padding:10px 4px 8px}.un-ab b{font-size:var(--tk-fs-s)}
+/* 装備：アイコン＋名前 */
+.un-eqs{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:0 10px}
+.un-eq{position:relative;height:66px;border:0;border-radius:var(--tk-r);background:var(--tk-night-2);box-shadow:var(--tk-frame);padding:4px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:0}
+.un-eq b{font-size:9px;font-weight:500;color:var(--tk-ink-2);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .un-eq .g{color:var(--tk-void);font-family:var(--tk-disp);font-size:var(--tk-fs-l)}
-.un-eq .ic img,.un-sheet .ic img{width:32px;height:32px;image-rendering:pixelated}
-.un-eq em,.un-sheet em{font-style:normal;position:absolute;right:3px;bottom:1px;font-size:var(--tk-fs-xs);color:var(--tk-star)}
-#unit .un-bd{display:flex;margin:10px auto 0;width:calc(100% - 20px);height:40px}
-.un-sheet{position:fixed;left:0;right:0;bottom:0;max-height:48vh;overflow-y:auto;background:var(--tk-night-2);box-shadow:0 -2px 0 var(--tk-shade),0 -4px 0 var(--tk-line);padding:8px 10px calc(env(safe-area-inset-bottom,0px) + 10px)}
-.un-sheet .sb{display:flex;justify-content:space-between;margin-bottom:8px}
-.un-sheet ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-.un-sheet li button{position:relative;width:100%;height:50px;border:0;border-radius:var(--tk-r);background:var(--tk-night-3);box-shadow:var(--tk-frame);padding:0;display:flex;align-items:center;justify-content:center}
+.un-eq .ic img,.un-pw .ic img{width:32px;height:32px;image-rendering:pixelated}
+.un-eq em{font-style:normal;position:absolute;right:3px;top:2px;font-size:var(--tk-fs-xs);color:var(--tk-star)}
+#unit .un-bd{display:flex;margin:14px auto 0;width:calc(100% - 20px);height:40px}
+/* 専用の窓 */
+.un-pop{position:fixed;inset:0;z-index:3;background:rgba(7,7,26,.7);display:flex;align-items:flex-end;justify-content:center}
+.un-pw{width:min(460px,100%);max-height:82vh;overflow-y:auto;background:var(--tk-night-2);box-shadow:0 -2px 0 var(--tk-shade),0 -4px 0 var(--tk-line);padding:12px 12px calc(env(safe-area-inset-bottom,0px) + 14px);box-sizing:border-box}
+.un-ph{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.un-ph b{flex:1;font-family:var(--tk-disp);font-size:var(--tk-fs-l)}
+.un-ph .el{font-style:normal;color:var(--tk-ink-2);font-size:var(--tk-fs-s)}
+.un-tx{margin:0 0 10px;font-size:var(--tk-fs-m);line-height:1.6}
+.un-kv{list-style:none;margin:0 0 10px;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.un-kv li{display:flex;gap:8px;align-items:baseline;padding:4px 10px;background:var(--tk-night);box-shadow:var(--tk-frame)}
+.un-kv i{font-style:normal;font-size:var(--tk-fs-xs);color:var(--tk-ink-2)}
+.un-pr{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--tk-night);box-shadow:var(--tk-frame)}
+.un-pr .k{font-style:normal;font-size:var(--tk-fs-xs);color:var(--tk-lamp);flex:1}
+.un-pa{display:flex;justify-content:flex-end;margin-top:12px}#unit .un-pa .td-btn{min-width:120px;height:40px}
+.un-sts{display:flex;flex-direction:column;gap:8px}
+.un-stg{display:flex;gap:10px;padding:8px 10px;background:var(--tk-night);box-shadow:var(--tk-frame)}
+.un-stg h4{margin:0;width:20px;font-family:var(--tk-disp);color:var(--tk-void)}
+.un-stg.now{box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp)}.un-stg.now h4{color:var(--tk-lamp)}
+.un-stg.fut{opacity:.7}
+.un-stg ul{flex:1;list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px;font-size:var(--tk-fs-s)}
+.un-stg li{color:var(--tk-void)}.un-stg li.on{color:var(--tk-ink)}
+.un-stg li.spn{color:var(--tk-star);font-family:var(--tk-disp);margin-top:4px}
+.un-ic{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--tk-night);box-shadow:var(--tk-frame);margin-bottom:8px}
+.un-ic>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.un-ic b{font-size:var(--tk-fs-m)}.un-ic small{font-size:var(--tk-fs-xs);color:var(--tk-ink-2);line-height:1.5}
+.un-cmp{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}.un-cmp .un-ic{margin:0;box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp)}
+#unit .un-cmp .td-btn{align-self:flex-end;min-width:120px;height:40px}
+.dl{display:flex;flex-wrap:wrap;gap:6px;font-size:var(--tk-fs-xs);font-weight:700}.dl .up{color:#9fe8b8}.dl .dn{color:var(--tk-life)}
+.un-cl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.un-cl button{width:100%;display:flex;align-items:center;gap:8px;border:0;border-radius:var(--tk-r);background:var(--tk-night-3);box-shadow:var(--tk-frame);padding:4px 8px;text-align:left}
+.un-cl button.sel{box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp)}
+.un-cl .nm{flex:1;min-width:0;font-size:var(--tk-fs-s);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.un-cl .dl{justify-content:flex-end;max-width:46%}
+.un-cl .who{width:24px;height:24px;object-fit:contain;image-rendering:pixelated;opacity:.8}
+.un-none{text-align:center;color:var(--tk-void);padding:16px}
 
 /* 灯の琥珀は主役（+1）だけ。ほかの押せるボタンは琥珀の縁と字 */
 #unit .td-btn.ok{box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp);color:var(--tk-lamp)}

@@ -35,5 +35,31 @@ const ICONS={
  skull:S(P('M16 2C8 2 4.5 8 4.5 13.5c0 4 2 6 4.5 7.5V27h14v-6c2.5-1.5 4.5-3.5 4.5-7.5C27.5 8 24 2 16 2Z M8.5 14a3.2 3.2 0 1 0 .01 0Z M19.5 14a3.2 3.2 0 1 0 .01 0Z M16 18l-2 3.5h4Z')+'<path d="M13 23v4M16 23v4M19 23v4" stroke="rgba(0,0,0,.45)" stroke-width="1.2"/>')
 };
 /* 技 s（SK の 1 件）→ 絵柄の名前 */
-
+function of(s){if(!s)return'orb';const k=s.k||'',el=s.el||'',n=s.n||'',d=s.d||'',h=s.hits||1,all=s.t==='all';
+ if(s.ougi||k==='zen')return'star';
+ if(/^(heal|healAll|grace)$/.test(k))return'heart';
+ if(/^(revive|reviveAll)$/.test(k))return'revive';
+ if(k==='pct')return'skull';
+ if(k==='scan')return'eye';
+ if(k==='roar')return'roar';
+ if(k==='tstop'||k==='rewind')return'clock';
+ if(k==='haste'||k==='cheer')return'haste';
+ if(k==='charge')return'buff';
+ if(k==='taunt'||s.taunt20)return'taunt';
+ if(/^(guardRegen|barrier|kenshu)$/.test(k)||s.role==='guard')return'shield';
+ if(k==='sup20'){if(s.ct20)return'haste';if(s.role==='heal'||s.heal20)return'heart';if(s.role==='buff')return'buff';
+  if(/^(敵|対象).*↓/.test(d))return'debuff';return'buff';}
+ if(/毒刃|腐食/.test(n))return'poison';
+ if(/(矢|射|撃ち)/.test(n+d.split('／')[0]))return'bow';
+ if(el==='熱')return'flame';
+ if(el==='冷')return'ice';
+ if(el==='雷')return'bolt';
+ if(k==='mag'||k==='rhythm'){if(/時|刻|砂|クロノス/.test(n))return'clock';if(el==='陽')return'sun';if(el==='陰')return'moon';return'orb';}
+ if(el==='陰')return'moon';
+ if(el==='陽'||el==='斬')return h>1?'multi':all?'sweep':'slash';
+ if(el==='打')return all?'smash':'fist';
+ if(el==='突')return all?'volley':'pierce';
+ return'orb';}
+function svg(name){return ICONS[name]||ICONS.orb;}
+window.SKICON={of,svg,ICONS,html:s=>svg(of(s))};
 })();
