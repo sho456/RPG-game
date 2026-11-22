@@ -137,7 +137,7 @@ function drawFx(e,p){g.globalAlpha=1-p;
  g.globalAlpha=1;}
 /* ---------- 帯（変わったところだけ書き換える） ---------- */
 const memo={};const set=(k,el,v,f)=>{if(memo[k]===v)return;memo[k]=v;f(el,v);};
-function hud(){set('wv',$('.wv'),(st.wave+1)+'/'+st.S.waves.length,(e,v)=>e.textContent=v);
+function hud(){set('wv',$('.wv'),(st.wave+1)+(st.S.inf?'':'/'+st.S.waves.length),(e,v)=>e.textContent=v);
  set('lv',$('.td-life'),st.lives,(e,v)=>{e.innerHTML='<span>灯火</span>'+Array.from({length:K.LIVES},(_,i)=>`<i class="${i<v?'':'off'}"></i>`).join('');});
  set('co',$('.td-cost b'),st.cost,(e,v)=>e.textContent=v);$('.cb').style.width=Math.round(st.costAcc/K.COST_EVERY*84)+'px';
  const sr=Math.min(K.STAR_MAX,st.star);set('sr',$('.td-star'),st.star,(e,v)=>{e.querySelector('.g i').style.width=(sr/K.STAR_MAX*100)+'%';e.classList.toggle('full',v>=K.STAR_MAX);});
@@ -193,23 +193,23 @@ function onClick(ev){const b=ev.target.closest('[data-a],.td-card');if(!b)return
 function sheet(html){const s=$('.td-sheet');if(!html){s.hidden=true;return;}s.querySelector('.td-panel').innerHTML=html;s.hidden=false;}
 /* ---------- 結果：星 3 つ・報酬（経験値はストックへ、ゴールド） ---------- */
 function result(){const o=st.over,S0=st.S,win=o.win,n=o.stars.reduce((a,b)=>a+b,0);let rw={xp:0,gold:0},first=false;
- try{if(win&&typeof G!=='undefined'&&G){G.td=G.td||{c:{}};G.td.c=G.td.c||{};const prev=G.td.c[sid]||0;first=!prev;G.td.c[sid]=Math.max(prev,n);
-  rw=TDD.reward(sid,n,first);G.xpStock=(G.xpStock||0)+rw.xp;G.gold=(G.gold||0)+rw.gold;try{save();}catch(e){}}}catch(e){console.error(e);}
+ /* 精算（星・報酬・星 3 の錬磨石・周回・天への塔）は js/td/menu.js の TDM.settle */
+ const R=TDM.settle(sid,st);if(R.sheet){sheet(R.sheet);return;}rw=R.rw;first=R.first;
  const goals=[['灯を守りきる',o.stars[0]],['灯火を 1 つも減らさない',o.stars[1]],[`${S0.star.time} 秒以内に守りきる`,o.stars[2]]];
  sheet(`<h3>${win?'防衛成功':'灯が消えた'}</h3><div class="sub">${esc(TDM.chOf(sid).ch)}・${esc(S0.name)}　${o.t} 秒</div>
  <div class="td-stars">${o.stars.map(s=>`<i class="${s?'on':''}"></i>`).join('')}</div><ul class="td-goal">${goals.map(([t,s])=>`<li class="${s?'on':''}">${t}</li>`).join('')}</ul>
- ${win?`<div class="td-rw"><span>経験値 <b>${rw.xp}</b></span><span>ゴールド <b>${rw.gold}</b></span>${first?'<span>初回ボーナス</span>':''}</div>`:'<div class="sub">仲間を育てるか、配置を変えてもう一度</div>'}
+ ${win?`<div class="td-rw"><span>経験値 <b>${rw.xp}</b></span><span>ゴールド <b>${rw.gold}</b></span>${first?'<span>初回ボーナス</span>':''}${R.chips||''}</div>`:'<div class="sub">仲間を育てるか、配置を変えてもう一度</div>'}
  <div class="td-acts"><button class="td-btn" data-a="again">もう一度</button>${win?`<button class="td-btn on" data-a="next">次へ</button>`:`<button class="td-btn" data-a="map">地図へ</button>`}</div>`);
  TDM.cleared(sid,win,first);}
 /* ---------- 開く・止める ---------- */
 function lvMap(){const o={};try{for(const id in G.h)o[id]=G.h[id].lv||1;}catch(e){}return o;}
-function stop(){cancelAnimationFrame(raf);st=null;}
+function stop(){cancelAnimationFrame(raf);st=null;try{GUIDE.stop();}catch(e){}}
 function open(id,deck){build();sid=id;cancelAnimationFrame(raf);
  const dk=deck||TDD.deckOf(),rl={};for(const h of dk)rl[h]=TDD.real(h);
  st=TDS.create(sid,dk,{lv:lvMap(),real:rl,seed:(Date.now()%100000)+1});speed=1;paused=false;sel=null;selU=null;fx=[];nums=[];ended=false;acc=0;for(const k in memo)delete memo[k];
  root.classList.remove('hide');sheet(null);unitPanel(null);$('.td-deck').innerHTML=deckHTML();const sb=$('[data-a="spd"]');sb.textContent='×1';sb.classList.remove('on');
  const pb=$('[data-a="pause"]');pb.textContent='Ⅱ';pb.classList.remove('on');
- requestAnimationFrame(()=>{fit();setCam(st.S.W);last=performance.now();raf=requestAnimationFrame(loop);banner(st.S.name,'',1600);
+ requestAnimationFrame(()=>{fit();setCam(st.S.W);last=performance.now();raf=requestAnimationFrame(loop);banner(st.S.name,'',1600);try{GUIDE.start(sid);}catch(e){console.error(e);}
   });}
 function show(){build();root.classList.remove('hide');}
 function hide(){stop();if(root)root.classList.add('hide');}

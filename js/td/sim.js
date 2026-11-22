@@ -13,9 +13,9 @@ function mkPath(pts){const seg=[];let L=0;for(let i=0;i<pts.length-1;i++){const[
 function at(P,s){s=Math.max(0,Math.min(P.L,s));for(const g of P.seg)if(s<=g.s0+g.l||g===P.seg[P.seg.length-1]){const k=g.l?(s-g.s0)/g.l:0;return{x:g.a+(g.c-g.a)*k,y:g.b+(g.d-g.b)*k,dir:Math.sign(g.c-g.a)};}return{x:0,y:0,dir:1};}
 /* ---------- 作る ---------- */
 function findS(P,x){let b=0,bd=1e9;for(let s=0;s<=P.L;s+=2){const d=Math.abs(at(P,s).x-x);if(d<bd){bd=d;b=s;}}return b;}
-function create(stageId,deck,o={}){const S=D.STAGE[stageId];if(!S)throw new Error('TD: ステージが無い '+stageId);
+function create(stageId,deck,o={}){let S=D.STAGE[stageId];if(!S)throw new Error('TD: ステージが無い '+stageId);if(S.inf)S=Object.assign({},S,{waves:[]});
  const Ps=S.paths.map(mkPath),P=Ps[0],lvOf=o.lv||{},st={S,P,Ps,t:0,R:rng(o.seed||1),cost:S.cost0??K.COST0,costAcc:0,lives:K.LIVES,star:0,r0:S.light.r,lightR:S.light.r,
-  lamp:0,lampT:1,wave:-1,phase:'gap',gapT:o.prep??10,spawnQ:[],foes:[],units:[],fields:[],ev:[],uid:1,over:null,kills:0,leaks:0,timeSlow:0,cap:S.cap||6};
+  lamp:0,lampT:1,wave:-1,phase:'gap',gapT:o.prep??10,spawnQ:[],foes:[],units:[],fields:[],ev:[],uid:1,over:null,kills:0,leaks:0,timeSlow:0,cap:S.cap||6,infK:1,infA:1};
  st.pads=S.pads.map(p=>{const q=Object.assign({},p);if(p.k==='f'){q.lane=p.lane||0;const L=Ps[q.lane];q.s=p.s??findS(L,p.x);const a=at(L,q.s);q.x=a.x;q.y=a.y;}q.unit=null;q.lit=false;return q;});
  st.deck=(deck||D.deckOf()).map(id=>({id,h:D.hero(id,lvOf[id]||1,o.real&&o.real[id]),cd:0,on:null,ult:false})).filter(c=>c.h);
  /* 後ろの台座が道をどれだけ見ているか（自動の配置が使う） */
@@ -32,11 +32,17 @@ const ev=(st,e)=>{e.at=st.t;st.ev.push(e);};
 function lightUpdate(st){const[bx,by]=st.S.base;for(const p of st.pads)p.lit=dist(p.x,p.y,bx,by)<=st.lightR;
  for(let pass=0;pass<4;pass++){let ch=false;for(const u of st.units){if(!u.h.lt||!u.pad.lit)continue;for(const p of st.pads)if(!p.lit&&dist(p.x,p.y,u.x,u.y)<=u.h.lt){p.lit=true;ch=true;}}if(!ch)break;}
  for(const u of st.units)u.lit=u.pad.lit;}
+/* ---------- 天への塔の無限 WAVE（ステージの inf:1・pool＝雑魚の顔ぶれ・bosses＝5 WAVE ごとのボス） ----------
+ n（0 から）の WAVE：雑魚 2〜3 群（数は 8＋n、間隔は詰まっていく）、5 WAVE ごとにボス（bosses を順に）。強さは HP ×1.1^n・攻撃 ×1.035^n（st.infK・infA） */
+function infWave(st,n){const S=st.S,R=st.R,pick=a=>a[Math.floor(R()*a.length)],L=st.Ps.length,e=[];
+ st.infK=+Math.pow(1.1,n).toFixed(3);st.infA=+Math.pow(1.035,n).toFixed(3);
+ const g=n<3?2:3,cnt=Math.min(16,7+n),gap=Math.max(.45,1.05-n*.025);for(let i=0;i<g;i++)e.push([1+i*4,pick(S.pool),cnt,gap,(n+i)%L]);
+ if(n%5===4)e.push([2,S.bosses[Math.floor(n/5)%S.bosses.length],1,1,(n>>1)%L]);return{e};}
 /* ---------- WAVE ---------- */
-function startWave(st){st.wave++;st.phase='wave';const W=st.S.waves[st.wave];W.e.forEach(([t0,kind,n,gap,lane],j)=>{for(let i=0;i<n;i++)st.spawnQ.push({t:st.t+t0+i*gap,kind,lane:lane??((i+j)%st.Ps.length)});});
+function startWave(st){st.wave++;st.phase='wave';if(st.S.inf&&!st.S.waves[st.wave])st.S.waves.push(infWave(st,st.wave));const W=st.S.waves[st.wave];W.e.forEach(([t0,kind,n,gap,lane],j)=>{for(let i=0;i<n;i++)st.spawnQ.push({t:st.t+t0+i*gap,kind,lane:lane??((i+j)%st.Ps.length)});});
  st.spawnQ.sort((a,b)=>a.t-b.t);ev(st,{k:'wave',n:st.wave+1,of:st.S.waves.length,boss:W.e.some(e=>{const f=D.foe(e[1],1);return f&&f.boss;})});}
 function callWave(st){if(st.phase!=='gap'||st.over)return false;const b=Math.ceil(st.gapT);if(st.wave>=0)st.cost+=b;ev(st,{k:'call',bonus:st.wave>=0?b:0});startWave(st);return true;}
-function spawn(st,kind,s=0,lane=0){const f=D.foe(kind,st.S.lv);if(!f)return null;f.hp=Math.round(f.hp*(f.boss?(st.S.bk||1):(st.S.hk||1)));const P=st.Ps[lane]||st.P,a=at(P,s);
+function spawn(st,kind,s=0,lane=0){const f=D.foe(kind,st.S.lv);if(!f)return null;f.hp=Math.round(f.hp*(f.boss?(st.S.bk||1):(st.S.hk||1))*st.infK);if(st.infA!==1)f.atk=Math.round(f.atk*st.infA);const P=st.Ps[lane]||st.P,a=at(P,s);
  const u=Object.assign(f,{uid:st.uid++,lane,P,mhp:f.hp,s,x:a.x,y:a.y,dir:a.dir,by:null,atkT:f.iv,stun:0,slow:0,curse:0,aiT:f.ai?f.ai.every:0,hitT:-9});if(u.boss&&st.S.gim)u.gim={k:st.S.gim.k,every:st.S.gim.every||10,t:(st.S.gim.every||10)*.6,ch:0};st.foes.push(u);ev(st,{k:'spawn',f:u});return u;}
 /* ---------- ダメージ：攻撃 × 倍率 × 攻撃/(攻撃+防御) × 属性 × 会心 ---------- */
 function hit(st,u,f,m=1,o={}){if(f.hp<=0)return 0;const A=u.h.atk*(u.lit?1:K.DARK);let df=u.h.dmgK==='mag'?f.res:f.def;if(f.curse>0)df*=.6;
@@ -104,7 +110,7 @@ function tick(st){if(st.over)return;const dt=K.STEP;st.t+=dt;
  /* WAVE の進み */
  if(st.phase==='gap'){st.gapT-=dt;if(st.gapT<=0)startWave(st);}
  while(st.spawnQ.length&&st.spawnQ[0].t<=st.t){const q=st.spawnQ.shift();spawn(st,q.kind,0,q.lane);}
- if(st.phase==='wave'&&!st.spawnQ.length&&!st.foes.some(f=>f.hp>0)){if(st.wave>=st.S.waves.length-1){end(st,true);return;}st.phase='gap';st.gapT=K.GAP;ev(st,{k:'clear',n:st.wave+1});}
+ if(st.phase==='wave'&&!st.spawnQ.length&&!st.foes.some(f=>f.hp>0)){if(!st.S.inf&&st.wave>=st.S.waves.length-1){end(st,true);return;}st.phase='gap';st.gapT=K.GAP;ev(st,{k:'clear',n:st.wave+1});}
  /* 場の効果 */
  if(st.timeSlow>0)st.timeSlow-=dt;st.fields=st.fields.filter(z=>(z.t-=dt)>0);
  /* 虚蝕：灯の光を削る */
@@ -133,7 +139,7 @@ function tick(st){if(st.over)return;const dt=K.STEP;st.t+=dt;
    if(u.h.splash){ev(st,{k:'area',u,x:t.x,y:t.y,r:u.h.splash,small:1});for(const f of st.foes.slice())if(f.hp>0&&dist(t.x,t.y,f.x,f.y)<=u.h.splash)hit(st,u,f,f===t?1:.6);}
    else hit(st,u,t,1);}else u.atkT=.15;}}
 }
-function end(st,win){st.over={win,lives:st.lives,t:Math.round(st.t),stars:win?[1,st.lives>=K.LIVES?1:0,st.t<=(st.S.star.time||999)?1:0]:[0,0,0]};ev(st,{k:'end',win});}
+function end(st,win){st.over={win,lives:st.lives,t:Math.round(st.t),wave:st.S.inf?Math.max(0,st.wave):st.wave+1,stars:win?[1,st.lives>=K.LIVES?1:0,st.t<=(st.S.star.time||999)?1:0]:[0,0,0]};ev(st,{k:'end',win});}
 /* ---------- 自動の配置（計測と、将来の AUTO 用） ---------- */
 function bot(st){if(st.over)return;if(st.phase==='gap'&&st.wave<0&&st.t>2)callWave(st);
  const has=f=>st.units.some(f),ord=st.deck.slice().sort((a,b)=>pr(a)-pr(b));
@@ -148,5 +154,5 @@ function bot(st){if(st.over)return;if(st.phase==='gap'&&st.wave<0&&st.t>2)callWa
  if(st.star>=K.STAR_MAX&&(st.foes.length>=4||st.foes.some(f=>f.boss))){const u=st.units.find(u=>{const c=st.deck.find(c=>c.on===u);return c&&!c.ult;});if(u)ult(st,u.uid);}}
 function run(stageId,deck,lv,seed=1,maxT=900){const st=create(stageId,deck,{lv,seed,prep:3});let n=0;while(!st.over&&st.t<maxT){if(n++%15===0)bot(st);tick(st);st.ev.length=0;}
  return st.over||{win:false,lives:st.lives,t:Math.round(st.t),stars:[0,0,0],timeout:1};}
-return{lampUp,lampCost,create,tick,deploy,retreat,ult,canUlt,canDeploy,callWave,bot,run,at,lightUpdate};})();
+return{infWave,lampUp,lampCost,create,tick,deploy,retreat,ult,canUlt,canDeploy,callWave,bot,run,at,lightUpdate};})();
 if(typeof module!=='undefined')module.exports=TDS;

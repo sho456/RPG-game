@@ -62,13 +62,19 @@ function foe(kind,lv=1){const e=ED[kind];if(!e)return null;const hk=1+.05*(Math.
 
 /* ---------- ステージ（中身は js/td/stages.js） ---------- */
 const STAGE={},CH=[],ORDER=[];
-/* 報酬：本編の経験値・ゴールドの表（ED.xp・gold）を、そのステージに出る敵の数で合計（初回は経験値 ×1.5・ゴールド ×2） */
-function reward(id,stars,first){const S=STAGE[id];let xp=0,g=0;for(const w of S.waves)for(const[,k,n]of w.e){const e=ED[k];if(!e)continue;xp+=(e.xp||10)*n;g+=(e.gold||5)*n;}
- const k=.6+.2*stars;return{xp:Math.round(xp*k*(first?1.5:1)),gold:Math.round(g*.5*k*(first?2:1))};}
+/* 報酬：本編の経験値・ゴールドの表（ED.xp・gold）を、そのステージに出る敵の数で合計。初回は経験値 ×1.5・ゴールド ×2、
+ クリア済みの周回は ×0.5（少なめ）。星 3 を初めて取ったとき（prev＝前の星の数が 3 未満）：錬磨石（ボスのステージ 5・ほか 3）とゴールド +50%。
+ 天への塔（S.inf）は到達 WAVE（stars に渡す）で：経験値・ゴールドは WAVE の 2 乗で増え、5 WAVE ごとに錬磨石 1 */
+const STONE='renma';
+function reward(id,stars,first,prev){const S=STAGE[id];
+ if(S.inf){const w=Math.max(0,stars|0);return{xp:Math.round(60*w+12*w*w),gold:Math.round(20*w+5*w*w),stone:Math.floor(w/5),s3:false,rep:false};}
+ let xp=0,g=0;for(const w of S.waves)for(const[,k,n]of w.e){const e=ED[k];if(!e)continue;xp+=(e.xp||10)*n;g+=(e.gold||5)*n;}
+ const k=.6+.2*stars,rep=!first,s3=stars>=3&&(prev||0)<3,rk=rep?.5:1;
+ return{xp:Math.round(xp*k*(first?1.5:rk)),gold:Math.round(g*.5*k*(first?2:rk)*(s3?1.5:1)),stone:s3?(S.boss?5:3):0,s3,rep};}
 /* 既定の手札（8 枚）：仲間の加入順から */
 function deckOf(){const L=(typeof G!=='undefined'&&G&&G.members?G.members:Object.keys(HERO)).filter(id=>HERO[id]);
  const saved=typeof G!=='undefined'&&G&&G.td&&G.td.deck;if(saved){const d=saved.filter(id=>L.includes(id));if(d.length)return d.slice(0,8);}
  const pri=['rio','gald','mire','celes','noah','erna','shion','hakua','balza','crow','jin','valk'];
  return pri.filter(id=>L.includes(id)).slice(0,8);}
-return{K,ROLE,HERO,ULT,TRAIT,TRN,hero,real,foe,STAGE,CH,ORDER,deckOf,skName,reward};})();
+return{K,ROLE,HERO,ULT,TRAIT,TRN,hero,real,foe,STAGE,CH,ORDER,deckOf,skName,reward,STONE};})();
 if(typeof module!=='undefined')module.exports=TDD;

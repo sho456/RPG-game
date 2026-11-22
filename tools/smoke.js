@@ -89,6 +89,10 @@ if (SHOTS) fs.mkdirSync(SHOTS, {recursive: true});
         const r = TDS.run(id, deck, L, 7919);out.push([id, !!r.win, r.t | 0, null]);}
       catch (e) {out.push([id, false, 0, String(e.message).slice(0, 160)]);}
     }
+    /* 天への塔（無限 WAVE）：負けるまで。到達 WAVE を勝ちの欄の代わりに見る */
+    if (TDD.INF) try {const deck = TDD.rosterAt(TDD.ORDER[TDD.ORDER.length - 1]).slice(0, 8), L = {};deck.forEach(h => L[h] = 50);
+      const r = TDS.run(TDD.INF, deck, L, 7919, 3000);out.push([TDD.INF, (r.wave | 0) > 3, r.t | 0, r.wave == null ? '塔が終わらない' : null]);}
+    catch (e) {out.push([TDD.INF, false, 0, String(e.message).slice(0, 160)]);}
     return out;
   });
   for (const [id, , , err] of runs) if (err) errs.push(['td-run:' + id, err]);
