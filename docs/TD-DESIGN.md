@@ -135,17 +135,17 @@ S('td1_3',{q:'q1_4', name, lv, th:'forest', hk, bk, star:{time}, pre:会話, joi
 
 P0 設計 → P1 試作 → P2 序盤 3 章 13 ステージ・章の地図・出撃準備・加入（ver0.51） → **P3 ホームと仲間画面の刷新・育成の反映・セーブ移行・文字を減らす（ver0.52）** → P4 残りの 3 章・ボスの仕掛け・**旧戦闘の削除（ver0.53 済み）** → P5 仕上げ。
 
-## 10. 現在地と次の作業（2026-11-20・ver0.53）
+## 10. 現在地と次の作業（2026-11-22・ver0.54）
 
 完了：P0 設計・P1 試作・P2 横スクロールと序盤 3 章・P3 ホームと仲間画面と育成の反映・P4 全 6 章 28 ステージとボスの仕掛けと旧コマンド戦闘の削除（JS 約 1.56MB→1.0MB、script 112→91 本）。smoke エラー 0。
 引き継ぎページ：https://claude.ai/artifact/UEG6zszE5FohwKx6NVDMqf
 
 P5（優先順）：
-1. 施設の画面の刷新（鍛冶・強化・持ち物・図鑑・鑑定・星盤）。`js/ui/growth.js` のタイル（CSS で隠しているだけ）と `QS` 参照を外す → `js/v31/quests.js` の旧クエストも削除できる
-2. 旧コードの残りの整理（旧 townMenu の積み重ね town/ver17/ver18-town/v20-ui/v21/v22・`engine.js`・`rs/core.js` の残り・`ver19.js`（図鑑のサムネ）・`v20-battle.js`（パッシブ説明）の一部）
-3. 敵の歩きのコマ（PixelLab `animate_character`。ボスから）— コードの動き（`TDFX.pose`：揺れ・傾き・影・型ごと・被弾ののけぞり・撃破の市松の崩れ）は済み。原画のコマは未
-4. 効果音・BGM（スキル rs-battle-fx の効果音のレシピ、PixelLab `create_sound_effect`）— 合成の効果音と章ごとの BGM は済み（`js/td/sfx.js`）
-5. 技ごとの演出（`assets_src/pixel-art/td-demo` の style1/style2 を TD 本編へ。止めない・短い・読める）— 働きごとの型＋9 人の固有・星臨は済み（`js/td/fx.js`）
+1. ~~施設の画面の刷新~~（済・ver0.54）：鍛冶・持ち物・鑑定 `js/ui/inv.js`（FAC）＋`smith.js`、強化 `growth.js`、図鑑の一覧 `js/ui/zukan.js`、星盤の見出しとボタン。旧クエスト `js/v31/quests.js` を削除（互換の `qCleared` は quest-data.js）。図鑑の詳細画面は未。元の文：施設の画面の刷新（鍛冶・強化・持ち物・図鑑・鑑定・星盤）。`js/ui/growth.js` のタイル（CSS で隠しているだけ）と `QS` 参照を外す → `js/v31/quests.js` の旧クエストも削除できる
+2. 旧コードの残りの整理（一部済：dot-heroes.js・town.js の旧持ち物/鑑定/OP/ソケット。道具 `smoke.js --cov`・`tools/deadcode.py`・`tools/prune.py`。残り：dot-mon/dot-rig/ver19-art の絵の連鎖・v20-battle の状態効果・v22 の旧 HUD・ver16 の旧描画・ver19 の drawBattle）。元の文：旧コードの残りの整理（旧 townMenu の積み重ね town/ver17/ver18-town/v20-ui/v21/v22・`engine.js`・`rs/core.js` の残り・`ver19.js`（図鑑のサムネ）・`v20-battle.js`（パッシブ説明）の一部）
+3. ~~敵の歩き（コード）~~（済）／原画のコマは未：敵の歩きのコマ（PixelLab `animate_character`。ボスから）— コードの動き（`TDFX.pose`：揺れ・傾き・影・型ごと・被弾ののけぞり・撃破の市松の崩れ）は済み。原画のコマは未
+4. ~~効果音・BGM~~（済）：効果音・BGM（スキル rs-battle-fx の効果音のレシピ、PixelLab `create_sound_effect`）— 合成の効果音と章ごとの BGM は済み（`js/td/sfx.js`）
+5. ~~技ごとの演出~~（済）：技ごとの演出（`assets_src/pixel-art/td-demo` の style1/style2 を TD 本編へ。止めない・短い・読める）— 働きごとの型＋9 人の固有・星臨は済み（`js/td/fx.js`）
 6. ~~難易度の仕上げ~~（済・2026-11-22）：推奨 Lv の灯火を全 28 ステージで 4.1〜6.2 に（自動の配置・40 戦）。序章は推奨 Lv を 灰狼の頭目 4→3・虚ろの番人 5→4 に下げ、Lv1〜2 で勝てる（灰狼の遠吠え Lv1 28%→100%・頭目 Lv2 40%→95%・番人 Lv2 78%→98%）。
    直したもの：禁書の守護像 3.9→5.0・雷の高原 3.9→5.0・氷華の妖狐 3.1→4.8・天狐の残照 3.4→5.5・星核の守護者 3.6→4.8・星核の扉 2.4→4.6（溜め撃ち 9→12 秒・WAVE1 の重装 10→8 体）。残り：推奨 −3 の勝率が 100% のステージが多い（自動の配置が下手なぶん、人には易しすぎない目安だが、もう少し差をつけてもよい）
 7. ~~字を使わない導き~~（済）：`js/td/guide.js`

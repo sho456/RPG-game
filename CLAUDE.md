@@ -34,19 +34,22 @@
 | 技・術の練達（3 段階・錬磨石。旧 技Lv） | `js/rs/mastery.js`（`RSM`：データ・強化。仲間画面が使う） | `css/ui/skill.css`（`.ms47`） |
 | 用語の緑のハイライト＋タップで説明 | `js/ui/keywords.js`（`KW.mark`） | `css/ui/keywords.css` |
 | 旧画面の入口（強化メニューのタイルなどが呼ぶ `partyScreen` `openSheet` `board` `bondMenu` `trialMenu` を仲間画面へ向けるだけ） | `js/ui/party.js` | — |
-| 鍛冶屋（品揃え・強化・OP付替・ソケット） | `js/ui/smith.js`（`smith`・`enhance` を置き換え。OP・ソケットの後半は `town.js opSwap / sockMenu`） | `css/ui/smith.css` |
+| 鍛冶屋（品揃え・強化・OP付替・ソケット） | `js/ui/smith.js`（`smith`・`enhance`・OP付替・ソケットまで。枠は `FAC`） | `css/ui/smith.css` |
+| 持ち物・鑑定（施設の共通の枠 `FAC`） | `js/ui/inv.js`（`FAC`・`INV`=`invMenu`・`APR`=`appraise`） | `css/ui/inv.css` |
+| 図鑑の一覧 | `js/ui/zukan.js`（`ZKUI`。データと詳細は `js/zukan/zukan.js`） | `css/ui/zukan.css` |
 | タイトル（タップで開始） | `js/v38/menu.js`（`titleTap`） | `css/ui/font.css` |
 | 戦闘の数値データ（武器種・技・LP など。TD が武器種を読む） | `js/rs/data.js`（`RSD`）・`js/rs/core.js`（`RSC`：能力値・習得・セーブ）。ターン制の進行 `js/rs/battle.js` は ver0.53 で削除 | — |
 | 文字のフォント（全画面で統一） | 本文＝M PLUS 1p、コマンド（ボタン・技名・名前・見出し・タブ）＝Kaisei Tokumin（`css/ui/font.css` の `--cmd`）。キャンバスの数字・英字は各画面のコード | `css/ui/font.css` |
 | 用語・耐性 | `js/data/terms.js`（`TERMS`） | — |
 | 強化メニュー（経験値のストック・レベルアップ・旧酒場の統合） | `js/ui/growth.js`（`GROW`） | `css/ui/growth.css` |
 | 版表示・お知らせ | `js/v38/menu.js`（`VER` `NEWS`） | — |
-| **タワーディフェンス「灯守の防衛線」**（移行先の戦闘。入口＝ホーム右の縦メニュー「防衛」・`index.html#td`） | データ `js/td/data.js`（`TDD`）・章とステージ `js/td/stages.js`・ロジック `js/td/sim.js`（`TDS`。DOM なしの固定刻み・自動の配置 `bot`）・背景 `js/td/bg.js`（`TDBG`）・戦闘画面（横スクロール）`js/td/view.js`（`TD`）・章の地図/出撃準備/会話/加入 `js/td/menu.js`（`TDM`）。設計 `docs/TD-DESIGN.md` | `css/ui/td.css` |
+| **タワーディフェンス「灯守の防衛線」**（移行先の戦闘。入口＝ホーム右の縦メニュー「防衛」・`index.html#td`） | データ `js/td/data.js`（`TDD`）・章とステージ `js/td/stages.js`・ロジック `js/td/sim.js`（`TDS`。DOM なしの固定刻み・自動の配置 `bot`）・背景 `js/td/bg.js`（`TDBG`）・戦闘画面（横スクロール）`js/td/view.js`（`TD`）・演出と敵の歩き `js/td/fx.js`（`TDFX`）・効果音と BGM `js/td/sfx.js`（`TDSFX`）・字を使わない導き `js/td/guide.js`（`GUIDE`）・章の地図/出撃準備/会話/加入 `js/td/menu.js`（`TDM`）。設計 `docs/TD-DESIGN.md` | `css/ui/td.css` |
 | **ホーム**（ver0.52。TD の「防衛」が主役・下のタブ 4 つ・≡ のシート） | `js/ui/home.js`（`HOME`。v22 の townMenu の重ね表示 .h22 を置き換え。背景の街の絵は v22 drawHome のまま） | `css/ui/home.css` |
 | **仲間**（ver0.52。一覧＋1 人の詳細で Lv・技の練達・装備・星盤をまとめる。TD の能力を表示） | `js/ui/unit.js`（`UNIT.open(id, 戻り先)`）。TD の能力は `TDD.hero(id, lv, TDD.real(id))`（装備の比・練達・星臨の位階を反映） | `css/ui/unit.css` |
 | デザイントークン（新しい画面はこれ以外の色・角・影を使わない） | — | `css/ui/tokens.css` |
 
-**引き継ぎ（2026-11-20・ver0.53）**：TD 移行の P0〜P4 完了（6 章 28 ステージ・ホーム・仲間画面・旧コマンド戦闘の削除）。次は P5（施設の画面の刷新・旧コードの残りの整理・敵の歩きのコマ・効果音・技の演出・難易度の仕上げ・字を使わない導き）。
+**引き継ぎ（2026-11-22・ver0.54）**：P5 のうち 施設の画面の刷新・効果音と BGM・技の演出・敵の歩き（コード）・難易度の仕上げ・字を使わない導き・やり込み（天への塔・周回・星 3 の報酬）が完了。残りは 旧コードの残りの整理（絵の古い連鎖 dot-mon/dot-rig/ver19-art・v20-battle・v22 の旧 HUD など）と、敵の歩きの原画のコマ・図鑑の詳細画面の刷新。
+旧コードの整理の道具：`node tools/smoke.js --cov cov.json`（一度も呼ばれなかった関数）→ `python3 tools/deadcode.py cov.json`（ファイルごとの候補）・`python3 tools/prune.py cov.json [--apply]`（名前でも参照されない宣言を消す）。smoke が通らない画面の関数も 0 回になるので、消す前に画面で確かめる。
 現在地と次の作業の一覧は `docs/TD-DESIGN.md` の「10. 現在地と次の作業」と、引き継ぎページ https://claude.ai/artifact/UEG6zszE5FohwKx6NVDMqf （Artifact の read で読める）。
 
 **方針（2026-11）：コマンドRPG → タワーディフェンスへ移行済み**（縦画面・横スクロールの戦場・灯域・本編 8 章を 6 章に）。旧コマンド戦闘（`startBattle` 系・`js/rs/battle.js`・`js/battle/*` など）は ver0.53 で削除した。戦闘の作業は `js/td/` と `docs/TD-DESIGN.md` に。古い版ファイル（ver16〜v38）には、ホーム・図鑑・持ち物・鑑定・鍛冶・星盤・セーブが使う部分だけが残っている（旧画面の入口は `js/ui/party.js` で仲間画面へ）。

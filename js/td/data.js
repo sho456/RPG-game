@@ -29,6 +29,8 @@ const HERO={
 /* 星臨（戦闘中 1 回）：既定は大きな範囲攻撃。ノア＝全員の回復と灯火 +1、セレス＝刻を止める（全体を遅く） */
 const ULT={noah:{k:'uheal'},celes:{k:'utime',m:4,dur:8}};
 /* 敵の型：キー → 特性。void＝虚蝕を撒く（生きている間、灯の光を毎秒削る）、fly＝止められない、armor＝物理に強い、ghost＝術に強い */
+/* 原画（SPX）の無い敵は、似た型の敵の絵を借りる */
+const SPRALT={bookghost:'shade'};
 const TRAIT={slime:['void'],moss:['void'],cursedslime:['void'],bookghost:['ghost'],shade:['ghost'],darkknight:['armor'],m_knight:['armor'],boss2:['armor']};
 const TRN={void:'虚蝕を撒く（光を削る）',ghost:'霊体（物理が効きにくく、術がよく効く）',armor:'重装（物理に強い。打で割れる）',fly:'飛行'};
 
@@ -56,7 +58,7 @@ function real(id){const o={gear:null,mas:0,aw:1};try{const h=G.h[id];if(!h)retur
 /* 敵：ED（RPG 版）とステージの Lv から。移動 = 14 + 素早さ × 2.4 px/秒 */
 function foe(kind,lv=1){const e=ED[kind];if(!e)return null;const hk=1+.05*(Math.max(1,lv)-1),ak=1+.04*(Math.max(1,lv)-1);
  const boss=!!e.boss||kind==='ernaE'||kind==='valkE',bh=boss?1:hk,ba=boss?1:ak,tr=(TRAIT[kind]||[]).slice();
- return{kind,name:e.name,spr:e.spr||kind,boss,rank:e.rank||(boss?'big':''),hp:Math.round(e.mhp*2.3*bh*(boss?1.6:1)),atk:Math.round((e.atk||30)*(boss?.9:1.15)*ba),
+ return{kind,name:e.name,spr:e.spr||SPRALT[kind]||kind,boss,rank:e.rank||(boss?'big':''),hp:Math.round(e.mhp*2.3*bh*(boss?1.6:1)),atk:Math.round((e.atk||30)*(boss?.9:1.15)*ba),
   def:e.def||0,res:e.res||0,spd:+(14+(e.spd||8)*2.4).toFixed(1)*(boss?.7:1),weak:(e.weak||[]).slice(0,2),resist:(e.resist||[]).slice(0,1),
   iv:boss?1:1.2,leak:boss?3:1,cost:boss?10:1,star:boss?5:1,tr,ai:boss&&e.ai?{every:Math.max(6,(e.ai.every||4)*3),summon:e.ai.summon||null,n:2}:null};}
 

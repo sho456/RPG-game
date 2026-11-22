@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.53';
+const VER='ver0.54';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,14 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　防衛の全 6 章・旧コマンド戦闘を削除<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　音・技の演出・天への塔<br><small>`+
+ `・防衛に効果音と章ごとの BGM（上の帯のスピーカーで消せる）<br>`+
+ `・仲間の技に一人ずつの演出、星臨は暗転と溜めつき。敵が歩き、倒れると崩れて消える<br>`+
+ `・天への塔：全章クリア後、地図の ∞ から。負けるまで続く WAVE と最高記録<br>`+
+ `・初めて星 3 を取ると錬磨石。クリア済みのステージは周回できる（報酬は半分）<br>`+
+ `・最初の 2 面は指と光の輪で遊び方を案内。序章と一部のボスの難しさを調整<br>`+
+ `・強化・鍛冶・持ち物・鑑定・図鑑・星盤の画面を作り直した</small></div>`+
+ `<div class="nt n38"><b>ver0.53</b>　防衛の全 6 章・旧コマンド戦闘を削除<br><small>`+
  `・第3章〜終章の 15 ステージを追加（全 28）。エルナ・バルザ・クロウ・ハクア・セレス・ヴァルクが仲間に。最後にエンディング<br>`+
  `・ボスの仕掛け：溜め（灯の光の中で灯を撃つ。止めるか気絶で防ぐ）・道替え・光を呑む<br>`+
  `・戦いは防衛（タワーディフェンス）に一本化。ホームの「冒険」と旧戦闘の画面・演出を外した<br>`+
