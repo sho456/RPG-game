@@ -2,7 +2,7 @@
 /* 主要画面のスクリーンショット（UI 改修の確認用。少ないトークンで画面を見るための道具）
    使い方：python3 -m http.server 8765 &  →  node tools/ui_shots.js <出力dir> [画面名...]（別のポートなら URL=http://localhost:ポート/index.html）
    画面名：home home-sheet td-map td-prep td-battle unit unit-detail unit-sheet board board-sel board-up board-up-lock
-           equip-info smith growth inv zukan
+           equip-info smith smith-op smith-sock growth inv appraise zukan
    ver0.53：旧コマンド戦闘の画面（battle-*・party・form・detail 系）は削除した。 */
 'use strict';
 const {chromium} = require('playwright');
@@ -46,6 +46,9 @@ const want = n => !only.length || only.includes(n);
   await shot('smith', () => smith());
   await shot('growth', () => tavern());
   await shot('inv', () => invMenu());
+  await shot('appraise', () => appraise());
+  await shot('smith-op', () => {G.fac.smith = 3;smith();document.querySelector('#fac [data-v="op"]').click();document.querySelector('#fac .fc-t').click();document.querySelector('#fac [data-a="do"]').click();});
+  await shot('smith-sock', () => {G.fac.smith = 3;smith();document.querySelector('#fac [data-v="sock"]').click();document.querySelector('#fac .fc-t').click();document.querySelector('#fac [data-a="do"]').click();});
   await shot('zukan', () => zkMenu());
   await b.close();
   if (errs.length) console.log('errors:\n' + errs.join('\n'));

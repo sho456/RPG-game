@@ -112,7 +112,6 @@ const SILC=new WeakMap();function silOf(src){let c=SILC.get(src);if(c)return c;c
 
 /* ==================== 街メニューへの組み込み ==================== */
 
-{const _inv=invMenu;invMenu=function(m){_inv(m);const b=$('#cmd').querySelector('[data-a="auto"]'),f=G.set.flt;if(b){b.className='tbtn'+(f.rar>=0?' gold':'');b.innerHTML=`拾う前フィルター<small>${f.rar>=0?FLN[f.rar+1]+'を'+(f.mode==='dism'?'分解':'売却'):'OFF'}</small>`;}ACT.auto=()=>cfgOpen(()=>invMenu());ACT.back=()=>partyScreen();};}
 
 /* ==================== 拾う前フィルター拡張 ==================== */
 /* 等級（コモン／アンコモン以下／レア以下）・処理（売却／分解）・「今より強い装備は残す」を選べる。未鑑定・レジェンド・セット装備は必ず残す */
