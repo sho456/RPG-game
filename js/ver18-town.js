@@ -159,7 +159,6 @@ const backBtn=(l='◀ 灯都へ戻る')=>`<button class="tbtn back wide" data-a=
 
 /* 鍛冶屋・鑑定屋：店内を見せる */
 
-{const _ap=appraise;appraise=function(m){_ap(m);roomOpen('eye','鑑定屋',`鑑定屋Lv${G.fac.eye}`);RSHOW=0;};}
 {const _et=enterTown;enterTown=function(m){TSC='home';_et(m);};}
 addEventListener('resize',()=>{if(scene==='town'&&TSC==='home'&&G&&homeH()!==H)townMenu();});
 /* タイトル */

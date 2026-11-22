@@ -46,28 +46,11 @@ function icard(it,o={}){const w=eqBy(it.uid),c=RAR[it.rar];
 
 /* 未使用：js/ver17.js が置き換え */
 
-let INVF='all';const INVT={all:['全部',()=>1],w:['武器',i=>i.slot==='w'],arm:['防具',i=>'sub head body'.includes(i.slot)],acc:['装飾',i=>i.slot==='acc'],un:['未鑑定',i=>i.unid]};
-function invMenu(m){const list=G.inv.filter(INVT[INVF][1]).sort((a,b)=>b.rar-a.rar||b.ilv-a.ilv),junk=G.inv.filter(i=>i.rar<=1&&!i.lock&&!i.unid&&!eqBy(i.uid));
- log((m||'<b>持ち物</b>　アイコンをタップで詳細')+goldTxt()+`<br><small>${G.inv.length}/200個</small>`);
- panel(`<div class="ftabs">${Object.entries(INVT).map(([k,[n]])=>`<button class="${INVF===k?'on':''}" data-a="tab" data-v="${k}">${n}</button>`).join('')}</div>
- <div class="igrid">${list.map(it=>{const w=eqBy(it.uid);return`<div class="itile r${it.rar}" data-a="item" data-v="${it.uid}"><img src="${itemIcon(it)}"><u class="eqi-b" data-eqi="${it.uid}">ⓘ</u>${it.plus?`<b class="pl">+${it.plus}</b>`:''}${w?`<b class="eb">E</b>`:''}${it.lock?'<b class="lk">🔒</b>':''}${it.unid?'<b class="un">?</b>':''}</div>`;}).join('')||'<div class="emp">なし</div>'}</div>
- <div class="tbar2"><button class="tbtn" data-a="junk" ${junk.length?'':'disabled'}>一括売却 <small>${junk.length}</small></button><button class="tbtn ${G.set.autoSell?'gold':''}" data-a="auto">自動売却 ${G.set.autoSell?'ON':'OFF'}</button></div>
- <button class="tbtn back wide" data-a="back">戻る</button>`,
- {tab:k=>{INVF=k;invMenu();},item:u=>itemMenu2(findItem(+u)),junk:()=>{const g=junk.reduce((a,i)=>a+price(i),0);G.inv=G.inv.filter(i=>!junk.includes(i));G.gold+=g;SFX.heal();save();invMenu(`コモン・アンコモン${junk.length}個を売却して${g}G`);},
-  auto:()=>{G.set.autoSell=!G.set.autoSell;save();invMenu();},back:()=>equipMenu(G.party[0])});}
-function itemMenu2(it){const w=eqBy(it.uid),dm=DISM[it.rar];log(`${ihtml(it)}`+goldTxt());
- const gone=m=>{G.inv=G.inv.filter(i=>i!==it);save();invMenu(m);};
- panel(icard(it,{})+`<div class="tbar3"><button class="tbtn" data-a="lock">${it.lock?'ロック解除':'ロック'}</button><button class="tbtn" data-a="sell" ${it.lock||w?'disabled':''}>売却<small>${price(it)}G</small></button>
- <button class="tbtn" data-a="dism" ${it.lock||w||it.unid?'disabled':''}>分解<small>${Object.entries(dm).map(([k,n])=>MATS[k].n+n).join(' ')}</small></button></div><button class="tbtn back wide" data-a="back">戻る</button>`,
- {lock:()=>{it.lock=!it.lock;save();itemMenu2(it);},sell:()=>{G.gold+=price(it);SFX.heal();gone(`${iname(it)}を売却した`);},dism:()=>{for(const[k,n]of Object.entries(dm))G.mats[k]+=n;SFX.brk();gone(`${iname(it)}を分解した`);},back:()=>invMenu()});}
+function invMenu(){}/* 未使用：js/ui/inv.js が置き換え */
 
 function smith(){}
 function enhance(){}/* 未使用：js/ui/smith.js が置き換え */
-function appraise(m){const un=G.inv.filter(i=>i.unid),cost=it=>Math.round((30+it.ilv*10)*(1-.1*(G.fac.eye-1))),tot=un.reduce((a,i)=>a+cost(i),0);
- log((m||'<b>鑑定屋</b>　エピック以上は鑑定するまで性能がわからない')+goldTxt());
- panel((un.length?`<div class="ttl2">未鑑定 ${un.length}個</div>`+un.map(it=>icard(it,{right:`<span class="pr">${cost(it)}G</span>`})).join(''):'<div class="emp">未鑑定品はない</div>')+
- `<div class="tbar2"><button class="tbtn gold" data-a="all" ${!un.length||G.gold<tot?'disabled':''}>一括鑑定 <small>${tot}G</small></button><button class="tbtn back" data-a="back">戻る</button></div>`,
- {all:()=>{G.gold-=tot;un.forEach(i=>{i.unid=false;i.up=0;if(Math.random()<(G.fac.eye-1)*.05&&upgradeRar(i))i.up=1;});SFX.aw();save();log('<b>鑑定結果</b>'+goldTxt());panel('<div class="ttl2">鑑定結果</div>'+un.map(it=>icard(it,{right:it.up?'<span class="pr">★レジェンド化！</span>':''})).join('')+'<button class="tbtn back wide" data-a="back">戻る</button>',{back:()=>appraise()});},back:()=>townMenu()});}
+function appraise(){}/* 未使用：js/ui/inv.js が置き換え */
 
 /* ===== ver0.9 街の発展 ===== */
 Object.assign(ITEMS,{hipotion:{n:'ハイポーション',p:120,d:'HP50%回復',lv:2},ether:{n:'エーテル',p:150,d:'SP+50',lv:3},drop2:{n:'星の大雫',p:400,d:'AG+60',lv:4},tail:{n:'不死鳥の尾',p:600,d:'HP全快で復活',lv:5}});
@@ -77,7 +60,6 @@ const STONES={ruby:{n:'紅玉',v:{atkP:5},c:'#ff5a5a'},sapph:{n:'蒼玉',v:{defP
 const shadeHex=(h,f)=>{const n=parseInt(h.slice(1),16);return'#'+[n>>16,n>>8&255,n&255].map(v=>Math.min(255,Math.round(v*f)).toString(16).padStart(2,'0')).join('');};
 for(const k in STONES){const c=document.createElement('canvas');c.width=c.height=12;const g=c.getContext('2d'),s=STONES[k],ov={p:shadeHex(s.c,1.3),v:s.c,V:shadeHex(s.c,.55)};
  IIS.kakera.forEach((r,y)=>{r=r.padEnd(12,'.');for(let x=0;x<12;x++)if(r[x]!=='.'){g.fillStyle=ov[r[x]]||PAL[r[x]];g.fillRect(x,y,1,1);}});ICON['st_'+k]=c.toDataURL();}
-const stoneTxt=k=>`${ii(ICON['st_'+k],STONES[k].c)}${STONES[k].n}（${Object.entries(STONES[k].v).map(([a,b])=>opTxt({k:a,v:b})).join('')}）`;
 
 const invCap=()=>200+(G.fac.store-1)*75;
 const ecap=()=>Math.min(12,2+2*G.fac.smith);
@@ -88,21 +70,6 @@ const ISLE=(()=>{const c=document.createElement('canvas');c.width=40;c.height=24
  })();
 function gardenTick(){if(!G.fac.garden)return;const n=Math.min(10,G.sorties-(G.garden.last||0));if(n>0)G.garden.n=Math.min(10,(G.garden.n||0)+n);G.garden.last=G.sorties;}
 
-function opSwap(tg,ti){const can=i=>!i.unid&&i.ops.length;
- if(!tg){log('<b>OP付け替え</b>　付け替えたい装備を選ぶ（素材にした装備は消える）'+goldTxt());panel(G.inv.filter(can).sort((a,b)=>b.rar-a.rar).slice(0,40).map(it=>icard(it,{a:'t'})).join('')+'<button class="tbtn back wide" data-a="back">戻る</button>',{t:u=>opSwap(findItem(+u)),back:()=>smith()});return;}
- if(ti==null){log(`${ihtml(tg)}　入れ替えるOPを選ぶ`);panel(icard(tg,{})+'<div class="ttl2">入れ替えるOP</div>'+tg.ops.map((o,i)=>`<button class="tbtn wide" style="margin-bottom:6px" data-a="o" data-v="${i}">${opTxt(o)}</button>`).join('')+'<button class="tbtn back wide" data-a="back">戻る</button>',{o:i=>opSwap(tg,+i),back:()=>opSwap()});return;}
- const cost={g:Math.round(200+tg.ilv*40),k:1+Math.floor(tg.rar/2)},ok=G.gold>=cost.g&&G.mats.kakera>=cost.k,ds=G.inv.filter(i=>i!==tg&&can(i)&&!i.lock&&!eqBy(i.uid)).slice(0,40);
- log(`<b>${opTxt(tg.ops[ti])}</b> の代わりに付けるOPを選ぶ　費用：${cost.g}G・虚の欠片${cost.k}`+goldTxt());
- panel((ds.map(d=>`<div class="icard r${d.rar}"><img class="iic" src="${itemIcon(d)}"><div class="ibody"><div class="inm">${iname(d)}</div><div>${d.ops.map((o,j)=>`<button class="chp op" style="font-size:12px;padding:3px 7px;margin:3px 4px 0 0" data-a="p" data-v="${d.uid}:${j}" ${!ok||tg.ops.some((x,xi)=>xi!==ti&&x.k===o.k)?'disabled':''}>${opTxt(o)}</button>`).join('')}</div></div></div>`).join('')||'<div class="emp">素材にできる装備がない</div>')+'<button class="tbtn back wide" data-a="back">戻る</button>',
- {p:v=>{const[u,j]=v.split(':').map(Number),d=findItem(u),o=d.ops[j];tg.ops[ti]={...o};G.inv=G.inv.filter(i=>i!==d);G.gold-=cost.g;G.mats.kakera-=cost.k;SFX.aw();save();smith(`${iname(tg)}に<b>${opTxt(o)}</b>を付け替えた！`);},back:()=>opSwap(tg)});}
-function sockMenu(it){const st=Object.keys(STONES).filter(k=>(G.stones[k]||0)>0);
- if(!it){log('<b>ソケット加工</b>　レア以上の装備には星石をはめる穴がある'+goldTxt()+'<br>星石：'+(Object.keys(STONES).filter(k=>G.stones[k]).map(k=>stoneTxt(k)+'×'+G.stones[k]).join('　')||'なし'));
-  panel(G.inv.filter(i=>!i.unid&&i.sock&&i.sock.length).sort((a,b)=>(eqBy(b.uid)?1:0)-(eqBy(a.uid)?1:0)).slice(0,40).map(i=>icard(i,{a:'s'})).join('')||'<div class="emp">穴のある装備がない（レア以上に付く）</div>'+'',{s:u=>sockMenu(findItem(+u)),back:()=>smith()});$('#cmd').insertAdjacentHTML('beforeend','<button class="tbtn back wide" data-a="back">戻る</button>');return;}
- log(`${ihtml(it)}　穴をタップ：空き→星石をはめる／埋まり→外す（星石は戻る）`);
- panel(icard(it,{})+it.sock.map((k,i)=>`<button class="tbtn wide" style="margin-bottom:6px" data-a="h" data-v="${i}">${k?'◆ '+stoneTxt(k)+'　（外す）':'◇ 空きソケット'}</button>`).join('')+'<div class="ttl2">はめる星石を選んでから空きをタップ</div>'+
-  (st.length?st.map(k=>`<button class="chp ${SELST===k?'up':''}" style="font-size:12px;padding:4px 8px;margin:3px" data-a="c" data-v="${k}">${stoneTxt(k)}×${G.stones[k]}</button>`).join(''):'<div class="emp">星石を持っていない（ボス・庭園・雑魚がまれに落とす）</div>')+'<button class="tbtn back wide" style="margin-top:8px" data-a="back">戻る</button>',
- {c:k=>{SELST=k;sockMenu(it);},h:i=>{i=+i;const k=it.sock[i];if(k){it.sock[i]=null;G.stones[k]=(G.stones[k]||0)+1;}else if(SELST&&G.stones[SELST]>0){it.sock[i]=SELST;G.stones[SELST]--;if(!G.stones[SELST])SELST=null;SFX.aw();}save();sockMenu(it);},back:()=>sockMenu()});}
-let SELST=null;
 function upgradeRar(it){if(it.rar>=4)return false;const n=genItem(it.ilv,0,0,it.slot,4);Object.assign(it,n,{uid:it.uid,unid:false});return true;}
 
 QS.push(...Q2,...Q3,...Q4,...Q5,...Q6);

@@ -1,0 +1,55 @@
+/* ===== 持ち物・鑑定・鍛冶屋の共通の全画面（js/ui/inv.js の FAC）。色・角・影は tokens.css の値だけ。レア度の色は装備データの色（--rc）を細い帯にだけ使う ===== */
+#fac{position:fixed;inset:0;margin:0 auto;width:100%;max-width:480px;z-index:6;display:flex;flex-direction:column;background:var(--tk-night);color:var(--tk-ink);font-family:var(--tk-font);
+ padding-top:env(safe-area-inset-top,0px);font-variant-numeric:tabular-nums;box-shadow:0 0 0 100vw var(--tk-night)}
+#fac.hide{display:none}
+#fac button{font-family:inherit;color:inherit;cursor:pointer;border:0;border-radius:var(--tk-r)}
+#fac b,#fac em,#fac i{font-style:normal}
+.fc-ic{width:18px;height:18px;fill:currentColor;flex:none}
+.fc-mi{width:16px;height:16px;image-rendering:pixelated;flex:none}
+.fc-h{display:flex;align-items:center;gap:10px;padding:6px 10px;height:44px;flex:none;background:var(--tk-night-2);box-shadow:var(--tk-drop)}
+.fc-h>b{font-family:var(--tk-disp);font-size:var(--tk-fs-l);font-weight:400;flex:1}
+.fc-bk{min-width:40px;height:32px;padding:0 10px;background:var(--tk-night-3);box-shadow:var(--tk-frame);font-size:var(--tk-fs-m);font-weight:700}
+.fc-res{display:flex;align-items:center;gap:10px}
+.fc-g{display:flex;align-items:center;gap:4px;font-size:var(--tk-fs-m);font-weight:700}
+.fc-n{font-size:var(--tk-fs-s);color:var(--tk-ink-2)}.fc-n i{margin:0 1px}
+.fc-tabs{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:3px;padding:6px 8px 0;flex:none}
+.fc-tabs button{position:relative;height:38px;display:flex;align-items:center;justify-content:center;gap:3px;background:var(--tk-night-2);color:var(--tk-ink-2);box-shadow:var(--tk-drop)}
+.fc-tabs button.on{background:var(--tk-lamp);color:var(--tk-shade);box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp-deep)}
+.fc-tabs button.lk{background:transparent;color:var(--tk-void);box-shadow:0 0 0 1px var(--tk-void);cursor:default}
+.fc-tabs button.lk .fc-ic+.fc-ic{width:11px;height:11px}
+.fc-body{flex:1;min-height:0;overflow-y:auto;padding:10px 8px;-webkit-overflow-scrolling:touch}
+.fc-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.fc-t{position:relative;aspect-ratio:1;display:grid;place-items:center;padding:0;overflow:hidden;background:var(--tk-night-2);box-shadow:var(--tk-frame)}
+.fc-t::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--rc,var(--tk-line))}
+.fc-t>img,.fc-t>svg{width:74%;height:74%;image-rendering:pixelated;object-fit:contain}
+.fc-t.off>img{opacity:.45}
+.fc-t.sel{background:var(--tk-night-3);box-shadow:0 0 0 2px var(--tk-lamp),0 0 0 3px var(--tk-shade)}
+.fc-t .pl{position:absolute;right:3px;bottom:2px;font-size:var(--tk-fs-xs);font-weight:700;color:var(--tk-star)}
+.fc-t .eq{position:absolute;left:3px;top:6px;width:8px;height:8px;background:var(--tk-lamp);box-shadow:0 0 0 1px var(--tk-shade)}
+.fc-t .lk{position:absolute;right:3px;top:6px;color:var(--tk-ink-2);display:flex}.fc-t .lk .fc-ic{width:11px;height:11px}
+.fc-t .up{position:absolute;right:3px;top:6px;color:var(--tk-lamp);display:flex}
+.fc-t small{position:absolute;left:0;right:0;bottom:0;padding:1px 0;background:var(--tk-shade);font-size:var(--tk-fs-xs);font-weight:700;color:var(--tk-star)}
+.fc-t.off small{color:var(--tk-void)}
+.fc-em{display:flex;justify-content:center;padding:70px 0;color:var(--tk-void)}.fc-em .fc-ic{width:56px;height:56px}
+.fc-f{flex:none;padding:6px 8px calc(env(safe-area-inset-bottom,0px) + 8px);background:var(--tk-night-2);box-shadow:0 -2px 0 var(--tk-shade);display:flex;flex-direction:column;gap:6px}
+.fc-f:empty{display:none}
+.fc-sb{display:flex;align-items:center;gap:8px;padding:4px 6px;background:var(--tk-night-3);box-shadow:var(--tk-frame),inset 3px 0 0 var(--rc,var(--tk-line))}
+.fc-si{flex:none;width:44px;height:44px;display:grid;place-items:center;padding:0;background:var(--tk-night);box-shadow:var(--tk-frame)}
+.fc-si img{width:80%;height:80%;image-rendering:pixelated}
+.fc-sb .t{flex:1;min-width:0;display:flex;flex-direction:column}
+.fc-sb b{min-width:0;font-family:var(--tk-disp);font-size:var(--tk-fs-m);font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc-sb>b{flex:1}
+.fc-sb small{font-size:var(--tk-fs-xs);color:var(--tk-ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc-sb .bt{display:flex;gap:4px;flex:none}
+.fc-tools{display:flex;gap:6px}
+.fc-bt{height:38px;min-width:38px;padding:0 8px;display:flex;align-items:center;justify-content:center;gap:4px;font-size:var(--tk-fs-m);font-weight:700;background:var(--tk-night-3);box-shadow:var(--tk-frame),var(--tk-drop)}
+.fc-bt.wide{flex:1;height:42px}
+.fc-bt em{font-size:var(--tk-fs-s);color:var(--tk-ink-2)}
+.fc-bt.on,.fc-bt.go{background:var(--tk-lamp);color:var(--tk-shade);box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp-deep),var(--tk-drop)}
+.fc-bt.go em{color:var(--tk-lamp-deep)}
+.fc-bt:disabled{background:transparent;color:var(--tk-void);box-shadow:0 0 0 1px var(--tk-void);cursor:default}
+.fc-bt:disabled .fc-mi,.fc-bt:disabled .fc-st{opacity:.5}
+.fc-bt:active:not(:disabled),.fc-bk:active,.fc-tabs button:active{transform:translateY(1px);box-shadow:none}
+.fc-toast{position:absolute;left:50%;top:60px;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--tk-night-3);box-shadow:var(--tk-frame),var(--tk-drop);font-size:var(--tk-fs-m);font-weight:700;pointer-events:none;animation:fc-toast 1.6s ease-out both}
+.fc-toast img{width:24px;height:24px;image-rendering:pixelated}
+@keyframes fc-toast{0%{opacity:0;transform:translate(-50%,-6px)}12%,70%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
