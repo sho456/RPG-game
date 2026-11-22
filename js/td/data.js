@@ -11,12 +11,15 @@ const K={FH:420,STEP:1/30,LIVES:7,COST0:10,COST_EVERY:.9,STAR_MAX:10,DARK:.6/*�
 const AWK={dur:15,atk:.3,ch:1.6,heal:.3,ou:1.3};
 /* 役割：line＝隊列（f＝前衛：道の上で敵を止める／b＝後衛：前衛の後ろ・道の脇）・射程・攻撃間隔・止める数・コスト・攻撃の形
  mv＝歩く速さ（px/秒）・chase＝斬るが持ち場から敵へ詰め寄る間合い・off＝後衛が一番前の前衛から下がる間合い */
+/* 役割（ver0.58 で名前を統一）：タンク・近距離物理アタッカー・遠距離物理アタッカー・魔法アタッカー・サポーター・ヒーラー・特殊（上に当てはまらない）。動きは sim.js の BR */
 const ROLE={
- guard:{n:'守る',line:'f',rng:42,iv:1.3,blk:3,cost:16,col:'#7fa6d9',mv:46},
- blade:{n:'斬る',line:'f',rng:40,iv:1.0,blk:1,cost:10,col:'#e0a050',mv:68,chase:80},
- shot: {n:'射る',line:'b',rng:150,iv:1.1,blk:0,cost:12,col:'#9fd36a',mv:52,off:72},
- spell:{n:'術',  line:'b',rng:112,iv:1.6,blk:0,cost:14,col:'#d070d0',splash:32,mv:50,off:56},
- aid:  {n:'支える',line:'b',rng:108,iv:1.5,blk:0,cost:12,col:'#80d8c8',mv:54,off:40}};
+ guard:  {n:'タンク',line:'f',rng:42,iv:1.3,blk:3,cost:16,col:'#7fa6d9',mv:46},
+ blade:  {n:'近距離物理アタッカー',line:'f',rng:40,iv:1.0,blk:1,cost:10,col:'#e0a050',mv:68,chase:80},
+ shot:   {n:'遠距離物理アタッカー',line:'b',rng:150,iv:1.1,blk:0,cost:12,col:'#9fd36a',mv:52,off:72},
+ spell:  {n:'魔法アタッカー',line:'b',rng:112,iv:1.6,blk:0,cost:14,col:'#d070d0',splash:32,mv:50,off:56},
+ aid:    {n:'サポーター',line:'b',rng:108,iv:1.5,blk:0,cost:12,col:'#80d8c8',mv:54,off:40},
+ heal:   {n:'ヒーラー',line:'b',rng:108,iv:1.5,blk:0,cost:12,col:'#f2a0c8',mv:56,off:34},
+ special:{n:'特殊',line:'b',rng:118,iv:1.4,blk:0,cost:13,col:'#b8b0d8',mv:54,off:50}};
 /* 仲間 12 人。sk＝技（RPG 版の技のキー。名前は SK から引く）、k＝技の働き、ch＝チャージ秒、lt＝自分の周りに出す光の半径 */
 const HERO={
  rio:  {role:'blade',el:'陽',lt:120,sk:'koujin',  k:'strike',m:2.6,ch:8},
@@ -28,8 +31,8 @@ const HERO={
  jin:  {role:'blade',el:'打',sk:'popo',     k:'strike',m:2.0,kb:36,ch:8,cost:11},
  erna: {role:'shot', el:'雷',sk:'raiya',    k:'chain',m:1.6,cnt:3,ch:7},
  mire: {role:'spell',el:'熱',sk:'flamewave',k:'nova',m:1.9,r:56,ch:9,at:'foe'},
- crow: {role:'spell',el:'陰',sk:'noroi',    k:'curse',m:1.3,dur:6,ch:8,cost:13},
- noah: {role:'aid',  el:'陽',lt:120,sk:'inori',k:'heal',m:.3,r:118,ch:10,cost:11,atkK:.6},
+ crow: {role:'special',el:'陰',sk:'noroi',    k:'curse',m:1.3,dur:6,ch:8,cost:13},
+ noah: {role:'heal', el:'陽',lt:120,sk:'inori',k:'heal',m:.3,r:118,ch:10,cost:11,atkK:.6},
  celes:{role:'aid',  el:'陰',sk:'chien',    k:'slow',m:.45,r:70,dur:6,ch:9,haste:.25,atkK:.7}};
 /* 星臨の奥義（戦闘中 1 回・1 人 1 つ）。名前は本編の奥義（AWX.ou）。ver0.56 で旧「極（goku）」の効果を合わせた。
  k：unova＝範囲攻撃（m 倍・半径 r）、uheal＝全員の回復＋灯火 +1＋光を戻す、utime＝敵全体を遅く、upct＝敵全体の今の HP を v 削る（ボスは b）
@@ -92,7 +95,7 @@ function skTxt(sk){const m=x=>`攻撃×${x}`;switch(sk.k){
  case'heal':return`周り（半径 ${sk.r}）の仲間の HP を ${Math.round(sk.m*100)}% 回復`;case'guard':return'止めている間、HP を 25% 回復・止める数 +2（6 秒）';}return'';}
 /* ---------- アビリティ（1 人 3 つ。本編の AB）を TD の能力へ読み替える ----------
  td(e)：TD で効く効果なら {k, v, txt}、効かないなら null（画面では灰色）。合計は abSum(id) */
-function abTd(e,id){const d=HERO[id],el=d&&d.el,c=e.c,v=e.v;let mag=false;try{mag=RSD.WPN[RSD.HERO[id].w].mag===1||d.role==='spell';}catch(x){}
+function abTd(e,id){const d=HERO[id],el=d&&d.el,c=e.c,v=e.v;let mag=false;try{mag=RSD.WPN[RSD.HERO[id].w].mag===1||d.role==='spell'||d.role==='special';}catch(x){}
  const free=!c||c==='any'||(c==='phys'&&!mag)||(c==='mag'&&mag)||(typeof c==='string'&&c.startsWith('el:')&&c.slice(3).split('|').includes(el));
  if(e.t==='dmg'&&free&&v>0)return{k:'atk',v,txt:`攻撃 +${v}%`};
  if(e.t==='stat'&&(e.k==='atk'||e.k==='mag')&&(e.k==='mag')===mag)return{k:'atk',v,txt:`攻撃 +${v}%`};
@@ -124,7 +127,7 @@ function hero(id,lv=1,o){const h=HB[id],d=HERO[id],R=ROLE[d.role];if(!h||!d)retu
   sk.ch=+(base.ch*K.SKCH*(1-.08*ms)).toFixed(1);return sk;};
  const sks=ids.map(mk),sk=sks[0];
  const ult=Object.assign({n:ouName(id),aw:awName(id),k:'unova',m:7,r:92},ULT[id]||{},{lv:aw});if(ult.m)ult.m=+(ult.m*(1+.25*(aw-1))).toFixed(2);
- return{id,name:h.name,role:d.role,line:R.line,mv:R.mv,chase:R.chase||0,off:R.off||0,el:d.el,dmgK:mag||d.role==='spell'?'mag':'phys',
+ return{id,name:h.name,role:d.role,line:R.line,mv:R.mv,chase:R.chase||0,off:R.off||0,el:d.el,dmgK:mag||d.role==='spell'||d.role==='special'?'mag':'phys',
   hp:Math.round((200+h.mhp*2.2)*k*q(gk.hp)*(1+(ab.hp||0)/100)),atk:Math.round((20+prim*1.6)*k*(d.atkK||1)*q(gk.atk)*(1+(ab.atk||0)/100)),def:Math.round(h.def*1.5*k*q(gk.def)*(1+(ab.def||0)/100)),res:Math.round(h.res*1.5*k*q(gk.res)),
   cut:Math.min(.5,(ab.cut||0)/100),crit:(ab.crit||0)/100,critd:(ab.critd||0)/100,regen:(ab.regen||0)/100,drain:(ab.drain||0)/100,pierce:Math.min(.6,(ab.pierce||0)/100),tatk:(ab.tatk||0)/100,tcut:(ab.tcut||0)/100,fu:ab.fu||[],
   iv:+((d.iv||R.iv)*(1-(h.spd-10)*.015)).toFixed(2),rng:d.rng||R.rng,blk:d.blk!=null?d.blk:R.blk,cost:d.cost||R.cost,splash:R.splash||0,

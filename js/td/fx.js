@@ -72,7 +72,7 @@ function ev(e,st){const u=e.u,el=u&&u.h?u.h.el:'陽',c=ELC[el]||'#fff',c2=EL2[el
  /* 星臨：足元から光の柱・星の輪が 2 重に広がる（オーラは view.js が描く） */
  case'aw':add({k:'pillar',x:u.x,y:u.y,w:22,h:96,c:'#fff1a8',d:.5});add({k:'gring',x:u.x,y:u.y,r:30,c:'#f2b347',c2:'#fff',d:.45});add({k:'gring',x:u.x,y:u.y,r:46,c,c2,d:.6,dl:.12});add({k:'star',x:u.x,y:u.y-56,r:22,c:'#fff',d:.4,dl:.08});rise(u.x,u.y-20,18,'#fff0b8',{w:30,d:.8});return;
  case'kill':{const f=e.f,F=B.spr(f.spr,f.kind,1);if(L.filter(x=>x.k==='corpse').length>14){const i=L.findIndex(x=>x.k==='corpse');L.splice(i,1);}
-  add({k:'corpse',F,x:f.x,y:f.y,mir:f.dir<0,hg:f.boss?60:32,gh:f.tr.includes('ghost'),boss:f.boss,seed:f.uid,hold:f._hold||0,d:(f.boss?.9:.45)+(f._hold||0)});
+  add({k:'corpse',F,x:f.x,y:f.y,mir:f.dir<0,hg:f.boss?76:40,gh:f.tr.includes('ghost'),boss:f.boss,seed:f.uid,hold:f._hold||0,d:(f.boss?.9:.45)+(f._hold||0)});
   sparks(f.x,f.y-14,f.boss?40:10,f.tr.includes('void')?'#b07aff':'#e86a6a',{sp:f.boss?140:80,d:.45});if(f.boss){add({k:'star',x:f.x,y:f.y-30,r:30,c:'#f2b347',d:.6});rise(f.x,f.y-30,16,'#f2b347',{w:50,d:.9});}return;}
  case'area':if(e.small)add({k:'gring',x:e.x,y:e.y,r:e.r,c,c2,d:.2,thin:1});return;
  case'heal':rise(e.u.x,e.u.y-30,3,'#9fe8b8',{w:16,d:.5});return;

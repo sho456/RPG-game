@@ -24,7 +24,7 @@ const L={
  td0_2:S('td0_2',{hk:1.28,star:{time:130},q:'q0_2',name:'灰狼の遠吠え',lv:2,th:'ash',cap:4,join:'shion',
   join_lines:[[null,'n','狼の群れが散ったあと、物陰から少年が顔を出した。'],['shion','h','へえ、やるじゃん。灯守ってのは口だけじゃないんだな'],['shion','n','俺はシオン。街の孤児の面倒を見てる。……虚蝕を追うなら、足の速い奴がいた方がいいだろ？']],
   waves:[{e:[[2,'wolf',5,1.6]]},{e:[[1,'slime',6,1.3],[5,'wolf',5,1.3]]},{e:[[1,'wolf',8,1.1],[4,'slime',6,1.2]]}]},ONE(920)),
- td0_3:S('td0_3',{hk:1.8,bk:0.8,star:{time:155},q:'q0_4',name:'灰狼の頭目',lv:3,th:'ash',cap:5,pre:pre('q0_4'),
+ td0_3:S('td0_3',{hk:1.8,bk:0.5,star:{time:155},q:'q0_4',name:'灰狼の頭目',lv:3,th:'ash',cap:5,pre:pre('q0_4'),
   waves:[{e:[[2,'slime',4,1.8],[7,'wolf',3,1.4]]},{e:[[1,'wolf',6,1.1],[4,'slime',5,1.3]]},{e:[[2,'m_wolf',1,1,0],[4,'slime',5,1.3],[8,'wolf',6,1.1]]}]},ONE(1000)),
  td0_4:S('td0_4',{hk:0.85,bk:0.36,star:{time:155},q:'q0_5',name:'虚ろの番人',lv:4,th:'ash',cap:5,boss:1,pre:pre('q0_5'),
   waves:[{e:[[2,'slime',6,1.4],[6,'wolf',4,1.3]]},{e:[[1,'wolf',8,1],[3,'slime',6,1.2]]},{e:[[2,'boss',1,1,1],[5,'wolf',6,1.2],[10,'slime',6,1.2]]}]},TWO(1040)),
@@ -65,7 +65,7 @@ const L={
  /* ---------- 第4章 沈んだ王都と天への塔（本編の第5・6章） ---------- */
  td4_1:S('td4_1',{hk:1.65,star:{time:160},q:'q5_1',name:'水底の大通り',lv:31,th:'ruin',
   waves:[{e:[[2,'waterslime',8,1.1]]},{e:[[1,'jelly',9,.9],[4,'waterslime',6,1.2]]},{e:[[1,'waterslime',9,.9],[3,'jelly',9,.8]]}]},THREE(1160)),
- td4_2:S('td4_2',{hk:0.6,bk:0.5,star:{time:155},q:'q5_4',name:'近衛隊長',lv:34,th:'ruin',boss:1,gim:{k:'charge',every:11},
+ td4_2:S('td4_2',{hk:0.6,bk:0.35,star:{time:155},q:'q5_4',name:'近衛隊長',lv:34,th:'ruin',boss:1,gim:{k:'charge',every:11},
   waves:[{e:[[2,'drowned',7,1.2]]},{e:[[1,'jelly',9,.9],[4,'drowned',6,1.1]]},{e:[[2,'m_guard',1,1,1],[4,'drowned',7,1.1],[9,'waterslime',8,1]]}]},THREE(1180)),
  td4_3:S('td4_3',{hk:0.21,bk:0.15,star:{time:115},q:'q5_6',name:'沈みし女王',lv:37,th:'ruin',boss:1,pre:pre('q5_6'),gim:{k:'drain',every:9},
   waves:[{e:[[2,'drowned',8,1],[5,'jelly',7,.9]]},{e:[[1,'waterslime',10,.8],[4,'drowned',7,1]]},{e:[[2,'boss6',1,1,1],[4,'jelly',10,.8],[9,'drowned',7,1]]}]},THREE(1200)),
@@ -73,7 +73,7 @@ const L={
   waves:[{e:[[2,'minerghost',8,1],[5,'jelly',8,.9]]},{e:[[1,'yukirei',10,.8],[4,'drowned',7,1]]},{e:[[2,'tower10',1,1,1],[4,'golemkin',7,1.2],[9,'minerghost',8,.9]]}]},THREE(1200)),
  td4_5:S('td4_5',{hk:0.35,bk:0.205,star:{time:125},q:'q6_4',name:'天狐の残照',lv:46,th:'tower',boss:1,join:'valk',join_lines:post('valk'),gim:{k:'shift',every:8},
   waves:[{e:[[2,'snowwolf',10,.8],[5,'iceslime',8,1]]},{e:[[1,'onimusha',8,1],[4,'jelly',9,.8]]},{e:[[2,'tower20',1,1,1],[4,'yukirei',10,.8],[9,'onimusha',7,1]]}]},THREE(1220)),
- td4_6:S('td4_6',{hk:0.31,bk:0.27,star:{time:180},q:'q6_6',name:'星核の守護者',lv:50,th:'tower',boss:1,pre:pre('q6_6'),gim:{k:'charge',every:9},
+ td4_6:S('td4_6',{hk:0.31,bk:0.18,star:{time:180},q:'q6_6',name:'星核の守護者',lv:50,th:'tower',boss:1,pre:pre('q6_6'),gim:{k:'charge',every:9},
   waves:[{e:[[2,'shade',10,.8],[5,'onimusha',7,1]]},{e:[[1,'minerghost',10,.8],[4,'waterslime',8,1]]},{e:[[1,'darkknight',9,.9],[4,'shade',10,.7]]},{e:[[2,'boss7',1,1,1],[4,'shade',10,.8],[9,'onimusha',7,1]]}]},THREE(1240)),
  /* ---------- 終章 星核の残響 ---------- */
  td5_1:S('td5_1',{hk:1.37,star:{time:175},q:'q7_1',name:'虚の底',lv:50,th:'void',

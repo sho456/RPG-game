@@ -3,8 +3,8 @@
  操作：deploy(st,id,x,y)・move(st,uid,x,y)・retreat(st,uid)・aw(st,uid)＝星臨・ult(st,uid)＝奥義・callWave(st)。
  技（ver0.57）：1 人 3 つ（u.h.sks）。それぞれの溜め u.ch[i] が終わると自動で出る（技と技の間は K.GCD 秒あける）。星臨と奥義は手で出す（星片を使う・1 人 1 回ずつ）
  止める（ver0.57）：地上の敵は前衛をすり抜けない。止める数（blk）を超えた敵は後ろに並び、半分の速さで叩く。自動の配置：bot(st)。計測：run(stageId,deck,lv,seed)
- 隊形（ver0.55）：台座は無い。置いた場所に一番近い道へ立ち、役割で前衛（守る・斬る＝道の上で止める）と後衛（射る・術・支える＝前衛の後ろ、道の脇）に分かれる。
- キャラは歩く：斬るは近づく敵へ詰め寄り、後衛は前衛の後ろへ下がり、敵に寄られると灯の側へ退く。移動の指示は move
+ 隊形（ver0.55）：台座は無い。置いた場所に一番近い道へ立ち、役割で前衛（タンク・近距離＝道の上で止める）と後衛（遠距離・魔法・サポーター・ヒーラー・特殊＝前衛の後ろ、道の脇）に分かれる。
+ キャラは歩く：役割ごとの考え（BR・ver0.58）で行き先を決め、重ならないように並ぶ。移動の指示は move
  設計：docs/TD-DESIGN.md（灯域・灯火・灯力・星片・ダメージの式） */
 'use strict';
 const TDS=(()=>{
@@ -77,17 +77,41 @@ function deploy(st,id,x,y){const why=canDeploy(st,id,x,y);if(why)return why;cons
 /* 動かす：その場所へ歩く（別の道へも）。止めていた敵は放す */
 function move(st,uid,x,y){const u=st.units.find(u=>u.uid===uid);if(!u||st.over)return'なし';const p=spot(st,x,y),a=at(p.P,p.s);
  if(!litAt(st,a.x,a.y))return'灯の光が届いていない';release(u);u.lane=p.li;u.P=p.P;u.home=p.s;u.yo=yo(st,p.li,u.h.line);form(st);ev(st,{k:'move',u,x:a.x,y:a.y+u.yo});return'';}
-/* 隊形：道ごとに、前衛はそれぞれの持ち場（home）、後衛は一番前の前衛の後ろ（役割の間合い off）。後衛どうしは 16 ずつ離す */
-function form(st){st.tAtk=0;st.tCut=0;for(const u of st.units){st.tAtk+=u.h.tatk||0;st.tCut+=u.h.tcut||0;}for(let li=0;li<st.Ps.length;li++){const U=st.units.filter(u=>u.lane===li),F=U.filter(u=>u.h.line==='f'),fr=F.length?Math.min(...F.map(u=>u.home)):null;
- for(const u of F)u.ts=u.home;let last=-1e9;
- for(const o of U.filter(u=>u.h.line==='b').map(u=>({u,s:fr==null?u.home:Math.max(u.home,fr+u.h.off)})).sort((a,b)=>a.s-b.s)){o.s=Math.min(o.u.P.L-20,Math.max(o.s,last+16));last=o.s;o.u.ts=o.s;}}}
-/* 歩く：斬るは間合い（chase）の中の敵へ詰め寄る（光の外へは出ない）。後衛は止められていない敵に寄られると灯の側へ退く。止めている間は動かない */
-function walk(st,dt){for(const u of st.units){let ts=u.ts;
- if(u.h.line==='f'){if(u.blocking.length){u.mv=0;continue;}
-  if(u.h.chase){let b=null;for(const f of st.foes)if(f.hp>0&&f.lane===u.lane&&!f.tr.includes('fly')&&f.s<u.s+4&&u.home-f.s<=u.h.chase&&(!b||f.s>b.s))b=f;if(b){ts=Math.max(b.s+6,u.home-u.h.chase);const q=at(u.P,ts);if(!litAt(st,q.x,q.y,u))ts=u.home;}}}
- else if(st.foes.some(f=>f.hp>0&&f.lane===u.lane&&!f.by&&f.s<=u.s&&u.s-f.s<34))ts=Math.min(u.P.L-20,u.s+40);
- const a=at(u.P,ts),tx=a.x,ty=a.y+u.yo,d=dist(u.x,u.y,tx,ty);
- if(d<.5){u.x=tx;u.y=ty;u.mv=0;}else{const m=Math.min(d,u.h.mv*dt);u.x+=(tx-u.x)/d*m;u.y+=(ty-u.y)/d*m;u.mv=1;if(Math.abs(tx-u.x)>.5)u.face=Math.sign(tx-u.x);}
+/* ---------- 役割ごとの動き（ver0.58）----------
+ 毎刻み、役割の考え（BR）で行き先 ts（道の上の距離）と横のずれ dy を決め、最後に同じ列のキャラが重ならないよう SP ずつ離して並べる（sep）。
+ タンク：持ち場を守り、止めていない敵が近づくと 1 歩前へ出て受け止める／近距離：味方が敵を止めていればそのすぐ後ろの手前に入って肩越しに叩き（dy・止めない）、
+ いなければ近づく敵へ詰め寄って止める／遠距離：いちばん前の敵から射程の 8 割の所に立ち、寄られたら下がる／魔法：射程の 6.5 割・敵の多い所が届く位置／
+ サポーター：仲間のまん中の少し後ろ（強化の届く所）／ヒーラー：いちばん傷ついた仲間の後ろ／特殊：前線の後ろで、寄られたら下がる。どれも光の外へは出ない */
+const SP=40;/* 並ぶ間隔（キャラの絵の幅 ≈ 36） */
+const laneFoes=(st,li)=>st.foes.filter(f=>f.hp>0&&f.lane===li&&!f.tr.includes('fly'));
+function backOf(st,u,fr){return fr==null?u.home:Math.max(u.home,fr+u.h.off);}
+/* 寄られたら下がる（止められていない敵が後衛の前 34 以内） */
+const pressed=(st,u)=>st.foes.some(f=>f.hp>0&&f.lane===u.lane&&!f.by&&f.s<=u.s&&u.s-f.s<34);
+const BR={
+ guard(st,u,c){u.dy=0;const L=c.Lf.filter(f=>!f.by&&f.s<u.s+4&&u.home-f.s<=28);if(L.length&&u.blocking.length<u.h.blk){const b=L.reduce((a,f)=>f.s>a.s?f:a);return Math.max(b.s+6,u.home-28);}return u.home;},
+ blade(st,u,c){const T=c.U.find(v=>v!==u&&v.h.line==='f'&&!v.dy&&v.blocking.length&&Math.abs(v.s-u.home)<=u.h.chase+20);
+  if(T&&!u.blocking.length){u.dy=10;return T.s+26;}u.dy=0;
+  let b=null;for(const f of c.Lf)if(f.s<u.s+4&&u.home-f.s<=u.h.chase&&(!b||f.s>b.s))b=f;return b?Math.max(b.s+6,u.home-u.h.chase):u.home;},
+ ranged(st,u,c,k){u.dy=0;const base=backOf(st,u,c.fr);if(pressed(st,u))return u.s+40;
+  const lead=c.Lf.length?c.Lf.reduce((a,f)=>f.s>a.s?f:a):null;if(!lead)return base;return Math.max(c.fr==null?0:c.fr+u.h.off*.6,Math.min(base,lead.s+u.h.rng*k));},
+ shot(st,u,c){return BR.ranged(st,u,c,.8);},
+ spell(st,u,c){return BR.ranged(st,u,c,.65);},
+ aid(st,u,c){u.dy=0;const base=backOf(st,u,c.fr);if(pressed(st,u))return u.s+40;const O=c.U.filter(v=>v!==u);if(!O.length)return base;return Math.max(base-20,O.reduce((a,v)=>a+v.s,0)/O.length+18);},
+ heal(st,u,c){u.dy=0;const base=backOf(st,u,c.fr);if(pressed(st,u))return u.s+40;const W=st.units.filter(v=>v!==u&&v.lane===u.lane&&v.hp<v.h.hp*.95);if(!W.length)return base;
+  const w=W.reduce((a,v)=>v.hp/v.h.hp<a.hp/a.h.hp?v:a);return Math.max(c.fr==null?0:c.fr+16,Math.min(base,w.s+26));},
+ special(st,u,c){u.dy=0;const base=backOf(st,u,c.fr);return pressed(st,u)?u.s+40:base;}};
+/* 重ならないように：道ごとに前から順に並べ、すぐ前の者と同じ列（前衛・肩越し・後衛）なら SP、別の列でも 26 離す。敵を止めている者は動かさない */
+function sep(U){const row=u=>u.h.line==='f'?(u.dy?1:0):2,key=u=>u.blocking.length?u.s:u.ts,L=U.slice().sort((a,b)=>key(a)-key(b));let p=null;
+ for(const u of L){if(u.blocking.length){u.ts=u.s;p={s:u.s,r:row(u)};continue;}if(p)u.ts=Math.max(u.ts,p.s+(p.r===row(u)?SP:26));p={s:u.ts,r:row(u)};}}
+function form(st){st.tAtk=0;st.tCut=0;for(const u of st.units){st.tAtk+=u.h.tatk||0;st.tCut+=u.h.tcut||0;}
+ for(let li=0;li<st.Ps.length;li++){const U=st.units.filter(u=>u.lane===li);if(!U.length)continue;const F=U.filter(u=>u.h.line==='f'),c={U,Lf:laneFoes(st,li),fr:F.length?Math.min(...F.map(u=>u.home)):null};
+  for(const u of U){let ts=(BR[u.h.role]||BR.special)(st,u,c);ts=Math.max(20,Math.min(u.P.L-20,ts));const q=at(u.P,ts);if(!litAt(st,q.x,q.y,u))ts=Math.max(ts,u.home);u.ts=ts;}
+  sep(U);
+  for(const u of U)u.ts=Math.min(u.P.L-20,u.ts);}}
+/* 歩く：行き先（ts と横のずれ dy）へ。止めている間は動かない。dy のある者（回り込み）は道から外れているので敵を止めない */
+function walk(st,dt){for(const u of st.units){if(u.blocking.length){u.mv=0;continue;}
+ const a=at(u.P,u.ts),tx=a.x,ty=a.y+u.yo+(u.dy||0),d=dist(u.x,u.y,tx,ty);
+ if(d<.5){u.x=tx;u.y=ty;u.mv=0;}else{const m=Math.min(d,u.h.mv*dt);u.x+=(tx-u.x)/d*m;u.y+=(ty-u.y)/d*m;u.mv=d>2?1:0;if(Math.abs(tx-u.x)>.5)u.face=Math.sign(tx-u.x);}
  u.s=sOf(u.P,u.x);u.onP=Math.abs(u.y-u.yo-at(u.P,u.s).y)<5;}}
 function retreat(st,uid){const u=st.units.find(u=>u.uid===uid);if(!u)return false;st.cost+=Math.floor(u.h.cost/2);release(u);
  st.units=st.units.filter(x=>x!==u);const c=st.deck.find(c=>c.on===u);if(c){c.on=null;c.cd=u.h.redeploy;}ev(st,{k:'retreat',u});lightUpdate(st);return true;}
@@ -108,7 +132,9 @@ function ult(st,uid){if(!canUlt(st,uid))return false;const u=st.units.find(u=>u.
 /* ---------- 技 ---------- */
 const inRange=(st,u,r)=>st.foes.filter(f=>f.hp>0&&dist(u.x,u.y,f.x,f.y)<=r);
 const rem=f=>f.P.L-f.s,front=L=>L.reduce((a,f)=>!a||rem(f)<rem(a)?f:a,null);
-function target(st,u){if(u.blocking.length)return front(u.blocking);return front(inRange(st,u,u.h.rng));}
+function target(st,u){if(u.blocking.length)return front(u.blocking);const L=inRange(st,u,u.h.rng);
+ /* 特殊は HP のいちばん多い敵（ボス）を、回り込みの近距離は止められている敵を狙う */
+ if(u.h.role==='special'&&L.length)return L.reduce((a,f)=>f.hp>a.hp?f:a);if(u.dy>0){const B=L.filter(f=>f.by);if(B.length)return front(B);}return front(L);}
 function cast(st,u,k){let t=null;
  if(k.k==='heal'){const L=st.units.filter(v=>dist(u.x,u.y,v.x,v.y)<=k.r&&v.hp<v.h.hp*.8);if(!L.length)return false;for(const v of L){const a=Math.round(v.h.hp*k.m);v.hp=Math.min(v.h.hp,v.hp+a);ev(st,{k:'heal',u:v,v:a});}ev(st,{k:'cast',u,sk:k});return true;}
  if(k.k==='guard'){if(!u.blocking.length)return false;const a=Math.round(u.h.hp*.25);u.hp=Math.min(u.h.hp,u.hp+a);u.blkUp=6;ev(st,{k:'heal',u,v:a});ev(st,{k:'cast',u,sk:k});return true;}
@@ -184,7 +210,7 @@ function tick(st){if(st.over)return;const dt=K.STEP;st.t+=dt;
 }
 function end(st,win){st.over={win,lives:st.lives,t:Math.round(st.t),wave:st.S.inf?Math.max(0,st.wave):st.wave+1,stars:win?[1,st.lives>=K.LIVES?1:0,st.t<=(st.S.star.time||999)?1:0]:[0,0,0]};ev(st,{k:'end',win});}
 /* ---------- 自動の配置（計測と、将来の AUTO 用） ----------
- 前衛：前衛の少ない道へ。光の届く一番前から光の半径の 0.25（守る。敵はすり抜けないので守るが前）・0.4（斬る）内側（虚蝕に光を削られても光の中に残る）。同じ役割がいればその後ろ 22。後衛：前衛の多い道（隊形で前衛の後ろへ並ぶ） */
+ 前衛：前衛の少ない道へ。光の届く一番前から光の半径の 0.25（タンク。敵はすり抜けないのでタンクが前）・0.4（近距離）内側（虚蝕に光を削られても光の中に残る）。同じ役割がいればその後ろ 22。後衛：前衛の多い道（隊形で前衛の後ろへ並ぶ） */
 function frontier(st,li){const P=st.Ps[li];for(let s=20;s<P.L;s+=6){const a=at(P,s);if(litAt(st,a.x,a.y))return s;}return P.L-30;}
 function bot(st){if(st.over)return;if(st.phase==='gap'&&st.wave<0&&st.t>2)callWave(st);
  const has=f=>st.units.some(f),ord=st.deck.slice().sort((a,b)=>pr(a)-pr(b));

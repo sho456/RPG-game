@@ -8,8 +8,10 @@ let V=null;const memo={};
 const $=q=>V.root.querySelector(q);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const set=(k,el,v,f)=>{if(!el||memo[k]===v)return;memo[k]=v;f(el,v);};
-const skI=k=>{try{return SKICON.html(SK[k]);}catch(e){return'';}};
-const ouI=id=>{try{return SKICON.html(SK[RSD.AWX[id].ou]);}catch(e){return'';}};
+/* 技ボタンの絵は js/td/skicon.js（TDI。属性の色のドット絵）。溜めは暗い扇＋回る針、溜まると金に脈打ち星が光る（デモの技ボタン） */
+const elOf=k=>{try{return(SK[k]&&SK[k].el)||'陽';}catch(e){return'陽';}};
+const ouK=id=>{try{return RSD.AWX[id].ou;}catch(e){return'';}};
+const btn=(cls,a,i,icon,name,cost)=>`<button class="td-sb ${cls}" data-a="${a}"${i!=null?` data-i="${i}"`:''} aria-label="${esc(name)}"><span class="bx">${icon}<i class="fan"></i><i class="hand"></i>${cost?`<em class="cost">${cost}</em>`:''}<i class="t"></i></span><b class="nm">${esc(name)}</b></button>`;
 /* ---------- 画面の骨組み（view.js の build が置く） ---------- */
 function markup(){return{
  top:`<div class="td-top"><div class="td-wave"><small>WAVE</small><b class="wv">-</b></div><div class="td-life" aria-label="灯火"><i class="ic-lamp"></i><div class="seg"></div></div>
@@ -20,21 +22,20 @@ function markup(){return{
 /* ---------- 操作盤：選んだ仲間（顔と HP・技 3 つ・星臨・奥義・移動・撤退） ---------- */
 let conU=null;
 function con(u){conU=u||null;const e=$('.td-con');for(const k in memo)if(k[0]==='k')delete memo[k];
- if(!u){e.className='td-con empty';e.innerHTML=`<div class="cf"></div><div class="cs">${'<span class="td-sk"></span>'.repeat(3)}</div><span class="td-aw"></span><span class="td-ou"></span>`;return;}
+ if(!u){e.className='td-con empty';e.innerHTML=`<div class="cf"></div><div class="cs">${'<span class="td-sb td-sk"><span class="bx"></span></span>'.repeat(3)}</div><span class="td-sb td-aw"><span class="bx"></span></span><span class="td-sb td-ou"><span class="bx"></span></span>`;return;}
  const h=u.h;e.className='td-con';e.style.setProperty('--rc',TDD.ROLE[h.role].col);
  e.innerHTML=`<button class="cf" data-a="focus" aria-label="${esc(h.name)}"><img src="${V.face(u.id)}" alt=""><i class="hp"><b></b></i></button>
- <div class="cs">${h.sks.map((k,i)=>`<button class="td-sk" data-a="sk" data-i="${i}" aria-label="${esc(k.n)}"><span class="i">${skI(k.id)}</span><i class="fan"></i></button>`).join('')}</div>
- <button class="td-aw" data-a="aw" aria-label="星臨"><i class="ic-star"></i><b>${TDD.K.AW}</b><i class="t"></i></button>
- <button class="td-ou ult" data-a="ult" aria-label="${esc(h.ult.n)}"><span class="i">${ouI(u.id)}</span><b>${TDD.K.STAR_MAX}</b></button>
+ <div class="cs">${h.sks.map((k,i)=>btn('td-sk','sk',i,TDI.img(k.id,elOf(k.id)),k.n)).join('')}</div>
+ ${btn('td-aw','aw',null,TDI.img('_aw','陽',1),'星臨',TDD.K.AW)}${btn('td-ou ult','ult',null,TDI.img(ouK(u.id),elOf(ouK(u.id)),1),h.ult.n,TDD.K.STAR_MAX)}
  <div class="cm"><button class="td-btn" data-a="mv">移動</button><button class="td-btn" data-a="ret">撤退</button></div>`;}
 /* 技が出た：そのボタンを光らせる */
 function fire(u,sk){if(u!==conU)return;const i=u.h.sks.indexOf(sk),b=$(`.td-con .td-sk[data-i="${i}"]`);if(!b)return;b.classList.remove('fire');void b.offsetWidth;b.classList.add('fire');}
 function conTick(st){const u=conU;if(!u)return;if(!st.units.includes(u)){con(null);return;}const c=st.deck.find(c=>c.on===u);
  const hp=Math.max(0,u.hp/u.h.hp);set('khp',$('.td-con .hp b'),Math.round(hp*100),(e,v)=>{e.style.width=v+'%';e.classList.toggle('low',hp<.35);});
- u.h.sks.forEach((k,i)=>{const r=Math.min(1,u.ch[i]/k.ch),b=$(`.td-con .td-sk[data-i="${i}"]`);set('ks'+i,b,Math.round(r*40),(e)=>{e.style.setProperty('--p',Math.round((1-r)*100)+'%');e.classList.toggle('ready',r>=1);});});
+ u.h.sks.forEach((k,i)=>{const r=Math.min(1,u.ch[i]/k.ch),b=$(`.td-con .td-sk[data-i="${i}"]`);set('ks'+i,b,Math.round(r*90),(e)=>{e.style.setProperty('--p',Math.round((1-r)*100)+'%');e.style.setProperty('--a',Math.round(r*360)+'deg');e.classList.toggle('ready',r>=1);});});
  const aw=u.awT>0,ca=TDS.canAw(st,u.uid);set('kaw',$('.td-aw'),`${c&&c.aw?1:0}${ca?1:0}${aw?Math.ceil(u.awT):0}`,(e)=>{e.classList.toggle('used',!!(c&&c.aw)&&!aw);e.classList.toggle('can',ca);e.classList.toggle('act',aw);
-  e.disabled=!ca;e.querySelector('.t').style.width=aw?Math.round(u.awT/TDD.AWK.dur*100)+'%':'0';});
- const cu=TDS.canUlt(st,u.uid);set('kou',$('.td-ou'),`${c&&c.ult?1:0}${cu?1:0}${aw?1:0}`,(e)=>{e.classList.toggle('used',!!(c&&c.ult));e.classList.toggle('can',cu);e.classList.toggle('boost',cu&&aw);e.disabled=!cu;});}
+  e.classList.toggle('ready',ca);e.disabled=!ca;e.querySelector('.t').style.width=aw?Math.round(u.awT/TDD.AWK.dur*100)+'%':'0';});
+ const cu=TDS.canUlt(st,u.uid);set('kou',$('.td-ou'),`${c&&c.ult?1:0}${cu?1:0}${aw?1:0}`,(e)=>{e.classList.toggle('used',!!(c&&c.ult));e.classList.toggle('can',cu);e.classList.toggle('boost',cu&&aw);e.classList.toggle('ready',cu);e.disabled=!cu;});}
 /* ---------- 手札：顔・コスト・役割の色。置いた仲間は HP と技の溜まり（3 つの点）・星臨/奥義が出せる印 ---------- */
 function deckHTML(st){return st.deck.map(c=>`<button class="td-card" data-id="${c.id}" aria-label="${esc(c.h.name)} コスト${c.h.cost}"><img src="${V.face(c.id)}" alt=""><span class="c">${c.h.cost}</span>
  <span class="r" style="background:${TDD.ROLE[c.h.role].col}"></span><span class="n">${esc(c.h.name)}</span><span class="pp">${c.h.sks.map(()=>'<i></i>').join('')}</span><i class="hp"><b></b></i><i class="sr"></i><span class="cd" hidden></span></button>`).join('');}

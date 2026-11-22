@@ -43,7 +43,7 @@
 | 用語・耐性 | `js/data/terms.js`（`TERMS`） | — |
 | 強化メニュー（経験値のストック・レベルアップ・旧酒場の統合） | `js/ui/growth.js`（`GROW`） | `css/ui/growth.css` |
 | 版表示・お知らせ | `js/v38/menu.js`（`VER` `NEWS`） | — |
-| **タワーディフェンス「灯守の防衛線」**（移行先の戦闘。入口＝ホーム右の縦メニュー「防衛」・`index.html#td`） | データ `js/td/data.js`（`TDD`）・章とステージ `js/td/stages.js`・ロジック `js/td/sim.js`（`TDS`。DOM なしの固定刻み・自動の配置 `bot`）・背景 `js/td/bg.js`（`TDBG`）・戦闘画面（横スクロール・縦画面・カメラの自動追従・ピンチ）`js/td/view.js`（`TD`）・帯と操作盤と手札（技 3 つ・星臨・奥義）`js/td/hud.js`（`TDH`）・演出と敵の歩き `js/td/fx.js`（`TDFX`）・効果音と BGM `js/td/sfx.js`（`TDSFX`）・字を使わない導き `js/td/guide.js`（`GUIDE`）・章の地図/出撃準備/会話/加入 `js/td/menu.js`（`TDM`）。設計 `docs/TD-DESIGN.md` | `css/ui/td.css` |
+| **タワーディフェンス「灯守の防衛線」**（移行先の戦闘。入口＝ホーム右の縦メニュー「防衛」・`index.html#td`） | データ `js/td/data.js`（`TDD`）・章とステージ `js/td/stages.js`・ロジック `js/td/sim.js`（`TDS`。DOM なしの固定刻み・自動の配置 `bot`）・背景 `js/td/bg.js`（`TDBG`）・戦闘画面（横スクロール・縦画面・カメラの自動追従・ピンチ）`js/td/view.js`（`TD`）・帯と操作盤と手札（技 3 つ・星臨・奥義）`js/td/hud.js`（`TDH`）・技ボタンのドット絵 `js/td/skicon.js`（`TDI`）・役割（タンク〜特殊）と動きは `TDD.ROLE`・`sim.js` の `BR`・演出と敵の歩き `js/td/fx.js`（`TDFX`）・効果音と BGM `js/td/sfx.js`（`TDSFX`）・字を使わない導き `js/td/guide.js`（`GUIDE`）・章の地図/出撃準備/会話/加入 `js/td/menu.js`（`TDM`）。設計 `docs/TD-DESIGN.md` | `css/ui/td.css` |
 | **ホーム**（ver0.52。TD の「防衛」が主役・下のタブ 4 つ・≡ のシート） | `js/ui/home.js`（`HOME`。v22 の townMenu の重ね表示 .h22 を置き換え。背景の街の絵は v22 drawHome のまま） | `css/ui/home.css` |
 | **仲間**（ver0.52。一覧＋1 人の詳細で Lv・技の練達・装備・星盤をまとめる。TD の能力を表示） | `js/ui/unit.js`（`UNIT.open(id, 戻り先)`）。TD の能力は `TDD.hero(id, lv, TDD.real(id))`（装備の比・練達・星臨の位階を反映） | `css/ui/unit.css` |
 | デザイントークン（新しい画面はこれ以外の色・角・影を使わない） | — | `css/ui/tokens.css` |

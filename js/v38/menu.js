@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.57';
+const VER='ver0.58';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,12 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　スマホの縦画面の戦闘・技 3 つ・星臨<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　役割と動き・大きなキャラ・技ボタン<br><small>`+
+ `・役割の名前をタンク・近距離物理アタッカー・遠距離物理アタッカー・魔法アタッカー・サポーター・ヒーラー・特殊に統一<br>`+
+ `・役割ごとに動きが賢く：タンクは前へ出て受け止め、近距離は味方の肩越しに叩き、遠距離は射程ぎりぎり、ヒーラーは傷ついた仲間の後ろへ<br>`+
+ `・仲間どうしが重ならないように並ぶ<br>`+
+ `・キャラを大きく（これからのモーションのため）。技ボタンを属性の色のドット絵に、溜まると金に光る<br></small></div>`+
+ `<div class="nt n38"><b>ver0.57</b>　スマホの縦画面の戦闘・技 3 つ・星臨<br><small>`+
  `・戦闘画面をスマホの縦画面に合わせた。カメラが前線を自動で追う。下に選んだ仲間の操作盤（顔・技 3 つ・星臨・奥義）<br>`+
  `・技は 1 人 3 つを仲間の画面で選び、溜まると自動で出る。星臨と奥義は操作盤から手で出す<br>`+
  `・ダメージの数字を大きく読みやすく（弱点は金と「弱」・会心は赤）。技の名前を頭の上に<br>`+
