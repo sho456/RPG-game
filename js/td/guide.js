@@ -22,7 +22,7 @@ function point(x,y){if(x==null){hand.hidden=true;return;}hand.hidden=false;hand.
 /* 要素の中心（#td の中の座標。#td は画面いっぱいの fixed） */
 function mid(el){if(!el)return null;const r=el.getBoundingClientRect();if(!r.width)return null;return{x:r.left+r.width/2,y:r.top+r.height/2,w:r.width,h:r.height};}
 /* 戦場の座標 → 画面の座標 */
-function scr(st,x,y){const cv=TD.root().querySelector('.td-field canvas'),r=cv.getBoundingClientRect(),S=r.height/TDD.K.FH;return{x:r.left+(x-TD.cam)*S,y:r.top+y*S,S,L:r.left,R:r.left+r.width};}
+function scr(st,x,y){return TD.toScr(x,y);}
 /* ---------- 毎コマ ---------- */
 function loop(){raf=requestAnimationFrame(loop);const st=TD.st;if(!st||!ov){return;}
  const root=TD.root(),s=step();let n=0;arrow.hidden=true;
