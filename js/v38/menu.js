@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.56';
+const VER='ver0.57';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,13 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　技 5 つ・奥義・装備・戦闘画面<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　スマホの縦画面の戦闘・技 3 つ・星臨<br><small>`+
+ `・戦闘画面をスマホの縦画面に合わせた。カメラが前線を自動で追う。下に選んだ仲間の操作盤（顔・技 3 つ・星臨・奥義）<br>`+
+ `・技は 1 人 3 つを仲間の画面で選び、溜まると自動で出る。星臨と奥義は操作盤から手で出す<br>`+
+ `・ダメージの数字を大きく読みやすく（弱点は金と「弱」・会心は赤）。技の名前を頭の上に<br>`+
+ `・ピンチで画面が崩れるのを修正（戦場だけを拡大）。敵が前衛をすり抜けないように<br>`+
+ `・アビリティの窓は今の効果だけ。段階別は「段階」のタブで<br></small></div>`+
+ `<div class="nt n38"><b>ver0.56</b>　技 5 つ・奥義・装備・戦闘画面<br><small>`+
  `・技と術は 1 人 5 つに。仲間の画面で戦闘で使う技を選べる。星臨の奥義は 1 つにまとめた<br>`+
  `・技・奥義・アビリティはタップで専用の窓。アビリティは防衛でも効くように<br>`+
  `・装備は名前と能力の増減を見て選べる。「おまかせ」で一番良い物を付ける<br>`+

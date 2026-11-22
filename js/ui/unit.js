@@ -1,7 +1,8 @@
 /* ===== 仲間の画面（UNIT）：TD 用の一覧＋1 人の詳細。Lv・技 5 つ・奥義・アビリティ 3 つ・装備・星盤をここにまとめる =====
  UNIT.open() で一覧、UNIT.open(id) で詳細、UNIT.open(null, 戻り先の関数)。全画面の #unit（z902）。閉じたら townMenu()。
  能力は TDD.hero(id,lv,TDD.real(id)) の数字。Lv は GROW.lvUp、装備は equip、練達は RSM.up。変えたら save()
- ver0.56：技・奥義・アビリティ・装備は、タップで開く専用の窓（pop）で確かめる。技は 5 つから戦闘で使う 1 つを選ぶ（G.h[id].tdsk）。
+ ver0.56：技・奥義・アビリティ・装備は、タップで開く専用の窓（pop）で確かめる。
+ ver0.57：技は 5 つから戦闘で使う 3 つを選ぶ（G.h[id].tdsk3。技の窓の 3 つの枠をタップで入れる・入れ替える）。アビリティの窓は今の段階の効果だけ、段階別は別のタブ。
  装備の窓は候補ごとに防衛の能力の増減を出し、選んでから付ける。おまかせ（auto）は空いている・弱い枠に一番良い物を付ける（他の仲間からは取らない） */
 'use strict';
 const UNIT=(()=>{
@@ -42,9 +43,9 @@ function slotBtn(id,sl,g){const it=itOf(G.h[id].eq[sl]);
  return`<button class="un-eq${it?' r'+(it.rar||0):''}" data-a="slot" data-v="${sl}">${it?`<span class="ic">${itSrc(it)}</span><b>${esc(it.name)}</b>${it.plus?`<em>+${it.plus}</em>`:''}`:`<span class="g">${g}</span>`}</button>`;}
 /* ---------- 詳細 ---------- */
 function detail(id){const all=byRole(),s=stats(id),d=TDD.HERO[id],R=TDD.ROLE[d.role],h=G.h[id];
- const cap=(()=>{try{return V31.capOf(id);}catch(e){return 99;}})(),max=h.lv>=cap,ok=GROW.can(id),sel=TDD.skSel(id);
+ const cap=(()=>{try{return V31.capOf(id);}catch(e){return 99;}})(),max=h.lv>=cap,ok=GROW.can(id),s3=TDD.skSel3(id);
  const stat=(g,v)=>`<li><i>${g}</i><b>${v}</b></li>`;
- const sks=TDD.skills(id).map(x=>`<button class="un-sk${x.k===sel?' sel':''}${x.on?'':' lock'}" data-a="sk" data-v="${x.k}" aria-label="${esc(TDD.skName(x.k))}"><span class="i">${skI(x.k)}</span>${x.on?`<b>${esc(TDD.skName(x.k))}</b>${dots(RSM.lvOf(id,x.k))}`:`<b class="lv">${x.how==='lv'?'Lv'+x.lv:'星盤'}</b>`}</button>`).join('');
+ const sks=TDD.skills(id).map(x=>`<button class="un-sk${s3.includes(x.k)?' sel':''}${x.on?'':' lock'}" data-a="sk" data-v="${x.k}" aria-label="${esc(TDD.skName(x.k))}">${s3.includes(x.k)?`<i class="no">${s3.indexOf(x.k)+1}</i>`:''}<span class="i">${skI(x.k)}</span>${x.on?`<b>${esc(TDD.skName(x.k))}</b>${dots(RSM.lvOf(id,x.k))}`:`<b class="lv">${x.how==='lv'?'Lv'+x.lv:'星盤'}</b>`}</button>`).join('');
  const abs=(RSD.AB[id]||[]).map((A,i)=>{const r=RSC.abRank(id,i);return`<button class="un-ab${r?'':' lock'}" data-a="ab" data-v="${i}"><b>${esc(A.n)}</b>${r?dots(r):`<b class="lv">Lv${RSD.ABL[i]}</b>`}</button>`;}).join('');
  return`<header class="un-h"><button class="td-btn" data-a="list" aria-label="一覧">◀</button><b>${esc(s.name)}</b><span class="un-sum">${xpI}${fm(stk())}</span></header>
  <section class="un-hero"><button class="td-btn nv" data-a="nav" data-v="-1" ${all.length<2?'disabled':''}>‹</button>
@@ -62,19 +63,24 @@ function popHTML(id){if(!pop)return'';let b='';
  if(pop.t==='sk')b=skPop(id,pop.v);else if(pop.t==='ou')b=ouPop(id);else if(pop.t==='ab')b=abPop(id,+pop.v);else if(pop.t==='eq')b=eqPop(id,pop.v);
  return`<div class="un-pop" data-a="shut"><div class="un-pw" data-a="stay">${b}</div></div>`;}
 const ph=(icon,name,x='')=>`<div class="un-ph">${icon?`<span class="i">${icon}</span>`:''}<b>${esc(name)}</b>${x}<button class="td-btn" data-a="shut" aria-label="閉じる">✕</button></div>`;
-function skPop(id,k){const x=TDD.skills(id).find(x=>x.k===k);if(!x)return'';const s0=SK[k]||{},mas=RSM.lvOf(id,k),use=TDD.skSel(id)===k;
- const h=TDD.hero(id,G.h[id].lv,Object.assign(TDD.real(id),{sk:k,mas}));const cost=mas>=3?0:RSM.costOf(id,k),why=mas>=3?'max':RSM.canUp(id,k);
+function skPop(id,k){const x=TDD.skills(id).find(x=>x.k===k);if(!x)return'';const s0=SK[k]||{},mas=RSM.lvOf(id,k),s3=TDD.skSel3(id);
+ const h=TDD.hero(id,G.h[id].lv,Object.assign(TDD.real(id),{sks:[k],masM:{[k]:mas}}));const cost=mas>=3?0:RSM.costOf(id,k),why=mas>=3?'max':RSM.canUp(id,k);
  return ph(skI(k),TDD.skName(k),`<em class="el">${esc(s0.el||'')}</em>`)+`
  <p class="un-tx">${esc(TDD.skTxt(h.sk))}</p><ul class="un-kv"><li><i>溜め</i><b>${h.sk.ch} 秒</b></li><li><i>習得</i><b>${x.how==='lv'?'Lv'+x.lv:'星盤'}</b></li></ul>
  <div class="un-pr"><i class="k">練達</i>${dots(mas)}<button class="td-btn${why===null?' ok':' dis'}" data-a="mas" data-v="${k}" ${why===null?'':'aria-disabled="true"'}>${why==='max'?'MAX':`${stI()}${cost}`}</button></div>
- <div class="un-pa">${!x.on?`<button class="td-btn dis" aria-disabled="true">${x.how==='lv'?'Lv'+x.lv:'星盤'}</button>`:use?'<button class="td-btn dis" aria-disabled="true">使用中</button>':`<button class="td-btn on" data-a="use" data-v="${k}">使う</button>`}</div>`;}
+ ${!x.on?`<div class="un-pa"><button class="td-btn dis" aria-disabled="true">${x.how==='lv'?'Lv'+x.lv:'星盤'}</button></div>`:
+  /* 戦闘で使う 3 つの枠：タップでこの技をその枠へ（すでに別の枠にあれば入れ替え） */
+  `<div class="un-slot">${s3.map((q,i)=>`<button class="${q===k?'sel':''}" data-a="put3" data-v="${i}" aria-label="枠${i+1}"><i class="no">${i+1}</i><span class="i">${skI(q)}</span></button>`).join('')}</div>`}`;}
 function ouPop(id){const s=stats(id),U=s.ult,X=RSD.AWX[id]||{};
- return ph(skI(X.ou),U.n,dots(U.lv))+`<p class="un-tx">${esc(U.d||'')}</p><ul class="un-kv">${U.m?`<li><i>威力</i><b>攻撃×${U.m}</b></li>`:''}${U.r?`<li><i>範囲</i><b>${U.r}</b></li>`:''}<li><i>星臨</i><b>${esc(U.aw||'')}</b></li></ul>`;}
+ return ph(skI(X.ou),U.n,dots(U.lv))+`<p class="un-tx">${esc(U.d||'')}</p><ul class="un-kv">${U.m?`<li><i>威力</i><b>攻撃×${U.m}</b></li>`:''}${U.r?`<li><i>範囲</i><b>${U.r}</b></li>`:''}<li><i>星臨</i><b>${esc(U.aw||'')}</b></li></ul><p class="un-tx aw">星臨 ★${TDD.K.AW}：${TDD.AWK.dur} 秒・攻撃 +${Math.round(TDD.AWK.atk*100)}%・技の溜め ×${TDD.AWK.ch}・HP ${Math.round(TDD.AWK.heal*100)}% 回復。星臨中の奥義 ×${TDD.AWK.ou}</p>`;}
 function abPop(id,i){const A=(RSD.AB[id]||[])[i];if(!A)return'';const r=RSC.abRank(id,i);
  const row=(e,sp)=>{const t=TDD.abTd(e,id);return`<li class="${t?'on':''}${sp?' sp':''}">${esc(t?t.txt:RSC.effTxt(e))}</li>`;};
- const st=[1,2,3].map(rr=>{const L=A.fx.map(f=>RSC.resolve(f,rr)).filter(RSC.active);
+ /* 今の段階だけ（未習得は段階Ⅰを薄く）。段階別のタブで 3 段を並べる */
+ const all=pop.tab==='all',rs=all?[1,2,3]:[Math.max(1,r)];
+ const tabs=`<nav class="un-tabs"><button class="${all?'':'on'}" data-a="abt" data-v="now">効果</button><button class="${all?'on':''}" data-a="abt" data-v="all">段階</button></nav>`;
+ const st=rs.map(rr=>{const L=A.fx.map(f=>RSC.resolve(f,rr)).filter(RSC.active);
   return`<section class="un-stg${rr===r?' now':''}${rr>r?' fut':''}"><h4>${['','Ⅰ','Ⅱ','Ⅲ'][rr]}</h4><ul>${L.map(e=>row(e)).join('')}${rr===3&&A.sp?`<li class="spn">${esc(A.sp.n)}</li>${A.sp.fx.map(f=>row(Object.assign({},f,{p:f.t==='fu'?f.v:f.p,pow:f.pw}),1)).join('')}`:''}</ul></section>`;}).join('');
- return ph('',A.n,r?dots(r):`<em class="el">Lv${RSD.ABL[i]}</em>`)+`<div class="un-sts">${st}</div>`;}
+ return ph('',A.n,r?dots(r):`<em class="el">Lv${RSD.ABL[i]}</em>`)+tabs+`<div class="un-sts">${st}</div>`;}
 function eqPop(id,sl){const h=G.h[id],cu=itOf(h.eq[sl]),base=stats(id),L=cands(id,sl),pk=pop.pick&&L.find(it=>it.uid===pop.pick),g=(SLOTS.find(x=>x[0]===sl)||[])[1];
  const card=(it,x)=>`<div class="un-ic r${it.rar||0}"><span class="ic">${itSrc(it)}</span><div><b style="color:${(RAR[it.rar]||RAR[0]).c}">${esc(iname(it))}</b><small>${(it.ops||[]).map(o=>esc(opTxt(o))).join('　')}</small></div>${x||''}</div>`;
  const rows=L.map(it=>{const w=holder(it.uid),s=trial(id,sl,it.uid);return`<li><button class="${pop.pick===it.uid?'sel':''}" data-a="pick2" data-v="${it.uid}"><span class="ic">${itSrc(it)}</span><span class="nm">${esc(iname(it))}</span><span class="dl">${delta(base,s)}</span>${w?`<img class="who" src="${pic(w,24)}" alt="">`:''}</button></li>`;}).join('');
@@ -87,11 +93,11 @@ function onClick(e){const b=e.target.closest('[data-a]');if(!b)return;const a=b.
  if(a==='pick'){cur=v;pop=null;draw();root.scrollTop=0;return;}
  if(a==='nav'){const all=byRole(),i=all.indexOf(cur);cur=all[(i+(+v)+all.length)%all.length];pop=null;draw();return;}
  if(a==='lv'){if(b.getAttribute('aria-disabled'))return;const k=GROW.lvUp(cur,+v||1);if(k){try{SFX.aw();}catch(x){}save();}draw();return;}
- if(a==='sk'){pop={t:'sk',v};draw();return;}if(a==='ou'){pop={t:'ou'};draw();return;}if(a==='ab'){pop={t:'ab',v};draw();return;}
+ if(a==='sk'){pop={t:'sk',v};draw();return;}if(a==='ou'){pop={t:'ou'};draw();return;}if(a==='ab'){pop={t:'ab',v,tab:'now'};draw();return;}if(a==='abt'){pop.tab=v;draw();return;}
  if(a==='slot'){pop={t:'eq',v};draw();return;}
  if(a==='shut'){if(e.target!==b&&b.classList.contains('un-pop'))return;pop=null;draw();return;}
  if(a==='mas'){if(b.getAttribute('aria-disabled'))return;if(RSM.canUp(cur,v)===null){RSM.up(cur,v);try{SFX.aw();}catch(x){}save();}draw();return;}
- if(a==='use'){G.h[cur].tdsk=v;save();draw();return;}
+ if(a==='put3'){const k=pop.v,s3=TDD.skSel3(cur).slice(),i=+v,j=s3.indexOf(k);if(j>=0)[s3[i],s3[j]]=[s3[j],s3[i]];else s3[i]=k;G.h[cur].tdsk3=s3;delete G.h[cur].tdsk;try{SFX.sel();}catch(x){}save();draw();return;}
  if(a==='pick2'){pop.pick=+v===pop.pick?null:+v;draw();return;}
  if(a==='put'){equip(cur,pop.v,+v);save();pop=null;draw();return;}
  if(a==='off'){equip(cur,pop.v,null);save();pop=null;draw();return;}

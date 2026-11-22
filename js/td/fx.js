@@ -29,12 +29,12 @@ const at=(u,f)=>f?{x:f.x,y:f.y-14}:{x:u.x,y:u.y-14};
 const K={
  strike:(u,f,c,c2)=>{const p=at(u,f),d=u.face||-1;add({k:'xslash',x:p.x,y:p.y,r:16,c,c2,dir:d,d:.26});add({k:'burst',x:p.x,y:p.y,r:22,c,c2,d:.3,dl:.06});add({k:'star',x:p.x,y:p.y,r:12,c:'#fff',d:.28,dl:.06});sparks(p.x,p.y,16,c,{dl:.06,a:d>0?0:Math.PI,w:2});},
  guard:(u,f,c,c2)=>{add({k:'dome',x:u.x,y:u.y,r:24,c,c2,d:.55});rise(u.x,u.y-10,6,c2,{w:30,d:.5});},
- nova:(u,f,c,c2)=>{const p=u.h.sk.at==='foe'&&f?{x:f.x,y:f.y}:{x:u.x,y:u.y};add({k:'gring',x:p.x,y:p.y,r:u.h.sk.r||44,c,c2,d:.45});add({k:'burst',x:p.x,y:p.y-12,r:26,c,c2,d:.3});sparks(p.x,p.y-6,22,c,{sp:110,d:.4});},
+ nova:(u,f,c,c2)=>{const p=(u.cs||u.h.sk).at==='foe'&&f?{x:f.x,y:f.y}:{x:u.x,y:u.y};add({k:'gring',x:p.x,y:p.y,r:(u.cs||u.h.sk).r||44,c,c2,d:.45});add({k:'burst',x:p.x,y:p.y-12,r:26,c,c2,d:.3});sparks(p.x,p.y-6,22,c,{sp:110,d:.4});},
  stun:(u,f,c,c2)=>{const p=at(u,f);add({k:'burst',x:p.x,y:p.y,r:18,c,c2,d:.28});add({k:'star',x:p.x,y:p.y-16,r:10,c:'#ffe14a',d:.4,dl:.05});sparks(p.x,p.y,10,c);},
  chain:(u,f,c)=>{add({k:'burst',x:u.x,y:u.y-24,r:10,c,c2:'#fff',d:.2});},
  curse:(u,f,c,c2)=>{const p=f||u;add({k:'sigil',x:p.x,y:p.y,r:30,n:5,c,c2,d:.6});},
- heal:(u,f,c,c2)=>{add({k:'gring',x:u.x,y:u.y,r:u.h.sk.r*.5,c:'#9fe8b8',c2:'#fff',d:.5});rise(u.x,u.y-20,10,'#9fe8b8',{w:40});},
- slow:(u,f,c,c2)=>{const p=f||u;add({k:'clock',x:p.x,y:p.y,r:u.h.sk.r||60,c,c2,d:.6});}};
+ heal:(u,f,c,c2)=>{add({k:'gring',x:u.x,y:u.y,r:(u.cs||u.h.sk).r*.5,c:'#9fe8b8',c2:'#fff',d:.5});rise(u.x,u.y-20,10,'#9fe8b8',{w:40});},
+ slow:(u,f,c,c2)=>{const p=f||u;add({k:'clock',x:p.x,y:p.y,r:(u.cs||u.h.sk).r||60,c,c2,d:.6});}};
 /* 固有（キャラの性格を乗せる） */
 const H={
  /* リオ：光の刃。三日月の後に縦の光の柱で両断・星の閃光 */
@@ -48,13 +48,13 @@ const H={
  shion:(u,f,c,c2)=>{const p=at(u,f);for(let i=0;i<3;i++){const a=-Math.PI/2+(i-1)*.7;add({k:'needle',x0:p.x+Math.cos(a)*40,y0:p.y+Math.sin(a)*34,x1:p.x+(i-1)*4,y1:p.y+4,c,c2:'#6f6888',d:.18,dl:i*.05});}
   add({k:'burst',x:p.x,y:p.y,r:14,c,c2,d:.25,dl:.16});},
  /* ミレ：炎の波。輪に沿って炎の舌が立つ */
- mire:(u,f,c,c2)=>{const p=f||u;add({k:'flame',x:p.x,y:p.y,r:u.h.sk.r||56,c,c2,d:.5});add({k:'burst',x:p.x,y:p.y-12,r:24,c,c2,d:.3});rise(p.x,p.y-6,10,c2,{k:'ember',w:60,d:.6});},
+ mire:(u,f,c,c2)=>{const p=f||u;add({k:'flame',x:p.x,y:p.y,r:(u.cs||u.h.sk).r||56,c,c2,d:.5});add({k:'burst',x:p.x,y:p.y-12,r:24,c,c2,d:.3});rise(p.x,p.y-6,10,c2,{k:'ember',w:60,d:.6});},
  /* クロウ：紫の五芒の陣＋星座の線で縛る */
  crow:(u,f,c,c2)=>{K.curse(u,f,c,c2);const p=f||u;add({k:'stars',x:p.x,y:p.y-18,r:22,c:c2,d:.5,dl:.08});},
  /* セレス：時計の陣（12 の刻みと逆回りの針） */
  celes:(u,f,c,c2)=>{K.slow(u,f,'#b07aff','#f2b347');motes(u.x,u.y-24,10,'#f2b347',26,.2);},
  /* ノア：祈り。灯の色の粒と十字の星が昇る */
- noah:(u,f,c,c2)=>{add({k:'gring',x:u.x,y:u.y,r:u.h.sk.r*.5,c:'#fff1a8',c2:'#9fe8b8',d:.55});rise(u.x,u.y-20,14,'#fff1a8',{w:50,d:.7});},
+ noah:(u,f,c,c2)=>{add({k:'gring',x:u.x,y:u.y,r:(u.cs||u.h.sk).r*.5,c:'#fff1a8',c2:'#9fe8b8',d:.55});rise(u.x,u.y-20,14,'#fff1a8',{w:50,d:.7});},
  /* エルナ：雷の矢。放つ前に弓の先に光 */
  erna:(u,f,c)=>{add({k:'star',x:u.x+(u.face||-1)*10,y:u.y-28,r:10,c,d:.25});}};
 /* ---------- 出来事 → 演出 ---------- */
@@ -63,12 +63,14 @@ function ev(e,st){const u=e.u,el=u&&u.h?u.h.el:'陽',c=ELC[el]||'#fff',c2=EL2[el
  case'hit':{const f=e.f,hx=f.x,hy=f.y-14;
   if(u.id==='lamp'){add({k:'shot',x0:u.x,y0:u.y,x1:hx,y1:hy,c:'#f2b347',c2:'#fff1a8',d:.2,big:1});sparks(hx,hy,4,'#f2b347');return;}
   if(e.big){if(f.hp<=0)f._hold=.24;sparks(hx,hy,6,c,{dl:.24});return;}
-  if(e.sk){if(u.h.sk.k==='chain')add({k:'bolt',x0:u.x,y0:u.y-26,x1:hx,y1:hy,c,seed:Math.random()*99,d:.22});sparks(hx,hy,8,c);return;}
+  if(e.sk){if((u.cs||u.h.sk).k==='chain')add({k:'bolt',x0:u.x,y0:u.y-26,x1:hx,y1:hy,c,seed:Math.random()*99,d:.22});sparks(hx,hy,8,c);return;}
   const far=u.h.rng>60,mag=u.h.dmgK==='mag';
   if(far)add({k:mag?'orb':'arrow',x0:u.x+(u.face||-1)*6,y0:u.y-24,x1:hx,y1:hy,c,c2,d:mag?.2:.14});
   else add({k:'slash',x:hx,y:hy,c,c2,dir:u.face||-1,d:.14});
   sparks(hx,hy,e.cr?10:4,e.weak?'#f2b347':c,{dl:far?.14:0,d:.25});if(e.cr)add({k:'star',x:hx,y:hy,r:9,c:'#fff',d:.2,dl:far?.14:0});return;}
- case'cast':(H[u.id]||K[e.sk.k]||K.strike)(u,e.f,c,c2);return;
+ case'cast':u.cs=e.sk;((e.sk.id===TDD.HERO[u.id].sk&&H[u.id])||K[e.sk.k]||K.strike)(u,e.f,c,c2);return;
+ /* 星臨：足元から光の柱・星の輪が 2 重に広がる（オーラは view.js が描く） */
+ case'aw':add({k:'pillar',x:u.x,y:u.y,w:22,h:96,c:'#fff1a8',d:.5});add({k:'gring',x:u.x,y:u.y,r:30,c:'#f2b347',c2:'#fff',d:.45});add({k:'gring',x:u.x,y:u.y,r:46,c,c2,d:.6,dl:.12});add({k:'star',x:u.x,y:u.y-56,r:22,c:'#fff',d:.4,dl:.08});rise(u.x,u.y-20,18,'#fff0b8',{w:30,d:.8});return;
  case'kill':{const f=e.f,F=B.spr(f.spr,f.kind,1);if(L.filter(x=>x.k==='corpse').length>14){const i=L.findIndex(x=>x.k==='corpse');L.splice(i,1);}
   add({k:'corpse',F,x:f.x,y:f.y,mir:f.dir<0,hg:f.boss?60:32,gh:f.tr.includes('ghost'),boss:f.boss,seed:f.uid,hold:f._hold||0,d:(f.boss?.9:.45)+(f._hold||0)});
   sparks(f.x,f.y-14,f.boss?40:10,f.tr.includes('void')?'#b07aff':'#e86a6a',{sp:f.boss?140:80,d:.45});if(f.boss){add({k:'star',x:f.x,y:f.y-30,r:30,c:'#f2b347',d:.6});rise(f.x,f.y-30,16,'#f2b347',{w:50,d:.9});}return;}

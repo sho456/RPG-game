@@ -1,10 +1,14 @@
 /* ===== TD のデータ（仲間・敵の変換・数値の定数・報酬。ステージは js/td/stages.js）。設計は docs/TD-DESIGN.md =====
  RPG 版のデータ（HB・ED・AW・SK・RSD.HERO）を読むだけで、書き換えない。数値の尺度は TD 用に引き直す（9999 万・Lv60 以降のインフレは使わない）。
- 正本：仲間＝HERO、敵の型＝TRAIT、ステージ＝STAGE。変換＝hero(id,lv)・foe(kind,lv)。技 5 つの読み替え＝mapSk、アビリティ＝abTd・abSum、奥義＝ULT */
+ 正本：仲間＝HERO、敵の型＝TRAIT、ステージ＝STAGE。変換＝hero(id,lv)・foe(kind,lv)。技 5 つの読み替え＝mapSk、アビリティ＝abTd・abSum、奥義＝ULT・星臨＝AWK
+ ver0.57：戦闘で使う技は 1 人 3 つ（skSel3・G.h[id].tdsk3）。それぞれの溜め（リキャスト）が終わると自動で出る。星臨と奥義は手で出す */
 'use strict';
 const TDD=(()=>{
 /* ---------- 定数 ---------- */
-const K={FH:420,STEP:1/30,LIVES:7,COST0:10,COST_EVERY:.9,STAR_MAX:10,DARK:.6/*光の外の攻撃の倍率*/,GAP:8/*WAVE の間の秒*/};
+const K={FH:420,STEP:1/30,LIVES:7,COST0:10,COST_EVERY:.9,STAR_MAX:10,DARK:.6/*光の外の攻撃の倍率*/,GAP:8/*WAVE の間の秒*/,
+ SKCH:2.2/*技 3 つの溜めの倍率（1 つだった頃より長く）*/,GCD:.7/*技と技の間の最短の秒*/,AW:6/*星臨の星片*/};
+/* 星臨（戦闘中 1 人 1 回・手で出す）：dur 秒のあいだ攻撃 +atk・技の溜めが ch 倍の速さ・出した時に HP を heal 回復。星臨中の奥義は威力 ×ou */
+const AWK={dur:15,atk:.3,ch:1.6,heal:.3,ou:1.3};
 /* 役割：line＝隊列（f＝前衛：道の上で敵を止める／b＝後衛：前衛の後ろ・道の脇）・射程・攻撃間隔・止める数・コスト・攻撃の形
  mv＝歩く速さ（px/秒）・chase＝斬るが持ち場から敵へ詰め寄る間合い・off＝後衛が一番前の前衛から下がる間合い */
 const ROLE={
@@ -72,8 +76,14 @@ function mapSk(k,role){const s=(typeof SK!=='undefined'&&SK[k])||{},rk=s.rk||'B'
 /* そのキャラの 5 つ：[{k, how, lv, on（覚えた）}]。how：lv＝レベル／board＝星盤 */
 function skills(id){let L=[];try{L=RSD.LEARN[id]||[];}catch(e){}const h=typeof G!=='undefined'&&G&&G.h&&G.h[id];
  return L.map(([k,how,lv])=>({k,how,lv,on:!!h&&(how==='lv'?h.lv>=lv:(h.board||[]).includes('2,-2'))}));}
-/* 戦闘で使う技（覚えていなければ既定） */
-function skSel(id){try{const h=G.h[id],k=h&&h.tdsk;if(k&&skills(id).some(x=>x.k===k&&x.on))return k;}catch(e){}return HERO[id].sk;}
+/* 戦闘で使う技の 1 つめ（互換） */
+function skSel(id){return skSel3(id)[0];}
+/* 計測用（セーブなし）：既定の技＋その Lv で覚えている技（星盤の技は除く）を習得の早い順に 3 つ */
+function skDef(id,lv){const d=HERO[id].sk;let L=[];try{L=(RSD.LEARN[id]||[]).filter(([k,how,l])=>how==='lv'&&l<=lv&&k!==d).map(x=>x[0]);}catch(e){}return[d,...L].slice(0,3);}
+/* 戦闘で使う技 3 つ：選んだ技（覚えているものだけ）→ 足りなければ既定の技・覚えた順で埋める。セーブが無い（計測）ときは既定＋習得の早い順 */
+function skSel3(id){const d=HERO[id].sk,all=skills(id),hasG=typeof G!=='undefined'&&G&&G.h&&G.h[id],on=hasG?all.filter(x=>x.on).map(x=>x.k):all.map(x=>x.k);let L=[];
+ try{if(hasG){const h=G.h[id];L=(h.tdsk3||(h.tdsk?[h.tdsk]:[])).filter(k=>on.includes(k));}}catch(e){}
+ for(const k of[d,...on])if(L.length<3&&!L.includes(k)&&(k===d||on.includes(k)))L.push(k);return L.slice(0,3);}
 /* TD の技の説明（詳しい窓に出す） */
 function skTxt(sk){const m=x=>`攻撃×${x}`;switch(sk.k){
  case'strike':return`近くの敵 1 体に ${m(sk.m)}${sk.kb?'・はじき返す':''}`;case'stun':return`敵 1 体に ${m(sk.m)}・${sk.dur} 秒止める`;
@@ -107,23 +117,27 @@ function abSum(id){const o={atk:0,hp:0,def:0,cut:0,crit:0,critd:0,regen:0,drain:
 function hero(id,lv=1,o){const h=HB[id],d=HERO[id],R=ROLE[d.role];if(!h||!d)return null;
  let mag=false;try{mag=RSD.WPN[RSD.HERO[id].w].mag===1;}catch(e){}
  const prim=mag?h.mag:h.atk,k=lvK(lv),gk=(o&&o.gear)||{},q=x=>Math.max(.8,Math.min(3,x||1)),mas=Math.min(3,(o&&o.mas)||0),aw=Math.max(1,Math.min(3,(o&&o.aw)||1));
- const sid=(o&&o.sk)||d.sk,base=sid===d.sk?d:Object.assign({haste:d.haste,thief:d.thief},mapSk(sid,d.role)),ab=(o&&o.ab)||{};
- const sk=Object.assign({id:sid,n:skName(sid)},base,{mas});if(sk.m&&sk.k!=='heal'&&sk.k!=='slow')sk.m=+(sk.m*(1+.15*mas)).toFixed(2);if(sk.k==='heal')sk.m=+(sk.m*(1+.1*mas)).toFixed(2);sk.ch=+(base.ch*(1-.08*mas)).toFixed(1);
+ const ab=(o&&o.ab)||{},ids=(o&&o.sks)||(o&&o.sk?[o.sk]:skDef(id,lv)),masOf=k=>Math.min(3,o&&o.masM&&o.masM[k]!=null?o.masM[k]:mas);
+ /* 技：既定の技は手で合わせた数字、ほかは mapSk。練達で威力と溜めが良くなる。溜めは K.SKCH 倍（技が 3 つあるぶん長い） */
+ const mk=sid=>{const ms=masOf(sid),base=sid===d.sk?{k:d.k,m:d.m,r:d.r,dur:d.dur,cnt:d.cnt,kb:d.kb,at:d.at,ch:d.ch}:mapSk(sid,d.role),sk=Object.assign({id:sid,n:skName(sid)},base,{mas:ms});
+  for(const x in sk)if(sk[x]===undefined)delete sk[x];if(sk.m&&sk.k!=='heal'&&sk.k!=='slow')sk.m=+(sk.m*(1+.15*ms)).toFixed(2);if(sk.k==='heal')sk.m=+(sk.m*(1+.1*ms)).toFixed(2);
+  sk.ch=+(base.ch*K.SKCH*(1-.08*ms)).toFixed(1);return sk;};
+ const sks=ids.map(mk),sk=sks[0];
  const ult=Object.assign({n:ouName(id),aw:awName(id),k:'unova',m:7,r:92},ULT[id]||{},{lv:aw});if(ult.m)ult.m=+(ult.m*(1+.25*(aw-1))).toFixed(2);
  return{id,name:h.name,role:d.role,line:R.line,mv:R.mv,chase:R.chase||0,off:R.off||0,el:d.el,dmgK:mag||d.role==='spell'?'mag':'phys',
   hp:Math.round((200+h.mhp*2.2)*k*q(gk.hp)*(1+(ab.hp||0)/100)),atk:Math.round((20+prim*1.6)*k*(d.atkK||1)*q(gk.atk)*(1+(ab.atk||0)/100)),def:Math.round(h.def*1.5*k*q(gk.def)*(1+(ab.def||0)/100)),res:Math.round(h.res*1.5*k*q(gk.res)),
   cut:Math.min(.5,(ab.cut||0)/100),crit:(ab.crit||0)/100,critd:(ab.critd||0)/100,regen:(ab.regen||0)/100,drain:(ab.drain||0)/100,pierce:Math.min(.6,(ab.pierce||0)/100),tatk:(ab.tatk||0)/100,tcut:(ab.tcut||0)/100,fu:ab.fu||[],
   iv:+((d.iv||R.iv)*(1-(h.spd-10)*.015)).toFixed(2),rng:d.rng||R.rng,blk:d.blk!=null?d.blk:R.blk,cost:d.cost||R.cost,splash:R.splash||0,
-  lt:d.lt||0,sk,ult,redeploy:Math.round(22+(14-Math.min(14,h.spd))*1.5),lv};}
+  lt:d.lt||0,sk,sks,haste:d.haste||0,thief:d.thief||0,ult,redeploy:Math.round(22+(14-Math.min(14,h.spd))*1.5),lv};}
 /* 本編のセーブ（G）から、その仲間の育成を読む：装備の比・練達の段階・星臨の位階 */
-function real(id){const o={gear:null,mas:0,aw:1,sk:HERO[id].sk,ab:null};try{const h=G.h[id];if(!h)return o;o.aw=h.awLv||1;o.sk=skSel(id);o.ab=abSum(id);try{o.mas=RSM.lvOf(id,o.sk)||0;}catch(e){}
+function real(id){const o={gear:null,mas:0,aw:1,sks:null,masM:{},ab:null};try{const h=G.h[id];if(!h)return o;o.aw=h.awLv||1;o.sks=skSel3(id);o.ab=abSum(id);try{for(const k of o.sks)o.masM[k]=RSM.lvOf(id,k)||0;}catch(e){}
  if(h.eq&&typeof stats==='function'){let mag=false;try{mag=RSD.WPN[RSD.HERO[id].w].mag===1;}catch(e){}const P=mag?'mag':'atk',s1=stats(id),eq=h.eq;
   h.eq={w:null,main:null,sub:null,acc1:null,acc2:null};let s0;try{s0=stats(id);}finally{h.eq=eq;}
   o.gear={atk:s1[P]/Math.max(1,s0[P]),hp:s1.mhp/Math.max(1,s0.mhp),def:s1.def/Math.max(1,s0.def),res:s1.res/Math.max(1,s0.res)};}}catch(e){console.error(e);}return o;}
 /* 敵：ED（RPG 版）とステージの Lv から。移動 = 14 + 素早さ × 2.4 px/秒 */
 function foe(kind,lv=1){const e=ED[kind];if(!e)return null;const hk=1+.05*(Math.max(1,lv)-1),ak=1+.04*(Math.max(1,lv)-1);
  const boss=!!e.boss||kind==='ernaE'||kind==='valkE',bh=boss?1:hk,ba=boss?1:ak,tr=(TRAIT[kind]||[]).slice();
- return{kind,name:e.name,spr:e.spr||SPRALT[kind]||kind,boss,rank:e.rank||(boss?'big':''),hp:Math.round(e.mhp*2.3*bh*(boss?1.6:1)),atk:Math.round((e.atk||30)*(boss?.9:1.15)*ba),
+ return{kind,name:e.name,spr:e.spr||SPRALT[kind]||kind,boss,rank:e.rank||(boss?'big':''),hp:Math.round(e.mhp*(boss?2.3:2.3+Math.min(.25,Math.max(0,lv-8)*.02))*bh*(boss?1.6:1)),atk:Math.round((e.atk||30)*(boss?.9:1.15+Math.min(.3,(lv-1)*.015))*ba),
   def:e.def||0,res:e.res||0,spd:+(14+(e.spd||8)*2.4).toFixed(1)*(boss?.7:1),weak:(e.weak||[]).slice(0,2),resist:(e.resist||[]).slice(0,1),
   iv:boss?1:1.2,leak:boss?3:1,cost:boss?10:1,star:boss?5:1,tr,ai:boss&&e.ai?{every:Math.max(6,(e.ai.every||4)*3),summon:e.ai.summon||null,n:2}:null};}
 
@@ -143,5 +157,5 @@ function deckOf(){const L=(typeof G!=='undefined'&&G&&G.members?G.members:Object
  const saved=typeof G!=='undefined'&&G&&G.td&&G.td.deck;if(saved){const d=saved.filter(id=>L.includes(id));if(d.length)return d.slice(0,8);}
  const pri=['rio','gald','mire','celes','noah','erna','shion','hakua','balza','crow','jin','valk'];
  return pri.filter(id=>L.includes(id)).slice(0,8);}
-return{K,ROLE,HERO,ULT,TRAIT,TRN,hero,real,foe,STAGE,CH,ORDER,deckOf,skName,reward,STONE,skills,skSel,mapSk,skTxt,abTd,abSum,ouName,awName};})();
+return{K,AWK,skSel3,ROLE,HERO,ULT,TRAIT,TRN,hero,real,foe,STAGE,CH,ORDER,deckOf,skName,reward,STONE,skills,skSel,mapSk,skTxt,abTd,abSum,ouName,awName};})();
 if(typeof module!=='undefined')module.exports=TDD;

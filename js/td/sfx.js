@@ -89,6 +89,7 @@ function ev(e){if(!live())return;const m=e.u&&e.u.h?ELF[e.u.h.el]||1:1;
   case'beam':if(!e.u){if(gate('life',.25))R.life();}else{thump(.12);swoosh(2600,300,.3,.04);}return;
   case'lamp':R.lamp();return;
   case'ult':R.ult(m);return;
+  case'aw':R.lamp();return;
   case'deploy':R.deploy();return;
   case'retreat':R.retreat();return;
   case'fall':R.fall();return;

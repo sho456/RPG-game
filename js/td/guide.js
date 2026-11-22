@@ -1,7 +1,7 @@
 /* ===== TD の字を使わない導き（GUIDE）の正本：最初の 1〜2 面で、光る指・脈打つ輪・矢印だけで操作を順に示す =====
  順番：①手札を選ぶ → ②光る台座に置く（手札の人数ぶん・最大 2 人）→ ③灯を強める → ④星臨（ユニットをタップ → 星臨のボタン）。
  やった操作で次へ進む。進み具合は G.td.gd（0〜3、3＝終わり）。2 面目が終わった時点で終わりにする。一度終えたら二度と出ない。
- 戦闘画面（js/td/view.js）とは TD.st・TD.cam・TD.root() と DOM のクラス（.td-card.sel・.td-unit・.td-lampb）だけでつながる。
+ 戦闘画面（js/td/view.js）とは TD.st・TD.cam・TD.root() と DOM のクラス（.td-card.sel・.td-con（操作盤）・.td-lampb）だけでつながる。
  view.js からの呼び出しは open() の GUIDE.start(sid) と stop() の GUIDE.stop() の 2 か所だけ */
 'use strict';
 const GUIDE=(()=>{
@@ -46,7 +46,7 @@ function loop(){raf=requestAnimationFrame(loop);const st=TD.st;if(!st||!ov){retu
   if(st.deck.some(c=>c.ult)){setStep(DONE);return hide();}
   if(st.star<TDD.K.STAR_MAX||!st.units.length){clearRings(0);return point(null);}
   const gauge=mid(root.querySelector('.td-star'));if(gauge)ring(n++,gauge.x,gauge.y,gauge.w/2+4,'star gauge',gauge.h/2+4);
-  const pan=root.querySelector('.td-unit'),ub=pan&&!pan.hidden&&pan.querySelector('.ult:not([disabled])');
+  const pan=root.querySelector('.td-con'),ub=pan&&pan.querySelector('.ult:not([disabled])');
   if(ub){const m=mid(ub);ring(n++,m.x,m.y,m.w/2+4,'star',m.h/2+4);clearRings(n);return point(m.x,m.y);}
   const u=st.units.slice().sort((a,b)=>b.x-a.x).find(u=>{const c=st.deck.find(c=>c.on===u);return c&&!c.ult;});if(!u){clearRings(n);return point(null);}
   const q=scr(st,u.x,u.y-22);if(q.x>q.L&&q.x<q.R){ring(n++,q.x,q.y,20*q.S,'star');clearRings(n);point(q.x,q.y);}else{clearRings(n);point(null);edge(st,u);}return;}
