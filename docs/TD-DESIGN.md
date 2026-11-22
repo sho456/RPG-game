@@ -108,6 +108,8 @@ S('td1_3',{q:'q1_4', name, lv, th:'forest', hk, bk, star:{time}, pre:会話, joi
 | `js/td/stages.js` | 章とステージ（`TDD.STAGE` `TDD.CH` `TDD.ORDER` `TDD.rosterAt`） |
 | `js/td/sim.js`（`TDS`） | 戦闘のシミュレーション。DOM・時計に触れない（固定刻み 1/30 秒、乱数の種つき）。複数の道・灯の強化・自動の配置 `bot`・計測 `run` |
 | `js/td/bg.js`（`TDBG`） | 戦場の背景（テーマ ash／forest／chapel／storm／ice／ruin／tower／void の空・遠景・中景・地面）と灯の塔 |
+| `js/td/sfx.js`（`TDSFX`） | 効果音（WebAudio の合成・sim の出来事 `st.ev` から鳴らす・種類ごとに間引く）と BGM（ver16 の合成エンジンに `SONGS['td:…']` を足し `BGM.force` で地図・戦闘・ボスを切り替え）・ミュート |
+| `js/td/fx.js`（`TDFX`） | 戦闘の演出：技の働きごとの型と固有の演出・星臨の短い暗転・粒・敵の歩き/被弾/撃破（1 枚絵をコードで動かす `pose`）。描くだけでロジックに触れない |
 | `js/td/view.js`（`TD`） | 戦闘画面：横スクロール・小地図・手札・ユニットの窓・リザルト |
 | `js/td/menu.js`（`TDM`） | 章の地図・出撃準備・会話・加入・結果の精算 `settle`・天への塔のタブ。入口（ホーム右の「防衛」・`index.html#td`） |
 | `js/td/guide.js`（`GUIDE`） | 字を使わない導き（最初の 1〜2 面）。view.js からは `GUIDE.start(sid)`（open）・`GUIDE.stop()`（stop）だけ |
@@ -141,9 +143,9 @@ P0 設計 → P1 試作 → P2 序盤 3 章 13 ステージ・章の地図・出
 P5（優先順）：
 1. 施設の画面の刷新（鍛冶・強化・持ち物・図鑑・鑑定・星盤）。`js/ui/growth.js` のタイル（CSS で隠しているだけ）と `QS` 参照を外す → `js/v31/quests.js` の旧クエストも削除できる
 2. 旧コードの残りの整理（旧 townMenu の積み重ね town/ver17/ver18-town/v20-ui/v21/v22・`engine.js`・`rs/core.js` の残り・`ver19.js`（図鑑のサムネ）・`v20-battle.js`（パッシブ説明）の一部）
-3. 敵の歩きのコマ（PixelLab `animate_character`。ボスから）
-4. 効果音・BGM（スキル rs-battle-fx の効果音のレシピ、PixelLab `create_sound_effect`）
-5. 技ごとの演出（`assets_src/pixel-art/td-demo` の style1/style2 を TD 本編へ。止めない・短い・読める）
+3. 敵の歩きのコマ（PixelLab `animate_character`。ボスから）— コードの動き（`TDFX.pose`：揺れ・傾き・影・型ごと・被弾ののけぞり・撃破の市松の崩れ）は済み。原画のコマは未
+4. 効果音・BGM（スキル rs-battle-fx の効果音のレシピ、PixelLab `create_sound_effect`）— 合成の効果音と章ごとの BGM は済み（`js/td/sfx.js`）
+5. 技ごとの演出（`assets_src/pixel-art/td-demo` の style1/style2 を TD 本編へ。止めない・短い・読める）— 働きごとの型＋9 人の固有・星臨は済み（`js/td/fx.js`）
 6. ~~難易度の仕上げ~~（済・2026-11-22）：推奨 Lv の灯火を全 28 ステージで 4.1〜6.2 に（自動の配置・40 戦）。序章は推奨 Lv を 灰狼の頭目 4→3・虚ろの番人 5→4 に下げ、Lv1〜2 で勝てる（灰狼の遠吠え Lv1 28%→100%・頭目 Lv2 40%→95%・番人 Lv2 78%→98%）。
    直したもの：禁書の守護像 3.9→5.0・雷の高原 3.9→5.0・氷華の妖狐 3.1→4.8・天狐の残照 3.4→5.5・星核の守護者 3.6→4.8・星核の扉 2.4→4.6（溜め撃ち 9→12 秒・WAVE1 の重装 10→8 体）。残り：推奨 −3 の勝率が 100% のステージが多い（自動の配置が下手なぶん、人には易しすぎない目安だが、もう少し差をつけてもよい）
 7. ~~字を使わない導き~~（済）：`js/td/guide.js`

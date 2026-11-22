@@ -239,3 +239,7 @@
 .td-inf{display:flex;align-items:center;justify-content:center;gap:8px;margin:6px 0 12px;font-size:var(--tk-fs-xxl);color:var(--tk-star);font-variant-numeric:tabular-nums}
 .td-inf .ic-tower{width:14px;height:28px}
 .td-inf small{font-size:var(--tk-fs-m);color:var(--tk-ink-2)}
+/* 音の切り替え（js/td/sfx.js のアイコン）。切ると虚蝕の灰紫 */
+.td-snd{min-width:32px;padding:0 6px;display:inline-flex;align-items:center;justify-content:center}
+.td-snd svg{display:block}
+.td-snd.off{color:var(--tk-void)}
