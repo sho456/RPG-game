@@ -203,13 +203,13 @@ function result(){const o=st.over,S0=st.S,win=o.win,n=o.stars.reduce((a,b)=>a+b,
  TDM.cleared(sid,win,first);}
 /* ---------- 開く・止める ---------- */
 function lvMap(){const o={};try{for(const id in G.h)o[id]=G.h[id].lv||1;}catch(e){}return o;}
-function stop(){cancelAnimationFrame(raf);st=null;}
+function stop(){cancelAnimationFrame(raf);st=null;try{GUIDE.stop();}catch(e){}}
 function open(id,deck){build();sid=id;cancelAnimationFrame(raf);
  const dk=deck||TDD.deckOf(),rl={};for(const h of dk)rl[h]=TDD.real(h);
  st=TDS.create(sid,dk,{lv:lvMap(),real:rl,seed:(Date.now()%100000)+1});speed=1;paused=false;sel=null;selU=null;fx=[];nums=[];ended=false;acc=0;for(const k in memo)delete memo[k];
  root.classList.remove('hide');sheet(null);unitPanel(null);$('.td-deck').innerHTML=deckHTML();const sb=$('[data-a="spd"]');sb.textContent='×1';sb.classList.remove('on');
  const pb=$('[data-a="pause"]');pb.textContent='Ⅱ';pb.classList.remove('on');
- requestAnimationFrame(()=>{fit();setCam(st.S.W);last=performance.now();raf=requestAnimationFrame(loop);banner(st.S.name,'',1600);
+ requestAnimationFrame(()=>{fit();setCam(st.S.W);last=performance.now();raf=requestAnimationFrame(loop);banner(st.S.name,'',1600);try{GUIDE.start(sid);}catch(e){console.error(e);}
   });}
 function show(){build();root.classList.remove('hide');}
 function hide(){stop();if(root)root.classList.add('hide');}
