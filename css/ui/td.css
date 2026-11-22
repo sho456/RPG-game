@@ -226,3 +226,16 @@
 @keyframes tdgNudge{0%,100%{translate:0 0}50%{translate:4px 0}}
 .tdg-arrow.l{animation-direction:reverse}
 @media (prefers-reduced-motion:reduce){.tdg-ring,.tdg-hand,.tdg-arrow{animation:none}}
+/* ---------- やり込み：錬磨石（星 3 の報酬）・周回・天への塔 ---------- */
+.ic-stone,.ss i.ic-stone{display:inline-block;width:9px;height:11px;background:linear-gradient(135deg,var(--el-in),var(--tk-void));clip-path:polygon(50% 0,100% 28%,100% 72%,50% 100%,0 72%,0 28%);vertical-align:-1px}
+.ss i.ic-stone{margin-left:3px;opacity:.85}
+.td-rw .s3{display:inline-flex;align-items:center;gap:2px}
+.td-rw .s3 .ic-star{width:11px;height:11px}
+.td-rw .s3 .ic-stone{width:11px;height:13px}
+.td-rw .rp{color:var(--tk-ink-2)}
+.tdm-tabs button.inf{background:linear-gradient(var(--tk-night-2),var(--tk-night-3));box-shadow:0 0 0 1px var(--tk-star) inset}
+.tdm-tabs button.inf small{color:var(--tk-star)}
+.tdm-best{display:inline-flex;align-items:center;gap:4px;font-weight:800;color:var(--tk-star);font-variant-numeric:tabular-nums}
+.td-inf{display:flex;align-items:center;justify-content:center;gap:8px;margin:6px 0 12px;font-size:var(--tk-fs-xxl);color:var(--tk-star);font-variant-numeric:tabular-nums}
+.td-inf .ic-tower{width:14px;height:28px}
+.td-inf small{font-size:var(--tk-fs-m);color:var(--tk-ink-2)}

@@ -86,6 +86,10 @@ const L={
  td5_3:S('td5_3',{hk:0.6,bk:0.09,star:{time:200},q:'q7_5',name:'星核の扉',lv:55,th:'void',boss:1,pre:pre('q7_5'),fin:1,gim:{k:'charge',every:12},
   waves:[{e:[[2,'darkknight',8,1],[6,'shade',9,.8]]},{e:[[2,'last1',1,1,1],[4,'shade',10,.7]]},{e:[[2,'last2',1,1,0],[4,'onimusha',8,.9]]},{e:[[2,'last3',1,1,2],[4,'shade',12,.6],[9,'darkknight',8,.9]]}]},THREE(1260))
 };
+/* ---------- 天への塔（やり込み・全章クリア後）：WAVE は sim.js の infWave が毎回作る。到達の最高は G.td.inf ---------- */
+const INF={td_inf:S('td_inf',{inf:1,name:'天への塔',lv:50,th:'tower',cap:8,cost0:20,hk:.22,bk:.1,star:{time:9999},waves:[],
+ pool:['shade','darkknight','onimusha','yukirei','golemkin','minerghost','jelly','drowned','snowwolf','raiwolf','waterslime'],
+ bosses:['tower10','boss5','m_guard','tower20','m_echo','boss7']},THREE(1240))};
 /* 章（本編の 8 章を 6 章に） */
 const CH=[
  {id:'c0',ch:'序章',n:'灰の街道',th:'ash',st:['td0_1','td0_2','td0_3','td0_4'],intro:'虚蝕に色を奪われた古い街道。灯都ルミナスを出て、最初の灯を守る。'},
@@ -94,7 +98,7 @@ const CH=[
  {id:'c3',ch:'第3章',n:'雷鳴と氷華',th:'storm',st:['td3_1','td3_2','td3_3','td3_4','td3_5','td3_6'],intro:'雷鳴高原・黒鉄鉱山・東方の島'},
  {id:'c4',ch:'第4章',n:'沈んだ王都と天への塔',th:'ruin',st:['td4_1','td4_2','td4_3','td4_4','td4_5','td4_6'],intro:'沈んだ王都と天への塔'},
  {id:'c5',ch:'終章',n:'星核の残響',th:'void',st:['td5_1','td5_2','td5_3'],intro:'星核の残響'}];
-Object.assign(TDD.STAGE,L);TDD.CH.push(...CH);TDD.ORDER.push(...CH.flatMap(c=>c.st));
+Object.assign(TDD.STAGE,L,INF);TDD.INF='td_inf';TDD.CH.push(...CH);TDD.ORDER.push(...CH.flatMap(c=>c.st));
 /* その時点で仲間になっている顔ぶれ（計測用）：最初はリオとガルド。join はクリア後に加わる */
 TDD.rosterAt=id=>{const r=['rio','gald'];for(const s of TDD.ORDER){if(s===id)break;const j=L[s]&&L[s].join;if(j)r.push(j);}return r;};
 })();

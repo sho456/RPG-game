@@ -20,29 +20,43 @@ function build(){if(root)return;root=document.createElement('div');root.id='tdm'
 function show(html){build();TD.hide();root.innerHTML=html;root.classList.remove('hide');root.scrollTop=0;}
 function close(){if(root)root.classList.add('hide');TD.hide();try{townMenu();}catch(e){}}
 /* ---------- 章の地図 ---------- */
-function map(){build();try{TD0();}catch(e){}const cur=TDD.CH.filter(chOpen).pop()||TDD.CH[0];if(!tab||!TDD.CH.find(c=>c.id===tab&&chOpen(c)))tab=cur.id;const C=TDD.CH.find(c=>c.id===tab);
+/* 天への塔：全章クリア（最後のステージに星）で地図のタブに出る。到達の最高は G.td.inf */
+const infOpen=()=>!!(TDD.INF&&stars(TDD.ORDER[TDD.ORDER.length-1])>0);
+const best=()=>(G&&G.td&&G.td.inf)||0;
+function map(){build();try{TD0();}catch(e){}const cur=TDD.CH.filter(chOpen).pop()||TDD.CH[0];if(tab==='inf'&&!infOpen())tab=null;if(tab!=='inf'&&(!tab||!TDD.CH.find(c=>c.id===tab&&chOpen(c))))tab=cur.id;
+ if(tab==='inf')return infMap();const C=TDD.CH.find(c=>c.id===tab);
  const nx=TDD.ORDER.find(id=>open(id)&&!stars(id));
  show(`<header class="tdm-h"><button class="td-btn" data-a="home" aria-label="灯都へ戻る">◀</button><b>灯守の防衛線</b><span class="tdm-sum">★ ${TDD.ORDER.reduce((a,id)=>a+stars(id),0)}/${TDD.ORDER.length*3}</span></header>
- <nav class="tdm-tabs">${TDD.CH.map(c=>{const ok=chOpen(c);return`<button class="${c.id===tab?'on':''}${ok?'':' lock'}" data-a="tab" data-v="${c.id}" ${ok?'':'disabled'}><small>${esc(c.ch)}</small>${ok?esc(c.n):c.soon?'準備中':'未踏'}</button>`;}).join('')}</nav>
+ <nav class="tdm-tabs">${TDD.CH.map(c=>{const ok=chOpen(c);return`<button class="${c.id===tab?'on':''}${ok?'':' lock'}" data-a="tab" data-v="${c.id}" ${ok?'':'disabled'}><small>${esc(c.ch)}</small>${ok?esc(c.n):c.soon?'準備中':'未踏'}</button>`;}).join('')}${tabInf()}</nav>
  <section class="tdm-ch"><canvas class="tdm-sky" width="360" height="96"></canvas><div class="tdm-cht"><small>${esc(C.ch)}</small><b>${esc(C.n)}</b></div></section>
  <ol class="tdm-road">${C.st.map((id,i)=>{const S=TDD.STAGE[id],ok=open(id),n=stars(id),me=id===nx;
   return`<li class="${ok?'':'lock'}${me?' next':''}${n?' done':''}"><button data-a="stage" data-v="${id}" ${ok?'':'disabled'}><span class="no">${S.boss?'◆':i+1}</span>
   <span class="tx"><b>${ok?esc(S.name):'？？？'}</b><small>Lv${S.lv}</small></span>
   ${S.join&&ok&&!(G.members||[]).includes(S.join)?`<img class="jn" src="${pic(S.join,S.join,0,30)}" alt="加入：${esc(HB[S.join].name)}">`:''}
-  <span class="ss">${[0,1,2].map(k=>`<i class="${k<n?'on':''}"></i>`).join('')}</span></button></li>`;}).join('')}</ol>`);
- try{skyArt(root.querySelector('.tdm-sky'),C.th);}catch(e){}}
+  <span class="ss">${[0,1,2].map(k=>`<i class="${k<n?'on':''}"></i>`).join('')}${ok&&n<3?'<i class="ic-stone" title="星 3 の報酬：錬磨石"></i>':''}</span></button></li>`;}).join('')}</ol>`);
+ try{skyArt(root.querySelector('.tdm-sky'),C.th);}catch(e){}tabSee();}
+const tabInf=()=>infOpen()?`<button class="inf${tab==='inf'?' on':''}" data-a="tab" data-v="inf"><small>∞</small>${esc(TDD.STAGE[TDD.INF].name)}</button>`:'';
+function infMap(){const S=TDD.STAGE[TDD.INF],b=best();
+ show(`<header class="tdm-h"><button class="td-btn" data-a="home" aria-label="灯都へ戻る">◀</button><b>灯守の防衛線</b><span class="tdm-sum">★ ${TDD.ORDER.reduce((a,id)=>a+stars(id),0)}/${TDD.ORDER.length*3}</span></header>
+ <nav class="tdm-tabs">${TDD.CH.map(c=>`<button data-a="tab" data-v="${c.id}">${'<small>'+esc(c.ch)+'</small>'+esc(c.n)}</button>`).join('')}${tabInf()}</nav>
+ <section class="tdm-ch"><canvas class="tdm-sky" width="360" height="96"></canvas><div class="tdm-cht"><small>∞</small><b>${esc(S.name)}</b></div></section>
+ <ol class="tdm-road"><li class="next${b?' done':''}"><button data-a="stage" data-v="${TDD.INF}"><span class="no">∞</span><span class="tx"><b>${esc(S.name)}</b><small>Lv${S.lv}〜</small></span>
+ <span class="tdm-best" title="到達の最高"><i class="ic-tower"></i>${b}</span></button></li></ol>`);
+ try{skyArt(root.querySelector('.tdm-sky'),S.th);}catch(e){}tabSee();}
+/* 選んでいるタブ（塔が開いていれば塔のタブ）を横スクロールの中で見える位置へ */
+function tabSee(){try{const n=root.querySelector('.tdm-tabs'),b=n.querySelector('.inf')||n.querySelector('.on');if(b)n.scrollLeft=Math.max(0,b.offsetLeft-n.clientWidth+b.offsetWidth+10);}catch(e){}}
 function skyArt(c,th){const st={S:{W:900,th,base:[870,300],paths:[[[-30,262],[900,262]],[[-30,338],[900,338]]],pads:[]},pads:[]};st.Ps=[];
  const b=TDBG.make(st,360),g=c.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(b.sky,40,0,360,236,0,0,360,236);g.drawImage(b.far,-40,-70);g.drawImage(b.mid,-20,-60);
  const gr=g.createLinearGradient(0,40,0,96);gr.addColorStop(0,'rgba(18,19,42,0)');gr.addColorStop(1,'rgba(18,19,42,1)');g.fillStyle=gr;g.fillRect(0,0,360,96);}
 /* ---------- 出撃準備 ---------- */
-function prep(id){if(!open(id))return map();cur=id;const S=TDD.STAGE[id],C=chOf(id);TD0();
+function prep(id){const S=TDD.STAGE[id];if(!S||(S.inf?!infOpen():!open(id)))return map();cur=id;const C=S.inf?{ch:'∞',n:S.name}:chOf(id);TD0();
  const mem=(G.members||[]).filter(h=>TDD.HERO[h]),deck=TDD.deckOf().filter(h=>mem.includes(h));G.td.deck=deck;
- const kinds=[...new Set(S.waves.flatMap(w=>w.e.map(e=>e[1])))],cnt=k=>S.waves.reduce((a,w)=>a+w.e.filter(e=>e[1]===k).reduce((b,e)=>b+e[2],0),0);
+ const kinds=S.inf?[...S.pool,...S.bosses]:[...new Set(S.waves.flatMap(w=>w.e.map(e=>e[1])))],cnt=k=>S.waves.reduce((a,w)=>a+w.e.filter(e=>e[1]===k).reduce((b,e)=>b+e[2],0),0);
  const avg=deck.length?Math.round(deck.reduce((a,h)=>a+(G.h[h]?G.h[h].lv:1),0)/deck.length):1;
  show(`<header class="tdm-h"><button class="td-btn" data-a="map" aria-label="地図へ戻る">◀</button><b>出撃準備</b><span class="tdm-sum">${esc(C.ch)}</span></header>
  <section class="tdm-st"><h2>${S.boss?'<i class="bs">◆</i>':''}${esc(S.name)}</h2><canvas class="tdm-prev" width="360" height="90"></canvas>
- <div class="tdm-tags">${avg<S.lv&&typeof UNIT!=='undefined'?`<button class="lv warn" data-a="grow" title="推奨 Lv${S.lv}・手札の平均 Lv${avg}">Lv${S.lv} ↑</button>`:`<span class="lv" title="推奨 Lv${S.lv}">Lv${S.lv}</span>`}<span class="cap" title="配置の上限">${'<i></i>'.repeat(S.cap)}</span><span title="WAVE">≋ ${S.waves.length}</span></div></section>
- <ul class="tdm-foes">${kinds.map(k=>{const f=TDD.foe(k,S.lv);if(!f)return'';return`<li><img src="${pic(f.spr,k,1,28)}" alt=""><span class="tx"><b>${f.boss?'<i class="bs">◆</i>':''}${esc(f.name)}</b></span><span class="tr">${f.tr.map(t=>`<i class="t-${t}" title="${esc(TDD.TRN[t]||t)}">${({void:'蝕',ghost:'霊',armor:'重',fly:'飛'})[t]||''}</i>`).join('')}</span><span class="wk">${f.weak.map(e=>`<i style="--c:${ELC[e]}">${e}</i>`).join('')}</span><span class="n">×${cnt(k)}</span></li>`;}).join('')}</ul>
+ <div class="tdm-tags">${avg<S.lv&&typeof UNIT!=='undefined'?`<button class="lv warn" data-a="grow" title="推奨 Lv${S.lv}・手札の平均 Lv${avg}">Lv${S.lv} ↑</button>`:`<span class="lv" title="推奨 Lv${S.lv}">Lv${S.lv}</span>`}<span class="cap" title="配置の上限">${'<i></i>'.repeat(S.cap)}</span><span title="WAVE">≋ ${S.inf?'∞':S.waves.length}</span>${S.inf?`<span class="tdm-best" title="到達の最高"><i class="ic-tower"></i>${best()}</span>`:''}</div></section>
+ <ul class="tdm-foes">${kinds.map(k=>{const f=TDD.foe(k,S.lv);if(!f)return'';return`<li><img src="${pic(f.spr,k,1,28)}" alt=""><span class="tx"><b>${f.boss?'<i class="bs">◆</i>':''}${esc(f.name)}</b></span><span class="tr">${f.tr.map(t=>`<i class="t-${t}" title="${esc(TDD.TRN[t]||t)}">${({void:'蝕',ghost:'霊',armor:'重',fly:'飛'})[t]||''}</i>`).join('')}</span><span class="wk">${f.weak.map(e=>`<i style="--c:${ELC[e]}">${e}</i>`).join('')}</span>${S.inf?'':`<span class="n">×${cnt(k)}</span>`}</li>`;}).join('')}</ul>
   <div class="tdm-pool">${mem.map(h=>{const x=TDD.hero(h,G.h[h]?G.h[h].lv:1),on=deck.includes(h);
   return`<button class="${on?'on':''}" data-a="pick" data-v="${h}"><img src="${pic(h,h,0,40)}" alt=""><span class="c">${x.cost}</span><span class="r" style="background:${TDD.ROLE[x.role].col}"></span>
   <b>${esc(x.name)}</b><small>Lv${x.lv}</small>${on?`<i class="k">${deck.indexOf(h)+1}</i>`:''}</button>`;}).join('')}</div>
@@ -63,13 +77,25 @@ function talk(lines,done){if(!lines||!lines.length)return done();let i=0;build()
 function go(id){const S=TDD.STAGE[id],deck=G.td.deck||TDD.deckOf();try{save();}catch(e){}
  const run=()=>{root.classList.add('hide');root.innerHTML='';TD.open(id,deck);};if(S.pre&&!stars(id))talk(S.pre,run);else run();}
 let pendEnd=false;
+/* ---------- 結果の精算（view.js の result が呼ぶ）：星・報酬（初回・周回・星 3 の錬磨石）・天への塔の到達 WAVE ----------
+ 返り値：{rw, first, chips}（chips＝報酬の欄に足す印の HTML）。塔は {sheet}（結果の窓をまるごと） */
+const stoneHTML=n=>n?`<span class="s3"><i class="ic-stone"></i><b>${n}</b></span>`:'';
+function settle(id,st){const o=st.over,S=TDD.STAGE[id],n=o.stars.reduce((a,b)=>a+b,0);let rw={xp:0,gold:0,stone:0},first=false;
+ try{TD0();G.mats=G.mats||{};
+  if(S.inf){const w=o.wave||0,b0=best(),rec=w>b0;if(rec)G.td.inf=w;rw=TDD.reward(id,w);G.xpStock=(G.xpStock||0)+rw.xp;G.gold=(G.gold||0)+rw.gold;if(rw.stone)G.mats[TDD.STONE]=(G.mats[TDD.STONE]||0)+rw.stone;try{save();}catch(e){}
+   return{sheet:`<h3>${esc(S.name)}</h3><div class="td-inf"><i class="ic-tower"></i><b>${w}</b>${rec?'<i class="ic-star" title="最高記録"></i>':`<small title="到達の最高">${b0}</small>`}</div>
+   <div class="td-rw"><span>経験値 <b>${rw.xp}</b></span><span>ゴールド <b>${rw.gold}</b></span>${stoneHTML(rw.stone)}</div>
+   <div class="td-acts"><button class="td-btn" data-a="again">もう一度</button><button class="td-btn on" data-a="map">地図へ</button></div>`};}
+  if(o.win){const prev=G.td.c[id]||0;first=!prev;G.td.c[id]=Math.max(prev,n);rw=TDD.reward(id,n,first,prev);
+   G.xpStock=(G.xpStock||0)+rw.xp;G.gold=(G.gold||0)+rw.gold;if(rw.stone)G.mats[TDD.STONE]=(G.mats[TDD.STONE]||0)+rw.stone;try{save();}catch(e){}}}catch(e){console.error(e);}
+ return{rw,first,chips:(rw.s3?`<span class="s3"><i class="ic-star"></i><i class="ic-star"></i><i class="ic-star"></i></span>`+stoneHTML(rw.stone):'')+(rw.rep?'<span class="rp" title="周回">↻</span>':'')};}
 function cleared(id,win,first){const S=TDD.STAGE[id];pendEnd=!!(win&&first&&S.fin);pend=win&&first&&S.join&&!(G.members||[]).includes(S.join)?S.join:null;}
 /* エンディング（最終ステージの初回クリア） */
 const ENDING=[[null,'n','星核の光が、灯都の灯台へ流れこんでいく。'],['rio','n','……色が、戻ってくる'],['gald','h','ああ。おまえが継いだ灯だ'],['celes','n','千年ぶんの夜明けじゃな。……悪くない'],[null,'n','灰色だった街道に、朝の色が差した。']];
 function ending(done){show('<div class="tdm-blank"></div>');talk(ENDING,()=>{const n=TDD.ORDER.reduce((a,id)=>a+stars(id),0);
  show(`<div class="tdm-join tdm-end"><i class="ic-star"></i><b>灯は継がれた</b><span class="tdm-sum">★ ${n}/${TDD.ORDER.length*3}</span><button class="td-btn on" data-a="fin">灯都へ</button></div>`);
  root.querySelector('[data-a="fin"]').onclick=e=>{e.stopPropagation();done();};});}
-function after(id,next){if(pendEnd){pendEnd=false;return ending(()=>close());}const fin=()=>{const i=TDD.ORDER.indexOf(id),nx=TDD.ORDER[i+1];if(next&&nx&&TDD.STAGE[nx]&&open(nx))prep(nx);else map();};
+function after(id,next){if(TDD.STAGE[id]&&TDD.STAGE[id].inf){TD.hide();tab='inf';return map();}if(pendEnd){pendEnd=false;return ending(()=>close());}const fin=()=>{const i=TDD.ORDER.indexOf(id),nx=TDD.ORDER[i+1];if(next&&nx&&TDD.STAGE[nx]&&open(nx))prep(nx);else map();};
  TD.hide();if(!pend)return fin();const who=pend,S=TDD.STAGE[id];pend=null;show('<div class="tdm-blank"></div>');
  talk(S.join_lines,()=>{try{newMember(who);G.td.deck=G.td.deck||[];if(G.td.deck.length<8&&!G.td.deck.includes(who))G.td.deck.push(who);save();}catch(e){console.error(e);}
   show(`<div class="tdm-join"><img src="${pic(who,who,0,64)}" alt=""><b>${esc(HB[who].name)}が仲間になった</b><button class="td-btn on" data-a="fin">続ける</button></div>`);
@@ -85,4 +111,4 @@ function onClick(e){const b=e.target.closest('[data-a]');if(!b||b.disabled)retur
 function boot(){if(location.hash!=='#td')return;const go2=()=>{if(typeof SPX==='undefined'||!SPX.ready)return setTimeout(go2,300);
  try{if(typeof G==='undefined'||!G){const s=loadSave();G=migrate(s||newGame());}const ov=document.querySelector('#ov');if(ov)ov.classList.add('hide');townMenu();}catch(e){console.error(e);}map();};go2();}
 addEventListener('load',boot);
-return{map,prep,after,cleared,chOf,talk,close};})();
+return{map,prep,after,cleared,chOf,talk,close,settle};})();
