@@ -118,9 +118,9 @@ function retreat(st,uid){const u=st.units.find(u=>u.uid===uid);if(!u)return fals
 function canUlt(st,uid){const u=st.units.find(u=>u.uid===uid),c=u&&st.deck.find(c=>c.on===u);return!!(u&&c&&!c.ult&&st.star>=K.STAR_MAX&&!st.over);}
 /* 星臨：星片 K.AW。AWK.dur 秒のあいだ攻撃が上がり、技の溜めが速くなる。出した時に HP を回復 */
 function canAw(st,uid){const u=st.units.find(u=>u.uid===uid),c=u&&st.deck.find(c=>c.on===u);return!!(u&&c&&!c.aw&&st.star>=K.AW&&!st.over);}
-function aw(st,uid){if(!canAw(st,uid))return false;const u=st.units.find(u=>u.uid===uid),c=st.deck.find(c=>c.on===u),A=D.AWK;c.aw=true;st.star-=K.AW;u.awT=A.dur;u.actT=st.t;
+function aw(st,uid){if(!canAw(st,uid))return false;const u=st.units.find(u=>u.uid===uid),c=st.deck.find(c=>c.on===u),A=D.AWK;c.aw=true;st.star-=K.AW;u.awT=A.dur;u.actT=st.t;u.actK='aw';
  const a=Math.round(u.h.hp*A.heal);u.hp=Math.min(u.h.hp,u.hp+a);ev(st,{k:'aw',u});ev(st,{k:'heal',u,v:a});return true;}
-function ult(st,uid){if(!canUlt(st,uid))return false;const u=st.units.find(u=>u.uid===uid),c=st.deck.find(c=>c.on===u),U=u.h.ult;c.ult=true;st.star-=K.STAR_MAX;u.actT=st.t;
+function ult(st,uid){if(!canUlt(st,uid))return false;const u=st.units.find(u=>u.uid===uid),c=st.deck.find(c=>c.on===u),U=u.h.ult;c.ult=true;st.star-=K.STAR_MAX;u.actT=st.t;u.actK='cast';
  const live=st.foes.filter(f=>f.hp>0),am=u.awT>0?D.AWK.ou:1,extra=L=>{for(const f of L){if(f.hp<=0)continue;if(U.stun)f.stun=Math.max(f.stun,f.boss?U.stun*.4:U.stun);if(U.curse)f.curse=Math.max(f.curse,U.curse);}
   if(U.heal)for(const v of st.units){const a=Math.round(v.h.hp*U.heal);v.hp=Math.min(v.h.hp,v.hp+a);ev(st,{k:'heal',u:v,v:a});}if(U.buff){st.buff=U.buff;st.buffT=8;}};
  if(U.k==='uheal'){for(const v of st.units)v.hp=v.h.hp;st.lives=Math.min(K.LIVES,st.lives+1);st.lightR=st.r0;lightUpdate(st);ev(st,{k:'ult',u,x:u.x,y:u.y,r:999});return true;}
@@ -203,8 +203,8 @@ function tick(st){if(st.over)return;const dt=K.STEP;st.t+=dt;
   if(u.h.regen&&u.hp<u.h.hp)u.hp=Math.min(u.h.hp,u.hp+u.h.hp*u.h.regen*dt/3);
   /* 技 3 つ：溜めが終わった技から自動で出す（技と技の間は K.GCD 秒） */
   u.gcd-=dt;const SK=u.h.sks;for(let i=0;i<SK.length;i++){if(u.ch[i]<SK[i].ch)u.ch[i]=Math.min(SK[i].ch,u.ch[i]+dt*hs);}
-  if(u.gcd<=0)for(let i=0;i<SK.length;i++)if(u.ch[i]>=SK[i].ch&&cast(st,u,SK[i])){u.ch[i]=0;u.gcd=K.GCD;u.actT=st.t;follow(st,u,1);break;}
-  u.atkT-=dt;if(u.atkT<=0){const t=target(st,u);if(t){u.atkT=u.h.iv;u.actT=st.t;u.face=Math.sign(t.x-u.x)||u.face;
+  if(u.gcd<=0)for(let i=0;i<SK.length;i++)if(u.ch[i]>=SK[i].ch&&cast(st,u,SK[i])){u.ch[i]=0;u.gcd=K.GCD;u.actT=st.t;u.actK='cast';follow(st,u,1);break;}
+  u.atkT-=dt;if(u.atkT<=0){const t=target(st,u);if(t){u.atkT=u.h.iv;u.actT=st.t;u.actK='atk';u.face=Math.sign(t.x-u.x)||u.face;
    if(u.h.splash){ev(st,{k:'area',u,x:t.x,y:t.y,r:u.h.splash,small:1});for(const f of st.foes.slice())if(f.hp>0&&dist(t.x,t.y,f.x,f.y)<=u.h.splash)hit(st,u,f,f===t?1:.6);}
    else hit(st,u,t,1);follow(st,u,0,t);}else{u.atkT=.15;if(!u.mv)u.face=-1;}}}
 }

@@ -1,0 +1,158 @@
+{
+  "_doc": "仮のコマ（make_pack.py が作る）。本番に差し替えるときは anim/<名>/ の PNG を入れ替え、anims.<名> の ms・hit を直す。コマは全て同じキャンバス、足元の基準点 anchor は元の解像度で。詳しくは docs/PIPELINE.md・tools/spx_import.py",
+  "id": "celes_hd",
+  "kind": "hum",
+  "name": "セレス（案2）",
+  "identity": "銀髪ロングの魔女。紫のローブと金の縁取り・紫のとんがり帽子・青い宝石の金の杖",
+  "face": "R",
+  "key": null,
+  "palette": {
+    "colors": 32,
+    "seirinColors": 32
+  },
+  "scale": {
+    "ref": "front",
+    "refK": 1.0,
+    "seirin": 1.0
+  },
+  "sizes": [
+    [
+      "b50",
+      50
+    ],
+    [
+      "b66",
+      66
+    ],
+    [
+      "b83",
+      83
+    ],
+    [
+      "b99",
+      99
+    ]
+  ],
+  "poses": {
+    "front": "master/front.png",
+    "side": "master/side.png",
+    "ready": "master/ready.png",
+    "dying": "master/dying.png",
+    "faint": "master/faint.png"
+  },
+  "anims": {
+    "idle": {
+      "dir": "anim/idle",
+      "ms": [
+        380,
+        380,
+        380,
+        380
+      ],
+      "loop": true,
+      "matchPose": "ready",
+      "anchor": [
+        56,
+        102
+      ]
+    },
+    "walk": {
+      "dir": "anim/walk",
+      "ms": [
+        110,
+        110,
+        110,
+        110
+      ],
+      "loop": true,
+      "matchPose": "ready",
+      "anchor": [
+        56,
+        102
+      ]
+    },
+    "atk": {
+      "dir": "anim/atk",
+      "ms": [
+        90,
+        70,
+        80,
+        90,
+        90
+      ],
+      "loop": false,
+      "matchPose": "ready",
+      "anchor": [
+        56,
+        102
+      ],
+      "hit": 2
+    },
+    "cast": {
+      "dir": "anim/cast",
+      "ms": [
+        90,
+        110,
+        100,
+        110,
+        150,
+        100
+      ],
+      "loop": false,
+      "matchPose": "ready",
+      "anchor": [
+        56,
+        102
+      ],
+      "hit": 3
+    },
+    "hurt": {
+      "dir": "anim/hurt",
+      "ms": [
+        60,
+        80,
+        80
+      ],
+      "loop": false,
+      "matchPose": "ready",
+      "anchor": [
+        56,
+        102
+      ]
+    },
+    "down": {
+      "dir": "anim/down",
+      "ms": [
+        140,
+        140,
+        700
+      ],
+      "loop": false,
+      "matchPose": "dying",
+      "anchor": [
+        56,
+        102
+      ]
+    },
+    "aw_in": {
+      "dir": "anim/aw_in",
+      "ms": [
+        110,
+        90,
+        90,
+        110,
+        160,
+        100
+      ],
+      "loop": false,
+      "matchPose": "ready",
+      "anchor": [
+        56,
+        102
+      ],
+      "hit": 3
+    }
+  },
+  "seirinAnims": {},
+  "rig": null
+}

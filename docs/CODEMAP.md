@@ -53,7 +53,7 @@
 | 47 | `js/sprite/data/spx-data.js` | 95 | 自動生成：旧 tools/build_spx.py の出力を tools/spx_normalize.py が整えたもの（提供原画 → パレット番号 PNG）。手で編集しない |  |
 | 48 | `js/sprite/data/spx-data-enemy.js` | 1005 | （データ。読まない） |  |
 | 49 | `js/sprite/data/spx-data-heroes.js` | 1000 | （データ。読まない） |  |
-| 50 | `js/sprite/data/spx-data-chars.js` | 0 | 自動生成：tools/spx_import.py（素材パック assets_src/chars の各 character.json）。手で編集しない |  |
+| 50 | `js/sprite/data/spx-data-chars.js` | 88 | 自動生成：tools/spx_import.py（素材パック assets_src/chars の各 character.json）。手で編集しない |  |
 | 51 | `js/sprite/spx.js` | 31 | ドット絵刷新：提供原画から作ったスプライト（SPX）を、既存の描画の入口で差し替える | SPX |
 | 52 | `js/zukan/viewer.js` | 11 | ver0.30 図鑑のキャラクタービューア（ZVIEW） | ZVIEW |
 | 53 | `js/zukan/zukan.js` | 13 | 図鑑（一覧・詳細） ver0.30 | ZUKAN |
@@ -93,13 +93,14 @@
 | 87 | `js/td/fx.js` | 21 | TD の戦闘の演出（TDFX）：技ごとのエフェクト・星臨の短い暗転・粒・敵の歩き/被弾/崩れ。描くだけで、ロジック（TDS）の結果に触れない | TDFX |
 | 88 | `js/td/skicon.js` | 4 | 戦闘の技ボタンの絵（TDI）：SKICON の白いシルエットから、技ごとのドット絵のアイコンを作る（ver0.58） | TDI |
 | 89 | `js/td/hud.js` | 8 | TD の戦闘画面の帯と操作盤（TDH）：上の帯・灯力と星片の帯・選んだ仲間の操作盤・手札。戦場の描画と操作は js/td/view.js | TDH |
-| 90 | `js/td/view.js` | 28 | TD の戦闘画面（TD）：横スクロールの戦場・上下の帯・手札・ユニットの窓・リザルト。ロジックは js/td/sim.js（TDS） | TD |
-| 91 | `js/td/guide.js` | 5 | TD の字を使わない導き（GUIDE）の正本：最初の 1〜2 面で、光る指・脈打つ輪・矢印だけで操作を順に示す | GUIDE |
-| 92 | `js/td/menu.js` | 15 | TD の章の地図・出撃準備・会話・仲間の加入（TDM）。戦闘画面は js/td/view.js（TD） | TDM |
-| 93 | `js/ui/home.js` | 4 | ホーム画面（灯都ルミナス）の正本：TD「防衛」を主役にした重ね表示 | HOME |
-| 94 | `js/ui/unit.js` | 13 | 仲間の画面（UNIT）：TD 用の一覧＋1 人の詳細。Lv・技 5 つ・奥義・アビリティ 3 つ・装備・星盤をここにまとめる | UNIT |
-| 95 | `js/ui/zukan.js` | 3 | 図鑑の一覧（ZKUI）：敵・仲間・装備の全画面の一覧。ver0.54 新規 | ZKUI |
-| 96 | `js/ui/dev.js` | 4 | 開発者モードの正本（タイトルの「開発者モード」・ホームの ≡ の DEV） | DEVUI |
+| 90 | `js/td/uanim.js` | 3 | TD：味方の状態ごとのコマ送り（TDA。素材パック assets_src/chars の anims を引く） | TDA |
+| 91 | `js/td/view.js` | 29 | TD の戦闘画面（TD）：横スクロールの戦場・上下の帯・手札・ユニットの窓・リザルト。ロジックは js/td/sim.js（TDS） | TD |
+| 92 | `js/td/guide.js` | 5 | TD の字を使わない導き（GUIDE）の正本：最初の 1〜2 面で、光る指・脈打つ輪・矢印だけで操作を順に示す | GUIDE |
+| 93 | `js/td/menu.js` | 15 | TD の章の地図・出撃準備・会話・仲間の加入（TDM）。戦闘画面は js/td/view.js（TD） | TDM |
+| 94 | `js/ui/home.js` | 4 | ホーム画面（灯都ルミナス）の正本：TD「防衛」を主役にした重ね表示 | HOME |
+| 95 | `js/ui/unit.js` | 13 | 仲間の画面（UNIT）：TD 用の一覧＋1 人の詳細。Lv・技 5 つ・奥義・アビリティ 3 つ・装備・星盤をここにまとめる | UNIT |
+| 96 | `js/ui/zukan.js` | 3 | 図鑑の一覧（ZKUI）：敵・仲間・装備の全画面の一覧。ver0.54 新規 | ZKUI |
+| 97 | `js/ui/dev.js` | 4 | 開発者モードの正本（タイトルの「開発者モード」・ホームの ≡ の DEV） | DEVUI |
 
 ## 上書きの連鎖（2 ファイル以上で定義・上書きされる関数）
 
@@ -122,6 +123,7 @@
 | `addLoot` | items.js → ch9.js → ver17.js → v20-ui.js |
 | `drawUnit` | engine.js → ver16.js → ver17.js → td/view.js |
 | `fit` | core.js → v21.js → v22.js → td/view.js |
+| `frame` | sprite/legacy/dot-rig.js → ver19-art.js → v21.js → td/uanim.js |
 | `genItem` | items.js → v31/items.js → data/resist.js → data/equip7.js |
 | `kBoss` | ch8.js → ver19-pre.js → sprite/spx.js → v31/enemies.js |
 | `loop` | v21-art.js → zukan/viewer.js → td/view.js → td/guide.js |
@@ -139,8 +141,8 @@
 | `drawBoard` | items.js → ver17.js → v31/board.js |
 | `enterTown` | town.js → ch8.js → ver18-town.js |
 | `exprFace` | ch9.js → ver19-art.js → sprite/spx.js |
-| `frame` | sprite/legacy/dot-rig.js → ver19-art.js → v21.js |
 | `gainXP` | engine.js → v31/core.js → ui/growth.js |
+| `has` | sprite/facing.js → td/sim.js → td/uanim.js |
 | `hide` | ui/inv.js → td/view.js → td/guide.js |
 | `itemIcon` | ch3.js → v21-art.js → v31/items.js |
 | `key` | ver18-field.js → sprite/facing.js → ui/smith.js |
@@ -150,6 +152,7 @@
 | `openBoard` | items.js → v21.js → v31/board.js |
 | `pic` | ui/growth.js → td/menu.js → ui/unit.js |
 | `portrait` | ver18-art.js → ver19-art.js → sprite/spx.js |
+| `put` | ver16.js → items/icons36.js → td/uanim.js |
 | `render` | v21-items.js → items/icons36.js → td/skicon.js |
 | `rewards` | engine.js → rs/mastery.js → ui/growth.js |
 | `ring` | v21-art.js → td/sfx.js → td/guide.js |
@@ -188,7 +191,6 @@
 | `flask` | ver18-art.js → v21-art.js |
 | `follow` | td/sim.js → td/view.js |
 | `fuQ` | v20-battle.js → v31/board.js |
-| `has` | sprite/facing.js → td/sim.js |
 | `hash` | td/fx.js → td/skicon.js |
 | `healAll` | field.js → v38/core.js |
 | `hex` | sprite/spx.js → items/icons36.js |
@@ -217,7 +219,6 @@
 | `part` | sprite/legacy/px.js → td/fx.js |
 | `partyScreen` | ver17.js → ui/party.js |
 | `power` | ver17.js → v31/board.js |
-| `put` | ver16.js → items/icons36.js |
 | `ramp` | sprite/legacy/dot.js → sprite/legacy/px.js |
 | `reg` | sprite/legacy/dot-rig.js → ui/keywords.js |
 | `result` | ui/inv.js → td/view.js |

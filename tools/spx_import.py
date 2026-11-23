@@ -223,6 +223,7 @@ def load_clip(base, name, spec, key, scale_to=None):
         raise SystemExit('error: %s の ms の数がコマ数と違う' % name)
     c = Clip(name, frames, (ax, ay), [int(v) for v in ms], bool(spec.get('loop', True)))
     c.rest_h = bbox(frames[0][1])[1] - bbox(frames[0][1])[0]
+    c.hit = spec.get('hit')   # 当たる（効果が出る）コマの番号（任意。TD の view が読む）
     return c
 
 
@@ -314,7 +315,7 @@ def build_char(cdir, scale_cfg):
     C = {'face': M.get('face', 'L'), 'kind': kind, 'pal': [hexs(c) for c in pal], 'sizes': sizes_for(P, A, pal, 1.0),
          'src': 'pack:' + os.path.relpath(cdir, ROOT)}
     if A:
-        C['anims'] = {c.name: {'f': ['%s@%d' % (c.name, i) for i in range(len(c.frames))], 'ms': c.ms, 'loop': 1 if c.loop else 0} for c in A}
+        C['anims'] = {c.name: {'f': ['%s@%d' % (c.name, i) for i in range(len(c.frames))], 'ms': c.ms, 'loop': 1 if c.loop else 0, **({'hit': c.hit} if c.hit is not None else {})} for c in A}
     if kind == 'hum':
         hf = 'front' if 'front' in P else ref
         C['heads'] = head_tiles(*P[hf], pal, int(round(P[hf][1].shape[0] * float(M.get('headK', .37)))))

@@ -69,13 +69,13 @@ function take(){for(const e of st.ev){TDSFX.ev(e);TDFX.ev(e,st);
  else if(e.k==='kill'){if(e.f.boss)shake=3;}
  else if(e.k==='heal'){if(nums.length<24)nums.push({t:0,x:e.u.x,y:e.u.y-52,v:'+'+e.v,c:'#9fe8b8',big:0});}
  else if(e.k==='hurt'){e.u.hitT=st.t;}
- else if(e.k==='cast'){nm=nm.filter(n=>n.u!==e.u);nm.push({t:0,u:e.u,x:e.u.x,y:e.u.y-UH-12,s:e.sk.n});TDH.fire(e.u,e.sk);}
- else if(e.k==='aw'){nm=nm.filter(n=>n.u!==e.u);nm.push({t:0,u:e.u,x:e.u.x,y:e.u.y-UH-12,s:'星臨',aw:1});shake=2;}
+ else if(e.k==='cast'){nm=nm.filter(n=>n.u!==e.u);nm.push({t:0,u:e.u,x:e.u.x,y:e.u.y-TDA.hgt(e.u.id,UH)-12,s:e.sk.n});TDH.fire(e.u,e.sk);}
+ else if(e.k==='aw'){nm=nm.filter(n=>n.u!==e.u);nm.push({t:0,u:e.u,x:e.u.x,y:e.u.y-TDA.hgt(e.u.id,UH)-12,s:'星臨',aw:1});shake=2;}
  else if(e.k==='ult'){banner(e.u.h.ult.n,'',900);shake=3;}
  else if(e.k==='leak'){baseHit=st.t;shake=3;nope('.td-life');}
  else if(e.k==='wave'){banner('WAVE '+e.n,'',1200,e.boss);}
  else if(e.k==='clear')banner('WAVE '+e.n,'',700);
- else if(e.k==='fall'){if(selU===e.u)unitPanel(null);}
+ else if(e.k==='fall'){TDA.fall(e.u,st);if(selU===e.u)unitPanel(null);}
  else if(e.k==='deploy'){unitPanel(e.u,1);}
  else if(e.k==='beam'){shake=3;if(!e.u)baseHit=st.t;}}
  st.ev.length=0;}
@@ -97,7 +97,7 @@ function draw(t,dt){TDFX.step(dt);g.setTransform(1,0,0,1,0,0);g.imageSmoothingEn
  marks(t,dt);
  /* キャラ（奥から） */
  const L=[...st.foes.map(f=>({y:f.y,f})),...st.units.map(u=>({y:u.y,u}))].sort((a,b)=>a.y-b.y);
- spread();for(const o of L)o.f?drawFoe(o.f,t):drawUnit(o.u,t);
+ TDA.drawGhosts(g,st);spread();for(const o of L)o.f?drawFoe(o.f,t):drawUnit(o.u,t);
  TDFX.front(g);
  /* 画面に固定：小地図・画面の外の敵 */
  g.setTransform(k,0,0,k,0,0);air(t);g.setTransform(DPR,0,0,DPR,0,0);mini();edge(t);
@@ -106,7 +106,7 @@ function draw(t,dt){TDFX.step(dt);g.setTransform(1,0,0,1,0,0);g.imageSmoothingEn
 const SX=x=>(x-cam)*S,SY=y=>(y-VT)*S;
 /* 数字：白＝通常・金＝弱点（「弱」の印）・灰＝耐性・大きい＝会心と奥義。出た瞬間に大きく弾けて上へ抜け、最後に薄れる */
 function texts(dt){g.textAlign='center';g.textBaseline='alphabetic';g.lineJoin='round';
- nm=nm.filter(n=>(n.t+=dt)<.9);for(const n of nm){const p=n.t/.9,x=SX(n.u&&n.u.hp>0?n.u.x:n.x),y=SY((n.u&&n.u.hp>0?n.u.y-UH-12:n.y))-p*6;g.globalAlpha=p<.85?Math.min(1,n.t*12):(1-p)*6.6;
+ nm=nm.filter(n=>(n.t+=dt)<.9);for(const n of nm){const p=n.t/.9,x=SX(n.u&&n.u.hp>0?n.u.x:n.x),y=SY((n.u&&n.u.hp>0?n.u.y-TDA.hgt(n.u.id,UH)-12:n.y))-p*6;g.globalAlpha=p<.85?Math.min(1,n.t*12):(1-p)*6.6;
   g.font=`700 ${n.aw?15:12}px "Kaisei Tokumin",serif`;const w=g.measureText(n.s).width+14;g.fillStyle=n.aw?'rgba(90,60,10,.88)':'rgba(7,7,26,.78)';g.fillRect(x-w/2,y-13,w,18);
   g.fillStyle=n.aw?'#ffe2a0':'#f2b347';g.fillRect(x-w/2,y-13,2,18);g.fillStyle=n.aw?'#fff8e0':'#fff0b8';g.fillText(n.s,x,y+1);}
  nums=nums.filter(n=>(n.t+=dt)<.85);for(const n of nums){if(n.t<0)continue;const p=n.t/.85,pop=n.t<.08?1.45-n.t/.08*.45:1,sz=(n.big===2?24:n.big?20:n.res?13:16)*pop;
@@ -167,11 +167,11 @@ function drawUnit(u,t){const fl=st.t-(u.hitT||-9)<.08,lg=st.t-u.actT<.12?u.face*
  /* 星臨中：金の光の衣（足元から昇る光と、体の後ろの光） */
  if(u.awT>0){const k2=.75+.25*Math.sin(t*7),gr=g.createRadialGradient(x,u.y-30,3,x,u.y-30,38);gr.addColorStop(0,`rgba(255,226,160,${.5*k2})`);gr.addColorStop(1,'rgba(242,179,71,0)');g.fillStyle=gr;g.fillRect(x-38,u.y-68,76,76);
   g.fillStyle='#fff0b8';for(let i=0;i<4;i++){const q=(t*1.3+i*.25)%1;g.globalAlpha=1-q;g.fillRect(x-10+i*6+Math.sin(t*3+i)*2,u.y-q*44,1.5,3);}g.globalAlpha=1;}
- sprite(F,x+lg,u.y+bob,u.face>0,UH,fl,u.lit?1:.55);
+ if(!TDA.draw(g,u,x,u.y,fl,u.lit?1:.55,st))sprite(F,x+lg,u.y+bob,u.face>0,UH,fl,u.lit?1:.55);
  if(!u.lit){g.fillStyle='rgba(169,165,196,.95)';g.font='700 8px "M PLUS 1p",sans-serif';g.textAlign='center';g.fillText('光の外',x,u.y+13);}
- bar(x,u.y-UH-6,24,u.hp/u.h.hp,u.hp/u.h.hp<.35?'#e86a6a':'#9fe8b8');
+ bar(x,u.y-TDA.hgt(u.id,UH)-6,24,u.hp/u.h.hp,u.hp/u.h.hp<.35?'#e86a6a':'#9fe8b8');
  if(selU===u){g.strokeStyle='#fff0b8';g.lineWidth=1.5;g.beginPath();g.ellipse(x,u.y+1,18,6,0,0,7);g.stroke();}
- if(c&&((st.star>=K.STAR_MAX&&!c.ult)||(st.star>=K.AW&&!c.aw))){g.fillStyle='#fff0b8';g.globalAlpha=.6+.4*Math.sin(t*8);g.fillRect(x-17,u.y-UH-4,3,3);g.globalAlpha=1;}}
+ if(c&&((st.star>=K.STAR_MAX&&!c.ult)||(st.star>=K.AW&&!c.aw))){g.fillStyle='#fff0b8';g.globalAlpha=.6+.4*Math.sin(t*8);g.fillRect(x-17,u.y-TDA.hgt(u.id,UH)-4,3,3);g.globalAlpha=1;}}
 let bT=0;function banner(a,b,ms,boss){const e=$('.td-banner');e.innerHTML=`${esc(a)}${b?`<small>${esc(b)}</small>`:''}`;e.classList.toggle('boss',!!boss);e.classList.add('show');clearTimeout(bT);bT=setTimeout(()=>e.classList.remove('show'),ms);}
 /* できない操作は文章でなく、その場所を揺らして赤く光らせる */
 function nope(q){const e=typeof q==='string'?$(q):q;if(!e)return;e.classList.remove('nope');void e.offsetWidth;e.classList.add('nope');}
@@ -236,7 +236,7 @@ function lvMap(){const o={};try{for(const id in G.h)o[id]=G.h[id].lv||1;}catch(e
 function stop(){cancelAnimationFrame(raf);st=null;try{GUIDE.stop();}catch(e){}}
 function open(id,deck){build();sid=id;cancelAnimationFrame(raf);
  const dk=deck||TDD.deckOf(),rl={};for(const h of dk)rl[h]=TDD.real(h);
- st=TDS.create(sid,dk,{lv:lvMap(),real:rl,seed:(Date.now()%100000)+1});speed=1;paused=false;sel=null;selU=null;mvU=null;nm=[];nums=[];TDFX.reset();ended=false;acc=0;Z=1;userT=0;bg=null;pts.clear();pinch=null;drag=null;
+ st=TDS.create(sid,dk,{lv:lvMap(),real:rl,seed:(Date.now()%100000)+1});speed=1;paused=false;sel=null;selU=null;mvU=null;nm=[];nums=[];TDA.clear();TDFX.reset();ended=false;acc=0;Z=1;userT=0;bg=null;pts.clear();pinch=null;drag=null;
  root.classList.remove('hide');sheet(null);TDH.open(st);const sb=$('[data-a="spd"]');sb.textContent='×1';sb.classList.remove('on');
  const sn=$('[data-a="snd"]');sn.innerHTML=TDSFX.icon();sn.classList.toggle('off',!TDSFX.on);const pb=$('[data-a="pause"]');pb.textContent='Ⅱ';pb.classList.remove('on');
  requestAnimationFrame(()=>{fit();setCam(st.S.W);last=performance.now();raf=requestAnimationFrame(loop);banner(st.S.name,'',1600);try{GUIDE.start(sid);}catch(e){console.error(e);}
