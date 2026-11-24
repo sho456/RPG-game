@@ -1,4 +1,4 @@
-# ===== セレス 正本の原画（通常・正面／星臨）の仕上げ：背景の透過・パレットへの減色・ゴミ取り・足元そろえ =====
+# ===== セレス 正本の原画（通常・正面／星臨／瀕死）の仕上げ：背景の透過・パレットへの減色・ゴミ取り・足元そろえ =====
 # master.py の後に：python3 master_build.py → sprites/celes_master_{front,seirin}.png・sprites/palette_{front,seirin}.npy
 # 手順は build.py と同じ（関数をそのまま使う）。星臨は銀河の色が多いので別のパレット・色数を多めに。
 import numpy as np
@@ -37,7 +37,7 @@ def alpha_mask(a):
     return ~bg
 
 CW,CH=84,112
-for k,ncol in [('front',40),('seirin',52)]:
+for k,ncol in [('front',40),('seirin',52),('dying',40)]:
     a=np.asarray(Image.open(f'src/master/celes_{k}_raw.png').convert('RGB')).astype(float)
     m=alpha_mask(a)
     km=KMeans(ncol,random_state=1).fit(a[m])

@@ -1,9 +1,9 @@
-# ===== セレス 正本の原画（通常・正面／星臨）の 2K JPG を 1 マス＝1 ドットに戻す =====
+# ===== セレス 正本の原画（通常・正面／星臨／瀕死）の 2K JPG を 1 マス＝1 ドットに戻す =====
 # 使い方：python3 master.py  → src/master/celes_{front,seirin}_raw.png（背景つき）と grid.json
 # マス目は縦横の明るさの変化の周期から測る（周期は約 22.5px。広く探すと 2 倍の 45px を拾うので 20〜24px に絞る。縦横は別々に測る）。
 import json, numpy as np
 from PIL import Image
-SRC = {'front': 'src/master/celes_front_2k.jpg', 'seirin': 'src/master/celes_seirin_2k.jpg'}
+SRC = {'front': 'src/master/celes_front_2k.jpg', 'seirin': 'src/master/celes_seirin_2k.jpg', 'dying': 'src/master/celes_dying_2k.jpg'}
 
 def score(g, p, ph):
     idx = np.round(np.arange(ph, len(g) - 1, p)).astype(int)
