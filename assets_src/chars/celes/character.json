@@ -1,10 +1,10 @@
 {
-  "_doc": "仮のコマ（make_pack.py が作る）。本番に差し替えるときは anim/<名>/ の PNG を入れ替え、anims.<名> の ms・hit を直す。コマは全て同じキャンバス、足元の基準点 anchor は元の解像度で。詳しくは docs/PIPELINE.md・tools/spx_import.py",
+  "_doc": "walk/atk/cast/hurt/down は PixelLab の本番コマ（assets_src/pixel-art/celes-hd/import_pl.py が src/master/pl/ から作る。エフェクトは fx/<名>/ に分離）。idle は仮（import_pl.py の make_idle）。aw_in は仮（make_pack.py）。コマは全て同じキャンバス、足元の基準点 anchor は元の解像度で。詳しくは docs/PIPELINE.md・tools/spx_import.py",
   "id": "celes_hd",
   "kind": "hum",
   "name": "セレス（案2）",
   "identity": "銀髪ロングの魔女。紫のローブと金の縁取り・紫のとんがり帽子・青い宝石の金の杖",
-  "face": "R",
+  "face": "L",
   "key": null,
   "palette": {
     "colors": 32,
@@ -44,94 +44,115 @@
     "idle": {
       "dir": "anim/idle",
       "ms": [
-        380,
-        380,
-        380,
-        380
+        420,
+        160,
+        420,
+        160,
+        420,
+        160
       ],
       "loop": true,
-      "matchPose": "ready",
+      "scale": 1.0,
       "anchor": [
-        56,
-        102
+        54,
+        121
       ]
     },
     "walk": {
       "dir": "anim/walk",
       "ms": [
-        110,
-        110,
-        110,
-        110
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
       ],
       "loop": true,
-      "matchPose": "ready",
+      "scale": 1.0,
       "anchor": [
-        56,
-        102
+        54,
+        121
       ]
     },
     "atk": {
       "dir": "anim/atk",
       "ms": [
-        90,
-        70,
         80,
-        90,
-        90
+        70,
+        70,
+        70,
+        70,
+        60,
+        60,
+        60,
+        80
       ],
       "loop": false,
-      "matchPose": "ready",
+      "scale": 1.0,
       "anchor": [
-        56,
-        102
+        54,
+        121
       ],
-      "hit": 2
+      "hit": 5
     },
     "cast": {
       "dir": "anim/cast",
       "ms": [
         90,
-        110,
+        90,
+        100,
+        100,
         100,
         110,
-        150,
-        100
+        110,
+        100,
+        120
       ],
       "loop": false,
-      "matchPose": "ready",
+      "scale": 1.0,
       "anchor": [
-        56,
-        102
+        54,
+        121
       ],
-      "hit": 3
+      "hit": 6
     },
     "hurt": {
       "dir": "anim/hurt",
       "ms": [
+        50,
         60,
-        80,
-        80
+        70,
+        60,
+        60
       ],
       "loop": false,
-      "matchPose": "ready",
+      "scale": 1.0,
       "anchor": [
-        56,
-        102
+        54,
+        121
       ]
     },
     "down": {
       "dir": "anim/down",
       "ms": [
+        100,
+        100,
+        100,
+        120,
         140,
-        140,
-        700
+        160,
+        160,
+        160,
+        300
       ],
       "loop": false,
-      "matchPose": "dying",
+      "scale": 1.0,
       "anchor": [
-        56,
-        102
+        54,
+        121
       ]
     },
     "aw_in": {

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""セレス（案2・celes-hd）の素材パック assets_src/chars/celes/ を作る【仮のコマ】。
+"""セレス（案2・celes-hd）の素材パック assets_src/chars/celes/ を作る【仮のコマ・以後は実行しない：本番コマ import_pl.py のコマを消すため】。
 master/ は celes-hd の sprites（front/side/ready/dying/faint）。anim/<名>/frame_000.png … は、補間を使わず
 「ドットを動かす操作」だけで ready / dying から作る仮のコマ（呼吸＝行を抜く・前傾＝行ごとのずらし・宝石を明るく・浮き）。
 後で PixelLab 等の本番のコマに差し替えるときは、anim/<名>/ のフォルダの中身を入れ替え、character.json の

@@ -3,7 +3,7 @@
  星臨中は aw_idle/aw_walk/aw_atk/aw_cast があればそれ、無ければ通常のアニメを 'aw' の色（palAw があれば）で。
  アニメが無い仲間は drawUnit が従来の 1 枚絵（TDA.draw が false を返す）。
  ドットはにじませない：補間なし・1 ドット＝画面上の整数画素（S*DPR を見て、使うサイズと整数倍 n を選ぶ）。
- 仮のコマ：assets_src/pixel-art/celes-hd/make_pack.py。差し替えは assets_src/chars/<id>/anim/<名>/ と character.json の ms・hit。 */
+ 本番コマ（walk/atk/cast/hurt/down）：assets_src/pixel-art/celes-hd/import_pl.py。待機・aw_in は仮。差し替えは assets_src/chars/<id>/anim/<名>/ と character.json の ms・hit。 */
 const TDA=(()=>{
 const AN={celes:'celes_hd'};/* 仲間 id → 素材パックの id */
 const HGT={celes:72};/* 表示の背丈（論理 px。敵は雑魚 40・ボス 76、既定の仲間 60） */
