@@ -1,5 +1,5 @@
 {
-  "_doc": "walk/atk/cast/hurt/down は PixelLab の本番コマ（assets_src/pixel-art/celes-hd/import_pl.py が src/master/pl/ から作る。エフェクトは fx/<名>/ に分離）。idle は仮（import_pl.py の make_idle）。aw_in は仮（make_pack.py）。コマは全て同じキャンバス、足元の基準点 anchor は元の解像度で。詳しくは docs/PIPELINE.md・tools/spx_import.py",
+  "_doc": "全アニメ PixelLab の本番コマ（assets_src/pixel-art/celes-hd/import_pl.py が src/master/pl/ から作る。エフェクトは fx/<名>/ に分離）。aw_*＝星臨（aw_walk は aw_idle・aw_atk は aw_cast のコピー）。コマは全て同じキャンバス、足元の基準点 anchor は元の解像度で。詳しくは docs/PIPELINE.md・tools/spx_import.py",
   "id": "celes_hd",
   "kind": "hum",
   "name": "セレス（案2）",
@@ -7,7 +7,7 @@
   "face": "L",
   "key": null,
   "palette": {
-    "colors": 32,
+    "colors": 80,
     "seirinColors": 32
   },
   "scale": {
@@ -44,12 +44,15 @@
     "idle": {
       "dir": "anim/idle",
       "ms": [
-        420,
-        160,
-        420,
-        160,
-        420,
-        160
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150
       ],
       "loop": true,
       "scale": 1.0,
@@ -158,20 +161,157 @@
     "aw_in": {
       "dir": "anim/aw_in",
       "ms": [
-        110,
+        100,
+        90,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        70,
         90,
         90,
-        110,
-        160,
-        100
+        70,
+        70,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60
       ],
       "loop": false,
-      "matchPose": "ready",
+      "scale": 1.0,
       "anchor": [
-        56,
-        102
+        54,
+        121
+      ]
+    },
+    "aw_idle": {
+      "dir": "anim/aw_idle",
+      "ms": [
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150
       ],
-      "hit": 3
+      "loop": true,
+      "scale": 1.0,
+      "anchor": [
+        54,
+        121
+      ]
+    },
+    "aw_cast": {
+      "dir": "anim/aw_cast",
+      "ms": [
+        90,
+        90,
+        100,
+        100,
+        100,
+        110,
+        110,
+        100,
+        120
+      ],
+      "loop": false,
+      "scale": 1.0,
+      "anchor": [
+        54,
+        121
+      ],
+      "hit": 5
+    },
+    "aw_ult": {
+      "dir": "anim/aw_ult",
+      "ms": [
+        120,
+        120,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        100,
+        100,
+        100,
+        100,
+        100,
+        90,
+        90,
+        90,
+        90,
+        70,
+        70,
+        70,
+        70,
+        110,
+        110,
+        130,
+        200
+      ],
+      "loop": false,
+      "scale": 1.0,
+      "anchor": [
+        54,
+        121
+      ],
+      "hit": 17
+    },
+    "aw_walk": {
+      "dir": "anim/aw_walk",
+      "ms": [
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110,
+        110
+      ],
+      "loop": true,
+      "scale": 1.0,
+      "anchor": [
+        54,
+        121
+      ]
+    },
+    "aw_atk": {
+      "dir": "anim/aw_atk",
+      "ms": [
+        60,
+        60,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        60
+      ],
+      "loop": false,
+      "scale": 1.0,
+      "anchor": [
+        54,
+        121
+      ],
+      "hit": 5
     }
   },
   "seirinAnims": {},

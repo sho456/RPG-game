@@ -28,7 +28,13 @@ SHEETS = {
     'cast': ('td_cast_v1_3x3_144x196.png', 3, 3, 144, 196, 'side'),
     'hurt': ('td_hurt_v1_3x2_148x140.png', 3, 2, 148, 140, 'side'),
     'down': ('td_down_v1_3x3_132x160.png', 3, 3, 132, 160, 'dying'),
+    'idle': ('td_idle_v2_3x3_104x140.png', 3, 3, 104, 140, 'side'),
+    'aw_in': ('td_aw_in_v1_5x5_120x164.png', 5, 5, 120, 164, 'side'),          # 0 番目＝通常の side_l、最後は星臨の姿
+    'aw_idle': ('td_aw_idle_v1_3x3_104x148.png', 3, 3, 104, 148, 'seirin'),
+    'aw_cast': ('td_aw_cast_v1_3x3_148x196.png', 3, 3, 148, 196, 'seirin'),
+    'aw_ult': ('td_aw_ult_v2_5x5_148x196.png', 5, 5, 148, 196, 'seirin'),      # v1 は予備（取り込まない）
 }
+AW = ('aw_in', 'aw_idle', 'aw_cast', 'aw_ult')   # 星臨のコマ（星臨用パレット・色でエフェクトを分ける）
 # 使うコマ・ms・hit（hit は使うコマの並びの中での番号）
 ANIMS = {
     'walk': dict(use=list(range(1, 9)), ms=[100] * 8, loop=True),
@@ -36,6 +42,15 @@ ANIMS = {
     'cast': dict(use=list(range(9)), ms=[90, 90, 100, 100, 100, 110, 110, 100, 120], loop=False, hit=6),
     'hurt': dict(use=[0, 1, 2, 3, 4], ms=[50, 60, 70, 60, 60], loop=False),
     'down': dict(use=list(range(9)), ms=[100, 100, 100, 120, 140, 160, 160, 160, 300], loop=False),
+    'idle': dict(use=list(range(9)), ms=[150] * 9, loop=True),
+    'aw_in': dict(use=list(range(25)), ms=[100, 90] + [80] * 10 + [70, 90, 90, 70, 70] + [60] * 8, loop=False),
+    'aw_idle': dict(use=list(range(9)), ms=[150] * 9, loop=True),
+    'aw_cast': dict(use=list(range(9)), ms=[90, 90, 100, 100, 100, 110, 110, 100, 120], loop=False, hit=5),
+    'aw_ult': dict(use=list(range(25)), ms=[120, 120] + [110] * 6 + [100] * 5 + [90] * 4 + [70] * 4 + [110, 110, 130, 200],
+                   loop=False, hit=17),
+    # 星臨の歩き・通常攻撃は作っていない：待機・技の流用（コマをコピー）
+    'aw_walk': dict(src='aw_idle', use=list(range(9)), ms=[110] * 9, loop=True),
+    'aw_atk': dict(src='aw_cast', use=list(range(9)), ms=[60, 60, 70, 70, 70, 70, 70, 70, 60], loop=False, hit=5),
 }
 # 以下の矩形は「足元の基準点からの相対座標」(x0,y0,x1,y1)（含む）。キャンバスの大きさが変わっても動かない。
 # (動き, コマ番号[元シートの番号]) ごと。REMOVE＝矩形内の全ドットをエフェクトへ／BLUE＝矩形内の青い所だけエフェクトへ／
@@ -46,6 +61,18 @@ BLUE = {('cast', 6): [(-36, -115, 4, -83)], ('cast', 7): [(-36, -115, 4, -83)]}
 KEEP = {('cast', 4): [(-24, -106, -6, -87)]}
 # 光弾・閃光で隠れた杖の宝石をほかのコマから貼る：(動き, コマ) → (元の動き, 元のコマ, 貼る位置 'ref'＝元と同じ／'fx'＝エフェクトの重心)
 GEM = {('cast', 5): ('cast', 3, 'fx'), ('cast', 6): ('cast', 3, 'ref'), ('cast', 7): ('cast', 3, 'ref')}
+AWFX = {('aw_in', 9): [(-34, -71, -9, -61)],
+        ('aw_cast', 2): [(-54, -115, -12, -78, 'w')], ('aw_cast', 3): [(-56, -122, -6, -80, 'w')],
+        ('aw_cast', 5): [(-46, -108, -2, -72, 'c')],
+        ('aw_cast', 6): [(-54, -108, -24, -56, 'p'), (-54, -80, -3, -56, 'c')], ('aw_cast', 7): [(-54, -82, -34, -48, 'p')],
+        ('aw_ult', 13): [(-48, -122, -14, -90), (-14, -122, 14, -90, 'k')],
+        ('aw_ult', 14): [(-46, -122, -14, -100), (-14, -122, 44, -103, 'k'), (-8, -103, 8, -66, 'k')],
+        ('aw_ult', 15): [(-12, -118, 11, -99, 'k')], ('aw_ult', 16): [(-50, -122, 1, -92, 'k')],
+        ('aw_ult', 17): [(-53, -118, -14, -62), (-53, -62, -2, -28, 'c')], ('aw_ult', 18): [(-53, -118, -14, -62), (-53, -62, -2, -28, 'c')],
+        ('aw_ult', 19): [(-53, -97, -30, -62), (-53, -62, -30, -28, 'c')], ('aw_ult', 20): [(-56, -62, -44, -45)]}
+AWKEEP = {('aw_ult', k): [(-53, -38, -34, -27)] for k in (17, 18, 19)}
+AWFX[('aw_ult', 17)] += [(-53, -62, -30, -39)]; AWFX[('aw_ult', 18)] += [(-53, -62, -30, -39)]; AWFX[('aw_ult', 19)] += [(-53, -62, -30, -39), (-53, -39, -30, -27, 'w')]
+AWKEEP = {}
 # 倒れの接地をそろえる（コマごとの上下のずらし。負＝上へ）
 DY = {('down', 7): -1, ('down', 8): -2}
 
@@ -115,6 +142,75 @@ def effect_mask(a):
     return fx
 
 
+def seirin_palette(seirin):
+    """星臨用パレット（48 色）：seirin_side_l と星臨の各シートの色から、出現数の平方根で重みづけた k-means。
+    水晶・目の水色・星の白（出現が少ない明るい色）は消えないよう、離れた色は固定で加える。palette_seirin_anim.npy に保存"""
+    pf = os.path.join(SP, 'palette_seirin_anim.npy')
+    if os.path.exists(pf) and '--pal' not in sys.argv:
+        return np.load(pf)
+    px = [seirin[seirin[..., 3] > 0][:, :3]]
+    for nm in AW:
+        fn, c, r, w, h, _ = SHEETS[nm]
+        for k, cell in enumerate(cut(fn, c, r, w, h)):
+            if nm == 'aw_in' and k < 15:
+                continue
+            px.append(cell[cell[..., 3] >= 128][:, :3])
+    cols, cnt = np.unique(np.vstack(px), axis=0, return_counts=True)
+    cols = cols.astype(float); wgt = np.sqrt(cnt.astype(float))
+    cen = [cols[int(np.argmax(wgt))]]
+    for _ in range(47):   # 重みつきの最遠点
+        d = np.min(((cols[:, None] - np.array(cen)[None]) ** 2).sum(-1), 1)
+        cen.append(cols[int(np.argmax(d * wgt))])
+    cen = np.array(cen)
+    for _ in range(40):
+        a = ((cols[:, None] - cen[None]) ** 2).sum(-1).argmin(1)
+        for j in range(48):
+            m = a == j
+            if m.any():
+                cen[j] = (cols[m] * wgt[m, None]).sum(0) / wgt[m].sum()
+    pal = np.round(cen).astype(np.uint8)
+    pal = pal[np.argsort([-(0.3 * p[0] + 0.59 * p[1] + 0.11 * p[2]) for p in pal.astype(float)])]
+    np.save(pf, pal)
+    return pal
+
+
+def effect_mask_aw(f, nm, i, R):
+    """星臨のコマのエフェクト（True）。aw_in：足元の輪（桃・水色）と粒。aw_cast/aw_ult：閃光・弧は AWFX の矩形＋本体から離れた粒"""
+    op = f[..., 3] > 0
+    r, g, b = (f[..., k].astype(int) for k in range(3))
+    fx = np.zeros_like(op)
+    if nm == 'aw_in' and i <= 14:
+        fx |= op & (r >= 195) & (b >= 150) & (g <= 150) & (r - g >= 70)                 # 桃・紫の輪
+        fx |= op & (b >= 200) & (g >= 150) & (r <= 135) & (b - r >= 90)                  # 水色の輪
+    if nm == 'aw_in' and 3 <= i <= 11:   # 足元の白い弧・粒（髪は膝より上なので、足元の帯の白だけ）
+        sl = R((-54, -43, 54, 3))
+        fx[sl] |= (op[sl] & (f[sl][..., :3].min(-1) >= 200))
+    for rc in AWFX.get((nm, i), []):
+        sl = R(rc[:4])
+        sub = f[sl].astype(int)
+        ok = sub[..., 3] > 0
+        mn = sub[..., :3].min(-1)
+        if len(rc) == 5 and rc[4] == 'w':      # 白だけ（宝石の水色は残す）
+            ok &= mn >= 240
+        elif len(rc) == 5 and rc[4] == 'p':    # 紫の弧（AA の縁まで）＋白・水色
+            ok &= (mn >= 215) | ((sub[..., 0] - sub[..., 1] >= 25) & (sub[..., 2] >= 130) & (sub[..., 0] >= 90)) | \
+                  ((sub[..., 2] >= 190) & (sub[..., 1] >= 110) & (sub[..., 0] <= 150) & (sub[..., 2] - sub[..., 0] >= 60))
+        elif len(rc) == 5 and rc[4] == 'k':    # 白＋水色（縁のにじみまで・ラベンダーは残す）
+            ok &= (mn >= 215) | ((sub[..., 2] >= 190) & (sub[..., 1] >= 110) & (sub[..., 0] <= 150) & (sub[..., 2] - sub[..., 0] >= 60))
+        elif len(rc) == 5 and rc[4] == 'c':    # 白＋水色の発光（髪のラベンダー・服は残す）
+            ok &= (mn >= 215) | ((sub[..., 2] >= 200) & (sub[..., 1] >= 150) & (sub[..., 0] <= 135))
+        fx[sl] |= ok
+    for rc in AWKEEP.get((nm, i), []):          # 矩形内はキャラのまま（弧の根元の宝石など）
+        fx[R(rc)] = False
+    rest = op & ~fx
+    lab, n = ndi.label(ndi.binary_dilation(rest, np.ones((3, 3)), iterations=2) & (op | ndi.binary_dilation(rest, np.ones((3, 3)), iterations=2)), np.ones((3, 3)))
+    if n:
+        sizes = ndi.sum(rest, lab, range(1, n + 1))
+        main = lab == (1 + int(np.argmax(sizes)))
+        fx |= rest & ~main
+    return fx
+
+
 def main():
     prev = sys.argv[sys.argv.index('--preview') + 1] if '--preview' in sys.argv else None
     side = img(os.path.join(SP, 'celes_master_side_l.png'))
@@ -124,7 +220,10 @@ def main():
     pal_all = np.concatenate([pal_f, pal_d])
     sfx, sfy = foot_x(side)
     dfx, dfy = foot_x(dying)
-    masters = {'side': (side, 0, 0), 'dying': (dying, sfx - dfx, sfy - dfy)}  # master→side_l 座標への平行移動
+    seirin = img(os.path.join(SP, 'celes_master_seirin_side_l.png'))   # side_l と同じ大きさ・同じ足元
+    pal_sa = seirin_palette(seirin)
+    pal_u = np.concatenate([pal_f, pal_sa])
+    masters = {'side': (side, 0, 0), 'dying': (dying, sfx - dfx, sfy - dfy), 'seirin': (seirin, 0, 0)}  # master→side_l 座標への平行移動
     # 1 切り出し＋並べ直し（共通座標へ。ここでは大きな作業キャンバスに置く）
     BIG = 400
     OX = OY = 150
@@ -147,7 +246,7 @@ def main():
     # 2 エフェクト分離・減色
     res = {}
     for nm, fr in raw.items():
-        pal = pal_d if nm == 'down' else pal_f
+        pal = {'down': pal_all, 'aw_in': pal_u}.get(nm, pal_sa if nm in AW else pal_f)
         res[nm] = []
         for i, f in enumerate(fr):
             if f is None:
@@ -155,10 +254,10 @@ def main():
                 continue
             if (nm, i) in DY:
                 f = np.roll(f, DY[(nm, i)], 0)
-            fx = effect_mask(f)
             def R(r):
                 x0, y0, x1, y1 = r
                 return slice(OY + sfy + y0, OY + sfy + y1 + 1), slice(OX + sfx + x0, OX + sfx + x1 + 1)
+            fx = effect_mask_aw(f, nm, i, R) if nm in AW else (np.zeros(f.shape[:2], bool) if nm == 'idle' else effect_mask(f))
             for r in REMOVE.get((nm, i), []):
                 fx[R(r)] |= f[R(r)][..., 3] > 0
             for r in BLUE.get((nm, i), []):
@@ -168,7 +267,7 @@ def main():
                 fx[R(r)] = False
             ch = f.copy(); ch[fx] = 0
             ef = f.copy(); ef[~fx] = 0
-            res[nm].append([snap(ch, pal_all if nm == 'down' else pal), ef])
+            res[nm].append([snap(ch, pal), ef])
     # 隠れた宝石を貼る
     def gem_c(ch):
         r, g, b = (ch[..., k].astype(int) for k in range(3))
@@ -189,6 +288,10 @@ def main():
         else:
             tx, ty = gx, gy
         d[0][ty - 11:ty + 12, tx - 10:tx + 11] = patch
+    # 弧を消して欠けた杖の先の宝石を、弧が消えたコマ（20）から貼る
+    sl = (slice(OY + sfy - 46, OY + sfy - 25), slice(OX + sfx - 54, OX + sfx - 29))
+    for i in (17, 18, 19):
+        res['aw_ult'][i][0][sl] = res['aw_ult'][20][0][sl]
     # 3 共通キャンバス（全コマの不透明の範囲＋余白）
     xs0 = ys0 = 10 ** 9; xs1 = ys1 = -1
     for nm, fr in res.items():
@@ -214,20 +317,18 @@ def main():
             for f in os.listdir(d):
                 os.remove(os.path.join(d, f))
         for k, i in enumerate(spec['use']):
-            ch, ef = res[nm][i]
+            ch, ef = res[spec.get('src', nm)][i]
             Image.fromarray(ch[cy0:cy0 + H, cx0:cx0 + W]).save(os.path.join(OUT, 'anim', nm, 'frame_%03d.png' % k))
             Image.fromarray(ef[cy0:cy0 + H, cx0:cx0 + W]).save(os.path.join(OUT, 'fx', nm, 'frame_%03d.png' % k))
         a = {'dir': 'anim/' + nm, 'ms': spec['ms'], 'loop': spec['loop'], 'scale': 1.0, 'anchor': [ax, ay]}
         if 'hit' in spec:
             a['hit'] = spec['hit']
         A[nm] = a
-    # 4 待機（仮）
-    make_idle(side, sfx, sfy, W, H, ax, ay, pal_f, A)
     # 5 character.json
     jp = os.path.join(OUT, 'character.json')
     J = json.load(open(jp))
-    J['_doc'] = ('walk/atk/cast/hurt/down は PixelLab の本番コマ（assets_src/pixel-art/celes-hd/import_pl.py が src/master/pl/ から作る。'
-                 'エフェクトは fx/<名>/ に分離）。idle は仮（import_pl.py の make_idle）。aw_in は仮（make_pack.py）。'
+    J['_doc'] = ('全アニメ PixelLab の本番コマ（assets_src/pixel-art/celes-hd/import_pl.py が src/master/pl/ から作る。'
+                 'エフェクトは fx/<名>/ に分離）。aw_*＝星臨（aw_walk は aw_idle・aw_atk は aw_cast のコピー）。'
                  'コマは全て同じキャンバス、足元の基準点 anchor は元の解像度で。詳しくは docs/PIPELINE.md・tools/spx_import.py')
     old = J['anims']
     for nm in A:
