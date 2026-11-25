@@ -11,9 +11,12 @@ const D=()=>SPX.D;
 const A=(id,n)=>{const d=D()[id];return d&&d.anims&&d.anims[n];};
 const tot=a=>a.tot||(a.tot=a.ms.reduce((x,y)=>x+y,0)||1);
 const has=u=>!!AN[u]&&SPX.ready&&!!D()[AN[u]];
+/* 奥義のアニメ：aw_ult → ult → aw_cast → cast の順に探す */
+const ultName=(id,aw)=>(aw&&A(id,'aw_ult')&&'aw_ult')||(A(id,'ult')&&'ult')||(aw&&A(id,'aw_cast')&&'aw_cast')||(A(id,'cast')&&'cast')||null;
 function state(u,id,T){const aw=u.awT>0,pick=n=>{if(aw&&A(id,'aw_'+n))return{n:'aw_'+n,v:''};return A(id,n)?{n,v:aw?'aw':''}:null;};
  if(u.actK==='aw'){const a=A(id,'aw_in');if(a&&T-u.actT<tot(a)/1000)return{n:'aw_in',v:'aw',t0:u.actT};}
  {const a=A(id,'hurt');if(a&&T-(u.hitT||-9)<tot(a)/1000)return{n:'hurt',v:aw?'aw':'',t0:u.hitT};}
+ if(u.actK==='ult'){const n=ultName(id,aw);if(n&&T-u.actT<tot(A(id,n))/1000)return{n,v:aw?'aw':'',t0:u.actT};}
  if(u.actK==='atk'||u.actK==='cast'){const p=pick(u.actK);if(p&&T-u.actT<tot(A(id,p.n))/1000)return Object.assign(p,{t0:u.actT});}
  return Object.assign(pick(u.mv?'walk':'idle')||pick('idle')||{n:'idle',v:''},{loop:1});}
 function frame(id,s,T,uid){const a=A(id,s.n);if(!a)return null;const t=tot(a);let ms=s.loop?(T*1000+uid*137)%t:Math.max(0,(T-s.t0)*1000);let acc=0;
@@ -30,4 +33,6 @@ return{has,hgt:(u,d)=>HGT[u]||d,
  fall(u,st){if(has(u.id)&&A(AN[u.id],'down'))ghosts.push({id:u.id,x:u.x+(u.ox||0),y:u.y,face:u.face,t0:st.t});},
  drawGhosts(g,st){for(let i=ghosts.length-1;i>=0;i--){const o=ghosts[i],T=st.t-o.t0;if(T<0||T>1.8){ghosts.splice(i,1);continue;}
   const id=AN[o.id];put(g,id,'',frame(id,{n:'down',t0:o.t0},st.t,0),o.face,o.x,o.y,HGT[o.id],0,Math.min(1,(1.8-T)/.6));}},
+ /* アニメの「当たるコマ」の時刻（秒。奥義なら anim 省略可）。hit が無い・アニメが無いなら null */
+ hitT(uid,anim,aw){const id=AN[uid];if(!id||!has(uid))return null;const n=anim||ultName(id,aw),a=n&&A(id,n);if(!a||a.hit==null)return null;let t=0;for(let i=0;i<a.hit&&i<a.ms.length;i++)t+=a.ms[i];return t/1000;},
  clear(){ghosts.length=0;}};})();

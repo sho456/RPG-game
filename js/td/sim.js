@@ -120,7 +120,7 @@ function canUlt(st,uid){const u=st.units.find(u=>u.uid===uid),c=u&&st.deck.find(
 function canAw(st,uid){const u=st.units.find(u=>u.uid===uid),c=u&&st.deck.find(c=>c.on===u);return!!(u&&c&&!c.aw&&st.star>=K.AW&&!st.over);}
 function aw(st,uid){if(!canAw(st,uid))return false;const u=st.units.find(u=>u.uid===uid),c=st.deck.find(c=>c.on===u),A=D.AWK;c.aw=true;st.star-=K.AW;u.awT=A.dur;u.actT=st.t;u.actK='aw';
  const a=Math.round(u.h.hp*A.heal);u.hp=Math.min(u.h.hp,u.hp+a);ev(st,{k:'aw',u});ev(st,{k:'heal',u,v:a});return true;}
-function ult(st,uid){if(!canUlt(st,uid))return false;const u=st.units.find(u=>u.uid===uid),c=st.deck.find(c=>c.on===u),U=u.h.ult;c.ult=true;st.star-=K.STAR_MAX;u.actT=st.t;u.actK='cast';
+function ult(st,uid){if(!canUlt(st,uid))return false;const u=st.units.find(u=>u.uid===uid),c=st.deck.find(c=>c.on===u),U=u.h.ult;c.ult=true;st.star-=K.STAR_MAX;u.actT=st.t;u.actK='ult';
  const live=st.foes.filter(f=>f.hp>0),am=u.awT>0?D.AWK.ou:1,extra=L=>{for(const f of L){if(f.hp<=0)continue;if(U.stun)f.stun=Math.max(f.stun,f.boss?U.stun*.4:U.stun);if(U.curse)f.curse=Math.max(f.curse,U.curse);}
   if(U.heal)for(const v of st.units){const a=Math.round(v.h.hp*U.heal);v.hp=Math.min(v.h.hp,v.hp+a);ev(st,{k:'heal',u:v,v:a});}if(U.buff){st.buff=U.buff;st.buffT=8;}};
  if(U.k==='uheal'){for(const v of st.units)v.hp=v.h.hp;st.lives=Math.min(K.LIVES,st.lives+1);st.lightR=st.r0;lightUpdate(st);ev(st,{k:'ult',u,x:u.x,y:u.y,r:999});return true;}

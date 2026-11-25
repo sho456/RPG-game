@@ -80,7 +80,7 @@ function take(){for(const e of st.ev){TDSFX.ev(e);TDFX.ev(e,st);
  else if(e.k==='beam'){shake=3;if(!e.u)baseHit=st.t;}}
  st.ev.length=0;}
 function draw(t,dt){TDFX.step(dt);g.setTransform(1,0,0,1,0,0);g.imageSmoothingEnabled=false;g.clearRect(0,0,cv.width,cv.height);
- const k=S*DPR,sx=shake?(Math.random()*2-1)*shake:0,sy=shake?(Math.random()*2-1)*shake:0;shake=Math.max(0,shake-dt*12);
+ const k=S*DPR,sx=shake?(Math.random()*2-1)*shake:0,sy=shake?(Math.random()*2-1)*shake:0;shake=Math.max(0,shake-dt*12);shake=Math.max(shake,TDFX.shk());
  /* 奥行き：空（固定）→ 遠景 ×0.25 → 中景 ×0.55 → 地面 ×1 */
  g.setTransform(k,0,0,k,0,-VT*k);const sw=Math.min(bg.sky.width,VW);g.drawImage(bg.sky,0,0,sw,bg.sky.height,0,0,VW,bg.sky.height*VW/sw);
  g.drawImage(bg.far,-Math.round(cam*.25),0);g.drawImage(bg.mid,-Math.round(cam*.55),0);

@@ -11,7 +11,7 @@ const TAU=Math.PI*2;
 let L=[],P=[],dimT=9,B={spr:()=>null,cam:()=>0,vw:()=>300};
 const OC=document.createElement('canvas'),OX=OC.getContext('2d');
 function bind(o){Object.assign(B,o);}
-function reset(){L=[];P=[];dimT=9;}
+function reset(){L=[];P=[];dimT=9;curSt=null;}
 function add(e){if(L.length>110){const i=L.findIndex(x=>x.k!=='corpse');L.splice(i<0?0:i,1);}e.t=-(e.dl||0);L.push(e);return e;}
 /* 粒：spark＝速い線（重力）・ember＝遅い四角（昇る）・star＝十字の星（昇る）・mote＝目標へ集まる */
 function part(o){if(P.length>=360)P.shift();o.t=-(o.dl||0);P.push(o);}
@@ -58,7 +58,7 @@ const H={
  /* エルナ：雷の矢。放つ前に弓の先に光 */
  erna:(u,f,c)=>{add({k:'star',x:u.x+(u.face||-1)*10,y:u.y-28,r:10,c,d:.25});}};
 /* ---------- 出来事 → 演出 ---------- */
-function ev(e,st){const u=e.u,el=u&&u.h?u.h.el:'陽',c=ELC[el]||'#fff',c2=EL2[el]||'#fff';
+function ev(e,st){curSt=st;const u=e.u,el=u&&u.h?u.h.el:'陽',c=ELC[el]||'#fff',c2=EL2[el]||'#fff';
  switch(e.k){
  case'hit':{const f=e.f,hx=f.x,hy=f.y-14;
   if(u.id==='lamp'){add({k:'shot',x0:u.x,y0:u.y,x1:hx,y1:hy,c:'#f2b347',c2:'#fff1a8',d:.2,big:1});sparks(hx,hy,4,'#f2b347');return;}
@@ -70,7 +70,7 @@ function ev(e,st){const u=e.u,el=u&&u.h?u.h.el:'陽',c=ELC[el]||'#fff',c2=EL2[el
   sparks(hx,hy,e.cr?10:4,e.weak?'#f2b347':c,{dl:far?.14:0,d:.25});if(e.cr)add({k:'star',x:hx,y:hy,r:9,c:'#fff',d:.2,dl:far?.14:0});return;}
  case'cast':u.cs=e.sk;((e.sk.id===TDD.HERO[u.id].sk&&H[u.id])||K[e.sk.k]||K.strike)(u,e.f,c,c2);return;
  /* 星臨：足元から光の柱・星の輪が 2 重に広がる（オーラは view.js が描く） */
- case'aw':add({k:'pillar',x:u.x,y:u.y,w:22,h:96,c:'#fff1a8',d:.5});add({k:'gring',x:u.x,y:u.y,r:30,c:'#f2b347',c2:'#fff',d:.45});add({k:'gring',x:u.x,y:u.y,r:46,c,c2,d:.6,dl:.12});add({k:'star',x:u.x,y:u.y-56,r:22,c:'#fff',d:.4,dl:.08});rise(u.x,u.y-20,18,'#fff0b8',{w:30,d:.8});return;
+ case'aw':if(u.id==='celes'){celesAw(u);return;}add({k:'pillar',x:u.x,y:u.y,w:22,h:96,c:'#fff1a8',d:.5});add({k:'gring',x:u.x,y:u.y,r:30,c:'#f2b347',c2:'#fff',d:.45});add({k:'gring',x:u.x,y:u.y,r:46,c,c2,d:.6,dl:.12});add({k:'star',x:u.x,y:u.y-56,r:22,c:'#fff',d:.4,dl:.08});rise(u.x,u.y-20,18,'#fff0b8',{w:30,d:.8});return;
  case'kill':{const f=e.f,F=B.spr(f.spr,f.kind,1);if(L.filter(x=>x.k==='corpse').length>14){const i=L.findIndex(x=>x.k==='corpse');L.splice(i,1);}
   add({k:'corpse',F,x:f.x,y:f.y,mir:f.dir<0,hg:f.boss?76:40,gh:f.tr.includes('ghost'),boss:f.boss,seed:f.uid,hold:f._hold||0,d:(f.boss?.9:.45)+(f._hold||0)});
   sparks(f.x,f.y-14,f.boss?40:10,f.tr.includes('void')?'#b07aff':'#e86a6a',{sp:f.boss?140:80,d:.45});if(f.boss){add({k:'star',x:f.x,y:f.y-30,r:30,c:'#f2b347',d:.6});rise(f.x,f.y-30,16,'#f2b347',{w:50,d:.9});}return;}
@@ -87,7 +87,7 @@ function ev(e,st){const u=e.u,el=u&&u.h?u.h.el:'陽',c=ELC[el]||'#fff',c2=EL2[el
  case'shift':add({k:'puff',x:e.f.x,y:e.f.y-20,boss:1,d:.45});return;
  case'drain':add({k:'gring',x:st.S.base[0],y:st.S.base[1],r:st.r0,c:'#b07aff',c2:'#6f6888',d:.8,shrink:1});return;}}
 /* 星臨：短い暗転（背景だけ・0.75 秒）→ 溜め（粒が集まる 0.2 秒）→ 放出（光の筋・白い芯・星・放射・輪）→ 星が昇る余韻 */
-function ult(e,c,c2){const u=e.u,full=e.r>500,cx=full?B.cam()+B.vw()/2:e.x,cy=full?250:e.y-10;dimT=0;
+function ult(e,c,c2){if(e.u.id==='celes'&&e.u.h.ult.k==='utime'){celesUlt(e);return;}const u=e.u,full=e.r>500,cx=full?B.cam()+B.vw()/2:e.x,cy=full?250:e.y-10;dimT=0;
  motes(u.x,u.y-24,26,c2,46,.2);add({k:'gring',x:u.x,y:u.y,r:34,c,c2,d:.22,shrink:1});
  if(!full)add({k:'streak',x0:u.x,y0:u.y-24,x1:cx,y1:cy,c,c2,d:.22,dl:.2});
  add({k:'flash',d:.1,dl:.22});
@@ -96,10 +96,71 @@ function ult(e,c,c2){const u=e.u,full=e.r>500,cx=full?B.cam()+B.vw()/2:e.x,cy=fu
  else{add({k:'gring',x:cx,y:cy+10,r:e.r,c,c2,d:.55,dl:.22});add({k:'burst',x:cx,y:cy,r:46,c,c2,d:.45,dl:.22});}
  add({k:'star',x:cx,y:cy,r:34,c:'#fff',d:.45,dl:.22});add({k:'stars',x:cx,y:cy-10,r:40,c:'#fff0b8',d:.6,dl:.26});
  sparks(cx,cy,90,c,{dl:.22,sp:170,d:.5});rise(cx,cy,18,'#fff0b8',{w:80,d:.9,dl:.4});}
+/* ---------- セレス：星臨の入り（0.9 秒）と奥義「刻の巻き戻し」（hit まで 1.8 秒＋余韻 2 秒） ----------
+ 奥義の段（1.8 秒基準。アニメの hit 時刻 H に合わせて前半を伸縮）：溜め 0〜.5（足元から星がらせん・紺へ暗転・光の柱）→ 天の文字盤 .4〜1.0（12 の星が順に灯り星座の線）→
+ 逆回り 1.0〜1.5（針が巻き戻る・ずれた走査線）→ 時間停止 1.5〜1.8（紫の単色へ沈む・長針が外れて槍に）→ H：槍が刺さり白飛び・衝撃の輪・揺れ 8px → 星の雨と時の欠片 → 敵に時計の印 */
+let curSt=null,shkV=0;
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)),ease=x=>x*x*(3-2*x);
+function celesAw(u){add({k:'clock',x:u.x,y:u.y,r:44,c:'#9fd8ff',c2:'#f2d98a',d:.9});add({k:'cvort',x:u.x,y:u.y,d:.9});add({k:'pillar',x:u.x,y:u.y,w:20,h:110,c:'#bfe6ff',d:.7,dl:.15});add({k:'gring',x:u.x,y:u.y,r:34,c:'#9fd8ff',c2:'#fff',d:.5,dl:.3});add({k:'star',x:u.x,y:u.y-60,r:26,c:'#fff',d:.4,dl:.35});motes(u.x,u.y-24,16,'#9fd8ff',44,.3);}
+function celesUlt(e){const u=e.u;curSt=curSt||null;let H=(typeof TDA!=='undefined'&&TDA.hitT(u.id,0,u.awT>0))||1.8;H=clamp(H,.9,2.6);
+ add({k:'cultb',ux:u.x,uy:u.y,H,d:H+1.8,cx:B.cam()+B.vw()/2});add({k:'cultf',ux:u.x,uy:u.y,H,d:H+1.8,cx:B.cam()+B.vw()/2});
+ motes(u.x,u.y-24,24,'#9fd8ff',50,.4);}
+function cultT(e){const T=e.t;return T<e.H?T*1.8/e.H:1.8+(T-e.H);}
+const CW={x:0,y:0,R:0};
+function cultGeo(e){const R=Math.min(B.vw()*.44,150);return{x:e.cx,y:Math.min(110,R+22),R};}
+const clockPt=(C,i,k=1)=>{const a=i*TAU/12-Math.PI/2;return[C.x+Math.cos(a)*C.R*k,C.y+Math.sin(a)*C.R*k*.92];};
+function cultB(g,e){const T=cultT(e),C=cultGeo(e),x0=B.cam()-4,w=B.vw()+8,fh=FHH(),H=1.8;
+ let a=T<.2?T/.2*.5:.5;if(T>1.5)a=.5+.25*clamp((T-1.5)/.2);if(T>H)a=.75*(1-clamp((T-H)/.7));
+ g.globalAlpha=a;g.fillStyle=T>1.5&&T<=H+.05?'#1a1040':'#050a2a';g.fillRect(x0,0,w,fh);
+ const k=ease(clamp((T-.4)/.35)),fo=1-clamp((T-H-.3)/.6);if(k<=0||fo<=0)return;
+ g.save();g.globalCompositeOperation='screen';g.globalAlpha=fo*k;const R=C.R*k;
+ g.strokeStyle='#f2b347';g.lineWidth=2;g.beginPath();g.ellipse(C.x,C.y,R,R*.92,0,0,TAU);g.stroke();g.globalAlpha=fo*k*.5;g.strokeStyle='#9fd8ff';g.lineWidth=1;g.beginPath();g.ellipse(C.x,C.y,R*.86,R*.86*.92,0,0,TAU);g.stroke();
+ g.globalAlpha=fo*k*.1;g.fillStyle='#6f4fd8';g.beginPath();g.ellipse(C.x,C.y,R,R*.92,0,0,TAU);g.fill();
+ const lit=[];for(let i=0;i<12;i++){const tl=.5+i*.04;lit.push(T>tl);}
+ /* 星座の線：12 の星を 5 つ飛びで結ぶ（灯った順に伸びる） */
+ g.strokeStyle='#bfe6ff';g.lineWidth=1;for(let i=0;i<12;i++){const j=(i+5)%12,tl=.5+Math.max(i,j===0?12:j)*.04*(j<i?0:1),q=clamp((T-(.55+i*.04))/.2);if(q<=0)continue;
+  const A=clockPt(C,i,k*.9),B2=clockPt(C,j,k*.9);g.globalAlpha=fo*.55*q;g.beginPath();g.moveTo(A[0],A[1]);g.lineTo(A[0]+(B2[0]-A[0])*q,A[1]+(B2[1]-A[1])*q);g.stroke();}
+ for(let i=0;i<12;i++){const q=clamp((T-(.5+i*.04))/.12);if(q<=0)continue;const p=clockPt(C,i,k*.9);star4(g,p[0],p[1],(i%3?5:8)*(.4+.6*q),i%3?'#fff0b8':'#fff',fo);}
+ /* 針：逆回りに巻き戻る（1.0〜1.5）。長針は 1.5 以降は槍になる */
+ const q=T<1?1:1-ease(clamp((T-1)/.5)),m=-Math.PI/2+q*TAU*3,hr=-Math.PI/2+q*TAU*.5-.5*(1-q)*0;
+ g.globalAlpha=fo;g.lineCap='round';g.strokeStyle='#f2b347';g.lineWidth=3;g.beginPath();g.moveTo(C.x,C.y);g.lineTo(C.x+Math.cos(hr)*R*.5,C.y+Math.sin(hr)*R*.46);g.stroke();
+ if(T<H-.3+.0&&T<1.5||T<1.6){g.strokeStyle='#fff';g.lineWidth=2;g.beginPath();g.moveTo(C.x,C.y);g.lineTo(C.x+Math.cos(m)*R*.85,C.y+Math.sin(m)*R*.78);g.stroke();}
+ /* ずれた走査線（巻き戻しの間） */
+ if(T>1&&T<1.55){const n=Math.floor(T*40);g.fillStyle='#9fd8ff';for(let i=0;i<9;i++){const y=hash(i,n,3)*fh,off=(hash(i,n,7)-.5)*40;g.globalAlpha=.18;g.fillRect(x0+off,y,w,1+hash(i,n,9)*2);}
+  g.strokeStyle='#fff';g.globalAlpha=.25*(1-clamp((T-1)/.55));for(let i=0;i<6;i++){const y=fh*.55+hash(i,n,1)*fh*.4;g.beginPath();g.moveTo(x0+w,y);g.lineTo(x0+w*(.5+hash(i,n,5)*.4),y);g.stroke();}}
+ g.restore();g.lineCap='butt';}
+function cultF(g,e){const T=cultT(e),C=cultGeo(e),H=1.8,x0=B.cam()-4,w=B.vw()+8,fh=FHH(),cx=e.cx,ty=e.uy,u0=e.ux,uy=e.uy;
+ g.save();g.globalCompositeOperation='screen';
+ /* 溜め：足元の光の柱（細く立つ） */
+ if(T<1.6){const h=clamp(T/.5)*(150+T*60),wd=3+Math.sin(T*24)*1.2,fa=1-clamp((T-1.2)/.4);g.globalAlpha=.75*fa;const gr=g.createLinearGradient(0,uy-h,0,uy);gr.addColorStop(0,'rgba(159,216,255,0)');gr.addColorStop(1,'#9fd8ff');g.fillStyle=gr;g.fillRect(u0-wd,uy-h,wd*2,h);g.fillStyle='#fff';g.globalAlpha=.8*fa;g.fillRect(u0-.7,uy-h*.8,1.4,h*.8);
+  for(let s=0;s<3;s++)for(let i=0;i<16;i++){const ph=((i/16+T*1.2+s/3)%1),ang=ph*14+s*2.1,r=26*(1-ph)+4;star4(g,u0+Math.cos(ang)*r,uy-6-ph*100,2.2*(1-ph*.5),s?'#9fd8ff':'#fff0b8',.9*Math.min(1,T/.2)*fa);}}
+ /* 針が槍になって降る */
+ if(T>H-.35&&T<H+.12){const p=clamp((T-(H-.35))/.35),y1=C.y+(ty-C.y)*p*p,L=110,top=Math.max(0,y1-L);g.globalAlpha=1;const gr=g.createLinearGradient(0,top,0,y1);gr.addColorStop(0,'rgba(242,179,71,0)');gr.addColorStop(.7,'#f2b347');gr.addColorStop(1,'#fff');
+  g.fillStyle=gr;g.beginPath();g.moveTo(cx-5,top);g.lineTo(cx+5,top);g.lineTo(cx+1.5,y1-8);g.lineTo(cx,y1+6);g.lineTo(cx-1.5,y1-8);g.closePath();g.fill();g.fillStyle='#fff';g.fillRect(cx-.8,top,1.6,y1-top);
+  g.globalAlpha=.3;g.fillStyle='#bfe6ff';g.fillRect(cx-14,top,28,y1-top);}
+ /* 着弾：白飛び・柱・衝撃の輪が画面を渡る・放射 */
+ const t=T-H;if(t>=0&&t<1.0){const q=clamp(t/.7),fl=Math.pow(1-clamp(t/.28),2);
+  g.globalAlpha=.85*fl;g.fillStyle='#fffbe8';g.fillRect(x0,0,w,fh);
+  const pw=34*(1-q)+4;g.globalAlpha=.9*(1-q);const pg=g.createLinearGradient(0,0,0,ty);pg.addColorStop(0,'rgba(255,241,168,0)');pg.addColorStop(1,'#fff1a8');g.fillStyle=pg;g.fillRect(cx-pw,0,pw*2,ty);g.fillStyle='#fff';g.fillRect(cx-pw*.3,0,pw*.6,ty);
+  for(let i=0;i<3;i++){const qq=clamp((t-i*.08)/.7);if(qq<=0)continue;g.globalAlpha=(1-qq)*.9;g.strokeStyle=i?'#9fd8ff':'#fff';g.lineWidth=3-i;g.beginPath();g.ellipse(cx,ty,qq*w*.75,qq*w*.75*.28,0,0,TAU);g.stroke();}
+  g.strokeStyle='#fff0b8';g.lineWidth=1.5;g.globalAlpha=1-q;for(let i=0;i<14;i++){const a=i*TAU/14,r0=14+q*40,r1=30+q*130;g.beginPath();g.moveTo(cx+Math.cos(a)*r0,ty-10+Math.sin(a)*r0*.6);g.lineTo(cx+Math.cos(a)*r1,ty-10+Math.sin(a)*r1*.6);g.stroke();}
+  star4(g,cx,ty-10,60*(1-q*.6),'#fff',1-q);}
+ /* 時間停止の紫の沈み（一瞬） */
+ if(T>1.5&&T<=H+.08){g.globalAlpha=.16*clamp((T-1.5)/.2);g.fillStyle='#8a5cff';g.fillRect(x0,0,w,fh);}
+ /* 遅くなった敵に時計の印 */
+ if(t>.15&&curSt){const fa=clamp((t-.15)/.2)*(1-clamp((t-1.4)/.4));for(const f of curSt.foes){if(f.hp<=0)continue;const fy=f.y-(f.boss?86:50)-Math.sin(t*3+f.uid)*1.5,r=f.boss?9:6;g.globalAlpha=fa;g.strokeStyle='#f2b347';g.lineWidth=1.2;g.beginPath();g.arc(f.x,fy,r,0,TAU);g.stroke();
+   g.strokeStyle='#fff';g.beginPath();g.moveTo(f.x,fy);g.lineTo(f.x+Math.cos(-t*5)*r*.8,fy+Math.sin(-t*5)*r*.8);g.moveTo(f.x,fy);g.lineTo(f.x,fy-r*.5);g.stroke();}}
+ g.restore();}
+function cvort(g,e,p){g.save();g.globalCompositeOperation='screen';const fa=1-clamp((p-.6)/.4);for(let s=0;s<3;s++)for(let i=0;i<14;i++){const ph=clamp(p*1.3-i*.02),ang=ph*12+s*2.1+i*.45,r=40*(1-ph*.7),y=e.y-ph*90-i*2;if(ph<=0)continue;star4(g,e.x+Math.cos(ang)*r,e.y*0+y+Math.sin(ang)*r*.3,3*(1-ph*.5),s?'#9fd8ff':'#fff0b8',fa);}g.restore();}
+/* 毎コマ：星の雨と時の欠片（着弾後 1 秒） */
+function cultRain(){for(const e of L){if(e.k!=='cultf')continue;const t=cultT(e)-1.8;if(t>=0&&t<1.0&&P.length<300){const vw=B.vw(),x=B.cam()+Math.random()*vw;
+  part({k:'star',x,y:-4,vx:(Math.random()-.5)*10,vy:90+Math.random()*80,gr:0,d:.9+Math.random()*.5,c:Math.random()<.4?'#fff0b8':'#9fd8ff',s:1.4});
+  if(Math.random()<.6)part({k:'spark',x:B.cam()+Math.random()*vw,y:-4,vx:(Math.random()-.5)*20,vy:120+Math.random()*60,gr:60,d:.7,c:'#f2b347'});}}}
+function shk(){for(const e of L){if(e.k!=='cultf')continue;const t=cultT(e)-1.8;if(t>=0&&t<.4)return 8*(1-t/.4);}return 0;}
 /* ---------- 毎コマ ---------- */
-function step(dt){dimT+=dt;for(const e of L)e.t+=dt;L=L.filter(e=>e.t<e.d);
+function step(dt){dimT+=dt;cultRain();for(const e of L)e.t+=dt;L=L.filter(e=>e.t<e.d);
  for(const p of P){p.t+=dt;if(p.t<0||p.k==='mote')continue;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=p.gr*dt;p.vx*=.98;}P=P.filter(p=>p.t<p.d);}
-const BACK={gring:1,sigil:1,clock:1,flame:1,dome:0};
+const BACK={cultb:1,gring:1,sigil:1,clock:1,flame:1,dome:0};
 function back(g){for(const e of L)if(e.t>=0&&BACK[e.k])draw(g,e,e.t/e.d);g.globalAlpha=1;}
 function dim(g){if(dimT>.75)return;const a=dimT<.12?dimT/.12:dimT<.32?1:1-(dimT-.32)/.43;g.globalAlpha=.4*a;g.fillStyle='#07071a';g.fillRect(B.cam()-4,0,B.vw()+8,FHH());g.globalAlpha=1;}
 const FHH=()=>(typeof TDD!=='undefined'?TDD.K.FH:420);
@@ -144,6 +205,9 @@ function draw(g,e,p){g.globalAlpha=1;const ea=1-p;
   for(let i=0;i<14;i++){const a=i*TAU/14,x=e.x+Math.cos(a)*r,y=e.y+Math.sin(a)*r*.5,h=(6+5*Math.sin(i*2.3+p*20))*ea;g.fillStyle=i%2?e.c:e.c2;g.beginPath();g.moveTo(x-2.5,y);g.lineTo(x,y-h);g.lineTo(x+2.5,y);g.closePath();g.fill();}break;}
  case'sigil':{const s=Math.min(1,p*5),rot=p*2,a=p>.6?1-(p-.6)/.4:1;g.globalAlpha=a;g.strokeStyle=e.c;g.lineWidth=1.5;g.beginPath();g.ellipse(e.x,e.y,e.r*s,e.r*s*.5,0,0,TAU);g.stroke();
   g.strokeStyle=e.c2;g.beginPath();for(let i=0;i<=e.n;i++){const ang=rot+i*2*TAU/e.n-Math.PI/2;const x=e.x+Math.cos(ang)*e.r*s*.9,y=e.y+Math.sin(ang)*e.r*s*.45;i?g.lineTo(x,y):g.moveTo(x,y);}g.stroke();break;}
+ case'cultb':cultB(g,e);break;
+ case'cultf':cultF(g,e);break;
+ case'cvort':cvort(g,e,p);break;
  case'clock':{const s=Math.min(1,p*4),a=p>.65?1-(p-.65)/.35:1,r=e.r*s;g.globalAlpha=a;g.strokeStyle=e.c;g.lineWidth=1.5;g.beginPath();g.ellipse(e.x,e.y,r,r*.5,0,0,TAU);g.stroke();
   g.strokeStyle=e.c2;g.lineWidth=1;for(let i=0;i<12;i++){const ang=i*TAU/12,c=Math.cos(ang),sn=Math.sin(ang);g.beginPath();g.moveTo(e.x+c*r*.82,e.y+sn*r*.41);g.lineTo(e.x+c*r*.95,e.y+sn*r*.475);g.stroke();}
   const h=-Math.PI/2-p*8;g.strokeStyle='#fff';g.lineWidth=1.5;g.beginPath();g.moveTo(e.x,e.y);g.lineTo(e.x+Math.cos(h)*r*.7,e.y+Math.sin(h)*r*.35);g.stroke();break;}
@@ -173,4 +237,4 @@ function pose(f,t,st){const tr=f.tr,gh=tr.includes('ghost'),fly=tr.includes('fly
  if(f.actT&&st.t-f.actT<.15){o.dx+=d*3;o.rot+=d*.1;}
  const k=(st.t-f.hitT)/.2;if(k>=0&&k<1){const q=(1-k)*(1-k);o.dx-=d*(f.boss?1.5:3.5)*q;o.rot-=d*(f.boss?.05:.14)*q;}
  return o;}
-return{bind,reset,ev,step,back,dim,front,pose,add:e=>add(e),ELC};})();
+return{shk,bind,reset,ev,step,back,dim,front,pose,add:e=>add(e),ELC};})();
