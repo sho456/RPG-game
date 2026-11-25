@@ -335,6 +335,11 @@ def main():
         old[nm] = A[nm]
     # aw_in は旧キャンバス（112×104）のままなので、基準点を新キャンバスへ置き直す
     J['anims'] = old
+    # エフェクト層：fx/<名>/ を fxAnims（<名> と同じ ms・loop・anchor）として登録（spx_import が <id>_fx を作る）
+    def has_fx(nm):
+        d = os.path.join(OUT, 'fx', nm)
+        return any(Image.open(os.path.join(d, f)).getchannel('A').getbbox() for f in os.listdir(d))
+    J['fxAnims'] = {nm: dict(dir='fx/' + nm, ms=A[nm]['ms'], loop=A[nm]['loop'], scale=1.0, anchor=A[nm]['anchor']) for nm in A if has_fx(nm)}
     json.dump(J, open(jp, 'w'), ensure_ascii=False, indent=2)
     if prev:
         preview(prev, A, res, cx0, cy0, W, H)

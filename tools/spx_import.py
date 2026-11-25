@@ -222,7 +222,8 @@ def load_clip(base, name, spec, key, scale_to=None):
     if len(ms) != len(frames):
         raise SystemExit('error: %s の ms の数がコマ数と違う' % name)
     c = Clip(name, frames, (ax, ay), [int(v) for v in ms], bool(spec.get('loop', True)))
-    c.rest_h = bbox(frames[0][1])[1] - bbox(frames[0][1])[0]
+    nz = [f for f in frames if (f[1] > 0).any()]   # 1 コマ目が空（エフェクト層）でも落ちない
+    c.rest_h = (bbox(nz[0][1])[1] - bbox(nz[0][1])[0]) if nz else 1
     c.hit = spec.get('hit')   # 当たる（効果が出る）コマの番号（任意。TD の view が読む）
     return c
 
@@ -322,6 +323,12 @@ def build_char(cdir, scale_cfg):
     if M.get('rig'):
         C['rig'] = M['rig']
     out = {cid: C}
+    # fxAnims：キャラに重ねるエフェクト層。専用パレット（発光の色を濁らせない）の別パック <id>_fx
+    FA = clips_of('fxAnims', {})
+    if FA:
+        palF = make_pal([f for c in FA for f in c.frames], ref_h, int(pal_cfg.get('fxColors', 48)))
+        out[cid + '_fx'] = {'face': C['face'], 'kind': kind, 'pal': [hexs(c) for c in palF], 'sizes': sizes_for({}, FA, palF, 1.0),
+                            'src': C['src'], 'anims': {c.name: {'f': ['%s@%d' % (c.name, i) for i in range(len(c.frames))], 'ms': c.ms, 'loop': 1 if c.loop else 0} for c in FA}}
     if S or SA:
         palK = make_pal(list(S.values()) + [f for c in SA for f in c.frames[::max(1, len(c.frames) // 4)]], ref_h,
                         int(pal_cfg.get('seirinColors', 32)))
