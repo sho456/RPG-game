@@ -53,7 +53,7 @@
 | 47 | `js/sprite/data/spx-data.js` | 95 | 自動生成：旧 tools/build_spx.py の出力を tools/spx_normalize.py が整えたもの（提供原画 → パレット番号 PNG）。手で編集しない |  |
 | 48 | `js/sprite/data/spx-data-enemy.js` | 1005 | （データ。読まない） |  |
 | 49 | `js/sprite/data/spx-data-heroes.js` | 1000 | （データ。読まない） |  |
-| 50 | `js/sprite/data/spx-data-chars.js` | 787 | （データ。読まない） |  |
+| 50 | `js/sprite/data/spx-data-chars.js` | 800 | （データ。読まない） |  |
 | 51 | `js/sprite/spx.js` | 31 | ドット絵刷新：提供原画から作ったスプライト（SPX）を、既存の描画の入口で差し替える | SPX |
 | 52 | `js/zukan/viewer.js` | 11 | ver0.30 図鑑のキャラクタービューア（ZVIEW） | ZVIEW |
 | 53 | `js/zukan/zukan.js` | 13 | 図鑑（一覧・詳細） ver0.30 | ZUKAN |
@@ -96,7 +96,7 @@
 | 90 | `js/td/fx.js` | 22 | TD の戦闘の演出（TDFX）：技ごとのエフェクト・星臨の短い暗転・粒・敵の歩き/被弾/崩れ。描くだけで、ロジック（TDS）の結果に触れない | TDFX |
 | 91 | `js/td/skicon.js` | 4 | 戦闘の技ボタンの絵（TDI）：SKICON の白いシルエットから、技ごとのドット絵のアイコンを作る（ver0.58） | TDI |
 | 92 | `js/td/hud.js` | 8 | TD の戦闘画面の帯と操作盤（TDH）：上の帯・灯力と星片の帯・選んだ仲間の操作盤・手札。戦場の描画と操作は js/td/view.js | TDH |
-| 93 | `js/td/uanim.js` | 4 | TD：味方の状態ごとのコマ送り（TDA。素材パック assets_src/chars の anims を引く） | TDA |
+| 93 | `js/td/uanim.js` | 6 | TD：味方の状態ごとのコマ送り（TDA。素材パック assets_src/chars の anims を引く） | TDA |
 | 94 | `js/td/view.js` | 29 | TD の戦闘画面（TD）：横スクロールの戦場・上下の帯・手札・ユニットの窓・リザルト。ロジックは js/td/sim.js（TDS） | TD |
 | 95 | `js/td/guide.js` | 5 | TD の字を使わない導き（GUIDE）の正本：最初の 1〜2 面で、光る指・脈打つ輪・矢印だけで操作を順に示す | GUIDE |
 | 96 | `js/td/menu.js` | 15 | TD の章の地図・出撃準備・会話・仲間の加入（TDM）。戦闘画面は js/td/view.js（TD） | TDM |
@@ -117,10 +117,10 @@
 | `show` | core.js → ver17.js → ver18-town.js → v20-ui.js → v22.js → ui/inv.js → ui/keywords.js → td/view.js → td/menu.js |
 | `close` | ver17.js → ui/equip-info.js → ui/keywords.js → ui/growth.js → td/menu.js → ui/unit.js → ui/zukan.js → ui/dev.js |
 | `open` | ui/equip-info.js → ui/growth.js → td/hud.js → td/view.js → td/menu.js → ui/unit.js → ui/zukan.js → ui/dev.js |
+| `face` | ui-assets.js → sprite/legacy/dot-rig.js → ver19-art.js → sprite/spx.js → td/uanim.js → td/view.js |
 | `onClick` | ui/growth.js → td/view.js → td/menu.js → ui/unit.js → ui/zukan.js → ui/dev.js |
 | `stats` | engine.js → v31/core.js → v31/items.js → rs/core.js → data/equip7.js → ui/unit.js |
 | `townMenu` | town.js → v22.js → v38/menu.js → ui/inv.js → td/menu.js → ui/home.js |
-| `face` | ui-assets.js → sprite/legacy/dot-rig.js → ver19-art.js → sprite/spx.js → td/view.js |
 | `frameOf` | sprite/legacy/px.js → sprite/legacy/px-enemy.js → ver19-art.js → sprite/spx.js → zukan/viewer.js |
 | `keyOf` | sprite/legacy/dot-rig.js → ver19.js → v21-items.js → v31/items.js → rs/core.js |
 | `addLoot` | items.js → ch9.js → ver17.js → v20-ui.js |
@@ -147,7 +147,6 @@
 | `enterTown` | town.js → ch8.js → ver18-town.js |
 | `exprFace` | ch9.js → ver19-art.js → sprite/spx.js |
 | `gainXP` | engine.js → v31/core.js → ui/growth.js |
-| `hand` | sprite/legacy/px-enemy.js → td/fx-celes.js → td/fx-celes-ult.js |
 | `has` | sprite/facing.js → td/sim.js → td/uanim.js |
 | `hide` | ui/inv.js → td/view.js → td/guide.js |
 | `itemIcon` | ch3.js → v21-art.js → v31/items.js |
@@ -200,6 +199,7 @@
 | `flask` | ver18-art.js → v21-art.js |
 | `follow` | td/sim.js → td/view.js |
 | `fuQ` | v20-battle.js → v31/board.js |
+| `hand` | sprite/legacy/px-enemy.js → td/fx-celes.js |
 | `hash` | td/fx.js → td/skicon.js |
 | `healAll` | field.js → v38/core.js |
 | `hex` | sprite/spx.js → items/icons36.js |
@@ -228,6 +228,7 @@
 | `parse` | ver19-art.js → sprite/spx.js |
 | `part` | sprite/legacy/px.js → td/fx.js |
 | `partyScreen` | ver17.js → ui/party.js |
+| `pick` | v31/items.js → td/uanim.js |
 | `power` | ver17.js → v31/board.js |
 | `ramp` | sprite/legacy/dot.js → sprite/legacy/px.js |
 | `reg` | sprite/legacy/dot-rig.js → ui/keywords.js |

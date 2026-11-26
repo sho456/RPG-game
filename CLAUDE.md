@@ -46,6 +46,7 @@
 | **タワーディフェンス「灯守の防衛線」**（移行先の戦闘。入口＝ホーム右の縦メニュー「防衛」・`index.html#td`） | データ `js/td/data.js`（`TDD`）・章とステージ `js/td/stages.js`・ロジック `js/td/sim.js`（`TDS`。DOM なしの固定刻み・自動の配置 `bot`）・背景 `js/td/bg.js`（`TDBG`）・戦闘画面（横スクロール・縦画面・カメラの自動追従・ピンチ）`js/td/view.js`（`TD`）・帯と操作盤と手札（技 3 つ・星臨・奥義）`js/td/hud.js`（`TDH`）・技ボタンのドット絵 `js/td/skicon.js`（`TDI`）・役割（タンク〜特殊）と動きは `TDD.ROLE`・`sim.js` の `BR`・演出と敵の歩き `js/td/fx.js`（`TDFX`）・効果音と BGM `js/td/sfx.js`（`TDSFX`）・字を使わない導き `js/td/guide.js`（`GUIDE`）・章の地図/出撃準備/会話/加入 `js/td/menu.js`（`TDM`）。設計 `docs/TD-DESIGN.md` | `css/ui/td.css` |
 | **ホーム**（ver0.52。TD の「防衛」が主役・下のタブ 4 つ・≡ のシート） | `js/ui/home.js`（`HOME`。v22 の townMenu の重ね表示 .h22 を置き換え。背景の街の絵は v22 drawHome のまま） | `css/ui/home.css` |
 | **仲間**（ver0.52。一覧＋1 人の詳細で Lv・技の練達・装備・星盤をまとめる。TD の能力を表示） | `js/ui/unit.js`（`UNIT.open(id, 戻り先)`）。TD の能力は `TDD.hero(id, lv, TDD.real(id))`（装備の比・練達・星臨の位階を反映） | `css/ui/unit.css` |
+| **TD の仲間のコマ送り・エフェクト**（ver0.59。まずセレス） | 状態→アニメ・再生ロック・表示用の向き・整数倍の描画・焼き込み fx 層 `js/td/uanim.js`（`TDA`）。光と粒の共通部品 `js/td/fxkit.js`（`FXK`）。セレスの通常攻撃・技 `js/td/fx-celes.js`（`FXC`）、星臨・奥義 `js/td/fx-celes-ult.js`（`FXU`）。素材：原画 `assets_src/pixel-art/celes-hd/src/master/`（PixelLab のシートは `pl/`）→ `import_pl.py` → `assets_src/chars/celes/` → `python3 tools/spx_import.py build celes`（パック `celes_hd`・`celes_hd_fx`） | — |
 | デザイントークン（新しい画面はこれ以外の色・角・影を使わない） | — | `css/ui/tokens.css` |
 
 **引き継ぎ（2026-11-22・ver0.54）**：P5 のうち 施設の画面の刷新・効果音と BGM・技の演出・敵の歩き（コード）・難易度の仕上げ・字を使わない導き・やり込み（天への塔・周回・星 3 の報酬）が完了。残りは 旧コードの残りの整理（絵の古い連鎖 dot-mon/dot-rig/ver19-art・v20-battle・v22 の旧 HUD など）と、敵の歩きの原画のコマ・図鑑の詳細画面の刷新。

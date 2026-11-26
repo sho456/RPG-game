@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.58';
+const VER='ver0.59';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,12 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　役割と動き・大きなキャラ・技ボタン<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　セレスの新しいドット絵と演出<br><small>`+
+ `・セレスの絵を描き直し、待機・歩き・攻撃・技・被弾・倒れ・星臨に入る・星臨の待機と技・奥義をなめらかなコマ送りに<br>`+
+ `・奥義は星臨の姿で。空に金の時計が現れ、針が光の槍になって敵の群れへ落ちる<br>`+
+ `・攻撃と技のエフェクトを光の質感から作り直し、当たった敵が一瞬止まって術の色に染まる。数字は着弾の瞬間に<br>`+
+ `・キャラがガタついたり、向きがパタパタ変わったりしないように<br></small></div>`+
+ `<div class="nt n38"><b>ver0.58</b>　役割と動き・大きなキャラ・技ボタン<br><small>`+
  `・役割の名前をタンク・近距離物理アタッカー・遠距離物理アタッカー・魔法アタッカー・サポーター・ヒーラー・特殊に統一<br>`+
  `・役割ごとに動きが賢く：タンクは前へ出て受け止め、近距離は味方の肩越しに叩き、遠距離は射程ぎりぎり、ヒーラーは傷ついた仲間の後ろへ<br>`+
  `・仲間どうしが重ならないように並ぶ<br>`+
