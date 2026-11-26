@@ -105,15 +105,10 @@ function makeKairouArea(f){const lv=kLv(f),boss=f%10===0,pool=KMOBS.map(voidKind
  return{name:`虚の回廊 ${f}層`,map:genVoidFloor(f),lv:[lv,lv],groups:[0,1,2,3,4].map(i=>{const n=1+((f+i)%3);return Array.from({length:n},(_,j)=>pool[(f*5+i*3+j*7)%pool.length]);}),
   crew:[{loot:[lv,3]},{gold:5000+f*400},{loot:[lv,3]},{item:'drop2',n:1}],boss:boss?{kind:kBoss(f),lv}:null,bossKind:boss?()=>kBoss(f):null,bflag:boss?'kr'+f:'',theme:'void',rec:`Lv${lv}`,
   intro:`<b>虚の回廊 ${f}層</b>――色を失った星の記憶が、果てなく積み重なる回廊。${f%10===1?'（中継地点）':''}${boss?'<b>この層には番人がいる</b>。倒すと階段が開く。':'光る階段から、さらに深い層へ。'}`};}
-function kairouMenu(){const K=kst(),cps=[];for(let f=1;f<=K.cp;f+=10)cps.push(f);
- log(`<b>虚の回廊</b>　果てのない回廊。10層ごとに番人がいて、倒した先の層が中継地点になる（最深到達：${K.max||0}層）`+goldTxt());
- menu([...cps.slice(-7).map(f=>({l:`${f}層から`,s:`推奨Lv${kLv(f)}`,cls:f===cps[cps.length-1]?'ready':'',f:()=>enterKairou(f)})),{l:'戻る',cls:'back',f:worldMap}],true);}
+
 function enterKairou(){}/* 未使用：js/v31/quests.js が置き換え */
-function kairouBossWin(){const f=kst().cur;banner('番人が崩れ、階段が開いた','#c8b0ff');if(f+1>kst().cp&&(f+1)%10===1)kst().cp=f+1;save();if(f===30&&!G.flags.celesMet)setTimeout(celesEvent,300);}
-function celesEvent(){F.pause=true;banner('セレス','#e0d0ff');
- log('番人が砂のように崩れ、止まっていた時計の音が戻った。瓦礫の玉座に、砂時計の杖を抱えた少女が腰かけている。<br><b>セレス</b>「……ようやく来たか、灯守。千年ぶんの退屈を数えておったところじゃ」<br>「勘違いするでないぞ。寂しかったわけではない。……おぬしらの旅、わらわが見届けてやろう」');
- menu([{l:'仲間にする',cls:'ready',f:()=>{G.flags.celesMet=1;newMember('celes');SFX.aw();save();fieldMenu('<b>セレスが仲間になった！</b>'+(G.party.includes('celes')?'':'（控えに入った）'));renderPartyStatic();}},
-  {l:'今はやめる',f:()=>{G.flags.celesMet=1;G.declined=[...(G.declined||[]),'celes'];save();fieldMenu('セレス「ふん、好きにせい。……酒場で待っておるからな」');}}]);}
+
+
 
 /* --- 竜の巣 --- */
 AREAS.ryuu={name:'竜の巣',lv:[60,68],theme:'lava',rec:'推奨Lv60〜68',bflag:'boss9',boss:{kind:'boss9',lv:68},
@@ -123,10 +118,8 @@ AREAS.ryuu={name:'竜の巣',lv:[60,68],theme:'lava',rec:'推奨Lv60〜68',bflag
  groups:[['firedrake'],['lavaslime','firedrake'],['dragonewt'],['ember','lavaslime'],['dragonewt','firedrake'],['dragonewt','ember','firedrake']],
  crew:[{loot:[64,3]},{gold:20000},{item:'tail',n:2},{loot:[66,3]}],
  intro:'<b>竜の巣</b>――星核が砕けた夜、竜たちが逃げ込んだ火山の洞。<b>溶岩の上を歩くとやけど</b>する（HP-4%）。奥で、竜人の剣士が強者を待っているという。'};
-function lavaBurn(){G.party.forEach(id=>{const m=stats(id).mhp;G.h[id].hp=Math.max(1,(G.h[id].hp??m)-Math.round(m*.04));});F.flash=Math.max(F.flash||0,3);if(!(F.burnT>performance.now())){banner('溶岩でやけど！（HP-4%）','#ff7a30');F.burnT=performance.now()+2500;}renderPartyStatic();}
-function valkEvent(){F.pause=true;banner('ヴァルク','#ff6030');
- log('溶岩の照り返しの中、大剣を担いだ竜人が振り返った。<br><b>ヴァルク</b>「……星核を鎮めた灯守か。噂より小さいな」<br>「強い灯なら、喰らってみたい。剣を抜け。俺に勝てたら、その旅に付き合ってやる」');
- menu([{l:'決闘する',cls:'ready',f:()=>{F.lock=true;F.pause=false;startBattle([{kind:'valkE',lv:1}],{event:'valk',onEnd:afterBattle});}},{l:'やめる',f:fieldMenu}]);}
+
+
 
 /* --- 虚蝕化エリア（出撃3回ごとに入れ替わる周回イベント） --- */
 let VOIDED=false;

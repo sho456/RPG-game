@@ -50,6 +50,7 @@
 | デザイントークン（新しい画面はこれ以外の色・角・影を使わない） | — | `css/ui/tokens.css` |
 
 **ver0.63（2026-11-26）**：戦闘をユーザーの指示で ver0.49（git `7bbc626`）のロマサガRS風に戻した。旧戦闘を消した 3 コミット（187346e・82ce1c4・bb0d361）の差分を今のファイルに 3-way で戻し、`js/rs/*`・`js/awaken.js` は 0.49 の版。コマンド戦闘（`js/cb/*`・ver0.60〜0.62）は削除。旧開発者メニューの上書きの受け皿 `dvMenu`・`devGear` は `js/core.js`。
+**ver0.64（2026-11-26）**：陣形（立ち位置だけ残す）・ひらめき・技セットを廃止し、技・術は 1 人 4 つ（`js/rs/data.js` の末尾で Lv10＋旧ひらめき、星盤＋天星盤を統合）。×1 の待ち `SPD[1]` を 2.3 に。セレスの演出の時計は戦闘の速さに合わせ、最初の命中は演出の着弾まで待つ（`js/battle/celes.js`）。参照されない宣言を `tools/prune.py` で削除。
 **次の作業**：セレス以外の仲間を今のコマ送りにするなら `js/battle/celes.js` の `ID` を広げる（TDA の素材が要る）。旧戦闘の演出の知見はスキル `rs-battle-flow` `rs-battle-fx` `rpg-hero-motion`。
 旧コードの整理の道具：`node tools/smoke.js --cov cov.json`（一度も呼ばれなかった関数）→ `python3 tools/deadcode.py cov.json`（ファイルごとの候補）・`python3 tools/prune.py cov.json [--apply]`（名前でも参照されない宣言を消す）。smoke が通らない画面の関数も 0 回になるので、消す前に画面で確かめる。
 現在地は上の ver0.63 の行。コマンド戦闘（ver0.60〜0.62）の設計は git の履歴（docs/CB-DESIGN.md）。

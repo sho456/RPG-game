@@ -11,8 +11,7 @@ function townMenu(m){devBtn(!!G.dev);log((m||'大灯（おおあかり）に守�
  menu([{l:'出撃',ic:'go',cls:'ready',f:worldMap},{l:'装備',ic:'eq',f:()=>equipMenu(G.party[0])},{l:'酒場',ic:'bar',f:tavern},
   {l:'鍛冶屋',ic:'smith',f:smith},{l:'鑑定屋',ic:'eye',s:un?`未鑑定${un}`:'',cls:un?'ready':'',f:appraise},{l:'道具屋',ic:'shop',f:shop},
   {l:'星詠みの塔',ic:'star',cls:G.members.some(i=>ptsLeft(i)>0)?'ready':'',f:()=>openBoard(G.party[0])},{l:'街の発展',ic:'door',cls:G.fac.garden&&G.garden.n?'ready':'',f:devMenu},{l:'記録',ic:'rec',f:saveMenu}],false,'grid9');}
-function statLine(id){const s=stats(id),h=G.h[id];return`<b>${HB[id].name}</b> Lv${h.lv}　HP${s.mhp} 攻${s.atk} 防${s.def} 魔${s.mag} 精${s.res} 速${+s.spd.toFixed(1)}`+
- [s.crit&&`会心+${s.crit}%`,s.weakDmg&&`弱点+${s.weakDmg}%`,s.startAG&&`開始AG${s.startAG}`,s.awDmg&&`星臨中+${s.awDmg}%`,s.spGain&&`SP+${s.spGain}`,s.drop&&`ドロップ+${s.drop}%`,s.atkEl&&`攻撃${s.atkEl}属性`].filter(Boolean).map(t=>`<span style="color:#7fd6ff"> ${t}</span>`).join('');}
+
 function tavern(){}/* 未使用：js/ch9.js が置き換え */
 function formation(){}/* 未使用：js/ver17.js が置き換え */
 function ecost(it){return{g:Math.round((it.plus+1)*25*(1+it.ilv/4)),haiseki:it.plus+1,kakera:Math.max(0,it.plus-4)};}

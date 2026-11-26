@@ -15,8 +15,7 @@ const ECHO={a:['<b>残響Ⅰ</b>――大灯が初めて灯った夜。','灯守
  b:['<b>残響Ⅱ</b>――ガルドの声がする。','「空白の星片……欠けているんじゃない。まだ、誰の色にも染まっていないだけだ」','だからリオは、誰の灯とも共鳴できた。<br>ミレイユの炎とも、ハクアの氷とも、クロウの闇とさえも。'],
  c:['<b>残響Ⅲ</b>――星核そのものの声が響く。','「わたしは星核。千年前、虚に喰われかけたわたしは、最後の光をひとつの命に託した」','「空白の星片は、わたし自身。すべての灯をつなぎ直すための器――それがおまえ」','リオ「……借り物の光でも、みんなの灯をつなげるなら。それが俺の光だ」<br><b style="color:#ffe27a">リオは終の星臨「全共鳴」を会得した！</b>']};
 const echoN=()=>Object.keys(G.flags.echo||{}).length;
-function echoEvent(x,y){const k=x+','+y,seen=G.flags.echo=G.flags.echo||{};if(seen[k])return;const id=['a','b','c'][echoN()];seen[k]=1;F.pause=true;F.flash=10;SFX.aw();
- const pg=ECHO[id];let i=0;const step=()=>{if(i<pg.length){log(pg[i++]);menu([{l:'▶ 次へ',cls:'ready',f:step}]);}else{if(id==='c')G.flags.zenkyo=1;save();fieldMenu(echoN()>=3?'<b>星核の扉が開いた。</b>最奥へ向かおう。':`残響はあと${3-echoN()}つ。`);}};step();}
+
 AREAS.zankyo={name:'星核の残響',lv:[50,54],theme:'void',rec:'推奨Lv50〜55',bflag:'boss8',boss:{kind:'last1',lv:55},stages:['last1','last2','last3'],
  map:['####################','#########B##########','########ttt#########','##C#####ttt#####G###','##t######t######t###','##tttttttttttttttt##','##t#####t###t####t##','#Yt#####t###t####tY#',
   '#tt##tttttttttt##tt#','#t###t###tt###t###t#','#t###t###tt###t###t#','#ttttt##tttt##ttttt#','###t####tYtt####t###','###t####tttt####t###','##Ctt####tt####ttC##','####t####tt####t####',

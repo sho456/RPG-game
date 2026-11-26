@@ -33,7 +33,7 @@ if (SHOTS) fs.mkdirSync(SHOTS, {recursive: true});
     try {const o = await p.evaluate(() => {const d = document.documentElement;return d.scrollWidth > innerWidth + 1 ? d.scrollWidth : 0;});if (o) errs.push([name, '横はみ出し: 幅 ' + o + 'px（画面 420px）']);} catch (e) {}};
   /* 開いている画面を全部閉じてホームへ */
   const HOME = `(()=>{try{ovClose();}catch(e){}try{const u=document.querySelector('#unit');if(u&&!u.classList.contains('hide'))u.classList.add('hide');}catch(e){}
-    try{CB.hide();}catch(e){}try{for(const s of['#tdm','#grow','#unit']){const t=document.querySelector(s);if(t)t.classList.add('hide');}}catch(e){}townMenu();})()`;
+    try{CB.hide();}catch(e){}try{for(const s of['#tdm','#grow','#unit','#zk','#fac']){const t=document.querySelector(s);if(t)t.classList.add('hide');}}catch(e){}townMenu();})()`;
 
   if (COV) await p.coverage.startJSCoverage({resetOnNavigation: false});
   await p.goto(URL);
@@ -137,7 +137,7 @@ if (SHOTS) fs.mkdirSync(SHOTS, {recursive: true});
       await step('fx-prep:' + id, `TDM.prep('${id}')`, 400);
       await step('fx-go:' + id, `(()=>{const b=document.querySelector('#tdm [data-a="go"]');b&&b.click();})()`, 400);
       await step('fx-talk:' + id, `(()=>{for(let i=0;i<30;i++){const k=document.querySelector('#tdm .tdm-talk .skip');if(!k)break;k.click();}})()`, 400);
-      await p.waitForTimeout(2000);await step('fx-auto:' + id, `(()=>{auto=true;G.set.autoMode='full';if(B&&B.res)B.res();})()`, 300);
+      await p.waitForTimeout(2000);await step('fx-auto:' + id, `(()=>{speed=2;auto=true;G.set.autoMode='full';if(B&&B.res)B.res();})()`, 300);
       const t0 = Date.now();let over = false;
       while (Date.now() - t0 < 150000) {over = await p.evaluate(() => !!document.querySelector('#ov .stg-res')).catch(() => false);if (over) break;await p.waitForTimeout(500);}
       if (!over) errs.push(['fx:' + id, '戦闘が終わらない（×2・AUTO・150 秒）']);

@@ -167,7 +167,7 @@ const WAREAS=[{id:'haido',ch:'序章',need:()=>true},{id:'midori',ch:'第1章',n
  {id:'kairou',ch:'深層',t:1,nm:'虚の回廊',bf:'kr30',bk:()=>kBoss(10),need:()=>G.flags.boss8,un:'？？？',rec:()=>`最深到達 ${kst().max||0}層`,intro:'<b>虚の回廊</b>――果てのない回廊。10層ごとに番人がいて、倒した先の層が中継地点になる。'},
  {id:'ryuu',ch:'深層',t:1,need:()=>G.flags.boss8,un:'？？？'}];
 const WTHEME={midori:'lib',seido:'chapel',raimei:'mine',kouka:'shrine',ouito:'ruin',tower:'tower',zankyo:'void',kairou:'void',ryuu:'lava'};
-const SILC=new WeakMap();function silOf(src){let c=SILC.get(src);if(c)return c;c=document.createElement('canvas');c.width=src.width;c.height=src.height;const g=c.getContext('2d');g.drawImage(src,0,0);g.globalCompositeOperation='source-in';g.fillStyle='#05060f';g.fillRect(0,0,c.width,c.height);SILC.set(src,c);return c;}
+const SILC=new WeakMap();
 function wInfo(a){const A2=AREAS[a.id],st=AREAS[a.id]&&!['tower','kairou'].includes(a.id),open=!!a.need(),bf=a.bf||(A2&&A2.bflag);let bk=null;try{bk=a.bk?a.bk():A2.boss.kind;}catch(e){}
  const ds=new Set();[...(st?A2.groups.flat():[]),bk].forEach(k=>{((ED[k]&&ED[k].drop)||[]).forEach(([m])=>MATS[m]&&ds.add(m));});
  return{a,open,bk,clear:!!G.flags[bf],name:a.nm||A2.name,rec:a.rec?a.rec():A2.rec,intro:a.intro||A2.intro,drops:[...ds].slice(0,3),vd:voidArea(G.sorties+1)===a.id};}

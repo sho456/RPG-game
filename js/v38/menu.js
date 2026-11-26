@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.63';
+const VER='ver0.64';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,11 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　戦闘を ver0.49 のロマサガRS風に戻した<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　技と術を 1 人 4 つに・陣形とひらめきを廃止<br><small>`+
+ `・技・術は Lv1 の 2 つ・Lv10 の 1 つ・星盤の 1 つ。旧ひらめきと天星盤の技は、それぞれの技に効果をまとめた<br>`+
+ `・陣形の補正はなし（立ち位置だけ）。覚えた技はすべて戦闘で使える<br>`+
+ `・×1 のときは演出をゆっくり見られるように。セレスの技は光の着弾とダメージの数字が同時に<br>`+
+ `・使われていない古いコードと資料を整理<br></small></div><div class="nt"><b>ver0.63</b>　戦闘を ver0.49 のロマサガRS風に戻した<br><small>`+
  `・戦闘の画面・操作（技の一覧と ⓘ・道具・交代・AUTO通常/全力・リピート）・演出・技と術・アビリティ・ひらめき・陣形を ver0.49 のものに<br>`+
  `・章のステージから出撃すると、WAVE ごとに旧戦闘で戦い、最後に星と報酬<br>`+
  `・セレスは今のドット絵のコマ送りと技・星臨・奥義の演出のまま。背景は 8 つの章の描き込んだ景色<br></small></div><div class="nt"><b>ver0.62</b>　戦闘画面をロマサガRS風に作り直し・フリーズを修正・背景を一新<br><small>`+

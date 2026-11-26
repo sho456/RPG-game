@@ -2,7 +2,7 @@
 /* --- 会話ウィンドウと顔グラの表情（n通常 h笑顔 a怒り s悲しみ o驚き） --- */
 const EXN={n:'通常',h:'笑顔',a:'怒り',s:'悲しみ',o:'驚き'},EXBG={n:'#1a2048',h:'#3a3012',a:'#44141c',s:'#10224a',o:'#2e3a12'};
 const EXC={};
-function eyeOf(id){const r=SPR[id]||[];for(let y=0;y<r.length;y++){const x=r[y].indexOf('e');if(x>=0)return[x,y];}return null;}
+
 function exprFace(){}/* 未使用：js/ver18-art.js が置き換え */
 /* lines: [[話者id|null, 表情, 本文], ...] */
 function talk(){}/* 未使用：js/ver17.js が置き換え */

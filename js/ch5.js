@@ -43,10 +43,7 @@ Object.assign(SK,{tsume:{n:'爪撃',sp:15,el:'斬',k:'phys',pow:1.3,t:'one',d:'�
 AW.jin={name:'獣魂合一',type:'ターン制',turns:4,cmds:['juuou','shippuuga','houkou']};AWD.jin='相棒ポポと合体。攻撃と素早さ+30%、獣王撃は敵の弱点に合わせて属性が変わる';
 BDEF.jin=mkB('獣王座',[['atkP'],['mhpP'],['spd'],['defP'],['crit'],['resP']],['3,-2','-2,-1','-2,3','2,1'],'goga','tatsumaki',[[{atkP:12},'猛獣：攻撃+12%'],[{mhpP:15},'巨躯：最大HP+15%'],[{awDmg:20},'野生：星臨中与ダメ+20%'],[{spd:2},'俊足：素早さ+2']]);
 BOARD.jin=buildBoard('jin');IIS.claw=["","..m...m...m.","..m...m...m.","..mm..mm..mm","...mM..mM..M","....MMMMMMM.","....MbbbbbM.",".....bbbbb..",".....bbbbb.."];ITYPE.unshift(['爪','claw']);
-function jinEvent(){F.pause=true;banner('ジン','#d08030');
- log('月明かりの下、怪我をした小さな獣を抱えた男がいた。<br><b>ジン</b>「おっと、驚かせたか。こいつはポポ、俺の相棒さ。……あんたら、虚蝕を追ってるんだろ？ 夜の森で助けてもらった礼だ、ついて行くよ」');
- menu([{l:'仲間にする',cls:'ready',f:()=>{G.flags.jinMet=1;newMember('jin');SFX.aw();save();fieldMenu('<b>ジンが仲間になった！</b>'+(G.party.includes('jin')?'':'（控えに入った）'));renderPartyStatic();}},
-  {l:'今はやめる',f:()=>{G.flags.jinMet=1;G.declined=[...(G.declined||[]),'jin'];save();fieldMenu('ジン「そうか。酒場で待ってるぜ」');}}]);}
+
 
 MAP2[19]=MAP2[19].slice(0,18)+'n'+MAP2[19].slice(19);MAP2[20]=MAP2[20].slice(0,17)+'TJ'+MAP2[20].slice(19);
 AREAS.midori.intro+='<br><small>夜になると、月明かりの小道が現れるらしい……</small>';

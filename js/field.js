@@ -38,14 +38,13 @@ let MAP1=MAP_HAIDO,MW=20,MH=MAP1.length,AREA='haido',A=null,MX=-9,MY=-9,NX=-9,NY
 const FXHOOK=[];
 let CHESTS=[];
 let CREW=[],BSX=-9,BSY=-9;
-function setArea(id){AREA=id;A=AREAS[id];MAP1=A.map||MAP_HAIDO;MW=MAP1[0].length;MH=MAP1.length;CHESTS=[];BSX=BSY=MX=MY=NX=NY=EX=EY=VX=VY=UX=UY=DX=DY=-9;F&&(F.bolt=null);
- MAP1.forEach((r,y)=>[...r].forEach((t,x)=>{if(t==='C')CHESTS.push(x+','+y);if(t==='B'){BSX=x;BSY=y;}if(t==='M'){MX=x;MY=y;}if(t==='N'){NX=x;NY=y;}if(t==='E'){EX=x;EY=y;}if(t==='V'){VX=x;VY=y;}if(t==='U'){UX=x;UY=y;}if(t==='D'){DX=x;DY=y;}}));CREW=A.crew;GROUPS=A.groups;}
+
 const ck=(x,y)=>AREA==='haido'?x+','+y:AREA==='tower'?'tw'+G.tower.cur+':'+x+','+y:AREA==='kairou'?'kr'+G.kairou.cur+':'+x+','+y:AREA+':'+x+','+y;
 let GROUPS=[];
 function tileAt(){return'T';}/* 探索マップは廃止（v31/quests.js）。名前だけ残す */
 const walk=(x,y)=>'.,CcGgSfzrlEihoxLnt^evm'.includes(tileAt(x,y));
 
-function enterField(){}function spawnOne(){}function afterBattle(){}function fieldMenu(){}function pauseMenu(){}function renderPartyStatic(){}/* 探索マップは廃止（v31/quests.js）。名前だけ残す */
+function enterField(){}/* 探索マップは廃止（v31/quests.js）。名前だけ残す */
 
 let lastT=0;
 function banner(h,c='#ffe27a'){const d=document.createElement('div');d.className='bnr';d.style.top=(38+$('#pops').querySelectorAll('.bnr').length*16)+'%';d.innerHTML=h;d.style.borderColor=c;$('#pops').appendChild(d);setTimeout(()=>d.remove(),2300);}

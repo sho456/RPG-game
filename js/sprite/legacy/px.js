@@ -54,17 +54,15 @@ function part(dst,fn,noOut){const b=new Buf(dst.w,dst.h);fn(b);if(!noOut)b.outli
 const SPDEF={};          /* key → {w,h,ax,ay,draw(buf,anim,i,def),anims:{...},face:[x,y,w,h]} */
 const FRC=new Map();
 const ANI={idle:{n:4,sp:11,loop:1},walk:{n:4,sp:7,loop:1},atk:{n:6,sp:5},cast:{n:4,sp:8},hurt:{n:2,sp:9},guard:{n:1,sp:20,hold:1},dodge:{n:2,sp:8},down:{n:1,sp:20,hold:1},win:{n:4,sp:10,loop:1},awaken:{n:4,sp:8},charge:{n:2,sp:9,loop:1},item:{n:2,sp:12}};
-function sprDef(key){return SPDEF[key]||null;}
+
 function aniOf(def,k){return(def.anims&&def.anims[k])||ANI[k]||ANI.idle;}
 function frameOf(key,anim='idle',i=0,opt=''){const def=SPDEF[key];if(!def)return null;const a=aniOf(def,anim);i=((i%a.n)+a.n)%a.n;const ck=key+'|'+anim+'|'+i+'|'+opt;let f=FRC.get(ck);if(f)return f;
  const b=new Buf(def.w,def.h);def.draw(b,anim,i,def,opt);f={c:b.canvas(),w:null,ax:def.ax,ay:def.ay,W:def.w,H:def.h};FRC.set(ck,f);return f;}
 function whiteFrame(f){if(f.w)return f.w;const c=document.createElement('canvas');c.width=f.W;c.height=f.H;const g=c.getContext('2d');g.drawImage(f.c,0,0);g.globalCompositeOperation='source-in';g.fillStyle='#ffffff';g.fillRect(0,0,f.W,f.H);return f.w=c;}
 function tintFrame(f,col,key){f.t=f.t||{};if(f.t[key])return f.t[key];const c=document.createElement('canvas');c.width=f.W;c.height=f.H;const g=c.getContext('2d');g.drawImage(f.c,0,0);g.globalCompositeOperation='source-in';g.fillStyle=col;g.fillRect(0,0,f.W,f.H);return f.t[key]=c;}
 /* アニメ状態：u.an={k,t0,sp}。現在のコマ番号を返す（ループしないアニメは終わったらidleへ） */
-function aniFrame(u,def,now){let an=u.an;if(!an)an=u.an={k:'idle',t0:(u.x*7+u.y*13)|0};let a=aniOf(def,an.k),i=Math.floor((now-an.t0)/(an.sp||a.sp));
- if(i>=a.n&&!a.loop){if(a.hold||an.hold)i=a.n-1;else{u.an={k:an.next||'idle',t0:now};return aniFrame(u,def,now);}}
- return[an.k,a.loop?i%a.n:Math.max(0,i)];}
-function setAni(u,k,o){u.an=Object.assign({k,t0:typeof tick==='number'?tick:0},o||{});}
+
+
 
 /* ---------- 人型リグ（味方・人型の敵）：左向き ----------
  腰の中心を原点。y負が上。頭と胴は手描きグリッド、腕・脚・武器は姿勢から描く */

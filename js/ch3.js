@@ -84,16 +84,9 @@ AREAS.raimei={name:'雷鳴高原・黒鉄鉱山',map:MAP4,lv:[17,23],groups:[['r
  libGroups:[['golemkin'],['minerghost','ironslime'],['golemkin','minerghost'],['minerghost','minerghost']],crew:[{gold:2000},{loot:[20,2]},{item:'feather',n:2},{loot:[21,3]}],boss:{kind:'boss4',lv:23},bflag:'boss4',theme:'storm',rec:'推奨Lv17〜23',
  bossKind:()=>G.flags.crowChoice?'boss4b':'boss4',intro:'<b>第3章　雷鳴高原</b>――雷が絶えず落ちる高原。<b>光った場所には落雷</b>する。北の黒鉄鉱山の奥に、虚蝕の呪術師がいるという。'};
 const Q3=[{id:'q6',n:'雷鳴の主',d:'虚蝕のクロウを倒す',ok:()=>!!G.flags.boss4,pg:()=>G.flags.boss4?'達成':'未達成',rw:'4000G・不死鳥の羽×2',give:()=>{G.gold+=4000;addItem('feather',2);}}];
-function ernaEvent(){F.pause=true;banner('エルナ','#ffe14a');
- log('崩れた塔の上から矢が飛んできた。<br><b>エルナ</b>「虚蝕を追ってるの？ ……口だけなら誰でも言える。私に勝てたら、ついて行ってあげる」');
- menu([{l:'決闘する',cls:'ready',f:()=>{F.lock=true;F.pause=false;startBattle([{kind:'ernaE',lv:1}],{event:'erna',onEnd:afterBattle});}},{l:'やめる',f:fieldMenu}]);}
-function balzaEvent(){F.pause=true;banner('バルザ','#ff8030');
- log('<b>バルザ</b>「おい、そこの若いの！ 坑道の奥から黒鉄の巨像が湧いてきやがった。わしの炉を守るのを手伝え！」');
- menu([{l:'助ける',cls:'ready',f:()=>{F.lock=true;F.pause=false;startBattle([{kind:'golemboss',lv:21}],{event:'balza',onEnd:afterBattle});}},{l:'やめる',f:fieldMenu}]);}
-function crowChoice(){F.pause=true;banner('クロウ','#b07cff');
- log('クロウは膝をついた。体から虚蝕が抜けていく。<br><b>クロウ</b>「……とどめを刺せ。虚蝕に家族を喰われ、俺も喰われた。生きる理由なんて、もう――」');
- menu([{l:'救う',cls:'ready',f:()=>{G.flags.crowChoice='save';newMember('crow');SFX.aw();save();fieldMenu('<b>クロウが仲間になった！</b> 「……物好きだな。借りは、虚蝕で返す」');renderPartyStatic();}},
-  {l:'見逃す',f:()=>{G.flags.crowChoice='leave';const s=addLoot(genItem(23,3));save();fieldMenu(`クロウは無言で去っていった。足元に${s}が残されていた。`);}}]);}
+
+
+
 
 /* ===== ステータス画面 ===== */
 let sheetPrev=null;

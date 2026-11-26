@@ -46,8 +46,7 @@ const bK=()=>Math.max(2,Math.min(8,Math.ceil(SC*(window.devicePixelRatio||1)-.05
  ver0.25：ブレイク廃止に伴い、ボスの部位破壊は削除。破片の描画処理のみ残す */
 function drawDeb(){ctx.save();B.deb=B.deb.filter(d=>{d.x+=d.vx;d.y+=d.vy;d.vy+=.11;d.l--;if(d.y>d.fy&&d.vy>0){d.y=d.fy;d.vy*=-.3;d.vx*=.55;}
  ctx.globalAlpha=Math.min(1,d.l/18);ctx.fillStyle=d.c;ctx.fillRect(d.x,d.y,d.z,d.z);return d.l>0;});ctx.restore();}
-function noiseHit(d,v,hp){if(!AC)return;const t=AC.currentTime,s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();s.buffer=noiseBuf();f.type='highpass';f.frequency.value=hp;
- g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0008,t+d);s.connect(f).connect(g).connect(AC.destination);s.start(t);s.stop(t+d+.02);}
+
 
 /* ---------- 3. BGM（Web Audioで即時生成するチップチューン） ----------
  拠点／フィールド（エリア別・虚蝕化は変調）／通常戦闘／ボス戦／ラスボス／星臨中／勝利 */

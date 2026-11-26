@@ -128,9 +128,7 @@ function panel22(){const P=$('#party');if(!B||!P)return;const a=B.cur&&B.cur.sid
   <div class="sr"><div class="bx hp${low?' low':''}"><em>HP</em><b>${a.hp}</b><small>/${a.mhp}</small></div><div class="bx sp"><em>SP</em><b>${dev?'∞':a.sp}</b><small>/100</small></div><div class="bx ts">${sts||tg||'<small class="nst">状態異常なし</small>'}</div></div></div>`;
  if(P._h22!==ht||!P.querySelector('.bp22')){P._h22=ht;P.innerHTML=ht;}P.className='act v22';}
 /* 味方：足元の右に HP（大きな数字）・SP・星臨ゲージ */
-function heroLabs(){B.heroes.forEach(h=>{const el=h._pl;if(!el)return;let fx,fy;try{[fx,fy]=V19.foot(h);}catch(e){fx=h.x+16;fy=h.y+30;}
- el.style.left=Math.round((fx+4)*SC)+'px';el.style.top=Math.round((fy-15)*SC)+'px';el.classList.add('v22');
- const hs=el.querySelector('.hs span');if(hs)hs.textContent=DEV()?'SP∞':'SP'+h.sp;const em=el.querySelector('.hs em');if(em&&h.ag>=100&&!h.aw)em.textContent=SEIRIN.n+'OK';});}
+
 {const _rf=refresh;refresh=function(){_rf();if(!B||scene!=='battle')return;try{updHud();}catch(e){console.error(e);}};}
 
 /* ---------- 技リスト（ver0.17 の入力処理を引き継ぎ、見た目と開発者モードを追加） ---------- */
