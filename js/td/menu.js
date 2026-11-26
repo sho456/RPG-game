@@ -1,5 +1,5 @@
 /* ===== TD の章の地図・出撃準備・会話・仲間の加入（TDM）。戦闘画面は js/td/view.js（TD） =====
- 流れ（ver0.60 からコマンド戦闘）：ホームの「出撃」→ map()（章のタブ・ステージの道）→ prep(id)（出る敵と弱点・仲間 5 人の編成）→ CB.open→ 出撃前の会話 → TD.open
+ 流れ（ver0.60 からコマンド戦闘）：ホームの「出撃」→ map()（章のタブ・ステージの道）→ prep(id)（出る敵と弱点・仲間 4 人の編成）→ CB.open→ 出撃前の会話 → TD.open
        → 結果 → after()：初回クリアなら加入の会話と newMember → 次のステージの出撃準備へ。
  進み具合は G.td.c[ステージ]＝星の数、手札は G.td.deck。会話は本編のクエスト（QD）の pre と加入（QD.POST）を使う */
 'use strict';
@@ -49,7 +49,7 @@ function skyArt(c,th){const st={S:{W:900,th,base:[870,300],paths:[[[-30,262],[90
  const b=TDBG.make(st,360),g=c.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(b.sky,40,0,360,236,0,0,360,236);g.drawImage(b.far,-40,-70);g.drawImage(b.mid,-20,-60);
  const gr=g.createLinearGradient(0,40,0,96);gr.addColorStop(0,'rgba(18,19,42,0)');gr.addColorStop(1,'rgba(18,19,42,1)');g.fillStyle=gr;g.fillRect(0,0,360,96);}
 /* ---------- 出撃準備 ---------- */
-const PMAX=5;/* 出撃する仲間（コマンド戦闘は 5 人まで） */
+const PMAX=4;/* 出撃する仲間（コマンド戦闘は 4 人まで） */
 function prep(id){const S=TDD.STAGE[id];if(!S||(S.inf?!infOpen():!open(id)))return map();cur=id;const C=S.inf?{ch:'∞',n:S.name}:chOf(id);TD0();
  const mem=(G.members||[]).filter(h=>TDD.HERO[h]),deck=TDD.deckOf().filter(h=>mem.includes(h)).slice(0,PMAX);G.td.deck=deck;
  const W=S.inf?[]:CBE.wavesOf(S),kinds=S.inf?[...S.pool,...S.bosses]:[...new Set(W.flat())],cnt=k=>W.reduce((a,w)=>a+w.filter(x=>x===k).length,0);
@@ -71,7 +71,7 @@ function talk(lines,done){if(!lines||!lines.length)return done();let i=0;build()
  box.addEventListener('click',e=>{e.stopPropagation();if(e.target.dataset.k==='skip')i=lines.length;step();});step();}
 /* ---------- 出撃・結果のあと ---------- */
 function go(id){const S=TDD.STAGE[id],deck=G.td.deck||TDD.deckOf();try{save();}catch(e){}
- const run=()=>{root.classList.add('hide');root.innerHTML='';CB.open(id,deck.slice(0,5));};if(S.pre&&!stars(id))talk(S.pre,run);else run();}
+ const run=()=>{root.classList.add('hide');root.innerHTML='';CB.open(id,deck.slice(0,PMAX));};if(S.pre&&!stars(id))talk(S.pre,run);else run();}
 let pendEnd=false;
 /* ---------- 結果の精算（view.js の result が呼ぶ）：星・報酬（初回・周回・星 3 の錬磨石）・天への塔の到達 WAVE ----------
  返り値：{rw, first, chips}（chips＝報酬の欄に足す印の HTML）。塔は {sheet}（結果の窓をまるごと） */

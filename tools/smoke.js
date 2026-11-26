@@ -85,7 +85,7 @@ if (SHOTS) fs.mkdirSync(SHOTS, {recursive: true});
   const runs = await p.evaluate(() => {
     const out = [];
     for (const id of [...TDD.ORDER, TDD.INF].filter(Boolean)) {
-      try {const S = TDD.STAGE[id], party = TDD.rosterAt(id).slice(0, 5);party.forEach(h => {G.h[h].lv = S.inf ? 50 : S.lv;G.h[h].hp = null;});
+      try {const S = TDD.STAGE[id], party = TDD.rosterAt(id).slice(0, 4);party.forEach(h => {G.h[h].lv = S.inf ? 50 : S.lv;G.h[h].hp = null;});
         const r = CBE.run(id, party, 7919);out.push([id, !!r.win, r.turn | 0, null]);}
       catch (e) {out.push([id, false, 0, String(e.stack || e.message).slice(0, 200)]);}
     }

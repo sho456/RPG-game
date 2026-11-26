@@ -1,5 +1,5 @@
 /* ===== コマンド戦闘の難易度の計測と調整（CBE.run を AUTO で何十回も） =====
- node tools/cb_sim.js            … 全ステージを推奨 Lv で（仲間は加入の順で最大 5 人）。勝率・ターン・残り HP・倒れた数
+ node tools/cb_sim.js            … 全ステージを推奨 Lv で（仲間は加入の順で最大 4 人）。勝率・ターン・残り HP・倒れた数
  node tools/cb_sim.js --tune     … ステージごとの [HP の倍率, 攻撃の倍率] を探して js/cb/tune.js（CBT）に書く
    目安：通常のステージ＝全 WAVE で 4〜5 ターン・残り HP 55〜65%／ボスのステージ＝9〜11 ターン・勝率 80% 前後
  環境変数：URL（既定 http://localhost:8790/index.html）・N（1 ステージの回数）・DL（推奨 Lv からのずれ） */
@@ -10,7 +10,7 @@ const TUNE=process.argv.includes('--tune'),URL=process.env.URL||'http://localhos
  await p.evaluate(()=>{try{titleTap();}catch(e){}});await p.waitForTimeout(400);
  const r=await p.evaluate(([TUNE,N,DL])=>{G=migrate(newGame());const ORD=['rio','gald','celes','shion','mire','jin','noah','erna','balza','crow','hakua','valk'];
   for(const id of ORD)if(!G.members.includes(id))newMember(id);const out=[],tab={};
-  const party=sid=>{const i=TDD.ORDER.indexOf(sid),J=new Set(['rio','gald','celes']);for(const s of TDD.ORDER.slice(0,i)){const j=TDD.STAGE[s].join;if(j)J.add(j);}return ORD.filter(x=>J.has(x)).slice(0,5);};
+  const party=sid=>{const i=TDD.ORDER.indexOf(sid),J=new Set(['rio','gald','celes']);for(const s of TDD.ORDER.slice(0,i)){const j=TDD.STAGE[s].join;if(j)J.add(j);}return ORD.filter(x=>J.has(x)).slice(0,4);};
   const meas=(sid,P,o)=>{let w=0,t=0,hp=0,f=0;for(let k=0;k<N;k++){const R=CBE.run(sid,P,k*7919+13,o);w+=R.win;t+=R.turn;hp+=R.hp;f+=R.fell;}return{w:w/N,t:t/N,hp:hp/N,f:f/N};};
   for(const sid of TDD.ORDER){const S=TDD.STAGE[sid];if(S.inf)continue;const lv=Math.max(1,S.lv+DL),P=party(sid);for(const id of P){G.h[id].lv=lv;G.h[id].hp=null;}
    if(TUNE){const boss=!!(S.boss||CBE.wavesOf(S).some(w=>w.some(k=>ED[k]&&ED[k].boss))),T=boss?10:4.5;

@@ -40,7 +40,7 @@ function wavesOf(S){return S.waves.map(w=>{const L=[];for(const[,k,n]of w.e){con
 function infWave(b,i){const S=b.S,R=b.r,pick=L=>L[Math.floor(R()*L.length)];if((i+1)%5===0)return[pick(S.bosses),pick(S.pool)];const n=i<10?3:4,o=[];for(let k=0;k<n;k++)o.push(pick(S.pool));return o;}
 function create(sid,party,o={}){const S=TDD.STAGE[sid];const b={sid,S,hk:o.hk,ak:o.ak,uid:0,turn:0,wave:0,r:rng(o.seed||((Date.now()%99991)+1)),heroes:[],foes:[],waves:[],fell:0,over:null,log:[]};
  b.waves=S.inf?[infWave(b,0)]:wavesOf(S);
- party.slice(0,5).forEach((id,i)=>{const u=hero(id,i,b);if(u)b.heroes.push(u);});
+ party.slice(0,4).forEach((id,i)=>{const u=hero(id,i,b);if(u)b.heroes.push(u);});
  b.par=S.inf?999:b.waves.length*3+(S.boss?4:1);spawn(b);
  /* 戦闘開始時の強化（start）：自分・味方全体・敵全体 */
  for(const u of b.heroes)for(const e of u.ab)if(e.t==='start'){const T=e.on==='allies'?b.heroes:e.on==='enemies'?b.foes:[u];for(const t of T)addBuf(t,e.k,e.on==='enemies'?-Math.abs(val(e)):val(e),e.d||3);}
@@ -135,7 +135,7 @@ function turnStart(b){b.turn++;const rec=[];
   if(u.awOn>0&&u.id==='balza')u.awN=(u.awN||0)+1;}
  for(const f of F(b)){f.cmd=null;f.cnt++;f._n=0;if(f.chargeN){f.chargeN=0;f.charged=1;}const ai=f.ai;if(ai&&ai.charge&&ai.every&&f.cnt%ai.every===ai.every-1){f.charging=1;}}
  return rec;}
-/* 行動の順：素早さ×（0.9〜1.1）。先制は前・後発は後ろ。ボスは仲間が 4 人以上なら 2 回 */
+/* 行動の順：素早さ×（0.9〜1.1）。先制は前・後発は後ろ。ボスは仲間が 4 人なら 2 回 */
 function order(b){const L=[];for(const u of H(b))L.push({u,k:stat(u,'spd')*(.9+b.r()*.2)*(1+sumE(u,'prio')/100)+(u.cmd&&u.cmd.sk.prio?u.cmd.sk.prio*1000:0)});
  const n=H(b).length;for(const f of F(b)){L.push({u:f,k:stat(f,'spd')*3*(.9+b.r()*.2)});if(f.boss&&n>=4)L.push({u:f,k:stat(f,'spd')*3*(.5+b.r()*.2),again:1});}
  return L.sort((a,c)=>c.k-a.k).map(x=>x.u);}

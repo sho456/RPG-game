@@ -7,8 +7,9 @@
  進行はジェネレーター（yield 秒）で書き、毎コマ st.t（×1/×2）で進める。 */
 'use strict';
 const CB=(()=>{
-const VW=260,W=420,X0=(W-VW)/2,FOOT=380;/* 見せる幅（論理 px）・背景の幅・左端・足元の帯の下端 */
-const HS=[[250,304],[283,268],[285,342],[317,240],[315,374]],FS=HS.map(([x,y])=>[W-x,y]),BOSS=[132,322],BADD=[[184,268],[182,362],[100,252]];
+const VW=270,W=420,X0=(W-VW)/2,FOOT=380;/* 見せる幅（論理 px）・背景の幅・左端・足元の帯の下端 */
+/* 4 人：前 1・中 2・後 1 の菱形。敵は左右対称（前列どうしの間 100px） */
+const HS=[[260,304],[292,264],[294,346],[326,306]],FS=HS.map(([x,y])=>[W-x,y]),BOSS=[122,322],BADD=[[168,266],[166,362],[86,300]];
 const HG={hero:74,foe:60,boss:124};
 let root=null,cv=null,g=null,OC=null,O=null,DPR=1,S=1,CW=0,CHh=0,Y0=0,raf=0,last=0,speed=1,b=null,st=null,sid=null,bg=null,blur=null,gen=null,wake=0,phase='idle',sel=null,tgt=null,ended=false;
 let cam={x:0,y:0,z:1,tx:0,ty:0,tz:1,kick:0,shake:0};const nums=[],tx=[],motes=[];
@@ -215,7 +216,7 @@ function sheet(html){const s=root.querySelector('.cb-sheet');if(!html){s.hidden=
  s.onclick=e=>{const a=e.target.closest('[data-a]');if(!a)return;const k=a.dataset.a;if(k==='again')open(sid,party0);else if(k==='next')TDM.after(sid,true);else if(k==='map')TDM.after(sid,false);else if(k==='resume')sheet(null);else if(k==='flee'){hide();TDM.map();}};}
 /* ---------- 開く・閉じる ---------- */
 let party0=[];
-function open(id,party){build();sid=id;party0=party.slice(0,5);cancelAnimationFrame(raf);
+function open(id,party){build();sid=id;party0=party.slice(0,4);cancelAnimationFrame(raf);
  b=CBE.create(id,party0,{});st={t:0,units:b.heroes,foes:b.foes,ev:[],S:{th:b.S.th,base:[W+200,300]},fields:[],deck:[]};Object.defineProperty(st,'foes',{get:()=>b.foes});Object.defineProperty(st,'units',{get:()=>b.heroes.filter(u=>u.hp>0)});
  for(const u of b.heroes){u.dhp=u.hp;u.x=null;u.actT=-9;u.hitT=-9;}
  TDA.clear();TDFX.reset();Q.length=0;nums.length=0;tx.length=0;gen=null;phase='idle';speed=CBH.speed();ended=false;sel=null;tgt=null;
