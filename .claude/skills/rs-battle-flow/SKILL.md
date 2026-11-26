@@ -3,7 +3,7 @@ name: rs-battle-flow
 description: アストラル・ブレイカー（このリポジトリ）のロマサガRS風の戦闘の流れと表示を作る／直す／点検する。戦闘開始の筆文字・HP/BP を出すタイミング・技名の吹き出し・暗転・Critical/Weak＋属性の漢字・強化/弱体の文字・ダメージの数字（連続ヒット・全体攻撃）・表示の区切りと重なり。決まりは docs/BATTLE-FLOW.md、表示の枠は js/ui/battle-pop.js（BPOP）、流れは js/battle/flow.js と js/rs/battle.js。デモの録画（tools/battle_demo.js）とコマの一覧（tools/frame_grid.py）で必ず目で確かめる。Use when the user asks about the battle flow, damage numbers, Weak/Critical labels, buff/debuff text, HP/BP display timing, multi-hit or all-target display, overlapping battle text, or "make the battle look like Romancing SaGa Re;univerSe". 技ごとの演出（モーション・エフェクト）は rpg-hero-motion を使う。
 ---
 
-> 旧コマンド戦闘は ver0.53 で削除。演出の知見は TD の演出に応用する（このスキルが指す js/battle/*・js/rs/*・tools/battle_demo.js などは今は無い。時間割・効果音・色などの考え方だけを使う）。
+> ver0.63 で旧戦闘（ver0.49）を戻した。このスキルが指す js/battle/*・js/rs/*・tools/battle_demo.js は今も使える。ver0.64 で陣形・ひらめきは廃止、技・術は 1 人 4 つ。セレスだけ今のコマ送りと演出（js/battle/celes.js）。
 
 # ロマサガRS風の戦闘の流れと表示（アストラル・ブレイカー）
 

@@ -3,7 +3,7 @@ name: rpg-hero-motion
 description: アストラル・ブレイカー（このリポジトリ）の戦闘モーションと技の演出を作る／直す。味方 12 人の待機の癖・通常攻撃・技・被弾・勝利・星臨、敵の行動。1 枚絵を曲げて動かす仕組み（js/battle/rig.js の mL mB mS mR mF mU）、技の演出の台帳（BXS.def：予備動作 → 発動 → 命中 → 余韻）、エフェクト部品（BXP）、連続コマの原画の取り込み（tools/spx_import.py の anims）、演出ビューアとコマ送りでの確認（tools/motion_preview.js）。Use when the user asks for battle motions, attack/idle/cast/hurt/victory animation, skill effects, hit-stop, or "make the battle feel better" in this game. エフェクトの新規作成は pixelfx、コマを手で描くなら pixel-art-studio を併用する。
 ---
 
-> 旧コマンド戦闘は ver0.53 で削除（演出ビューア・tools/motion_preview.js も削除済み）。モーションの考え方は TD の描画（js/td/view.js）と js/sprite/spx.js で使う。
+> ver0.63 で旧戦闘（ver0.49）を戻した。このスキルが指す js/battle/*・js/rs/*・tools/battle_demo.js は今も使える。ver0.64 で陣形・ひらめきは廃止、技・術は 1 人 4 つ。セレスだけ今のコマ送りと演出（js/battle/celes.js）。
 
 # 戦闘モーション（アストラル・ブレイカー）
 

@@ -89,7 +89,7 @@ function enemy(kind,lv,x,y,suf=''){const d=ED[kind],L=d.boss?0:lv-1,M={mhp:.7+.1
 
 /* ===== 戦闘 ===== */
 let B=null,G=null,F=null,speed=1,auto=false;
-const SPD={1:1.7,2:.75,4:.35};
+const SPD={1:2.3,2:.75,4:.35};/* ver0.64：×1 は演出をじっくり（1.7→2.3）。×2・×4 はそのまま */
 const wait=ms=>new Promise(r=>setTimeout(r,ms*SPD[speed]));
 const log=t=>{$('#msg').innerHTML=t;};
 const aliveE=()=>B.enemies.filter(e=>e.alive),aliveH=()=>B.heroes.filter(h=>h.alive);

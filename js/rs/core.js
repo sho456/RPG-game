@@ -4,10 +4,10 @@
    旧来の内部値はこう対応する：防御＝体力、精神＝精神、魔力＝知力、素早さ（行動順の目盛り）＝素早さ÷3。
    「攻撃」（技の威力）は武器種ごとの能力の配分から決まる（Lv1 の強さは旧来と同じになるよう主能力を自動で決める）
  ・HP・LP・BP：LP はキャラごとの最大値。BP は［初期・最大・毎ターンの回復］をキャラごとに持つ
- ・技・術：キャラごとに 6 種（Lv・ひらめき・星盤・天星盤）。戦闘に持ち込めるのは 4 つ（技セット）
+ ・技・術：キャラごとに 4 つ（Lv1・Lv1・Lv10・星盤。ver0.64 で統合）。覚えた技はすべて戦闘で使える
  ・アビリティ：3 つ（Lv1・25・50 で解放、段階 I〜V）。星盤・天星盤のノードで強化
  ・陣形：並び順ごとの立ち位置と能力の補正
- セーブの項目：G.h[id].sset（技セット）・skx（技の熟練）・glim（ひらめいた技）・sseen・lp（今のLP）・G.form（陣形） */
+ セーブの項目：G.h[id].skx（技の熟練）・lp（今のLP）。技セット・ひらめき・陣形は ver0.64 で廃止 */
 'use strict';
 const RSC=(()=>{
 const D=RSD;
@@ -75,25 +75,21 @@ function ailP(a,t,f){const p=f.p==null?1:f.p;if(!a||!t||a.side===t.side)return p
  const x=STATK7.includes(f.k)?A.int:(A.int+A.cha)/2,y=T.wil;return Math.min(1,p*clamp(1+.8*(x-y)/Math.max(1,x+y),.4,1.6));}
 
 /* ==================== 技・術の習得とセット ==================== */
-const hh=id=>{const h=G.h[id];if(!h)return null;h.skx=h.skx||{};h.glim=h.glim||[];h.sseen=h.sseen||[];return h;};
+const hh=id=>{const h=G.h[id];if(!h)return null;h.skx=h.skx||{};return h;};
 /* 習得済みの技・術（id の配列） */
 function learned(id){const h=hh(id),o=[];if(!h)return o;
  for(const[k,how,lv]of D.LEARN[id]||[]){let ok=false;
-  if(how==='lv')ok=h.lv>=lv;else if(how==='glim')ok=h.glim.includes(k);else if(how==='board')ok=(h.board||[]).includes('2,-2');else if(how==='board2')ok=(h.board2||[]).includes('2,-2');
+  if(how==='lv')ok=h.lv>=lv;else if(how==='board')ok=(h.board||[]).includes('2,-2');
   if(ok)o.push(k);}
  return o;}
 /* 習得の方法の表示 */
 function howTxt(id,k){const e=(D.LEARN[id]||[]).find(x=>x[0]===k);if(!e)return'';
- const[,how,lv]=e,g=SK[k].glim;return how==='lv'?`Lv${lv}`:how==='glim'?`ひらめき（Lv${lv}以上で「${SK[g.from].n}」を使うと閃くことがある）`:how==='board'?'星盤':'天星盤（Lv60〜）';}
+ const[,how,lv]=e;return how==='lv'?`Lv${lv}`:'星盤';}
 skillList=function(id){return learned(id);};
-/* 技セット（最大 4）。空きがあれば新しく覚えた技を自動で入れる（一度外した技は勝手に戻さない） */
-function setOf(id){const h=hh(id);if(!h)return[];const L=learned(id);
- if(!Array.isArray(h.sset)){h.sset=L.slice(0,4);h.sseen=L.slice();}
- h.sset=h.sset.filter((k,i,a)=>L.includes(k)&&a.indexOf(k)===i).slice(0,4);
- for(const k of L)if(!h.sseen.includes(k)){h.sseen.push(k);if(h.sset.length<4)h.sset.push(k);}
- return h.sset.slice();}
-function toggleSet(id,k){const h=hh(id);setOf(id);const i=h.sset.indexOf(k);if(i>=0){h.sset.splice(i,1);return'外した';}if(h.sset.length>=4)return'技セットがいっぱい（4つまで）';if(!learned(id).includes(k))return'まだ覚えていない';h.sset.push(k);return'セットした';}
-function moveSet(id,k,d){const h=hh(id);setOf(id);const i=h.sset.indexOf(k),j=i+d;if(i<0||j<0||j>=h.sset.length)return;[h.sset[i],h.sset[j]]=[h.sset[j],h.sset[i]];}
+/* ver0.64：技・術は 1 人 4 つになったので、覚えた技はすべて戦闘に持ち込む（技セットは廃止） */
+function setOf(id){return learned(id).slice(0,4);}
+function toggleSet(){return'';}
+function moveSet(){}
 /* 技の熟練 */
 const profN=(id,k)=>{const h=hh(id);return h?h.skx[k]||0:0;};
 /* ver0.47：技Lv（熟練）は廃止し、練達（js/rs/mastery.js）に置き換え。profLv は練達の段階（0〜3）を返す。威力の倍率は prep で掛ける */
@@ -213,7 +209,7 @@ function applySt7(u,k,v){const m=1+v/100;if(u.s7&&u.s7[k]!=null)u.s7[k]=Math.rou
  else if(k==='cha'&&u.s7){u.healRecv=healRecv(u.s7);u.healAb=healAb(u.s7);}}
 
 /* ==================== 陣形 ==================== */
-const formOf=()=>D.FORM[G&&G.form]?G.form:'seikan';
+const formOf=()=>'seikan';/* ver0.64：陣形は廃止（立ち位置だけ） */
 function formEffects(i,f){const F=D.FORM[f||formOf()];return(F.s[i]||[]).map(x=>Object.assign({src:F.n},x));}
 function applyForm(u,i){u.rsE=(u.rsE||[]).filter(e=>!e.form);const fe=formEffects(i).map(e=>Object.assign(e,{form:1}));
  for(const e of fe){if(e.t==='stat')applyStat(u,e);if(e.t==='st7')applySt7(u,e.k,e.v);}u.rsE=u.rsE.concat(fe);u.rsSlot=i;}
@@ -221,7 +217,7 @@ function applyForm(u,i){u.rsE=(u.rsE||[]).filter(e=>!e.form);const fe=formEffect
 const formPos=(i,f)=>{const F=D.FORM[f||formOf()];return(F.p&&F.p[i])||[.5,i/3];};
 
 /* ==================== セーブ ==================== */
-{const _m=migrate;migrate=function(g){const r=_m(g);try{const G0=r||g;if(!D.FORM[G0.form])G0.form='seikan';for(const id in G0.h){const h=G0.h[id];if(!h)continue;h.skx=h.skx||{};h.glim=h.glim||[];h.sseen=h.sseen||[];h.job=null;h.sset=Array.isArray(h.sset)?h.sset.filter(k=>!/^j_/.test(k)):h.sset;}}catch(e){console.error(e);}return r;};}
+{const _m=migrate;migrate=function(g){const r=_m(g);try{const G0=r||g;delete G0.form;for(const id in G0.h){const h=G0.h[id];if(!h)continue;h.skx=h.skx||{};delete h.glim;delete h.sset;h.sseen=h.sseen||[];h.job=null;h.sset=Array.isArray(h.sset)?h.sset.filter(k=>!/^j_/.test(k)):h.sset;}}catch(e){console.error(e);}return r;};}
 
 return{D,pf,rs7,unit7,healRecv,healAb,hitRate,ailP,isHealSpell,lpCost,learned,howTxt,setOf,toggleSet,moveSet,profN,profLv,profMul,costOf,keyOf,abRank,abUps,abEffects,awEffects,abDesc,abNext,abName,effTxt,resolve,active,
  formOf,formEffects,formPos,applyForm,applyStat,applySt7,esc,clamp};})();

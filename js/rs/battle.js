@@ -173,16 +173,11 @@ function abPop(u,n){try{pop(u,n,'#ffffff',true,'st20 ab');}catch(e){}}
  refresh();};}
 const awLeft=u=>Math.max(0,awN(u)-(u.awT||0));
 
-/* ==================== ひらめき・熟練 ==================== */
-function glimmer(u,sk){if(!sk||sk.basic||sk.ougi||u.side!==0)return null;const k=C.keyOf(sk);if(!k)return null;const h=G.h[u.id];if(!h)return null;
- for(const[id,how,lv]of D.LEARN[u.id]||[]){if(how!=='glim')continue;const g=SK[id].glim;if(!g||g.from!==k||h.lv<lv||h.glim.includes(id))continue;
-  const boss=aliveE().some(e=>e.boss),p=(g.p||.08)*(boss?2:1)*(1+(((G.fac&&G.fac.tower)||1)-1)*.1)*(DEV()?5:1);/* 星詠みの塔：ひらめき率+10%/Lv */if(Math.random()<p){h.glim.push(id);try{save();}catch(e){}return SK[id];}}
- return null;}
-async function glimShow(u,sk){banner('ひらめき！',`${u.name}は「${sk.n}」を閃いた！`,'glim');SFX.weak();pop(u,'💡','#ffe27a',true);log(`<b>💡 ${u.name}は「${sk.n}」を閃いた！</b>`);await wait(700);}
+/* ==================== 熟練 ==================== */
 /* 技Lv（熟練）は ver0.47 で廃止（練達：js/rs/mastery.js） */
 function addProf(){}
 
-/* ==================== 見出し（奥義・ひらめき） ==================== */
+/* ==================== 見出し（奥義） ==================== */
 function banner(t,s,cls){let b=$('#rsban');if(!b){b=document.createElement('div');b.id='rsban';$('#stage').appendChild(b);}
  b.className=cls||'';b.innerHTML=`<b>${t}</b>${s?`<small>${s}</small>`:''}`;b.classList.remove('on');void b.offsetWidth;b.classList.add('on');clearTimeout(b._t);b._t=setTimeout(()=>b.classList.remove('on'),Math.round(1300*(SPD[speed]||1)));}
 
@@ -253,7 +248,6 @@ async function heroExec(u,c){if(!c||!c.sk)return;try{BPOP.cut();}catch(x){}/* �
  if(sk.k==='rewind'&&!B.snap)sk=ATK(u);
  let cost=DEV()?0:C.costOf(u,sk);const lpc=DEV()?0:C.lpCost(sk);
  if(u.sp<cost||(lpc&&(u.lp||0)<=lpc)){log(`${u.name}は${u.sp<cost?'BP':'LP'}が足りない…（通常攻撃）`);sk=ATK(u);cost=0;t=aliveE().sort((a,b)=>a.hp-b.hp)[0];}
- const g=glimmer(u,sk);if(g){sk=g;await glimShow(u,g);if(g.t==='one'&&(!t||!t.alive||t.side!==1))t=aliveE()[0];}
  const key=C.keyOf(sk),prof=key&&D.NEW[key]?C.profMul(u.id,key):1;
  u.sp-=cost;u._rsBpGain=0;
  /* 回復術の LP 消費は ver0.46f で廃止 */

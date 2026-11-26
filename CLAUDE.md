@@ -38,7 +38,7 @@
 | 持ち物・鑑定（施設の共通の枠 `FAC`） | `js/ui/inv.js`（`FAC`・`INV`=`invMenu`・`APR`=`appraise`） | `css/ui/inv.css` |
 | 図鑑の一覧 | `js/ui/zukan.js`（`ZKUI`。データと詳細は `js/zukan/zukan.js`） | `css/ui/zukan.css` |
 | タイトル（タップで開始） | `js/v38/menu.js`（`titleTap`） | `css/ui/font.css` |
-| 戦闘の数値データ（武器種・技・LP など。TD が武器種を読む） | `js/rs/data.js`（`RSD`）・`js/rs/core.js`（`RSC`：能力値・習得・セーブ）。ターン制の進行 `js/rs/battle.js` は ver0.53 で削除 | — |
+| 戦闘の数値データ（武器種・技・LP など。TD が武器種を読む） | `js/rs/data.js`（`RSD`）・`js/rs/core.js`（`RSC`：能力値・習得・セーブ）。技・術は 1 人 4 つ（data.js の末尾で 6→4 に統合）。陣形は立ち位置だけ | — |
 | 文字のフォント（全画面で統一） | 本文＝M PLUS 1p、コマンド（ボタン・技名・名前・見出し・タブ）＝Kaisei Tokumin（`css/ui/font.css` の `--cmd`）。キャンバスの数字・英字は各画面のコード | `css/ui/font.css` |
 | 用語・耐性 | `js/data/terms.js`（`TERMS`） | — |
 | 強化メニュー（経験値のストック・レベルアップ・旧酒場の統合） | `js/ui/growth.js`（`GROW`） | `css/ui/growth.css` |
@@ -52,7 +52,7 @@
 **ver0.63（2026-11-26）**：戦闘をユーザーの指示で ver0.49（git `7bbc626`）のロマサガRS風に戻した。旧戦闘を消した 3 コミット（187346e・82ce1c4・bb0d361）の差分を今のファイルに 3-way で戻し、`js/rs/*`・`js/awaken.js` は 0.49 の版。コマンド戦闘（`js/cb/*`・ver0.60〜0.62）は削除。旧開発者メニューの上書きの受け皿 `dvMenu`・`devGear` は `js/core.js`。
 **次の作業**：セレス以外の仲間を今のコマ送りにするなら `js/battle/celes.js` の `ID` を広げる（TDA の素材が要る）。旧戦闘の演出の知見はスキル `rs-battle-flow` `rs-battle-fx` `rpg-hero-motion`。
 旧コードの整理の道具：`node tools/smoke.js --cov cov.json`（一度も呼ばれなかった関数）→ `python3 tools/deadcode.py cov.json`（ファイルごとの候補）・`python3 tools/prune.py cov.json [--apply]`（名前でも参照されない宣言を消す）。smoke が通らない画面の関数も 0 回になるので、消す前に画面で確かめる。
-現在地は上の ver0.63 の行。`docs/CB-DESIGN.md` は削除したコマンド戦闘（ver0.60〜0.62）の記録。
+現在地は上の ver0.63 の行。コマンド戦闘（ver0.60〜0.62）の設計は git の履歴（docs/CB-DESIGN.md）。
 
 **方針（2026-11-26）**：タワーディフェンス（ver0.50〜0.59）→ コマンド戦闘（ver0.60〜0.62）を経て、ver0.63 で戦闘は ver0.49 の旧戦闘に戻した。ファイル名の `td` は章・ステージ・セレスの演出の部品として残っている（`TDD` `TDM` `TDFX` `TDA` など）。
 
@@ -96,7 +96,7 @@
 | `rpg-hero-motion` | 戦闘モーション・技の演出 |
 | `rpg-equipment-icon` | 装備アイコン |
 | `rs-battle-fx` | 技・術の演出の設計（録画の実測：吹き出し→暗転→溜め→放出→着弾→明けの時間割・剣の振りの周期・術の段取り・エフェクトの色・効果音のレシピ・背景）と、参考を写さず応用・進化させる決まり。録画の分析 `scripts/vref.py` |
-| `td-stage-author` | 章のステージ・WAVE・敵・仲間の加入と会話（`js/td/stages.js`）。WAVE は `CBE.wavesOf` で 1 戦 4 体までに読み替え。足したら `node tools/cb_sim.js --tune` |
+| `td-stage-author` | 章のステージ・WAVE・敵・仲間の加入と会話（`js/td/stages.js`）。WAVE は `STG.wavesOf`（`js/battle/stage.js`）で 1 戦 4 体までに読み替え |
 | `rs-battle-flow` | ロマサガRS風の戦闘の流れと表示（HP/BP のタイミング・Critical/Weak・強化弱体・数字・区切り）。デモ `tools/battle_demo.js`・コマの一覧 `tools/frame_grid.py` |
 
 **PixelLab（MCP サーバー `pixellab`、AI のドット絵生成・アニメ・タイル・効果音。有料の回数制）**：クラウドでは環境「rpg-game」の起動スクリプトが `claude mcp add -s user -t http pixellab https://api.pixellab.ai/mcp` で登録し、API キーは環境のネットワークシークレット（api.pixellab.ai）からプロキシが付ける（キーをリポジトリに書かない）。手元の PC では `claude mcp add pixellab https://api.pixellab.ai/mcp -t http -H "Authorization: Bearer <キー>"`。使い方は `search_help`、残りの回数は `get_balance`。生成した絵はセレス案1・案2の絵柄（`assets_src/pixel-art/celes-48`・`celes-hd`）に合わせて手直ししてから取り込む。

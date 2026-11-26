@@ -6,7 +6,7 @@
  呼称（RS に合わせたもの）
   ・技（わざ）＝武器による物理の行動、術（じゅつ）＝魔法の行動。まとめて「技・術」
   ・BP（バトルポイント）＝技・術の消費。毎ターン回復する。通常攻撃は消費 0
-  ・威力ランク（E〜SSS）、ひらめき、技・術の練達（錬磨石で 3 段階）、LP（ライフポイント）
+  ・威力ランク（E〜SSS）、技・術の練達（錬磨石で 3 段階）、LP（ライフポイント）
   ・アビリティ（旧パッシブ）、陣形
   ・能力値：腕力・体力・器用さ・素早さ・知力・精神・魅力（7 種）／攻撃属性 8 種／武器種 8 種
  RS の固有の技名・キャラ・絵は使っていない（仕組みと呼び名だけを取り入れ、中身はこの作品のもの） */
@@ -103,7 +103,7 @@ function S(id,o){const sk={n:o.n,ty:o.ty||'技',k:o.k||'phys',el:o.el===undefine
  if(o.fx)sk.fx20=o.fx.map(f=>Object.assign({on:'t'},f));
  if(o.self)sk.self20=o.self;
  if(o.sup)sk.fx20=o.sup;
- for(const k of['delay','cond20','pierce20','drain','steal','purge20','heal20','cleanse20','taunt20','auto','prio','post','crit','ct20','fixedK','glim','ougi','hits','role','w','revive','selfPre'])if(o[k]!=null)sk[k]=o[k];
+ for(const k of['delay','cond20','pierce20','drain','steal','purge20','heal20','cleanse20','taunt20','auto','prio','post','crit','ct20','fixedK','ougi','hits','role','w','revive','selfPre'])if(o[k]!=null)sk[k]=o[k];
  if(sk.k==='sup20'&&!sk.role)sk.role=o.heal20?'heal':'buff';
  sk.d=o.d||descOf(sk);NEW[id]=sk;return sk;}
 const CONDN={brk:'HP半分以下の敵に威力1.5倍',debuff:'弱体1つにつき威力+25%（最大+75%）',lowhp:'自分のHPが減るほど威力上昇（最大+80%）',spd:'敵より速いほど威力上昇（最大+40%）',poison:'毒の敵に威力1.8倍',full:'HP満タンの敵に威力1.5倍'};
@@ -122,7 +122,7 @@ function descOf(s){const L=[];
 S('koujin',{n:'光刃',el:'陽',rk:'B',fx:[{k:'def',v:-15,t:2,p:.5}]});
 S('harai',{n:'斬り払い',el:'斬',rk:'C',t:'all',fx:[{k:'atk',v:-15,t:2,p:.3}]});
 S('kobu',{n:'鼓舞の灯',k:'sup20',t:'self',bp:6,heal20:.15,sup:[{on:'allies',k:'atk',v:15,t:3},{on:'allies',k:'mag',v:15,t:3}]});
-S('torirensan',{n:'灯火連斬',el:'陽',rk:'A',hits:3,cond20:'brk',crit:20,glim:{from:'koujin',lv:20,p:.1}});
+S('torirensan',{n:'灯火連斬',el:'陽',rk:'A',hits:3,cond20:'brk',crit:20});
 S('shiden',{n:'紫電一閃',el:'雷',rk:'S',prio:1,fx:[{k:'stun',v:1,t:1,p:.35}]});
 S('x_rio1',{n:'天灯星斬',el:'陽',rk:'SSS',selfPre:1,fx:[{k:'def',v:-25,t:3}],self:[{k:'atk',v:20,t:3}]});
 S('seikou',{n:'星光終天斬',el:'陽',pow:6,bp:0,ougi:1,post:[{on:'allies',k:'atk',v:20,t:3},{on:'allies',k:'mag',v:20,t:3}]});
@@ -130,7 +130,7 @@ S('seikou',{n:'星光終天斬',el:'陽',pow:6,bp:0,ougi:1,post:[{on:'allies',k:
 S('tateuchi',{n:'盾撃',el:'打',rk:'C',delay:35,fx:[{k:'stun',v:1,t:1,p:.3}]});
 S('chouhatsu',{n:'挑発',k:'sup20',t:'self',bp:3,taunt20:2,sup:[{on:'self',k:'def',v:30,t:2},{on:'self',k:'res',v:30,t:2}],role:'guard'});
 S('chiretsu',{n:'地裂斬',el:'打',rk:'A',fx:[{k:'def',v:-25,t:3,p:.6}]});
-S('saigan',{n:'砕岩撃',el:'打',rk:'B',t:'all',fx:[{k:'spd',v:-20,t:2,p:.4}],glim:{from:'tateuchi',lv:20,p:.1}});
+S('saigan',{n:'砕岩撃',el:'打',rk:'B',t:'all',fx:[{k:'spd',v:-20,t:2,p:.4}]});
 S('teppekikamae',{n:'鉄壁の構え',k:'sup20',t:'self',bp:6,taunt20:2,sup:[{on:'allies',k:'prot',v:20,t:2},{on:'self',k:'counter',v:1.2,t:3}],role:'guard'});
 S('x_gald1',{n:'天崩撃',el:'打',rk:'SSS',fx:[{k:'def',v:-30,t:3}],post:[{on:'allies',k:'prot',v:20,t:2}]});
 S('houkai',{n:'城壁崩し',el:'打',pow:1,t:'all',bp:0,ougi:1,fixedK:'store',d:'受け止めて蓄積した力（蓄積×0.9＋攻撃×3）を敵全体へ放つ。蓄積は0に戻る'});
@@ -138,7 +138,7 @@ S('houkai',{n:'城壁崩し',el:'打',pow:1,t:'all',bp:0,ougi:1,fixedK:'store',d
 S('fire',{n:'ファイア',ty:'術',k:'mag',el:'熱',rk:'B',fx:[{k:'poison',v:.04,t:3,p:.3}]});
 S('blizz',{n:'ブリザド',ty:'術',k:'mag',el:'冷',rk:'B',fx:[{k:'spd',v:-20,t:2,p:.4}]});
 S('flamewave',{n:'フレイムウェーブ',ty:'術',k:'mag',el:'熱',rk:'B',t:'all',fx:[{k:'res',v:-15,t:2,p:.3}]});
-S('prism',{n:'プリズム・ブランド',ty:'術',k:'mag',el:'熱',rk:'A',fx:[{k:'weak',el:'熱',t:3},{k:'weak',el:'冷',t:3}],glim:{from:'fire',lv:20,p:.1}});
+S('prism',{n:'プリズム・ブランド',ty:'術',k:'mag',el:'熱',rk:'A',fx:[{k:'weak',el:'熱',t:3},{k:'weak',el:'冷',t:3}]});
 S('meteor',{n:'メテオスウォーム',ty:'術',k:'mag',el:'熱',rk:'S',t:'all',hits:3,bp:11});
 S('x_mire2',{n:'アブソリュート・ゼロ',ty:'術',k:'mag',el:'冷',rk:'SSS',fx:[{k:'stun',v:1,t:1,p:.4}]});
 S('zettai',{n:'絶対零度の太陽',ty:'術',k:'mag',el:'冷',t:'all',pow:3.8,bp:0,ougi:1,post:[{on:'enemies',k:'res',v:-30,t:3}]});
@@ -146,7 +146,7 @@ S('zettai',{n:'絶対零度の太陽',ty:'術',k:'mag',el:'冷',t:'all',pow:3.8,
 S('shippu',{n:'疾風斬',el:'斬',rk:'C',prio:1,steal:1});
 S('kagenui',{n:'影縫い',el:'突',rk:'C',bp:4,delay:40,fx:[{k:'para',v:1,t:1,p:.35}]});
 S('dokujin',{n:'毒刃',el:'突',rk:'B',fx:[{k:'poison',v:.05,t:3,p:.75}]});
-S('genei',{n:'幻影乱舞',el:'斬',rk:'A',hits:4,cond20:'spd',glim:{from:'shippu',lv:20,p:.1}});
+S('genei',{n:'幻影乱舞',el:'斬',rk:'A',hits:4,cond20:'spd'});
 S('oborozuki',{n:'朧月',el:'斬',rk:'B',t:'all',self:[{k:'evade',v:25,t:2}]});
 S('x_shion1',{n:'瞬影千刃',el:'斬',rk:'SSS',hits:7,delay:30});
 S('ou_shion',{n:'影縫・千刃乱',el:'斬',pow:6,hits:6,bp:0,ougi:1,prio:1,fx:[{k:'stun',v:1,t:1,p:.5}]});
@@ -154,7 +154,7 @@ S('ou_shion',{n:'影縫・千刃乱',el:'斬',pow:6,hits:6,bp:0,ougi:1,prio:1,fx
 S('inori',{n:'祈り',ty:'術',k:'heal',t:'ally',pow:.35,bp:4,post:[{on:'t',k:'regen',v:.05,t:2}],role:'heal'});
 S('holy',{n:'ホーリー',ty:'術',k:'mag',el:'陽',rk:'B',fx:[{k:'mark',v:15,t:2,p:.4}]});
 S('mamori',{n:'守りの祈り',ty:'術',k:'sup20',t:'self',bp:6,sup:[{on:'allies',k:'prot',v:25,t:3}],role:'guard'});
-S('regene',{n:'リジェネレイト',ty:'術',k:'sup20',t:'self',bp:7,heal20:.2,cleanse20:1,sup:[{on:'allies',k:'regen',v:.08,t:3}],glim:{from:'inori',lv:20,p:.12}});
+S('regene',{n:'リジェネレイト',ty:'術',k:'sup20',t:'self',bp:7,heal20:.2,cleanse20:1,sup:[{on:'allies',k:'regen',v:.08,t:3}]});
 S('dispel',{n:'ディスペル・ライト',ty:'術',k:'mag',el:'陽',rk:'A',purge20:1});
 S('x_noah1',{n:'天使の福音',ty:'術',k:'sup20',t:'self',bp:12,heal20:.6,cleanse20:1,sup:[{on:'allies',k:'regen',v:.08,t:3}]});
 S('ou_noah',{n:'聖機の福音',ty:'術',k:'reviveAll',t:'self',bp:0,ougi:1,post:[{on:'allies',k:'prot',v:30,t:3}],d:'戦闘不能の味方を復活させ、味方全体のHPを40%回復／味方全体の被ダメ-30%(3T)'});
@@ -162,7 +162,7 @@ S('ou_noah',{n:'聖機の福音',ty:'術',k:'reviveAll',t:'self',bp:0,ougi:1,pos
 S('raiya',{n:'雷矢',el:'雷',rk:'B',fx:[{k:'para',v:1,t:1,p:.25}]});
 S('nerai',{n:'狙い撃ち',el:'突',rk:'A',pierce20:.3,crit:20});
 S('samidare',{n:'五月雨撃ち',el:'突',rk:'B',t:'all',hits:2});
-S('ashidome',{n:'足止めの矢',el:'突',rk:'B',bp:5,delay:30,fx:[{k:'spd',v:-30,t:3}],glim:{from:'raiya',lv:20,p:.1}});
+S('ashidome',{n:'足止めの矢',el:'突',rk:'B',bp:5,delay:30,fx:[{k:'spd',v:-30,t:3}]});
 S('kantsuu',{n:'貫通射',el:'突',rk:'S',pierce20:.5});
 S('x_erna1',{n:'天穿雷霆',el:'雷',rk:'SSS',pierce20:.5,fx:[{k:'stun',v:1,t:1,p:.3}]});
 S('ou_erna',{n:'天穿・神鳴',el:'雷',t:'all',pow:3.6,bp:0,ougi:1,fx:[{k:'stun',v:1,t:1,p:.4}]});
@@ -170,7 +170,7 @@ S('ou_erna',{n:'天穿・神鳴',el:'雷',t:'all',pow:3.6,bp:0,ougi:1,fx:[{k:'st
 S('tekkai',{n:'鉄塊落とし',el:'打',rk:'B',fx:[{k:'def',v:-15,t:2,p:.4}]});
 S('shuuri',{n:'鍛冶師の手入れ',k:'sup20',t:'self',bp:5,sup:[{on:'allies',k:'def',v:20,t:3},{on:'self',k:'atk',v:15,t:3}]});
 S('kaentanda',{n:'火炎鍛打',el:'熱',rk:'A',selfPre:1,self:[{k:'atk',v:20,t:3}],fx:[{k:'poison',v:.04,t:3,p:.3}]});
-S('daichiwari',{n:'大地割り',el:'打',rk:'B',t:'all',fx:[{k:'spd',v:-20,t:2,p:.5}],glim:{from:'tekkai',lv:20,p:.1}});
+S('daichiwari',{n:'大地割り',el:'打',rk:'B',t:'all',fx:[{k:'spd',v:-20,t:2,p:.5}]});
 S('gouen',{n:'業炎',el:'熱',rk:'A',t:'all'});
 S('x_balza1',{n:'灼熱の鉄槌',el:'熱',rk:'SSS',prio:-1,selfPre:1,self:[{k:'atk',v:30,t:3}]});
 S('youtetsu',{n:'溶鉄爆砕',el:'熱',t:'all',pow:3.6,bp:0,ougi:1,fx:[{k:'def',v:-30,t:3}]});
@@ -178,7 +178,7 @@ S('youtetsu',{n:'溶鉄爆砕',el:'熱',t:'all',pow:3.6,bp:0,ougi:1,fx:[{k:'def'
 S('noroi',{n:'呪い',ty:'術',k:'mag',el:'陰',rk:'B',fx:[{k:'poison',v:.05,t:3,p:.5}]});
 S('yaminami',{n:'闇波',ty:'術',k:'mag',el:'陰',rk:'C',t:'all',fx:[{k:'blind',v:1,t:2,p:.3}]});
 S('fushoku',{n:'腐食の呪い',ty:'術',k:'mag',el:'陰',rk:'C',bp:5,fx:[{k:'def',v:-25,t:3},{k:'res',v:-25,t:3}]});
-S('tamakurai',{n:'魂喰らい',ty:'術',k:'mag',el:'陰',rk:'A',drain:.4,cond20:'debuff',glim:{from:'noroi',lv:20,p:.1}});
+S('tamakurai',{n:'魂喰らい',ty:'術',k:'mag',el:'陰',rk:'A',drain:.4,cond20:'debuff'});
 S('shisen',{n:'死の宣告',ty:'術',k:'mag',el:'陰',rk:'S',bp:9,cond20:'poison'});
 S('x_crow1',{n:'冥王の審判',ty:'術',k:'mag',el:'陰',rk:'SS',t:'all',bp:12,fx:[{k:'poison',v:.06,t:3,p:.6}]});
 S('ou_crow',{n:'死経',ty:'術',k:'pct',t:'all',bp:0,ougi:1,d:'敵全体の今のHPの40%を削る（ボスは12%）。防御・耐性に左右されない'});
@@ -186,7 +186,7 @@ S('ou_crow',{n:'死経',ty:'術',k:'pct',t:'all',bp:0,ougi:1,d:'敵全体の今�
 S('shouken',{n:'掌底',el:'打',rk:'C',hits:2,fx:[{k:'def',v:-10,t:2,p:.3}]});
 S('hyouken',{n:'氷拳',el:'冷',rk:'B',fx:[{k:'spd',v:-15,t:2,p:.4}]});
 S('hyouketsu',{n:'氷結掌',el:'冷',rk:'A',fx:[{k:'stun',v:1,t:1,p:.35}]});
-S('hyakuretsu',{n:'百裂拳',el:'打',rk:'A',hits:6,bp:7,glim:{from:'shouken',lv:20,p:.1}});
+S('hyakuretsu',{n:'百裂拳',el:'打',rk:'A',hits:6,bp:7});
 S('tsurara',{n:'氷柱落とし',el:'冷',rk:'A',t:'all',bp:9});
 S('x_hakua1',{n:'氷華千連',el:'冷',rk:'SSS',hits:10});
 S('ranbu',{n:'氷華乱舞・終の型',k:'rhythm',el:'冷',t:'one',bp:0,ougi:1,d:'白い輪が青い輪に重なった瞬間にタップ。決まるほど連撃が伸びる（最大16連）。12連以上で敵を凍結'});
@@ -194,7 +194,7 @@ S('ranbu',{n:'氷華乱舞・終の型',k:'rhythm',el:'冷',t:'one',bp:0,ougi:1,
 S('tsume',{n:'爪撃',el:'斬',rk:'B',hits:2});
 S('popo',{n:'ポポ突撃',el:'打',rk:'B',hits:2,fx:[{k:'atk',v:-15,t:2,p:.5}]});
 S('kazekiri',{n:'風切り',el:'斬',rk:'B',t:'all'});
-S('kemonohoko',{n:'獣の咆哮',k:'sup20',t:'self',bp:6,sup:[{on:'allies',k:'atk',v:20,t:3},{on:'enemies',k:'def',v:-10,t:3}],glim:{from:'tsume',lv:20,p:.1}});
+S('kemonohoko',{n:'獣の咆哮',k:'sup20',t:'self',bp:6,sup:[{on:'allies',k:'atk',v:20,t:3},{on:'enemies',k:'def',v:-10,t:3}]});
 S('goga',{n:'剛牙',el:'斬',rk:'S'});
 S('x_jin2',{n:'ポポ・メテオ',el:'打',rk:'SSS',fx:[{k:'atk',v:-20,t:3}]});
 S('ou_jin',{n:'獣王撃',el:'斬',pow:6,bp:0,ougi:1,auto:EL8,d:'ポポと一つになった全力の一撃。敵の弱点の属性に変化する'});
@@ -202,7 +202,7 @@ S('ou_jin',{n:'獣王撃',el:'斬',pow:6,bp:0,ougi:1,auto:EL8,d:'ポポと一つ
 S('tokiya',{n:'刻の矢',ty:'術',k:'mag',el:'陰',rk:'B'});
 S('chien',{n:'遅延の砂',ty:'術',k:'mag',el:'陰',rk:'C',t:'all',delay:30,fx:[{k:'blind',v:1,t:2,p:.35}]});
 S('kasoku',{n:'加速の刻',ty:'術',k:'sup20',t:'self',bp:5,ct20:.3,sup:[{on:'allies',k:'spd',v:25,t:3}]});
-S('chronoslow',{n:'クロノスロウ',ty:'術',k:'mag',el:'陰',rk:'B',t:'all',fx:[{k:'spd',v:-25,t:3}],glim:{from:'tokiya',lv:20,p:.1}});
+S('chronoslow',{n:'クロノスロウ',ty:'術',k:'mag',el:'陰',rk:'B',t:'all',fx:[{k:'spd',v:-25,t:3}]});
 S('shuuen',{n:'終焉の針',ty:'術',k:'mag',el:'陰',rk:'S',bp:9});
 S('x_celes2',{n:'永劫の刻',ty:'術',k:'sup20',t:'self',bp:12,ct20:.5,sup:[{on:'allies',k:'spd',v:40,t:3},{on:'allies',k:'atk',v:20,t:3},{on:'allies',k:'mag',v:20,t:3}]});
 S('makimodoshi',{n:'巻き戻し',ty:'術',k:'rewind',t:'self',bp:0,ougi:1,d:'星臨した瞬間まで、味方全員のHP・戦闘不能を巻き戻す'});
@@ -210,11 +210,11 @@ S('makimodoshi',{n:'巻き戻し',ty:'術',k:'rewind',t:'self',bp:0,ougi:1,d:'�
 S('ryuuga',{n:'竜牙斬',el:'熱',rk:'B',fx:[{k:'poison',v:.04,t:3,p:.3}]});
 S('kokuen',{n:'黒炎薙ぎ',el:'陰',rk:'C',t:'all'});
 S('ryurinkamae',{n:'竜鱗の構え',k:'sup20',t:'self',bp:5,sup:[{on:'self',k:'shield',v:.22,t:99},{on:'self',k:'counter',v:1,t:3}],role:'guard'});
-S('ryuumetsu',{n:'竜滅斬',el:'斬',rk:'S',glim:{from:'ryuuga',lv:20,p:.1}});
+S('ryuumetsu',{n:'竜滅斬',el:'斬',rk:'S'});
 S('gouka',{n:'劫火',el:'熱',rk:'A',t:'all',fx:[{k:'poison',v:.04,t:3,p:.4}]});
 S('x_valk2',{n:'黒竜断',el:'陰',rk:'SSS',drain:.2});
 S('gokuvalk',{n:'終焉竜咆',el:'熱',t:'all',pow:3.8,bp:0,ougi:1});
-/* キャラごとの技・術の習得（lv：レベル／glim：ひらめき／board：星盤／board2：天星盤） */
+/* キャラごとの技・術の習得の元データ（6 つ）。下の統合で 4 つ（Lv1・Lv1・Lv10・星盤）になる */
 const LEARN={
  rio:  [['koujin','lv',1],['harai','lv',1],['kobu','lv',10],['torirensan','glim',20],['shiden','board'],['x_rio1','board2']],
  gald: [['tateuchi','lv',1],['chouhatsu','lv',1],['chiretsu','lv',10],['saigan','glim',20],['teppekikamae','board'],['x_gald1','board2']],
@@ -228,6 +228,18 @@ const LEARN={
  jin:  [['tsume','lv',1],['popo','lv',1],['kazekiri','lv',10],['kemonohoko','glim',20],['goga','board'],['x_jin2','board2']],
  celes:[['tokiya','lv',1],['chien','lv',1],['kasoku','lv',10],['chronoslow','glim',20],['shuuen','board'],['x_celes2','board2']],
  valk: [['ryuuga','lv',1],['kokuen','lv',1],['ryurinkamae','lv',10],['ryuumetsu','glim',20],['gouka','board'],['x_valk2','board2']]};
+
+/* ver0.64：技・術は 1 人 4 つ。Lv10 の技＋旧ひらめきの技、星盤の技＋天星盤の技をそれぞれ 1 つに統合（ひらめきは廃止）。
+ 名前と鍵はランクの高い方（同じなら先の方）。ランクは高い方・全体／連撃は強い方・状態異常／強化／回復などの効果は両方を合わせる。
+ 覚え方：Lv1・Lv1・Lv10・星盤 */
+(()=>{const ri=r=>r?RANKS.indexOf(r):-1,cat=(x,y)=>[...(x||[]),...(y||[])],atk=s=>s.k==='phys'||s.k==='mag';
+ const merge=(a,b)=>{const A=NEW[a],B=NEW[b];if(!A||!B)return a;const kk=ri(B.rk)>ri(A.rk)?b:a,base=!atk(A)&&atk(B)?B:A,o=Object.assign({},base,{n:NEW[kk].n});
+  if(ri(B.rk)>ri(o.rk))o.rk=B.rk;if(A.t==='all'||B.t==='all')o.t='all';o.hits=Math.max(A.hits||1,B.hits||1);if(o.hits<2)delete o.hits;
+  o.fx20=cat(A.fx20,B.fx20);o.self20=cat(A.self20,B.self20);o.post=cat(A.post,B.post);
+  for(const k of['delay','pierce20','drain','heal20','cleanse20','taunt20','purge20','crit','ct20'])if(A[k]!=null||B[k]!=null)o[k]=Math.max(A[k]||0,B[k]||0);
+  if(atk(o)&&o.rk){let p=RANK[o.rk];if(o.t==='all')p*=.62;if(o.hits>1)p=p/o.hits*1.08;o.pow=+p.toFixed(3);}o.bp=Math.max(A.bp||0,B.bp||0);
+  for(const k of['fx20','self20','post'])if(!o[k].length)delete o[k];o.d=descOf(o);NEW[kk]=o;delete NEW[kk===a?b:a];return kk;};
+ for(const id in LEARN){const L=LEARN[id];if(L.length<6)continue;const k3=merge(L[2][0],L[3][0]),k4=merge(L[4][0],L[5][0]);LEARN[id]=[L[0],L[1],[k3,'lv',10],[k4,'board']];}})();
 
 /* アビリティ（AB・ABL）は js/rs/abilities.js（ver0.45：3 段階＋Ⅲの固有名の特殊効果） */
 const ABL=[1,25,50],AB={};
@@ -251,29 +263,7 @@ const AWX={
  valk:{n:'竜血星臨',ou:'gokuvalk',note:['与ダメ1.5倍'],fx:[{t:'cut',c:'el:熱|陰',v:50},{t:'drain',v:10},{t:'counter',v:.4,pw:1.5}]}};
 const AW_TURNS=3;
 
-/* ==================== 陣形 ====================
- 編成の並び順（1〜4 番目）ごとに「立ち位置」と「能力の補正」が決まる。立ち位置はそのまま戦闘の配置になる。
- p：立ち位置［x, y］（x：0＝前列（敵に近い）〜1＝後列、y：0＝上〜1＝下）
- s：並び順ごとの効果（st7＝能力値+%、taunt＝狙われやすい、bp0＝初期BP、bpr＝毎ターンのBP回復、cut＝被ダメ-%） */
-const st7=(k,v)=>({t:'st7',k,v});
-const FORM={
- seikan:{n:'星環の陣',d:'攻守の整った基本の陣形',
-  p:[[0,.5],[.5,.12],[.5,.88],[1,.5]],
-  s:[[st7('vit',10)],[st7('agi',10)],[st7('wil',10)],[st7('int',10),{t:'bp0',v:1}]]},
- tenkyu:{n:'天穹の陣',d:'前の2人で攻め、後ろの2人が術で続く',
-  p:[[0,.22],[0,.78],[1,.05],[1,.95]],
-  s:[[st7('str',15),{t:'taunt',v:1}],[st7('str',15),{t:'taunt',v:1}],[st7('int',15)],[st7('int',15)]]},
- jousai:{n:'城塞の陣',d:'先頭が敵を引きつけ、残りを守る',
-  p:[[0,.5],[.85,.08],[1,.5],[.85,.92]],
-  s:[[st7('vit',30),{t:'taunt',v:4}],[st7('wil',10)],[st7('wil',10)],[st7('vit',10)]]},
- shippu:{n:'疾風の陣',d:'全員が素早く動く速攻の陣形',
-  p:[[0,0],[.33,.33],[.66,.66],[1,1]],
-  s:[0,1,2,3].map(()=>[st7('agi',20),{t:'bp0',v:1},st7('vit',-10)])},
- kakuyoku:{n:'鶴翼の陣',d:'翼の2人は命中が上がり、中の2人は術が強まる',
-  p:[[0,0],[.75,.33],[.75,.67],[0,1]],
-  s:[[st7('dex',15)],[st7('int',15)],[st7('int',15)],[st7('dex',15)]]},
- shukusei:{n:'祝星の陣',d:'回復と BP を支える陣形',
-  p:[[.15,.15],[.85,.35],[.15,.65],[.85,.88]],
-  s:[[st7('vit',10)],[st7('cha',20),{t:'bpr',v:1}],[st7('cha',20),{t:'bpr',v:1}],[st7('wil',10)]]}};
+/* ver0.64：陣形は廃止。立ち位置（並び順 1〜4 の［x：0＝前列〜1＝後列, y：0＝上〜1＝下］）だけ残し、能力の補正は無し */
+const FORM={seikan:{n:'',p:[[0,.5],[.5,.12],[.5,.88],[1,.5]],s:[[],[],[],[]]}};
 
 return{LP_FIX,EL8,WPN,WPNS,ST7,ST7N,ST7S,ST7D,HERO,BP,RANK,RANKS,RBP,PROF,HPLP,TGT,NEW,LEARN,ABL,AB,AWX,AW_TURNS,FORM,fxTxt,descOf};})();
