@@ -1,0 +1,25 @@
+/* ===== 戦闘の強化・弱体のアイコンと専用のタブ（js/ui/battle-status.js・BST） ===== */
+#bst{position:absolute;inset:0;pointer-events:none;z-index:6}
+#bst .bst-row{position:absolute;left:0;top:0;display:flex;gap:1px;padding:2px;border:0;background:rgba(7,7,26,.55);border-radius:var(--tk-r);pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#bst .bst-row em{font:italic 800 10px/14px "Barlow Semi Condensed",sans-serif;color:var(--tk-ink-2);margin-left:1px}
+.bst-i{position:relative;display:inline-grid;place-items:center;width:15px;height:15px;border-radius:2px;font-style:normal;box-shadow:0 0 0 1px var(--tk-shade)}
+.bst-i b{font:800 10px/1 var(--tk-font);color:#fff}
+.bst-i u{position:absolute;right:-2px;bottom:-3px;font:900 8px/1 var(--tk-font);text-decoration:none;text-shadow:0 0 2px #000}
+.bst-i.bu{background:#2f6fd0}.bst-i.bu u{color:#9fe8ff}
+.bst-i.de{background:#b8322a}.bst-i.de u{color:#ffb0a0}
+.bst-i.ai{background:#7a3ac8}
+.bst-i.big{width:24px;height:24px}.bst-i.big b{font-size:14px}.bst-i.big u{font-size:11px}
+#bst-ov{position:fixed;inset:0;z-index:960;display:flex;align-items:flex-end;justify-content:center;background:rgba(7,7,26,.6)}
+#bst-ov.hide{display:none}
+#bst-ov .bst-p{width:min(420px,100%);max-height:70vh;display:flex;flex-direction:column;background:var(--tk-night-2);box-shadow:var(--tk-frame);border-radius:var(--tk-r) var(--tk-r) 0 0;color:var(--tk-ink)}
+#bst-ov nav{display:flex;gap:6px;padding:8px}
+#bst-ov nav button{flex:1;height:36px;border:0;border-radius:var(--tk-r);background:transparent;color:var(--tk-ink-2);box-shadow:0 0 0 1px var(--tk-void);font-family:var(--tk-disp);font-size:var(--tk-fs-m)}
+#bst-ov nav button.on{background:var(--tk-night-3);color:var(--tk-ink);box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp)}
+#bst-ov nav button.x{flex:none;width:36px;font-size:18px}
+#bst-ov .bst-b{overflow-y:auto;padding:0 10px 12px}
+#bst-ov section{padding:6px 0;border-top:1px solid var(--tk-line)}#bst-ov section.none{opacity:.45}
+#bst-ov h4{margin:0 0 4px;font-family:var(--tk-disp);font-size:var(--tk-fs-m)}
+#bst-ov ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+#bst-ov li{display:flex;align-items:center;gap:8px;font-size:var(--tk-fs-s)}
+#bst-ov li span{flex:1}#bst-ov li b.up{color:#9fe8ff}#bst-ov li b.dn{color:#ffb0a0}
+#bst-ov li small{font:italic 800 14px "Barlow Semi Condensed",sans-serif;color:var(--tk-ink-2)}

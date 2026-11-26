@@ -1,5 +1,5 @@
 /* ===== ver0.38 戦闘画面 =====
- 1. 配置：敵は左・味方は右で向き合う。味方の立ち位置は編成の陣形（RSD.FORM の p）どおり。戦闘画面に陣形名は出さない
+ 1. 配置：敵は左・味方は右で向き合い、それぞれ縦一列（ver0.65）
  2. 画面を広く：戦場は画面の高さいっぱい。上は細い帯（ターン・対象・弱点／耐性・速度・メニュー）、下は AUTO の帯だけ
     （行動順のアイコンは ver0.39 で削除）
  3. コマンド入力中は「戦場ごと上へスライド」して、下半分にコマンド欄を出す（ロマサガRS の見せ方）。
@@ -25,14 +25,14 @@ let GEO=null;
 HK23.hudPx=()=>{GEO=geo();app.style.setProperty('--p38',GEO.pan+'px');app.style.setProperty('--sl38',-GEO.slide+'px');return Math.round(GEO.bandTop-6);};
 HK23.botPx=()=>{const g=GEO||geo();return Math.round(g.sh-g.bandBot-3);};
 
-/* ==================== 2. 味方：陣形どおりに並べる ==================== */
+/* ==================== 2. 味方：右側に縦一列（ver0.65。少し千鳥・右端から吹き出しの分だけ離す） ==================== */
 function heroK(h,k){const A=ANIM.setup(h);if(!A||A.none)return;if(A._key25!==A.key||A._sc0==null){A._key25=A.key;A._sc0=A.sc;}h._k25=k;const s=A._sc0*k;if(Math.abs(A.sc-s)>1e-6)A.sc=s;}
 let SLOT=[],KH=1;
 HK23.placeHeroes=(hs,LY)=>{hs.forEach(h=>heroK(h,1));let ww=0,hh=0;hs.forEach(h=>{const Dm=V19.dims(h);ww=Math.max(ww,Dm.w);hh=Math.max(hh,Dm.h);});
- const band=LY.bot-LY.top,k=clamp(Math.min(V23.appW()*.15/(hh*SC),(band*.46)/hh),.66,1.4)/* ver0.41：味方を一回り大きく（最小サイズの絵に張り付くと、背丈の補正が効かず一部のキャラが小さく見えた） */;KH=k;hs.forEach(h=>heroK(h,k));ww*=k;hh*=k;
- const xF=W*.6+ww*.5,xB=W-4-ww*.55,f=C.formOf();SLOT=[];
- hs.forEach((h,i)=>{const[px,py]=C.formPos(i,f),fx=xF+(xB-xF)*px,fy=LY.top+hh+(band-hh)*py;SLOT[i]=[fx,fy];h.x=fx-8*h.sc;h.y=Math.round(fy-16*h.sc+2);h._fx23=fx;});
- LY.heroL=Math.min(...hs.map(h=>h._fx23))-ww/2-10;};
+ const n=hs.length,band=LY.bot-LY.top,k=clamp(Math.min(V23.appW()*.15/(hh*SC),(band*(n>2?.36:.46))/hh),.6,1.35);KH=k;hs.forEach(h=>heroK(h,k));ww*=k;hh*=k;
+ const xC=W-Math.max(ww*.5+8,32);SLOT=[];
+ hs.forEach((h,i)=>{const fx=xC+(n>1?(i%2?-7:3):0),fy=LY.top+hh+(band-hh)*(n>1?i/(n-1):.5);SLOT[i]=[fx,fy];h.x=fx-8*h.sc;h.y=Math.round(fy-16*h.sc+2);h._fx23=fx;});
+ LY.heroL=xC-7-ww/2-12;};
 /* 交代で入った味方：同じ大きさ・同じ持ち場に */
 function fitNew(){if(!inB())return;B.heroes.forEach((h,i)=>{if(h._k25)return;heroK(h,KH);const sl=SLOT[i];if(sl&&!(h.A&&h.A.mv)){h.x=sl[0]-8*h.sc;h.y=Math.round(sl[1]-16*h.sc+2);h._fx23=sl[0];}});}
 

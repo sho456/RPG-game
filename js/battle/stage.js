@@ -5,7 +5,11 @@
  星：勝利・誰も倒れない・規定ターン以内。 */
 'use strict';
 const STG=(()=>{
-let R=null;
+let R=null,LAST=null;
+/* 難易度：ステージごとの敵の Lv の増減（tools/stage_sim.js で推奨 Lv・AUTO の勝ち負けを見て決める） */
+/* ボスは Lv に関係なく固定の強さなので、ステージごとに［HP の倍率, 攻撃・魔力の倍率］ */
+const TUNEB={td3_2:[.8,.6],td3_6:[.7,.7],td4_3:[.65,.7]};
+const TUNE={td1_1:1,td1_2:1,td1_3:1,td1_4:1,td1_5:1,td2_1:2,td2_2:2,td2_3:2,td2_4:0,td3_1:2,td3_2:-2,td3_3:2,td3_4:1,td3_5:2,td3_6:-2,td4_1:-1,td4_2:2,td4_3:-3,td4_4:0,td4_5:1,td4_6:2,td5_1:3,td5_2:2,td5_3:0};
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const isBoss=k=>{const e=ED[k];return!!(e&&(e.boss||k==='ernaE'||k==='valkE'));};
 function wavesOf(S){return S.waves.map(w=>{const L=[];for(const[k,n]of w.e){if(!ED[k])continue;const b=isBoss(k),c=b?1:Math.max(1,Math.round(n/3));for(let i=0;i<c;i++)L.push({k,b});}
@@ -17,16 +21,17 @@ function run(id,party){const S=TDD.STAGE[id];if(!S)return;
  G.party=party.slice(0,4);for(const p of G.party)if(G.h[p])G.h[p].lp=null;healAll();
  R={id,S,wave:0,waves:S.inf?[]:wavesOf(S),turns:0,fell:0};R.par=S.inf?999:R.waves.length*3+(S.boss?4:1);
  try{save();}catch(e){}wave();}
-function wave(){const S=R.S,i=R.wave,ks=S.inf?infWave(S,i):R.waves[i];if(S.inf)R.waves[i]=ks;const lv=S.lv+(S.inf?i*2:0);
- const list=ks.map(k=>({kind:k,lv}));
- startBattle(list,{boss:ks.some(isBoss),theme:TH[S.th]||'ash',quest:true,stg:1,stageLv:lv});}
+function wave(){const S=R.S,i=R.wave,ks=S.inf?infWave(S,i):R.waves[i];if(S.inf)R.waves[i]=ks;const lv=Math.max(1,S.lv+(TUNE[R.id]||0)+(S.inf?i*2:0));
+ const list=ks.map(k=>({kind:k,lv:(k==='ernaE'||k==='valkE')?1:lv}));/* ライバル（ED では boss でない）も Lv で伸ばさない */
+ startBattle(list,{boss:ks.some(isBoss),theme:TH[S.th]||'ash',quest:true,stg:1,stageLv:lv});
+ const T=TUNEB[R.id];if(T&&B)for(const e of B.enemies)if(isBoss(e.kind)){e.mhp=e.hp=Math.round(e.mhp*T[0]);for(const k of['atk','mag'])if(e[k])e[k]=Math.round(e[k]*T[1]);}}
 /* 旧戦闘の終わり：ステージのときは WAVE を続けるか結果へ */
 {const _e=end;end=async function(win){if(!(R&&B&&B.opts&&B.opts.stg))return _e(win);
- B.over=true;$('#cmd').innerHTML='';R.turns+=B.turn||0;
+ B.over=true;$('#cmd').innerHTML='';R.turns+=(B.rs&&B.rs.round)||B.turns||0;
  for(const h of B.heroes){const s=G.h[h.id];if(!s)continue;if(!h.alive||h.hp<=0)R.fell++;s.hp=Math.max(h.hp,Math.ceil(h.mhp*.2));if(h.lp!=null)s.lp=h.lp;}
  if(win&&(R.S.inf||R.wave+1<R.waves.length)){R.wave++;try{save();}catch(e){}await wait(500);return wave();}
  finish(win);};}
-function finish(win){const id=R.id,S=R.S,o={win,stars:[win?1:0,win&&!R.fell?1:0,win&&R.turns<=R.par?1:0],wave:R.wave};
+function finish(win){const id=R.id,S=R.S,o={win,stars:[win?1:0,win&&!R.fell?1:0,win&&R.turns<=R.par?1:0],wave:R.wave};LAST={win,stars:o.stars.reduce((a,b)=>a+b,0),fell:R.fell,turns:R.turns,par:R.par,wave:R.wave};
  for(const p of G.party)if(G.h[p]){G.h[p].hp=null;G.h[p].lp=null;}
  let Q={rw:{xp:0,gold:0},first:false,chips:''};try{Q=TDM.settle(id,{over:o});}catch(e){console.error(e);}
  const ov=$('#ov');ov.className='';ov.classList.remove('hide');
@@ -51,4 +56,4 @@ function tdBg(th){const key=th+'|'+H;if(BGC[key])return BGC[key];const kk=.7*H/(
  g.setTransform(1,0,0,1,0,0);g.fillStyle='rgba(7,7,26,.12)';g.fillRect(0,0,W,H);return BGC[key]=c;}
 {const _mb=makeBg;makeBg=function(th,boss){if(scene==='battle'&&R&&typeof TDBG!=='undefined'){try{return tdBg(R.S.th||'ash');}catch(e){console.error(e);}}return _mb(th,boss);};}
 function hide(){/* 旧戦闘の画面はホーム・地図が上書きする */}
-return{run,hide,wavesOf,get cur(){return R;}};})();
+return{run,hide,wavesOf,TUNE,get cur(){return R;},get last(){return LAST;}};})();

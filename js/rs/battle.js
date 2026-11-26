@@ -253,7 +253,7 @@ async function heroExec(u,c){if(!c||!c.sk)return;try{BPOP.cut();}catch(x){}/* �
  /* 回復術の LP 消費は ver0.46f で廃止 */
  const s2=prep(u,sk,t);
  B.rs.cur={u,sk:s2,mul:prof,hitSet:new Set(),weak:false};
- if(sk.ougi){u._rsOugi=1;banner('奥義',`${u.name}「${sk.n}」`,'ougi');B.flashBg=24;B.flashCol='#fff3b0';try{SFX.aw();}catch(e){}await wait(650);}
+ if(sk.ougi){u._rsOugi=1;/* 見出しは js/battle/showcase.js のカットイン */if(typeof SHOW!=='undefined')await SHOW.cut('ou',u,sk.n,'奥義',1900);B.flashBg=24;B.flashCol='#fff3b0';await wait(260);}
  /* 回復術で気絶した仲間を復活させる（LP が 1 以上） */
  let revived=null;if(heal1&&t&&!t.alive&&(t.lp||0)>0){t.alive=true;t.hp=0;revived=t;setTimeout(()=>{try{pop(t,'REVIVE','#7dffa8',true);}catch(e){}},200);}
  const hp0=B.heroes.map(h=>h.hp);

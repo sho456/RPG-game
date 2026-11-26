@@ -1,0 +1,26 @@
+/* ===== 星臨・奥義のカットイン（js/battle/showcase.js・SHOW）。--d＝全体の長さ ===== */
+#show{position:fixed;inset:0;z-index:940;pointer-events:none;display:none;overflow:hidden;--d:1500ms}
+#show.on{display:block}
+#show .sh-dim{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,rgba(7,7,26,.55),rgba(5,4,14,.92));animation:shFade var(--d) ease both}
+#show .sh-flash{position:absolute;inset:0;background:#fff;opacity:0}
+#show.ou .sh-flash{animation:shFlash calc(var(--d)*.3) ease-out both}
+#show .sh-band{position:absolute;left:-10%;right:-10%;top:34%;height:30%;transform:skewY(-9deg) translateX(110%);animation:shBand var(--d) cubic-bezier(.2,.9,.2,1) both}
+#show.aw .sh-band.b1{background:linear-gradient(90deg,rgba(60,120,255,0),rgba(90,150,255,.55) 20%,rgba(210,230,255,.75) 50%,rgba(90,150,255,.55) 80%,rgba(60,120,255,0));box-shadow:0 0 30px rgba(140,190,255,.7)}
+#show.ou .sh-band.b1{background:linear-gradient(90deg,rgba(242,179,71,0),rgba(242,179,71,.85) 18%,rgba(255,240,184,.95) 50%,rgba(242,179,71,.85) 82%,rgba(242,179,71,0));box-shadow:0 0 36px var(--tk-lamp)}
+#show .sh-band.b2{top:31%;height:2px;background:#fff;animation-delay:calc(var(--d)*.06)}
+#show.ou .sh-band.b2{top:66%;height:6px;background:var(--tk-lamp-deep)}
+#show .sh-stars{position:absolute;inset:0;background-image:radial-gradient(2px 2px at 20% 30%,#fff,transparent),radial-gradient(2px 2px at 70% 60%,#fff,transparent),radial-gradient(1.5px 1.5px at 40% 75%,#cfe4ff,transparent),radial-gradient(1.5px 1.5px at 85% 25%,#fff4c8,transparent),radial-gradient(2px 2px at 55% 15%,#fff,transparent);background-size:180px 180px;opacity:0;animation:shStars var(--d) linear both}
+#show .sh-art{position:absolute;right:-4%;top:22%;height:46%;image-rendering:pixelated;filter:drop-shadow(0 0 10px rgba(255,255,255,.75)) drop-shadow(0 0 22px rgba(140,190,255,.6));transform:translateX(70%);opacity:0;animation:shArt var(--d) cubic-bezier(.2,.9,.2,1) both}
+#show.ou .sh-art{filter:drop-shadow(0 0 10px #fff) drop-shadow(0 0 26px var(--tk-lamp))}
+#show .sh-tt{position:absolute;left:6%;top:43%;display:flex;flex-direction:column;align-items:flex-start;gap:2px;opacity:0;animation:shTt var(--d) ease both}
+#show .sh-tt small{font-family:var(--tk-disp);font-size:var(--tk-fs-m);letter-spacing:.5em;color:#cfe4ff;text-shadow:0 0 6px #000}
+#show.ou .sh-tt small{color:var(--tk-star)}
+#show .sh-tt b{font:400 40px/1.05 "Yuji Boku","Kaisei Tokumin",serif;color:#fff;-webkit-text-stroke:1px #07071a;text-shadow:0 0 12px rgba(140,190,255,.9),0 3px 0 #07071a;max-width:72vw}
+#show.ou .sh-tt b{font-size:46px;color:#fff6d8;text-shadow:0 0 14px var(--tk-lamp),0 0 2px #fff,0 3px 0 #3a2208}
+#show .sh-tt em{font:700 var(--tk-fs-s) var(--tk-disp);font-style:normal;color:var(--tk-ink-2)}
+@keyframes shFade{0%{opacity:0}12%{opacity:1}85%{opacity:1}100%{opacity:0}}
+@keyframes shFlash{0%{opacity:.95}100%{opacity:0}}
+@keyframes shBand{0%{transform:skewY(-9deg) translateX(110%)}14%{transform:skewY(-9deg) translateX(0)}84%{transform:skewY(-9deg) translateX(-3%);opacity:1}100%{transform:skewY(-9deg) translateX(-110%);opacity:0}}
+@keyframes shArt{0%{transform:translateX(70%);opacity:0}18%{transform:translateX(0);opacity:1}82%{transform:translateX(-6%);opacity:1}100%{transform:translateX(-30%);opacity:0}}
+@keyframes shTt{0%{opacity:0;transform:translateX(-20px)}22%{opacity:1;transform:none}84%{opacity:1}100%{opacity:0}}
+@keyframes shStars{0%{opacity:0;background-position:0 0}20%{opacity:.9}100%{opacity:0;background-position:-260px 60px}}
