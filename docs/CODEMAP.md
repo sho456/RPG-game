@@ -119,9 +119,9 @@
 | 113 | `js/td/menu.js` | 14 | TD の章の地図・出撃準備・会話・仲間の加入（TDM）。戦闘画面は js/td/view.js（TD） | TDM |
 | 114 | `js/battle/stage.js` | 6 | 章のステージを ver0.49 のロマサガRS風の戦闘で戦う（STG。ver0.63 でコマンド戦闘 js/cb/* を置き換えた正本） | STG |
 | 115 | `js/battle/celes.js` | 4 | 旧戦闘（ver0.49 のロマサガRS風）でセレスだけを今のコマ送りと演出で描く橋（CEL。ver0.63） | CEL |
-| 116 | `js/ui/battle-status.js` | 4 | 戦闘の強化・弱体のアイコン（BST。ver0.66 の正本） | BST |
-| 117 | `js/battle/showcase.js` | 1 | 星臨と奥義の見せ場のカットイン（SHOW。ver0.65 の正本） | SHOW |
-| 118 | `js/battle/hd2d.js` | 9 | 戦闘の 2D-HD の見た目と、技・術・星臨・奥義の注目画面（HD。ver0.66 の正本） | HD |
+| 116 | `js/ui/battle-status.js` | 3 | 戦闘の強化・弱体のアイコン（BST。ver0.66 の正本） | BST |
+| 117 | `js/battle/showcase.js` | 2 | 星臨と奥義の見せ場のカットイン（SHOW。ver0.65 の正本） | SHOW |
+| 118 | `js/battle/hd2d.js` | 14 | 戦闘の 2D-HD の見た目と、技・術・星臨・奥義の注目画面（HD。ver0.66 の正本） | HD |
 | 119 | `js/ui/home.js` | 4 | ホーム画面（灯都ルミナス）の正本：「出撃」（コマンド戦闘のステージ）を主役にした重ね表示 | HOME |
 | 120 | `js/ui/unit.js` | 12 | 仲間の画面（UNIT）：一覧＋1 人の詳細（ver0.60 からコマンド戦闘の能力）。Lv・技 5 つ・奥義・アビリティ 3 つ・装備・星盤をここにまとめる | UNIT |
 | 121 | `js/ui/zukan.js` | 3 | 図鑑の一覧（ZKUI）：敵・仲間・装備の全画面の一覧。ver0.54 新規 | ZKUI |
@@ -153,6 +153,7 @@
 | `row` | ver17.js → v22.js → v24-text.js → zukan/zukan.js → data/resist.js → ui/battle-status.js → ui/unit.js |
 | `step` | ch7.js → v20-ui.js → v24.js → td/fxkit.js → td/fx.js → td/menu.js → battle/hd2d.js |
 | `add` | motion/fx19.js → data/terms.js → motion/registry.js → battle/core.js → ui/growth.js → td/fx.js |
+| `art` | ver17.js → ver18-art.js → ver19-art.js → sprite/spx.js → battle/showcase.js → battle/hd2d.js |
 | `boardMenu` | items.js → ver17.js → v21.js → v31/board.js → rs/core.js → ui/board.js |
 | `charHTML` | ver17.js → v20-ui.js → v22.js → v31/core.js → v31/board.js → rs/ui.js |
 | `keyOf` | sprite/legacy/dot-rig.js → ver19.js → v21-items.js → v31/items.js → battle/seq.js → rs/core.js |
@@ -160,7 +161,6 @@
 | `onClick` | battle/viewer.js → ui/growth.js → td/menu.js → ui/unit.js → ui/zukan.js → ui/dev.js |
 | `panel` | town.js → ver18-town.js → v20-ui.js → v22.js → battle/viewer.js → ui/battle-pop.js |
 | `stats` | engine.js → v31/core.js → v31/items.js → rs/core.js → data/equip7.js → ui/unit.js |
-| `art` | ver17.js → ver18-art.js → ver19-art.js → sprite/spx.js → battle/showcase.js |
 | `autoPick` | engine.js → ch8.js → ver17.js → v20-battle.js → rs/battle.js |
 | `cap` | sprite/legacy/dot-rig.js → battle/seq.js → battle/viewer.js → ui/inv.js → ui/growth.js |
 | `enemy` | engine.js → v31/enemies.js → v32.js → battle/size.js → v38/core.js |
@@ -173,6 +173,7 @@
 | `openSheet` | ch3.js → ver17.js → v22.js → rs/ui.js → ui/party.js |
 | `pick` | ver17.js → v31/items.js → battle/seq.js → td/uanim.js → battle/stage.js |
 | `put` | ver16.js → items/icons36.js → rs/battle.js → td/uanim.js → ui/battle-status.js |
+| `run` | engine.js → battle/prim.js → td/menu.js → battle/stage.js → battle/hd2d.js |
 | `addLoot` | items.js → ch9.js → ver17.js → v20-ui.js |
 | `bbar` | ver17.js → v22.js → v25.js → rs/ui.js |
 | `board` | town.js → ver18-town.js → v22.js → ui/party.js |
@@ -188,7 +189,6 @@
 | `play` | motion/registry.js → battle/seq.js → battle/viewer.js → td/sfx.js |
 | `reset` | ui/battle-pop.js → td/fxkit.js → td/fx-celes-ult.js → td/fx.js |
 | `ring` | motion/fx19.js → v21-art.js → td/sfx.js → td/fxkit.js |
-| `run` | engine.js → battle/prim.js → td/menu.js → battle/stage.js |
 | `skillList` | items.js → v20-battle.js → v31/board.js → rs/core.js |
 | `sparks` | v21-items.js → battle/prim.js → td/fxkit.js → td/fx.js |
 | `tick` | motion/anim.js → v25.js → ui/battle-pop.js → ui/battle-status.js |
@@ -209,6 +209,7 @@
 | `finish` | ver19.js → items/icons36.js → battle/stage.js |
 | `formation` | town.js → ver17.js → v22.js |
 | `gainXP` | engine.js → v31/core.js → ui/growth.js |
+| `gather` | motion/fx19.js → battle/prim.js → battle/hd2d.js |
 | `hash` | ver19.js → td/fx.js → td/skicon.js |
 | `hex` | v24-text.js → sprite/spx.js → items/icons36.js |
 | `itemIcon` | ch3.js → v21-art.js → v31/items.js |
@@ -294,7 +295,6 @@
 | `flame` | sprite/legacy/px-enemy.js → battle/prim.js |
 | `flask` | ver18-art.js → v21-art.js |
 | `fuQ` | v20-battle.js → v31/board.js |
-| `gather` | motion/fx19.js → battle/prim.js |
 | `glow` | td/bg.js → td/fxkit.js |
 | `hand` | sprite/legacy/px-enemy.js → td/fx-celes.js |
 | `healAll` | field.js → v38/core.js |

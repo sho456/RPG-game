@@ -20,4 +20,4 @@
 #app.fc66 #bt22 .b22tg,#app.fc66 #bt22 .b22ord,#app.fc66 #hl24{opacity:0;transition:opacity .25s;pointer-events:none}
 #app #bt22 .b22tg,#app #bt22 .b22ord{transition:opacity .35s}
 /* カメラの寄り（transform は hd2d.js が付ける） */
-#app[data-sc="battle"] #cv,#app[data-sc="battle"] #bp46{transition:transform .45s cubic-bezier(.2,.7,.2,1)}
+#app[data-sc="battle"] #cv,#app[data-sc="battle"] #bp46,#app[data-sc="battle"] #pops,#app[data-sc="battle"] #labels{transition:transform .45s cubic-bezier(.2,.7,.2,1)}

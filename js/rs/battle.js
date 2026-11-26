@@ -324,6 +324,8 @@ run=async function(){if(!B)return;if(B.opts&&B.opts.viewer)return oldRun();const
     const snap=ctSnap();B.cur=u;refresh();
     if(u.side===0)await heroExec(u,it.c);else await enemyExec(u);
     if(B!==myB||B.over)return;B.cur=null;ctApply(snap,u,q);lpGuard();refresh();
+    /* 行動の区切り（ver0.66）：数字・表示を消して、次の行動まで一拍おく */
+    await wait(speed<=1?320:140);try{BPOP.cut();}catch(e){}await wait(speed<=1?220:100);
     if(!aliveE().length){if(B.opts.stages&&(B.stage||0)<B.opts.stages.length-1){await nextStage();break;}await wait(500);return end(true);}
     if(!aliveH().length){await wait(500);return end(false);}}
    roundEnd();try{BPOP.cut();}catch(e){}await wait(speed<=1?750:260);}/* 1 倍速はターンの変わり目に少し間をおく（ver0.47） *//* ターンの終わり：表示を全部消してからコマンド入力へ */

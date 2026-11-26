@@ -1,7 +1,7 @@
 /* ===== 戦闘の 2D-HD の見た目と、技・術・星臨・奥義の注目画面（HD。ver0.66 の正本） =====
  1. 2D-HD：背景の上に奥行きの光（床の光だまり・地平の霧・周辺減光・漂う光の粒）。並びの奥行き（奥ほど小さく中央寄り）は
     js/v38/battle-ui.js の placeHeroes と js/v23.js の ANC・scM。描く順の差し込み口は js/ver19.js の drawBattle（V19.pre・V19.vis・V19.post）。
- 2. 注目画面：味方が技・術・奥義を使う間と星臨の間だけ、行動する味方とその相手だけを写す（他は消える・背景は暗く・カメラが寄る）。
+ 2. 注目画面：味方が技・術・奥義を使う間と星臨の間だけ、行動する味方とその相手だけを写す（他は消える・二人を中央に寄せて向かい合わせ・カメラが大きく寄る・背景は暗く）。
  3. セレスの絵：立ち絵・顔・カットインも戦闘のコマ（素材パック celes_hd）に揃える（SPX.unitCv・face・V19.art を包む）。 */
 'use strict';
 const HD=(()=>{
@@ -18,6 +18,28 @@ const UIC={};
 {const _f=face;face=function(id,aw){if(id===CID&&pk()){const k='f'+(aw?1:0);if(UIC[k])return UIC[k];try{const f=hdCut(aw,99,false);if(f){
   /* 顔まわり：上から幅の 6 割の正方形 */const s=Math.round(f.w*.5),c=document.createElement('canvas');c.width=c.height=s;const g=c.getContext('2d');g.imageSmoothingEnabled=false;
   g.drawImage(f.cv,Math.round((f.w-s)/2),Math.max(0,Math.round(f.h*.03)),s,s,0,0,s,s);return UIC[k]=c.toDataURL();}}catch(e){}}return _f(id,aw);};}
+/* 立ち絵（art：仲間画面・図鑑・編成）と図鑑の一覧の絵（ZIMG）：正方形・下揃え */
+function sq(aw,Ht,sil){const f=hdCut(aw,Ht,false);if(!f)return'';const S=Math.max(f.w,f.h)+2,c=document.createElement('canvas');c.width=c.height=S;const g=c.getContext('2d');g.imageSmoothingEnabled=false;
+ g.drawImage(f.cv,Math.round((S-f.w)/2),S-f.h-1);if(sil){g.globalCompositeOperation='source-in';g.fillStyle='#0c0c1c';g.fillRect(0,0,S,S);}return c.toDataURL();}
+function fixZ(){if(typeof ZIMG==='undefined'||!pk()||ZIMG.__hd)return;try{for(const sil of[0,1]){let v=null;Object.defineProperty(ZIMG,CID+(sil?'_w':''),{configurable:true,enumerable:true,get(){return v||(v=sq(false,66,sil));}});}
+ Object.defineProperty(ZIMG,'__hd',{configurable:true,enumerable:false,value:1});}catch(e){}}
+{const _a=art;art=function(id,aw){if(id===CID&&pk()){fixZ();const k='a'+(aw?1:0);return UIC[k]||(UIC[k]=sq(aw,99))||_a(id,aw);}return _a(id,aw);};}
+/* 図鑑の動く絵（ZVIEW）：セレスは戦闘のコマ送り（celes_hd の anims）で動かす */
+const ZM={idle:'idle',atk:'atk',cast:'cast',seirin:'aw_idle'};let ZV=null;
+Object.assign(ZVIEW.NAMES,{atk:ZVIEW.NAMES.atk||'攻撃',cast:ZVIEW.NAMES.cast||'技'});
+function zloop(){if(!ZV||!ZV.c.isConnected){ZV=null;return;}const c=ZV.c,d=pk(),an=d.anims[ZM[ZV.m]]||d.anims.idle,dpr=window.devicePixelRatio||1,w=Math.round(c.clientWidth*dpr),h=Math.round(c.clientHeight*dpr);
+ if(c.width!==w||c.height!==h){c.width=w;c.height=h;}const g=c.getContext('2d');g.clearRect(0,0,w,h);const tot=an.ms.reduce((x,y)=>x+y,0)||1,loop=/idle/.test(ZM[ZV.m]),ms=(performance.now()-ZV.t0)%(loop?tot:tot+700);
+ let i=0,acc=0;for(;i<an.f.length;i++){acc+=an.ms[i]||0;if(ms<acc)break;}const nm=an.f[Math.min(i,an.f.length-1)];
+ let sk='b99',be=1e9;for(const k in d.sizes){const n=Math.max(1,Math.floor(h*.78/d.sizes[k].dots)),e=Math.abs(h*.78-n*d.sizes[k].dots);if(e<be){be=e;sk=k;}}const n=Math.max(1,Math.floor(h*.78/d.sizes[sk].dots));
+ const f=SPX.cut(PK,sk,'',nm,false,0,0);if(f){g.imageSmoothingEnabled=false;g.drawImage(f.cv,Math.round(w/2-(f.ax+.5)*n),Math.round(h*.9-(f.ay+1)*n),f.w*n,f.h*n);}
+ ZV.raf=requestAnimationFrame(zloop);}
+{const _s=ZVIEW.start;ZVIEW.start=function(c,type,key){if(ZV){cancelAnimationFrame(ZV.raf);ZV=null;}if(type==='h'&&key===CID&&pk()){fixZ();ZVIEW.stop();ZV={c,m:'idle',t0:performance.now()};zloop();return true;}return _s.apply(this,arguments);};}
+{const _m=ZVIEW.modes;ZVIEW.modes=function(){return ZV?Object.keys(ZM):_m.apply(this,arguments);};}
+{const _sm=ZVIEW.setMotion;ZVIEW.setMotion=function(m){if(ZV){ZV.m=ZM[m]?m:'idle';ZV.t0=performance.now();const l=document.querySelector('#cmd .zvl');if(l)l.textContent=ZVIEW.NAMES[ZV.m]||'';
+  document.querySelectorAll('#cmd .zm [data-a="mo"]').forEach(b=>b.classList.toggle('on',b.dataset.v===ZV.m));return;}return _sm.apply(this,arguments);};}
+{const _f=ZVIEW.flipBattle;ZVIEW.flipBattle=function(){if(ZV)return;return _f.apply(this,arguments);};}
+{const _st=ZVIEW.stop;ZVIEW.stop=function(){if(ZV){cancelAnimationFrame(ZV.raf);ZV=null;}return _st.apply(this,arguments);};}
+{const tm=setInterval(()=>{if(pk()){fixZ();clearInterval(tm);}},500);}
 /* 旧戦闘の星臨の小窓（#cut canvas） */
 V19.art=(cv2,key)=>{if(key.replace(/_aw$/,'')!==CID||!pk())return false;const f=hdCut(/_aw$/.test(key),66,false);if(!f)return false;
  cv2.width=cv2.height=Math.max(f.w,f.h);const g=cv2.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(f.cv,Math.round((cv2.width-f.w)/2),cv2.height-f.h);return true;};
@@ -29,21 +51,33 @@ function targets(u,sk,t){if(Array.isArray(t))return t.filter(Boolean);if(sk&&(sk
 function focus(u,list){if(!inB())return;F={u,set:new Set([u,...list]),a:F?F.a:0,on:true};app.classList.add('fc66');}
 function unfocus(){if(F)F.on=false;app.classList.remove('fc66');}
 const step=()=>{if(!F)return;F.a=Math.max(0,Math.min(1,F.a+(F.on?.09:-.07)));if(!F.on&&F.a<=0){F=null;cam(null);}};
+/* 寄せ：写す味方と相手を画面の中央へ寄せて向かい合わせる（元の位置は HOME。終わったら戻す） */
+const HOME=new Map();
+const SPDK=()=>(typeof SPD!=='undefined'&&SPD[speed])||1;
+function tween(L,ms){return new Promise(res=>{if(!L.length)return res();const t0=performance.now();const f=()=>{const k=Math.min(1,(performance.now()-t0)/ms),e=1-Math.pow(1-k,3);
+  for(const[u,x0,y0,x1,y1]of L){u.x=x0+(x1-x0)*e;u.y=Math.round(y0+(y1-y0)*e);}if(k<1)requestAnimationFrame(f);else res();};requestAnimationFrame(f);});}
+async function gather(u,list){if(!inB())return;const[top,bot]=band(),cy=top+(bot-top)*.56,H=[u,...list.filter(x=>x&&x.side===0&&x!==u)],E=list.filter(x=>x&&x.side===1&&x.alive),M=[];
+ const lay=(G2,cx,dir)=>{const n=G2.length,sp=Math.min((bot-top)*.24,n>1?(bot-top)*.62/(n-1):0);G2.forEach((x,i)=>{if(!HOME.has(x))HOME.set(x,[x.x,x.y]);const d=i-(n-1)/2;
+  let fx=x.x+8*x.sc,fy=x.y+16*x.sc;try{[fx,fy]=V19.foot(x);}catch(e){}const tx=cx+dir*d*5,ty=cy+d*sp;M.push([x,x.x,x.y,x.x+(tx-fx),x.y+(ty-fy)]);});};
+ lay(E,W*(H.length&&E.length?.33:.5),-1);if(E.length)lay(H,W*.68,1);else lay(H,W*(H.length>1?.6:.5),1);
+ await tween(M,Math.round(240*SPDK()));}
+async function scatter(){if(!HOME.size)return;const M=[];for(const[u,[x,y]]of HOME)M.push([u,u.x,u.y,x,y]);HOME.clear();await tween(M,Math.round(220*SPDK()));}
 V19.vis=u=>{if(!F)return 1;return F.set.has(u)?1:1-F.a;};
 const big=sk=>!!sk&&!sk.basic&&!(sk.k==='item');
-{const _da=doAction;doAction=async function(u,sk,t){const on=inB()&&u&&u.side===0&&big(sk);if(on)focus(u,targets(u,sk,t));
-  try{return await _da.apply(this,arguments);}finally{if(on)unfocus();}};}
-{const _aw=awaken;awaken=async function(u){const on=inB()&&u&&u.side===0;if(on)focus(u,aliveE());try{return await _aw.apply(this,arguments);}finally{if(on)unfocus();}};}
-{const _sb=startBattle;startBattle=function(){F=null;app.classList.remove('fc66');cam(null);return _sb.apply(this,arguments);};}
+async function run(u,list,fn){focus(u,list);await gather(u,list);try{return await fn();}finally{unfocus();await scatter();}}
+{const _da=doAction;doAction=async function(u,sk,t){const a=arguments;if(inB()&&u&&u.side===0&&big(sk))return run(u,targets(u,sk,t),()=>_da.apply(this,a));return _da.apply(this,a);};}
+{const _aw=awaken;awaken=async function(u){const a=arguments;if(inB()&&u&&u.side===0&&!F)return run(u,[],()=>_aw.apply(this,a));return _aw.apply(this,a);};}
+{const _sb=startBattle;startBattle=function(){F=null;HOME.clear();app.classList.remove('fc66');cam(null);return _sb.apply(this,arguments);};}
 /* カメラ：写すユニットの中心へ少し寄る（キャンバスとダメージの数字の層を同じ倍率で） */
 let CAM='';
-function cam(c){const cv=$('#cv');if(!cv)return;const L=[cv,$('#bcv'),$('#bp46')].filter(Boolean);
+function cam(c){const cv=$('#cv');if(!cv)return;const L=[cv,$('#bcv'),$('#bp46'),$('#pops'),$('#labels')].filter(Boolean);
  if(!c){if(CAM){CAM='';L.forEach(e=>{e.style.transform='';});}return;}
  const k=cv.clientWidth/W,ox=cv.offsetLeft,oy=cv.offsetTop,sx=ox+c[0]*k,sy=oy+c[1]*k,key=`${Math.round(sx)},${Math.round(sy)},${c[2].toFixed(2)}`;if(key===CAM)return;CAM=key;
  L.forEach(e=>{const ex=e===cv||e.id==='bcv'?ox:0,ey=e===cv||e.id==='bcv'?oy:0;e.style.transformOrigin=`${Math.round(sx-ex)}px ${Math.round(sy-ey)}px`;e.style.transform=`scale(${c[2].toFixed(3)})`;});}
-function camOf(){if(!F)return null;let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;for(const u of F.set){if(!u||(!u.alive&&u!==F.u))continue;let fx=u.x+8*u.sc,fy=u.y+16*u.sc,h=24;try{[fx,fy]=V19.foot(u);h=V19.dims(u).h;}catch(e){}
+function camOf(){if(!F)return null;let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;for(const u of F.set){if(!u)continue;/* 倒れた相手も枠に入れる（崩れる最中に画面がずれない） */let fx=u.x+8*u.sc,fy=u.y+16*u.sc,h=24;try{[fx,fy]=V19.foot(u);h=V19.dims(u).h;}catch(e){}
   x0=Math.min(x0,fx);x1=Math.max(x1,fx);y0=Math.min(y0,fy-h);y1=Math.max(y1,fy);}
- if(x0>x1)return null;const z=1+.2*F.a*Math.max(0,Math.min(1,(W*.95)/Math.max(40,x1-x0+40)-.1));return[(x0+x1)/2,(y0+y1)/2,z];}
+ if(x0>x1)return null;const[top,bot]=band(),zf=Math.max(1,Math.min(1.8,(W*.9)/Math.max(30,x1-x0+34),((bot-top)*.95)/Math.max(20,y1-y0+16))),z=1+(zf-1)*F.a;
+ /* 寄った後も画面の外を写さない */const cx=Math.max(W/2/zf,Math.min(W-W/2/zf,(x0+x1)/2)),cy=(y0+y1)/2;return[cx,cy,z];}
 
 /* ---------- 1. 2D-HD の光（V19.pre：背景の直後・V19.post：キャラの後） ---------- */
 const MOTE=[];let t0=0;
