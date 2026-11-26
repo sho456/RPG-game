@@ -24,12 +24,12 @@ function frame(id,s,T,uid){const a=A(id,s.n);if(!a)return null;const t=tot(a);le
 /* 整数倍で描く：目標の高さ（画面の画素）にいちばん近い「サイズ × 整数倍」を選ぶ */
 function size(id,Ht){let best=null,be=9;const S=D()[id].sizes;for(const sk in S){if(sk[0]!=='b')continue;const d=S[sk].dots,n=Math.max(1,Math.round(Ht/d)),e=Math.abs(n*d-Ht)/Ht-d*1e-5;if(e<be){be=e;best={sk,n};}}return best;}
 /* エフェクト層：パック <id>_fx に同じ名前のコマがあれば、キャラの上に同じ位置で重ねる（星臨の色替えの対象外・加算合成） */
-const FXA=1,FXOP='lighter';
+const FXA=.45,FXOP='lighter';
 function put(g,id,v,name,face,x,y,hgt,fl,alpha,noFx){const m=g.getTransform(),k=m.a,z=size(id,hgt*k);if(!z)return false;
  const c=D()[id],f=SPX.cut(id,z.sk,v,name,(face>0)!==(c.face==='R'),0,0);if(!f)return false;
  g.save();g.setTransform(1,0,0,1,0,0);g.imageSmoothingEnabled=false;g.globalAlpha=alpha;if(fl&&'filter'in g)g.filter='brightness(2.4)';
  g.drawImage(f.cv,Math.round(m.e+x*k-(f.ax+.5)*z.n),Math.round(m.f+y*k-(f.ay+1)*z.n),f.w*z.n,f.h*z.n);
- const fxd=!noFx&&D()[id+'_fx'],ff=fxd&&fxd.sizes[z.sk]&&fxd.sizes[z.sk].frames[name]&&SPX.cut(id+'_fx',z.sk,'',name,(face>0)!==(c.face==='R'),0,0);
+ const fxd=!noFx&&!/atk/.test(name)&&D()[id+'_fx'],ff=fxd&&fxd.sizes[z.sk]&&fxd.sizes[z.sk].frames[name]&&SPX.cut(id+'_fx',z.sk,'',name,(face>0)!==(c.face==='R'),0,0);
  if(ff){g.globalAlpha=alpha*FXA;g.globalCompositeOperation=FXOP;if('filter'in g)g.filter='none';g.drawImage(ff.cv,Math.round(m.e+x*k-(ff.ax+.5)*z.n),Math.round(m.f+y*k-(ff.ay+1)*z.n),ff.w*z.n,ff.h*z.n);}
  g.restore();return true;}
 const ghosts=[];

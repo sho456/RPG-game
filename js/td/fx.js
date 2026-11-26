@@ -11,7 +11,7 @@ const TAU=Math.PI*2;
 let L=[],P=[],dimT=9,B={spr:()=>null,cam:()=>0,vw:()=>300};
 const OC=document.createElement('canvas'),OX=OC.getContext('2d');
 function bind(o){Object.assign(B,o);}
-function reset(){L=[];P=[];dimT=9;curSt=null;}
+function reset(){FXK.reset();L=[];P=[];dimT=9;curSt=null;}
 function add(e){if(L.length>110){const i=L.findIndex(x=>x.k!=='corpse');L.splice(i<0?0:i,1);}e.t=-(e.dl||0);L.push(e);return e;}
 /* 粒：spark＝速い線（重力）・ember＝遅い四角（昇る）・star＝十字の星（昇る）・mote＝目標へ集まる */
 function part(o){if(P.length>=360)P.shift();o.t=-(o.dl||0);P.push(o);}
@@ -62,13 +62,14 @@ function ev(e,st){curSt=st;const u=e.u,el=u&&u.h?u.h.el:'陽',c=ELC[el]||'#fff',
  switch(e.k){
  case'hit':{const f=e.f,hx=f.x,hy=f.y-14;
   if(u.id==='lamp'){add({k:'shot',x0:u.x,y0:u.y,x1:hx,y1:hy,c:'#f2b347',c2:'#fff1a8',d:.2,big:1});sparks(hx,hy,4,'#f2b347');return;}
+  if(u.id==='celes'&&!e.big){if(e.sk){if(u._skDl!=null&&st.t-u._skT<=.05){e._dl=FXC.skHit(u,f,e,st);return;}}else if(u.h.rng>60){e._dl=FXC.atk(u,f,e,st);return;}}
   if(e.big){if(f.hp<=0)f._hold=.24;sparks(hx,hy,6,c,{dl:.24});return;}
   if(e.sk){if((u.cs||u.h.sk).k==='chain')add({k:'bolt',x0:u.x,y0:u.y-26,x1:hx,y1:hy,c,seed:Math.random()*99,d:.22});sparks(hx,hy,8,c);return;}
   const far=u.h.rng>60,mag=u.h.dmgK==='mag';
   if(far)add({k:mag?'orb':'arrow',x0:u.x+(u.face||-1)*6,y0:u.y-24,x1:hx,y1:hy,c,c2,d:mag?.2:.14});
   else add({k:'slash',x:hx,y:hy,c,c2,dir:u.face||-1,d:.14});
   sparks(hx,hy,e.cr?10:4,e.weak?'#f2b347':c,{dl:far?.14:0,d:.25});if(e.cr)add({k:'star',x:hx,y:hy,r:9,c:'#fff',d:.2,dl:far?.14:0});return;}
- case'cast':u.cs=e.sk;((e.sk.id===TDD.HERO[u.id].sk&&H[u.id])||K[e.sk.k]||K.strike)(u,e.f,c,c2);return;
+ case'cast':u.cs=e.sk;if(u.id==='celes'){u._skDl=null;if(FXC.cast(u,e,st)!=null)return;}((e.sk.id===TDD.HERO[u.id].sk&&H[u.id])||K[e.sk.k]||K.strike)(u,e.f,c,c2);return;
  /* 星臨：足元から光の柱・星の輪が 2 重に広がる（オーラは view.js が描く） */
  case'aw':if(u.id==='celes'){celesAw(u);return;}add({k:'pillar',x:u.x,y:u.y,w:22,h:96,c:'#fff1a8',d:.5});add({k:'gring',x:u.x,y:u.y,r:30,c:'#f2b347',c2:'#fff',d:.45});add({k:'gring',x:u.x,y:u.y,r:46,c,c2,d:.6,dl:.12});add({k:'star',x:u.x,y:u.y-56,r:22,c:'#fff',d:.4,dl:.08});rise(u.x,u.y-20,18,'#fff0b8',{w:30,d:.8});return;
  case'kill':{const f=e.f,F=B.spr(f.spr,f.kind,1);if(L.filter(x=>x.k==='corpse').length>14){const i=L.findIndex(x=>x.k==='corpse');L.splice(i,1);}
@@ -158,10 +159,10 @@ function cultRain(){for(const e of L){if(e.k!=='cultf')continue;const t=cultT(e)
   if(Math.random()<.6)part({k:'spark',x:B.cam()+Math.random()*vw,y:-4,vx:(Math.random()-.5)*20,vy:120+Math.random()*60,gr:60,d:.7,c:'#f2b347'});}}}
 function shk(){for(const e of L){if(e.k!=='cultf')continue;const t=cultT(e)-1.8;if(t>=0&&t<.4)return 8*(1-t/.4);}return 0;}
 /* ---------- 毎コマ ---------- */
-function step(dt){dimT+=dt;cultRain();for(const e of L)e.t+=dt;L=L.filter(e=>e.t<e.d);
+function step(dt){FXK.step(dt);dimT+=dt;cultRain();for(const e of L)e.t+=dt;L=L.filter(e=>e.t<e.d);
  for(const p of P){p.t+=dt;if(p.t<0||p.k==='mote')continue;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=p.gr*dt;p.vx*=.98;}P=P.filter(p=>p.t<p.d);}
 const BACK={cultb:1,gring:1,sigil:1,clock:1,flame:1,dome:0};
-function back(g){for(const e of L)if(e.t>=0&&BACK[e.k])draw(g,e,e.t/e.d);g.globalAlpha=1;}
+function back(g){for(const e of L)if(e.t>=0&&BACK[e.k])draw(g,e,e.t/e.d);g.globalAlpha=1;FXK.draw(g,'back');}
 function dim(g){if(dimT>.75)return;const a=dimT<.12?dimT/.12:dimT<.32?1:1-(dimT-.32)/.43;g.globalAlpha=.4*a;g.fillStyle='#07071a';g.fillRect(B.cam()-4,0,B.vw()+8,FHH());g.globalAlpha=1;}
 const FHH=()=>(typeof TDD!=='undefined'?TDD.K.FH:420);
 function front(g){g.save();for(const e of L)if(e.t>=0&&!BACK[e.k])draw(g,e,e.t/e.d);
@@ -170,7 +171,7 @@ function front(g){g.save();for(const e of L)if(e.t>=0&&!BACK[e.k])draw(g,e,e.t/e
   else if(p.k==='mote'){const k=Math.min(1,q*1.2),x=p.x0+(p.x-p.x0)*k*k,y=p.y0+(p.y-p.y0)*k*k;g.globalAlpha=.4+.6*k;g.fillRect(x-1,y-1,2,2);}
   else if(p.k==='star'){star4(g,p.x,p.y,3*p.s*(1-q*.5),p.c,1-q);}
   else g.fillRect(p.x-1,p.y-1,2,2);}
- g.restore();g.globalAlpha=1;}
+ g.restore();g.globalAlpha=1;FXK.draw(g,'front');}
 function draw(g,e,p){g.globalAlpha=1;const ea=1-p;
  switch(e.k){
  case'shot':case'orb':{const x=e.x0+(e.x1-e.x0)*p,y=e.y0+(e.y1-e.y0)*p,s=e.big?2.5:2;g.globalCompositeOperation='screen';
@@ -226,7 +227,8 @@ function corpse(g,e,p){const F=e.F;if(!F)return;const sc=Math.min(1,e.hg/F.h),w=
  g.drawImage(OC,-F.ax*sc,-F.ay*sc*sy,w,h*sy);g.restore();}
 /* ---------- 敵の歩き（原画は 1 枚。コードで動かす） ---------- */
 function pose(f,t,st){const tr=f.tr,gh=tr.includes('ghost'),fly=tr.includes('fly'),heavy=f.boss||tr.includes('armor'),mov=!f.by&&f.stun<=0,d=f.dir||1;
- const o={dx:0,dy:0,rot:0,sx:1,sy:1,a:1,sh:1,fl:st.t-f.hitT<.09};
+ const R=FXK.react(f,st);if(R&&R.hold){if(f._ft===undefined)f._ft=t;t=f._ft;}else f._ft=undefined;
+ const o={dx:0,dy:0,rot:0,sx:1,sy:1,a:1,sh:1,fl:R?!!R.fl:st.t-f.hitT<.09};if(R&&R.ta>0){o.tint=R.tint;o.ta=R.ta;}
  if(gh){o.dy=-5+Math.sin(t*2.2+f.uid)*2.5;o.dx=Math.sin(t*1.6+f.uid)*1.5;o.rot=Math.sin(t*1.8+f.uid)*.06+(mov?d*.05:0);o.a=.5+.22*(.5+.5*Math.sin(t*3+f.uid));o.sh=.6+.1*Math.sin(t*2.2+f.uid);o.sx=1+.03*Math.sin(t*4+f.uid);}
  else if(fly){const b=Math.sin(t*3+f.uid);o.dy=-14+b*4;o.rot=d*.08+Math.sin(t*3.3+f.uid)*.05;o.sh=.55-.12*b;}
  else if(mov){const hz=Math.max(1.4,Math.min(3.2,f.spd/14))*(f.boss?.55:heavy?.8:1),ph=t*hz*Math.PI+f.uid,s=Math.abs(Math.sin(ph)),c=Math.abs(Math.cos(ph));
@@ -235,6 +237,6 @@ function pose(f,t,st){const tr=f.tr,gh=tr.includes('ghost'),fly=tr.includes('fly
  else{o.sy=1+.025*Math.sin(t*3+f.uid);o.sx=1-.012*Math.sin(t*3+f.uid);}
  if(f.stun>0)o.rot=Math.sin(t*14)*.07;
  if(f.actT&&st.t-f.actT<.15){o.dx+=d*3;o.rot+=d*.1;}
- const k=(st.t-f.hitT)/.2;if(k>=0&&k<1){const q=(1-k)*(1-k);o.dx-=d*(f.boss?1.5:3.5)*q;o.rot-=d*(f.boss?.05:.14)*q;}
+ const k=R?(R.t0===undefined?-1:(st.t-R.t0)/.2):(st.t-f.hitT)/.2;if(k>=0&&k<1){const q=(1-k)*(1-k);o.dx-=d*(f.boss?1.5:3.5)*q;o.rot-=d*(f.boss?.05:.14)*q;}
  return o;}
 return{shk,bind,reset,ev,step,back,dim,front,pose,add:e=>add(e),ELC};})();
