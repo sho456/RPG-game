@@ -84,7 +84,7 @@ function draw(t,dt){TDFX.step(dt);g.setTransform(1,0,0,1,0,0);g.imageSmoothingEn
  /* 奥行き：空（固定）→ 遠景 ×0.25 → 中景 ×0.55 → 地面 ×1 */
  g.setTransform(k,0,0,k,0,-VT*k);const sw=Math.min(bg.sky.width,VW);g.drawImage(bg.sky,0,0,sw,bg.sky.height,0,0,VW,bg.sky.height*VW/sw);
  g.drawImage(bg.far,-Math.round(cam*.25),0);g.drawImage(bg.mid,-Math.round(cam*.55),0);
- g.setTransform(k,0,0,k,(-cam+sx)*k,(sy-VT)*k);g.drawImage(bg.ground,0,0);
+ g.setTransform(k,0,0,k,Math.round((-cam+sx)*k),Math.round((sy-VT)*k));g.drawImage(bg.ground,0,0);/* 画面の画素に 1 回だけ丸める */
  TDBG.base(g,st.S.base[0],st.S.base[1],t,st.t-baseHit<.3);
  /* 遅延の陣 */
  for(const z of st.fields){if(z.u&&z.u.id==='celes')continue;g.strokeStyle='rgba(176,122,255,.7)';g.lineWidth=1;g.setLineDash([3,3]);g.beginPath();g.ellipse(z.x,z.y,z.r,z.r*.5,0,0,7);g.stroke();g.setLineDash([]);
@@ -160,14 +160,14 @@ function marks(t,dt){g.lineCap='round';
    g.lineWidth=1.5;g.beginPath();g.ellipse(tg.f.x,tg.f.y+1,(tg.f.boss?16:9)*(1+(1-p)*.3),(tg.f.boss?5:3)*(1+(1-p)*.3),0,0,7);g.stroke();g.globalAlpha=1;}}
  g.lineCap='butt';
  for(let i=dust.length-1;i>=0;i--){const d=dust[i];d.t+=dt;if(d.t>.4){dust.splice(i,1);continue;}const p=d.t/.4;g.globalAlpha=(1-p)*.5;g.fillStyle='#cfc8dc';g.fillRect(Math.round(d.x+d.vx*p),Math.round(d.y-p*5),2-p,2-p);}g.globalAlpha=1;}
-function drawUnit(u,t){const fl=st.t-(u.hitT||-9)<.08,lg=st.t-u.actT<.12?u.face*3:0,F=spr(u.id,u.id,0),c=st.deck.find(c=>c.on===u),bob=u.mv?-Math.abs(Math.sin(t*11+u.uid))*2.5:0,col=TDD.ROLE[u.h.role].col,x=u.x+(u.ox||0);
+function drawUnit(u,t){const fc=TDA.face(u,st.t),fl=st.t-(u.hitT||-9)<.08,lg=st.t-u.actT<.12?fc*3:0,F=spr(u.id,u.id,0),c=st.deck.find(c=>c.on===u),bob=u.mv?-Math.abs(Math.sin(t*11+u.uid))*2.5:0,col=TDD.ROLE[u.h.role].col,x=u.x+(u.ox||0);
  /* 足元：役割の色の楕円の影（止めている間は縁が太い）と、向きの小さな三角 */
  g.globalAlpha=.4;g.fillStyle=col;g.beginPath();g.ellipse(x,u.y+1,14,4.5,0,0,7);g.fill();g.globalAlpha=.95;g.strokeStyle=col;g.lineWidth=u.blocking.length?2:1;g.beginPath();g.ellipse(x,u.y+1,14,4.5,0,0,7);g.stroke();
- g.fillStyle=col;g.beginPath();g.moveTo(x+u.face*17,u.y+1);g.lineTo(x+u.face*12,u.y-1.5);g.lineTo(x+u.face*12,u.y+3.5);g.fill();g.globalAlpha=1;
+ g.fillStyle=col;g.beginPath();g.moveTo(x+fc*17,u.y+1);g.lineTo(x+fc*12,u.y-1.5);g.lineTo(x+fc*12,u.y+3.5);g.fill();g.globalAlpha=1;
  /* 星臨中：金の光の衣（足元から昇る光と、体の後ろの光） */
  if(u.awT>0){const k2=.75+.25*Math.sin(t*7),gr=g.createRadialGradient(x,u.y-30,3,x,u.y-30,38);gr.addColorStop(0,`rgba(255,226,160,${.5*k2})`);gr.addColorStop(1,'rgba(242,179,71,0)');g.fillStyle=gr;g.fillRect(x-38,u.y-68,76,76);
   g.fillStyle='#fff0b8';for(let i=0;i<4;i++){const q=(t*1.3+i*.25)%1;g.globalAlpha=1-q;g.fillRect(x-10+i*6+Math.sin(t*3+i)*2,u.y-q*44,1.5,3);}g.globalAlpha=1;}
- if(!TDA.draw(g,u,x,u.y,fl,u.lit?1:.55,st))sprite(F,x+lg,u.y+bob,u.face>0,UH,fl,u.lit?1:.55);
+ if(!TDA.draw(g,u,x,u.y,fl,u.lit?1:.55,st))sprite(F,x+lg,u.y+bob,fc>0,UH,fl,u.lit?1:.55);
  if(!u.lit){g.fillStyle='rgba(169,165,196,.95)';g.font='700 8px "M PLUS 1p",sans-serif';g.textAlign='center';g.fillText('光の外',x,u.y+13);}
  bar(x,u.y-TDA.hgt(u.id,UH)-6,24,u.hp/u.h.hp,u.hp/u.h.hp<.35?'#e86a6a':'#9fe8b8');
  if(selU===u){g.strokeStyle='#fff0b8';g.lineWidth=1.5;g.beginPath();g.ellipse(x,u.y+1,18,6,0,0,7);g.stroke();}

@@ -57,7 +57,7 @@
       "loop": true,
       "scale": 1.0,
       "anchor": [
-        54,
+        57,
         121
       ]
     },
@@ -76,7 +76,7 @@
       "loop": true,
       "scale": 1.0,
       "anchor": [
-        54,
+        57,
         121
       ]
     },
@@ -96,7 +96,7 @@
       "loop": false,
       "scale": 1.0,
       "anchor": [
-        54,
+        57,
         121
       ],
       "hit": 5
@@ -117,7 +117,7 @@
       "loop": false,
       "scale": 1.0,
       "anchor": [
-        54,
+        57,
         121
       ],
       "hit": 6
@@ -134,7 +134,7 @@
       "loop": false,
       "scale": 1.0,
       "anchor": [
-        54,
+        57,
         121
       ]
     },
@@ -154,7 +154,7 @@
       "loop": false,
       "scale": 1.0,
       "anchor": [
-        54,
+        57,
         121
       ]
     },
@@ -190,7 +190,7 @@
       "loop": false,
       "scale": 1.0,
       "anchor": [
-        54,
+        57,
         121
       ]
     },
@@ -210,7 +210,7 @@
       "loop": true,
       "scale": 1.0,
       "anchor": [
-        54,
+        57,
         121
       ]
     },
@@ -230,7 +230,7 @@
       "loop": false,
       "scale": 1.0,
       "anchor": [
-        54,
+        57,
         121
       ],
       "hit": 5
@@ -267,7 +267,7 @@
       "loop": false,
       "scale": 1.0,
       "anchor": [
-        54,
+        57,
         121
       ],
       "hit": 17
@@ -288,7 +288,7 @@
       "loop": true,
       "scale": 1.0,
       "anchor": [
-        54,
+        57,
         121
       ]
     },
@@ -308,7 +308,7 @@
       "loop": false,
       "scale": 1.0,
       "anchor": [
-        54,
+        57,
         121
       ],
       "hit": 5
@@ -333,7 +333,7 @@
       "loop": false,
       "scale": 1.0,
       "anchor": [
-        54,
+        57,
         121
       ]
     },
@@ -353,7 +353,7 @@
       "loop": false,
       "scale": 1.0,
       "anchor": [
-        54,
+        57,
         121
       ]
     },
@@ -369,7 +369,7 @@
       "loop": false,
       "scale": 1.0,
       "anchor": [
-        54,
+        57,
         121
       ]
     },
@@ -405,7 +405,7 @@
       "loop": false,
       "scale": 1.0,
       "anchor": [
-        54,
+        57,
         121
       ]
     },
@@ -425,7 +425,7 @@
       "loop": false,
       "scale": 1.0,
       "anchor": [
-        54,
+        57,
         121
       ]
     },
@@ -461,7 +461,7 @@
       "loop": false,
       "scale": 1.0,
       "anchor": [
-        54,
+        57,
         121
       ]
     },
@@ -481,7 +481,7 @@
       "loop": false,
       "scale": 1.0,
       "anchor": [
-        54,
+        57,
         121
       ]
     }

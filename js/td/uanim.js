@@ -14,11 +14,33 @@ const has=u=>!!AN[u]&&SPX.ready&&!!D()[AN[u]];
 /* 奥義のアニメ：aw_ult → ult → aw_cast → cast の順に探す */
 const ultName=(id,aw)=>(aw&&A(id,'aw_ult')&&'aw_ult')||(A(id,'ult')&&'ult')||(aw&&A(id,'aw_cast')&&'aw_cast')||(A(id,'cast')&&'cast')||null;
 function state(u,id,T){const aw=u.awT>0,pick=n=>{if(aw&&A(id,'aw_'+n))return{n:'aw_'+n,v:''};return A(id,n)?{n,v:aw?'aw':''}:null;};
- if(u.actK==='aw'){const a=A(id,'aw_in');if(a&&T-u.actT<tot(a)/1000)return{n:'aw_in',v:'aw',t0:u.actT};}
- {const a=A(id,'hurt');if(a&&T-(u.hitT||-9)<tot(a)/1000)return{n:'hurt',v:aw?'aw':'',t0:u.hitT};}
- if(u.actK==='ult'){const n=ultName(id,aw);if(n&&T-u.actT<tot(A(id,n))/1000)return{n,v:aw?'aw':'',t0:u.actT};}
- if(u.actK==='atk'||u.actK==='cast'){const p=pick(u.actK);if(p&&T-u.actT<tot(A(id,p.n))/1000)return Object.assign(p,{t0:u.actT});}
+ if(u.actK==='aw'){const a=A(id,'aw_in');if(a&&T-u.actT<tot(a)/1000)return{n:'aw_in',v:'aw',t0:u.actT,k:2};}
+ {const a=A(id,'hurt');if(a&&T-(u.hitT||-9)<tot(a)/1000)return{n:'hurt',v:aw?'aw':'',t0:u.hitT,k:1};}
+ if(u.actK==='ult'){const n=ultName(id,aw);if(n&&T-u.actT<tot(A(id,n))/1000)return{n,v:aw?'aw':'',t0:u.actT,k:3};}
+ if(u.actK==='atk'||u.actK==='cast'){const p=pick(u.actK);if(p&&T-u.actT<tot(A(id,p.n))/1000)return Object.assign(p,{t0:u.actT,k:0});}
  return Object.assign(pick(u.mv?'walk':'idle')||pick('idle')||{n:'idle',v:''},{loop:1});}
+/* 見せる状態を決める（見た目だけ。sim の判定・時間は変えない）。
+ ・技・攻撃・星臨に入る・奥義は始まったら最後まで再生（同じか低い優先度の割り込みは捨てる。被弾は攻撃と技だけ割り込める。奥義は何にでも）
+   → 技の直後の通常攻撃で技が 1 コマで切れる・星臨の演出が攻撃で途中で切れる、を防ぐ
+ ・待機と歩きの切り替えは 0.15 秒以上その状態にいてから（目標のぎりぎりで 1 コマずつチラつかない） */
+const MEM=new WeakMap(),DWELL=.15,FHOLD=.18;
+const mem=u=>{let m=MEM.get(u);if(!m){m={lock:null,seen:null,loop:null,loopT:-9,face:u.face,aT:u.actT,pend:null,pT:0,fresh:1};MEM.set(u,m);}return m;};
+function pick(u,id,T){const m=mem(u),p=state(u,id,T);
+ if(!p.loop){const key=p.n+'@'+p.t0;
+  if(key!==m.seen){m.seen=key;const lk=m.lock,live=lk&&T-lk.t0<tot(A(id,lk.n))/1000,fr=T-p.t0<.15||m.fresh;
+   if(fr&&(!live||p.k>lk.k)){m.lock=p;m.loop=null;}}
+  m.fresh=0;}
+ m.fresh=0;
+ const lk=m.lock;if(lk&&T-lk.t0<tot(A(id,lk.n))/1000)return lk;
+ m.lock=null;
+ const c=m.loop;if(c&&(c.n!==p.n||c.v!==p.v)&&T-m.loopT<DWELL&&A(id,c.n)){return c;}
+ if(!c||c.n!==p.n||c.v!==p.v){m.loop=p;m.loopT=T;}
+ return p.loop?p:Object.assign({},p,{loop:1});}
+/* 表示の向き：新しい攻撃・技の始まりは今すぐ向く。それ以外の向きの変化は 0.18 秒続いてから（目標が左右に入れ替わってもパタパタしない）。攻撃の 0.5 秒間は固定 */
+function face(u,T){const m=mem(u);if(u.actT!==m.aT){m.aT=u.actT;m.face=u.face;m.pend=null;return m.face;}
+ if(u.face===m.face||T-u.actT<.5){m.pend=null;return m.face;}
+ if(m.pend!==u.face){m.pend=u.face;m.pT=T;}else if(T-m.pT>=(u.mv?.05:FHOLD)){m.face=u.face;m.pend=null;}
+ return m.face;}
 function frame(id,s,T,uid){const a=A(id,s.n);if(!a)return null;const t=tot(a);let ms=s.loop?(T*1000+uid*137)%t:Math.max(0,(T-s.t0)*1000);let acc=0;
  for(let i=0;i<a.f.length;i++){acc+=a.ms[i]||0;if(ms<acc)return a.f[i];}return a.f[a.f.length-1];}
 /* 整数倍で描く：目標の高さ（画面の画素）にいちばん近い「サイズ × 整数倍」を選ぶ */
@@ -34,7 +56,8 @@ function put(g,id,v,name,face,x,y,hgt,fl,alpha,noFx){const m=g.getTransform(),k=
  g.restore();return true;}
 const ghosts=[];
 return{has,hgt:(u,d)=>HGT[u]||d,
- draw(g,u,x,y,fl,alpha,st){if(!has(u.id))return false;const id=AN[u.id],s=state(u,id,st.t),n=frame(id,s,st.t,u.uid);return n?put(g,id,s.v,n,u.face,x,y,HGT[u.id],fl,alpha):false;},
+ draw(g,u,x,y,fl,alpha,st){if(!has(u.id))return false;const id=AN[u.id],s=pick(u,id,st.t),n=frame(id,s,st.t,u.uid);return n?put(g,id,s.v,n,face(u,st.t),x,y,HGT[u.id],fl,alpha):false;},
+ face:(u,T)=>face(u,T),
  fall(u,st){if(has(u.id)&&A(AN[u.id],'down'))ghosts.push({id:u.id,x:u.x+(u.ox||0),y:u.y,face:u.face,t0:st.t});},
  drawGhosts(g,st){for(let i=ghosts.length-1;i>=0;i--){const o=ghosts[i],T=st.t-o.t0;if(T<0||T>1.8){ghosts.splice(i,1);continue;}
   const id=AN[o.id];put(g,id,'',frame(id,{n:'down',t0:o.t0},st.t,0),o.face,o.x,o.y,HGT[o.id],0,Math.min(1,(1.8-T)/.6));}},

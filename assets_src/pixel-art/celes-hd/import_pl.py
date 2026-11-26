@@ -292,6 +292,19 @@ def main():
     sl = (slice(OY + sfy - 46, OY + sfy - 25), slice(OX + sfx - 54, OX + sfx - 29))
     for i in (17, 18, 19):
         res['aw_ult'][i][0][sl] = res['aw_ult'][20][0][sl]
+    # 2.5 足元の x をそろえる（PixelLab のコマは 1 コマごとに体が数ドット横へ揺れる→再生でガタつく）。歩き・倒れ・被弾は本当に足が動くので対象外。
+    #     上下（跳ぶ・浮く）は動きなので残す。全コマの足元を side_l の足元 (OX+sfx) に寄せる（±8 まで）
+    for nm in ('atk', 'cast', 'aw_in', 'aw_idle', 'aw_cast', 'aw_ult'):
+        for t in res[nm]:
+            if t is None:
+                continue
+            ys, xs = np.where(t[0][..., 3] > 0)
+            ay_ = ys.max()
+            fxc = int(round(np.median(xs[ys >= ay_ - max(2, (ay_ - ys.min()) // 8)])))
+            dx = max(-8, min(8, OX + sfx - fxc))
+            if dx:
+                t[0] = np.roll(t[0], dx, 1)
+                t[1] = np.roll(t[1], dx, 1)
     # 3 共通キャンバス（全コマの不透明の範囲＋余白）
     xs0 = ys0 = 10 ** 9; xs1 = ys1 = -1
     for nm, fr in res.items():

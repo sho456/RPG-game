@@ -206,7 +206,7 @@ function tick(st){if(st.over)return;const dt=K.STEP;st.t+=dt;
   if(u.gcd<=0)for(let i=0;i<SK.length;i++)if(u.ch[i]>=SK[i].ch&&cast(st,u,SK[i])){u.ch[i]=0;u.gcd=K.GCD;u.actT=st.t;u.actK='cast';follow(st,u,1);break;}
   u.atkT-=dt;if(u.atkT<=0){const t=target(st,u);if(t){u.atkT=u.h.iv;u.actT=st.t;u.actK='atk';u.face=Math.sign(t.x-u.x)||u.face;
    if(u.h.splash){ev(st,{k:'area',u,x:t.x,y:t.y,r:u.h.splash,small:1});for(const f of st.foes.slice())if(f.hp>0&&dist(t.x,t.y,f.x,f.y)<=u.h.splash)hit(st,u,f,f===t?1:.6);}
-   else hit(st,u,t,1);follow(st,u,0,t);}else{u.atkT=.15;if(!u.mv)u.face=-1;}}}
+   else hit(st,u,t,1);follow(st,u,0,t);}else u.atkT=.15;}}
 }
 function end(st,win){st.over={win,lives:st.lives,t:Math.round(st.t),wave:st.S.inf?Math.max(0,st.wave):st.wave+1,stars:win?[1,st.lives>=K.LIVES?1:0,st.t<=(st.S.star.time||999)?1:0]:[0,0,0]};ev(st,{k:'end',win});}
 /* ---------- 自動の配置（計測と、将来の AUTO 用） ----------
