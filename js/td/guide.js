@@ -44,9 +44,9 @@ function loop(){raf=requestAnimationFrame(loop);const st=TD.st;if(!st||!ov){retu
   if(m&&TDS.lampCost(st)&&st.cost>=TDS.lampCost(st)){ring(0,m.x,m.y,m.w/2+4,'lamp',m.h/2+4);const q=scr(st,st.S.base[0],st.S.base[1]);ring(1,q.x,q.y,st.lightR*q.S,'light');point(m.x,m.y);}else point(null);return;}
  if(s===2){/* ④ 星臨：星が満ちたら星のゲージ → ユニット → 星臨のボタン */
   if(st.deck.some(c=>c.ult)){setStep(DONE);return hide();}
-  if(st.star<TDD.K.STAR_MAX||!st.units.length){clearRings(0);return point(null);}
+  const awing=st.units.some(u=>u.awT>0);if((st.star<TDD.K.AW&&!awing)||!st.units.length){clearRings(0);return point(null);}
   const gauge=mid(root.querySelector('.td-star'));if(gauge)ring(n++,gauge.x,gauge.y,gauge.w/2+4,'star gauge',gauge.h/2+4);
-  const pan=root.querySelector('.td-con'),ub=pan&&pan.querySelector('.ult:not([disabled])');
+  const pan=root.querySelector('.td-con'),ub=pan&&(pan.querySelector('.ult:not([disabled])')||pan.querySelector('.td-aw:not([disabled])'));
   if(ub){const m=mid(ub);ring(n++,m.x,m.y,m.w/2+4,'star',m.h/2+4);clearRings(n);return point(m.x,m.y);}
   const u=st.units.slice().sort((a,b)=>b.x-a.x).find(u=>{const c=st.deck.find(c=>c.on===u);return c&&!c.ult;});if(!u){clearRings(n);return point(null);}
   const q=scr(st,u.x,u.y-22);if(q.x>q.L&&q.x<q.R){ring(n++,q.x,q.y,20*q.S,'star');clearRings(n);point(q.x,q.y);}else{clearRings(n);point(null);edge(st,u);}return;}

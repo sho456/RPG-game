@@ -5,21 +5,23 @@
 'use strict';
 const TDD=(()=>{
 /* ---------- 定数 ---------- */
-const K={FH:420,STEP:1/30,LIVES:7,COST0:10,COST_EVERY:.9,STAR_MAX:10,DARK:.6/*光の外の攻撃の倍率*/,GAP:8/*WAVE の間の秒*/,
- SKCH:2.2/*技 3 つの溜めの倍率（1 つだった頃より長く）*/,GCD:.7/*技と技の間の最短の秒*/,AW:6/*星臨の星片*/};
-/* 星臨（戦闘中 1 人 1 回・手で出す）：dur 秒のあいだ攻撃 +atk・技の溜めが ch 倍の速さ・出した時に HP を heal 回復。星臨中の奥義は威力 ×ou */
-const AWK={dur:15,atk:.3,ch:1.6,heal:.3,ou:1.3};
+const K={FH:420,STEP:1/30,LIVES:7,COST0:10,COST_EVERY:.9,STAR_MAX:8,DARK:.6/*光の外の攻撃の倍率*/,GAP:8/*WAVE の間の秒*/,
+ SKCH:2.2/*技 3 つの溜めの倍率（1 つだった頃より長く）*/,GCD:.7/*技と技の間の最短の秒*/,AW:8/*星臨の星片（ゲージ満タン）*/};
+/* 星臨（ver0.60）：星片のゲージが満タンで手で出す。dur 秒のあいだ攻撃 +atk・技の溜めが ch 倍・出した時に HP を heal 回復＋役割ごとの専用の強化（ab）。
+ 奥義は星臨の間だけ・1 回の星臨に 1 回。奥義を出すと星臨の残り時間が半分になる。奥義の威力 ×ou
+ ab：cut＝被ダメージ減・blk＝止める数＋・atk＝攻撃＋・iv＝攻撃間隔の倍率・rng＝射程の倍率・spl＝範囲の倍率・tatk＝置いている仲間全員の攻撃＋・regen＝射程内の仲間の毎秒回復・ch＝技の溜めの倍率 */
+const AWK={dur:20,atk:.2,ch:1.4,heal:.3,ou:1.3,ab:{guard:{cut:.4,blk:2},blade:{atk:.3,iv:.65},shot:{rng:1.35,atk:.15},spell:{spl:1.6,atk:.15,rng:1.2},aid:{tatk:.15,rng:1.25},heal:{regen:.04,rng:1.25},special:{ch:1.5,rng:1.2}}};
 /* 役割：line＝隊列（f＝前衛：道の上で敵を止める／b＝後衛：前衛の後ろ・道の脇）・射程・攻撃間隔・止める数・コスト・攻撃の形
  mv＝歩く速さ（px/秒）・chase＝斬るが持ち場から敵へ詰め寄る間合い・off＝後衛が一番前の前衛から下がる間合い */
 /* 役割（ver0.58 で名前を統一）：タンク・近距離物理アタッカー・遠距離物理アタッカー・魔法アタッカー・サポーター・ヒーラー・特殊（上に当てはまらない）。動きは sim.js の BR */
 const ROLE={
- guard:  {n:'タンク',line:'f',rng:42,iv:1.3,blk:3,cost:16,col:'#7fa6d9',mv:46},
- blade:  {n:'近距離物理アタッカー',line:'f',rng:40,iv:1.0,blk:1,cost:10,col:'#e0a050',mv:68,chase:80},
- shot:   {n:'遠距離物理アタッカー',line:'b',rng:150,iv:1.1,blk:0,cost:12,col:'#9fd36a',mv:52,off:72},
- spell:  {n:'魔法アタッカー',line:'b',rng:112,iv:1.6,blk:0,cost:14,col:'#d070d0',splash:32,mv:50,off:56},
- aid:    {n:'サポーター',line:'b',rng:108,iv:1.5,blk:0,cost:12,col:'#80d8c8',mv:54,off:40},
- heal:   {n:'ヒーラー',line:'b',rng:108,iv:1.5,blk:0,cost:12,col:'#f2a0c8',mv:56,off:34},
- special:{n:'特殊',line:'b',rng:118,iv:1.4,blk:0,cost:13,col:'#b8b0d8',mv:54,off:50}};
+ guard:  {n:'タンク',line:'f',rng:42,iv:1.3,blk:3,cost:16,col:'#7fa6d9',mv:52,chase:70},
+ blade:  {n:'近距離物理アタッカー',line:'f',rng:40,iv:1.0,blk:1,cost:10,col:'#e0a050',mv:76,chase:150},
+ shot:   {n:'遠距離物理アタッカー',line:'b',rng:210,iv:1.1,blk:0,cost:12,col:'#9fd36a',mv:52,off:96},
+ spell:  {n:'魔法アタッカー',line:'b',rng:165,iv:1.6,blk:0,cost:14,col:'#d070d0',splash:36,mv:50,off:80},
+ aid:    {n:'サポーター',line:'b',rng:160,iv:1.5,blk:0,cost:12,col:'#80d8c8',mv:54,off:64},
+ heal:   {n:'ヒーラー',line:'b',rng:160,iv:1.5,blk:0,cost:12,col:'#f2a0c8',mv:56,off:60},
+ special:{n:'特殊',line:'b',rng:165,iv:1.4,blk:0,cost:13,col:'#b8b0d8',mv:54,off:72}};
 /* 仲間 12 人。sk＝技（RPG 版の技のキー。名前は SK から引く）、k＝技の働き、ch＝チャージ秒、lt＝自分の周りに出す光の半径 */
 const HERO={
  rio:  {role:'blade',el:'陽',lt:120,sk:'koujin',  k:'strike',m:2.6,ch:8},
@@ -32,7 +34,7 @@ const HERO={
  erna: {role:'shot', el:'雷',sk:'raiya',    k:'chain',m:1.6,cnt:3,ch:7},
  mire: {role:'spell',el:'熱',sk:'flamewave',k:'nova',m:1.9,r:56,ch:9,at:'foe'},
  crow: {role:'special',el:'陰',sk:'noroi',    k:'curse',m:1.3,dur:6,ch:8,cost:13},
- noah: {role:'heal', el:'陽',lt:120,sk:'inori',k:'heal',m:.3,r:118,ch:10,cost:11,atkK:.6},
+ noah: {role:'heal', el:'陽',lt:120,sk:'inori',k:'heal',m:.3,r:170,ch:10,cost:11,atkK:.6},
  celes:{role:'aid',  el:'陰',sk:'chien',    k:'slow',m:.45,r:70,dur:6,ch:9,haste:.25,atkK:.7}};
 /* 星臨の奥義（戦闘中 1 回・1 人 1 つ）。名前は本編の奥義（AWX.ou）。ver0.56 で旧「極（goku）」の効果を合わせた。
  k：unova＝範囲攻撃（m 倍・半径 r）、uheal＝全員の回復＋灯火 +1＋光を戻す、utime＝敵全体を遅く、upct＝敵全体の今の HP を v 削る（ボスは b）
@@ -68,7 +70,7 @@ const ouName=id=>{try{return SK[RSD.AWX[id].ou].n;}catch(e){return awName(id);}}
 const RK={E:.8,D:1.05,C:1.35,B:1.65,A:2,S:2.5,SS:3.2,SSS:4.2};
 function mapSk(k,role){const s=(typeof SK!=='undefined'&&SK[k])||{},rk=s.rk||'B',p=RK[rk]||1.65,m=+(1.1+p*.6).toFixed(2),ch=Math.round(6+p*1.3),back=ROLE[role].line==='b';
  const fx=[...(s.fx20||[]),...(s.post||[])],has=x=>fx.some(f=>f.k===x),sup=s.k==='sup20'||s.role==='guard';
- if(s.heal20||s.k==='heal'||s.k==='healAll'||s.k==='revive'||s.k==='reviveAll'||s.role==='heal')return{k:'heal',m:+(.22+(s.heal20||.1)*.3).toFixed(2),r:118,ch:ch+1};
+ if(s.heal20||s.k==='heal'||s.k==='healAll'||s.k==='revive'||s.k==='reviveAll'||s.role==='heal')return{k:'heal',m:+(.22+(s.heal20||.1)*.3).toFixed(2),r:170,ch:ch+1};
  if(sup)return back?{k:'slow',m:.35,r:70,dur:5,ch}:{k:'guard',ch:ch+2};
  if(has('stun')||has('para')||s.delay)return{k:'stun',m:+(m*.75).toFixed(2),dur:+(1.2+(s.delay?.6:0)).toFixed(1),ch};
  if(back&&has('spd'))return{k:'slow',m:.4,r:64,dur:5,ch};

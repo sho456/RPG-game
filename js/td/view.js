@@ -171,7 +171,7 @@ function drawUnit(u,t){const fc=TDA.face(u,st.t),fl=st.t-(u.hitT||-9)<.08,lg=st.
  if(!u.lit){g.fillStyle='rgba(169,165,196,.95)';g.font='700 8px "M PLUS 1p",sans-serif';g.textAlign='center';g.fillText('光の外',x,u.y+13);}
  bar(x,u.y-TDA.hgt(u.id,UH)-6,24,u.hp/u.h.hp,u.hp/u.h.hp<.35?'#e86a6a':'#9fe8b8');
  if(selU===u){g.strokeStyle='#fff0b8';g.lineWidth=1.5;g.beginPath();g.ellipse(x,u.y+1,18,6,0,0,7);g.stroke();}
- if(c&&((st.star>=K.STAR_MAX&&!c.ult)||(st.star>=K.AW&&!c.aw))){g.fillStyle='#fff0b8';g.globalAlpha=.6+.4*Math.sin(t*8);g.fillRect(x-17,u.y-TDA.hgt(u.id,UH)-4,3,3);g.globalAlpha=1;}}
+ if(c&&(TDS.canUlt(st,u.uid)||TDS.canAw(st,u.uid))){g.fillStyle='#fff0b8';g.globalAlpha=.6+.4*Math.sin(t*8);g.fillRect(x-17,u.y-TDA.hgt(u.id,UH)-4,3,3);g.globalAlpha=1;}}
 let bT=0;function banner(a,b,ms,boss){const e=$('.td-banner');e.innerHTML=`${esc(a)}${b?`<small>${esc(b)}</small>`:''}`;e.classList.toggle('boss',!!boss);e.classList.add('show');clearTimeout(bT);bT=setTimeout(()=>e.classList.remove('show'),ms);}
 /* できない操作は文章でなく、その場所を揺らして赤く光らせる */
 function nope(q){const e=typeof q==='string'?$(q):q;if(!e)return;e.classList.remove('nope');void e.offsetWidth;e.classList.add('nope');}

@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.59';
+const VER='ver0.60';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,12 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　セレスの新しいドット絵と演出<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　星臨と奥義・仲間の動き・戦場の広さ<br><small>`+
+ `・星臨は星片のゲージが満タンで発動。20 秒のあいだ、役割ごとの専用の強化が付く（何度でも使える）<br>`+
+ `・奥義は星臨の間だけ使える。使うと星臨の残り時間が半分に<br>`+
+ `・近距離の仲間は前へ出て敵を止めに行き、遠距離・支援の仲間は離れた所から広い範囲で戦う<br>`+
+ `・敵の入口と灯の距離を縮めた。明るくした灯の光が勝手に縮まないように<br></small></div>`+
+`<div class="nt"><b>ver0.59</b>　セレスの新しいドット絵と演出<br><small>`+
  `・セレスの絵を描き直し、待機・歩き・攻撃・技・被弾・倒れ・星臨に入る・星臨の待機と技・奥義をなめらかなコマ送りに<br>`+
  `・奥義は星臨の姿で。空に金の時計が現れ、針が光の槍になって敵の群れへ落ちる<br>`+
  `・攻撃と技のエフェクトを光の質感から作り直し、当たった敵が一瞬止まって術の色に染まる。数字は着弾の瞬間に<br>`+

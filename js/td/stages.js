@@ -6,8 +6,9 @@
 const GY=300;/* 灯の足元の高さ */
 /* 道：lanes は道の高さの列。どの道も最後は灯へ斜めに合流する */
 function lanePath(W,y){return[[-30,y],[W-150,y],[W-70,GY]];}
-/* 地図を作る：道の高さの列 lanes と灯の光の半径 r（既定は幅の 33%）。台座は無い（ver0.55：仲間は置いた場所の近くの道で、役割の隊形を組む） */
-function map(W,lanes,r){return{W,base:[W-46,GY],light:{r:r||Math.round(W*.33)},paths:lanes.map(y=>lanePath(W,y))};}
+/* 地図を作る：道の高さの列 lanes と灯の光の半径 r（既定は幅の 38%）。台座は無い（ver0.55：仲間は置いた場所の近くの道で、役割の隊形を組む）
+ ver0.60：敵の入口と灯が遠すぎたので、幅を書いた値の 78% に詰める（灯の光は詰める前の幅の 3 割ほどのまま） */
+function map(W,lanes,r){W=Math.round(W*.78);return{W,base:[W-46,GY],light:{r:r||Math.round(W*.38)},paths:lanes.map(y=>lanePath(W,y))};}
 /* 1 本道（高さ 300）・2 本道（262・338）・3 本道（244・300・356）の型 */
 const ONE=W=>map(W,[GY]);
 const TWO=W=>map(W,[262,338]);
@@ -21,15 +22,15 @@ const L={
  /* ---------- 序章 灰の街道 ---------- */
  td0_1:S('td0_1',{hk:2.0,star:{time:145},q:'q0_1',name:'灰色の街道',lv:1,th:'ash',cap:4,cost0:14,pre:pre('q0_1'),tut:1,
   waves:[{e:[[2,'slime',4,2.4]]},{e:[[1,'slime',6,1.8]]},{e:[[1,'slime',5,1.6],[6,'wolf',4,1.8]]}]},ONE(860)),
- td0_2:S('td0_2',{hk:1.28,star:{time:130},q:'q0_2',name:'灰狼の遠吠え',lv:2,th:'ash',cap:4,join:'shion',
+ td0_2:S('td0_2',{hk:1.0,star:{time:130},q:'q0_2',name:'灰狼の遠吠え',lv:2,th:'ash',cap:4,join:'shion',
   join_lines:[[null,'n','狼の群れが散ったあと、物陰から少年が顔を出した。'],['shion','h','へえ、やるじゃん。灯守ってのは口だけじゃないんだな'],['shion','n','俺はシオン。街の孤児の面倒を見てる。……虚蝕を追うなら、足の速い奴がいた方がいいだろ？']],
   waves:[{e:[[2,'wolf',5,1.6]]},{e:[[1,'slime',6,1.3],[5,'wolf',5,1.3]]},{e:[[1,'wolf',8,1.1],[4,'slime',6,1.2]]}]},ONE(920)),
- td0_3:S('td0_3',{hk:1.8,bk:0.5,star:{time:155},q:'q0_4',name:'灰狼の頭目',lv:3,th:'ash',cap:5,pre:pre('q0_4'),
+ td0_3:S('td0_3',{hk:1.74,bk:0.36,star:{time:155},q:'q0_4',name:'灰狼の頭目',lv:3,th:'ash',cap:5,pre:pre('q0_4'),
   waves:[{e:[[2,'slime',4,1.8],[7,'wolf',3,1.4]]},{e:[[1,'wolf',6,1.1],[4,'slime',5,1.3]]},{e:[[2,'m_wolf',1,1,0],[4,'slime',5,1.3],[8,'wolf',6,1.1]]}]},ONE(1000)),
  td0_4:S('td0_4',{hk:0.85,bk:0.36,star:{time:155},q:'q0_5',name:'虚ろの番人',lv:4,th:'ash',cap:5,boss:1,pre:pre('q0_5'),
   waves:[{e:[[2,'slime',6,1.4],[6,'wolf',4,1.3]]},{e:[[1,'wolf',8,1],[3,'slime',6,1.2]]},{e:[[2,'boss',1,1,1],[5,'wolf',6,1.2],[10,'slime',6,1.2]]}]},TWO(1040)),
  /* ---------- 第1章 翠の森・沈黙の図書遺跡 ---------- */
- td1_1:S('td1_1',{hk:2.12,star:{time:165},q:'q1_1',name:'翠の森へ',lv:6,th:'forest',pre:pre('q1_1'),
+ td1_1:S('td1_1',{hk:1.38,star:{time:165},q:'q1_1',name:'翠の森へ',lv:6,th:'forest',pre:pre('q1_1'),
   waves:[{e:[[2,'moss',5,1.6]]},{e:[[1,'jadewolf',5,1.2],[5,'moss',5,1.4]]},{e:[[1,'jadewolf',7,1],[4,'moss',6,1.2]]}]},TWO(1040)),
  td1_2:S('td1_2',{hk:1.26,star:{time:195},q:'q1_3',name:'図書遺跡の少女',lv:7,th:'forest',join:'mire',join_lines:post('mire'),
   waves:[{e:[[2,'shroom',5,1.5]]},{e:[[1,'bookghost',5,1.6],[5,'shroom',4,1.5]]},{e:[[1,'bookghost',6,1.2],[4,'moss',6,1.2],[9,'jadewolf',4,1.2]]}]},TWO(1060)),

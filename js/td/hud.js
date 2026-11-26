@@ -26,14 +26,14 @@ function con(u){conU=u||null;const e=$('.td-con');for(const k in memo)if(k[0]===
  const h=u.h;e.className='td-con';e.style.setProperty('--rc',TDD.ROLE[h.role].col);
  e.innerHTML=`<button class="cf" data-a="focus" aria-label="${esc(h.name)}"><img src="${V.face(u.id)}" alt=""><i class="hp"><b></b></i></button>
  <div class="cs">${h.sks.map((k,i)=>btn('td-sk','sk',i,TDI.img(k.id,elOf(k.id)),k.n)).join('')}</div>
- ${btn('td-aw','aw',null,TDI.img('_aw','陽',1),'星臨',TDD.K.AW)}${btn('td-ou ult','ult',null,TDI.img(ouK(u.id),elOf(ouK(u.id)),1),h.ult.n,TDD.K.STAR_MAX)}
+ ${btn('td-aw','aw',null,TDI.img('_aw','陽',1),'星臨',TDD.K.AW)}${btn('td-ou ult','ult',null,TDI.img(ouK(u.id),elOf(ouK(u.id)),1),h.ult.n,null)}
  <div class="cm"><button class="td-btn" data-a="mv">移動</button><button class="td-btn" data-a="ret">撤退</button></div>`;}
 /* 技が出た：そのボタンを光らせる */
 function fire(u,sk){if(u!==conU)return;const i=u.h.sks.indexOf(sk),b=$(`.td-con .td-sk[data-i="${i}"]`);if(!b)return;b.classList.remove('fire');void b.offsetWidth;b.classList.add('fire');}
 function conTick(st){const u=conU;if(!u)return;if(!st.units.includes(u)){con(null);return;}const c=st.deck.find(c=>c.on===u);
  const hp=Math.max(0,u.hp/u.h.hp);set('khp',$('.td-con .hp b'),Math.round(hp*100),(e,v)=>{e.style.width=v+'%';e.classList.toggle('low',hp<.35);});
  u.h.sks.forEach((k,i)=>{const r=Math.min(1,u.ch[i]/k.ch),b=$(`.td-con .td-sk[data-i="${i}"]`);set('ks'+i,b,Math.round(r*90),(e)=>{e.style.setProperty('--p',Math.round((1-r)*100)+'%');e.style.setProperty('--a',Math.round(r*360)+'deg');e.classList.toggle('ready',r>=1);});});
- const aw=u.awT>0,ca=TDS.canAw(st,u.uid);set('kaw',$('.td-aw'),`${c&&c.aw?1:0}${ca?1:0}${aw?Math.ceil(u.awT):0}`,(e)=>{e.classList.toggle('used',!!(c&&c.aw)&&!aw);e.classList.toggle('can',ca);e.classList.toggle('act',aw);
+ const aw=u.awT>0,ca=TDS.canAw(st,u.uid);set('kaw',$('.td-aw'),`${c&&c.aw?1:0}${ca?1:0}${aw?Math.ceil(u.awT):0}`,(e)=>{e.classList.toggle('can',ca);e.classList.toggle('act',aw);
   e.classList.toggle('ready',ca);e.disabled=!ca;e.querySelector('.t').style.width=aw?Math.round(u.awT/TDD.AWK.dur*100)+'%':'0';});
  const cu=TDS.canUlt(st,u.uid);set('kou',$('.td-ou'),`${c&&c.ult?1:0}${cu?1:0}${aw?1:0}`,(e)=>{e.classList.toggle('used',!!(c&&c.ult));e.classList.toggle('can',cu);e.classList.toggle('boost',cu&&aw);e.classList.toggle('ready',cu);e.disabled=!cu;});}
 /* ---------- 手札：顔・コスト・役割の色。置いた仲間は HP と技の溜まり（3 つの点）・星臨/奥義が出せる印 ---------- */

@@ -54,15 +54,15 @@ function spawn(st,kind,s=0,lane=0){const f=D.foe(kind,st.S.lv);if(!f)return null
  const u=Object.assign(f,{uid:st.uid++,lane,P,mhp:f.hp,s,x:a.x,y:a.y,dir:a.dir,by:null,atkT:f.iv,stun:0,slow:0,curse:0,aiT:f.ai?f.ai.every:0,hitT:-9});if(u.boss&&st.S.gim)u.gim={k:st.S.gim.k,every:st.S.gim.every||10,t:(st.S.gim.every||10)*.6,ch:0};st.foes.push(u);ev(st,{k:'spawn',f:u});return u;}
 /* ---------- ダメージ：攻撃 × 倍率 × 攻撃/(攻撃+防御) × 属性 × 会心 ---------- */
 /* アビリティ（TDD.abTd）：u.h の crit・critd・pierce・drain・cut・regen・fu、置いている仲間全員へ tatk・tcut（st.tAtk・st.tCut）。奥義の攻撃 +（st.buff） */
-function hit(st,u,f,m=1,o={}){if(f.hp<=0)return 0;const H=u.h,A=H.atk*(u.lit?1:K.DARK)*(u.id==='lamp'?1:1+(st.tAtk||0)+(st.buffT>0?st.buff:0)+(u.awT>0?D.AWK.atk:0));let df=H.dmgK==='mag'?f.res:f.def;if(f.curse>0)df*=.6;if(H.pierce)df*=1-H.pierce;
+function hit(st,u,f,m=1,o={}){if(f.hp<=0)return 0;const H=u.h,A=H.atk*(u.lit?1:K.DARK)*(u.id==='lamp'?1:1+(st.tAtk||0)+(st.buffT>0?st.buff:0)+(st.awTatk||0)+(u.awT>0?D.AWK.atk+(u.awA.atk||0):0));let df=H.dmgK==='mag'?f.res:f.def;if(f.curse>0)df*=.6;if(H.pierce)df*=1-H.pierce;
  let v=A*m*A/(A+df);const el0=o.el||u.h.el;
  if(f.tr.includes('ghost'))v*=u.h.dmgK==='phys'?.6:1.25;if(f.tr.includes('armor')&&u.h.dmgK==='phys'&&el0!=='打')v*=.55;
  const el=o.el||u.h.el,weak=f.weak.includes(el),res=f.resist.includes(el);if(weak)v*=1.5;if(res)v*=.5;
  const cr=st.R()<.1+(H.crit||0);if(cr)v*=1.5+(H.critd||0);v=Math.max(1,Math.round(v));f.hp-=v;f.hitT=st.t;if(H.drain&&u.hp>0)u.hp=Math.min(H.hp,u.hp+v*H.drain);
  ev(st,{k:'hit',f,u,v,el,weak,res,cr,sk:!!o.sk,big:!!o.big});if(f.hp<=0)kill(st,f,u);return v;}
-function kill(st,f,u){f.hp=0;st.kills++;st.cost+=f.cost+(u&&u.h.thief?1:0);st.star=Math.min(K.STAR_MAX*2,st.star+f.star);
+function kill(st,f,u){f.hp=0;st.kills++;st.cost+=f.cost+(u&&u.h.thief?1:0);st.star=Math.min(K.STAR_MAX,st.star+f.star);
  if(f.tr.includes('void'))st.lightR=Math.min(st.r0,st.lightR+10);if(f.by){f.by.blocking=f.by.blocking.filter(x=>x!==f);f.by=null;}ev(st,{k:'kill',f,u});}
-function hurt(st,f,u){const v=Math.max(1,Math.round(f.atk*f.atk/(f.atk+u.h.def)*(1-Math.min(.6,(u.h.cut||0)+(st.tCut||0)))));u.hp-=v;ev(st,{k:'hurt',u,v,f});if(u.hp<=0)fall(st,u);}
+function hurt(st,f,u){const v=Math.max(1,Math.round(f.atk*f.atk/(f.atk+u.h.def)*(1-Math.min(.75,(u.h.cut||0)+(st.tCut||0)+(u.awT>0&&u.awA.cut||0)))));u.hp-=v;ev(st,{k:'hurt',u,v,f});if(u.hp<=0)fall(st,u);}
 function release(u){for(const f of u.blocking)f.by=null;u.blocking=[];}
 function fall(st,u){u.hp=0;release(u);st.units=st.units.filter(x=>x!==u);const c=st.deck.find(c=>c.on===u);if(c){c.on=null;c.cd=Math.round(u.h.redeploy*1.5);}ev(st,{k:'fall',u});lightUpdate(st);}
 /* ---------- 操作：置く・動かす ---------- */
@@ -72,7 +72,7 @@ function canDeploy(st,id,x,y){const c=st.deck.find(c=>c.id===id);
  if(!c||st.over)return'なし';if(c.on)return'配置済み';if(c.cd>0)return'再配置まで '+Math.ceil(c.cd)+' 秒';if(st.cost<c.h.cost)return'灯力が足りない';
  if(st.units.length>=st.cap)return'配置の上限';if(x==null)return'';const p=spot(st,x,y),a=at(p.P,p.s);if(!litAt(st,a.x,a.y))return'灯の光が届いていない';return'';}
 function deploy(st,id,x,y){const why=canDeploy(st,id,x,y);if(why)return why;const c=st.deck.find(c=>c.id===id),p=spot(st,x,y),h=c.h;
- st.cost-=h.cost;const u={uid:st.uid++,id,h,hp:h.hp,lane:p.li,P:p.P,s:p.s,home:p.s,ts:p.s,yo:yo(st,p.li,h.line),x:0,y:0,atkT:.4,ch:h.sks.map((k,i)=>k.ch*(.35-.12*i)),gcd:0,awT:0,onP:true,blocking:[],blkUp:0,lit:true,face:-1,actT:-9,mv:0};
+ st.cost-=h.cost;const u={uid:st.uid++,id,h,hp:h.hp,lane:p.li,P:p.P,s:p.s,home:p.s,ts:p.s,yo:yo(st,p.li,h.line),x:0,y:0,atkT:.4,ch:h.sks.map((k,i)=>k.ch*(.35-.12*i)),gcd:0,awT:0,awA:{},onP:true,blocking:[],blkUp:0,lit:true,face:-1,actT:-9,mv:0};
  c.on=u;st.units.push(u);form(st);const a=at(u.P,u.ts);u.x=a.x;u.y=a.y+u.yo;u.s=u.ts;if(h.line==='b')u.home=u.ts;lightUpdate(st);ev(st,{k:'deploy',u});return'';}
 /* 動かす：その場所へ歩く（別の道へも）。止めていた敵は放す */
 function move(st,uid,x,y){const u=st.units.find(u=>u.uid===uid);if(!u||st.over)return'なし';const p=spot(st,x,y),a=at(p.P,p.s);
@@ -88,12 +88,12 @@ function backOf(st,u,fr){return fr==null?u.home:Math.max(u.home,fr+u.h.off);}
 /* 寄られたら下がる（止められていない敵が後衛の前 34 以内） */
 const pressed=(st,u)=>st.foes.some(f=>f.hp>0&&f.lane===u.lane&&!f.by&&f.s<=u.s&&u.s-f.s<34);
 const BR={
- guard(st,u,c){u.dy=0;const L=c.Lf.filter(f=>!f.by&&f.s<u.s+4&&u.home-f.s<=28);if(L.length&&u.blocking.length<u.h.blk){const b=L.reduce((a,f)=>f.s>a.s?f:a);return Math.max(b.s+6,u.home-28);}return u.home;},
+ guard(st,u,c){u.dy=0;const L=c.Lf.filter(f=>!f.by&&f.s<u.s+4&&u.home-f.s<=u.h.chase);if(L.length&&u.blocking.length<u.h.blk){const b=L.reduce((a,f)=>f.s>a.s?f:a);return Math.max(b.s+6,u.home-u.h.chase);}return u.home;},
  blade(st,u,c){const T=c.U.find(v=>v!==u&&v.h.line==='f'&&!v.dy&&v.blocking.length&&Math.abs(v.s-u.home)<=u.h.chase+20);
   if(T&&!u.blocking.length){u.dy=10;return T.s+26;}u.dy=0;
   let b=null;for(const f of c.Lf)if(f.s<u.s+4&&u.home-f.s<=u.h.chase&&(!b||f.s>b.s))b=f;return b?Math.max(b.s+6,u.home-u.h.chase):u.home;},
  ranged(st,u,c,k){u.dy=0;const base=backOf(st,u,c.fr);if(pressed(st,u))return u.s+40;
-  const lead=c.Lf.length?c.Lf.reduce((a,f)=>f.s>a.s?f:a):null;if(!lead)return base;return Math.max(c.fr==null?0:c.fr+u.h.off*.6,Math.min(base,lead.s+u.h.rng*k));},
+  const lead=c.Lf.length?c.Lf.reduce((a,f)=>f.s>a.s?f:a):null;if(!lead)return base;return Math.max(c.fr==null?0:c.fr+u.h.off*.6,Math.min(base,lead.s+rngOf(u)*k));},
  shot(st,u,c){return BR.ranged(st,u,c,.8);},
  spell(st,u,c){return BR.ranged(st,u,c,.65);},
  aid(st,u,c){u.dy=0;const base=backOf(st,u,c.fr);if(pressed(st,u))return u.s+40;const O=c.U.filter(v=>v!==u);if(!O.length)return base;return Math.max(base-20,O.reduce((a,v)=>a+v.s,0)/O.length+18);},
@@ -103,9 +103,9 @@ const BR={
 /* 重ならないように：道ごとに前から順に並べ、すぐ前の者と同じ列（前衛・肩越し・後衛）なら SP、別の列でも 26 離す。敵を止めている者は動かさない */
 function sep(U){const row=u=>u.h.line==='f'?(u.dy?1:0):2,key=u=>u.blocking.length?u.s:u.ts,L=U.slice().sort((a,b)=>key(a)-key(b));let p=null;
  for(const u of L){if(u.blocking.length){u.ts=u.s;p={s:u.s,r:row(u)};continue;}if(p)u.ts=Math.max(u.ts,p.s+(p.r===row(u)?SP:26));p={s:u.ts,r:row(u)};}}
-function form(st){st.tAtk=0;st.tCut=0;for(const u of st.units){st.tAtk+=u.h.tatk||0;st.tCut+=u.h.tcut||0;}
+function form(st){st.tAtk=0;st.tCut=0;st.awTatk=0;for(const u of st.units){st.tAtk+=u.h.tatk||0;st.tCut+=u.h.tcut||0;if(u.awT>0)st.awTatk+=u.awA.tatk||0;}
  for(let li=0;li<st.Ps.length;li++){const U=st.units.filter(u=>u.lane===li);if(!U.length)continue;const F=U.filter(u=>u.h.line==='f'),c={U,Lf:laneFoes(st,li),fr:F.length?Math.min(...F.map(u=>u.home)):null};
-  for(const u of U){let ts=(BR[u.h.role]||BR.special)(st,u,c);ts=Math.max(20,Math.min(u.P.L-20,ts));const q=at(u.P,ts);if(!litAt(st,q.x,q.y,u))ts=Math.max(ts,u.home);u.ts=ts;}
+  for(const u of U){let ts=(BR[u.h.role]||BR.special)(st,u,c);ts=Math.max(20,Math.min(u.P.L-20,ts));const q=at(u.P,ts);if(!litAt(st,q.x,q.y,u))ts=Math.max(ts,Math.min(u.home,frontier(st,li,u)+8));u.ts=ts;}
   sep(U);
   for(const u of U)u.ts=Math.min(u.P.L-20,u.ts);}}
 /* 歩く：行き先（ts と横のずれ dy）へ。止めている間は動かない。dy のある者（回り込み）は道から外れているので敵を止めない */
@@ -115,12 +115,13 @@ function walk(st,dt){for(const u of st.units){if(u.blocking.length){u.mv=0;conti
  u.s=sOf(u.P,u.x);u.onP=Math.abs(u.y-u.yo-at(u.P,u.s).y)<5;}}
 function retreat(st,uid){const u=st.units.find(u=>u.uid===uid);if(!u)return false;st.cost+=Math.floor(u.h.cost/2);release(u);
  st.units=st.units.filter(x=>x!==u);const c=st.deck.find(c=>c.on===u);if(c){c.on=null;c.cd=u.h.redeploy;}ev(st,{k:'retreat',u});lightUpdate(st);return true;}
-function canUlt(st,uid){const u=st.units.find(u=>u.uid===uid),c=u&&st.deck.find(c=>c.on===u);return!!(u&&c&&!c.ult&&st.star>=K.STAR_MAX&&!st.over);}
-/* 星臨：星片 K.AW。AWK.dur 秒のあいだ攻撃が上がり、技の溜めが速くなる。出した時に HP を回復 */
-function canAw(st,uid){const u=st.units.find(u=>u.uid===uid),c=u&&st.deck.find(c=>c.on===u);return!!(u&&c&&!c.aw&&st.star>=K.AW&&!st.over);}
-function aw(st,uid){if(!canAw(st,uid))return false;const u=st.units.find(u=>u.uid===uid),c=st.deck.find(c=>c.on===u),A=D.AWK;c.aw=true;st.star-=K.AW;u.awT=A.dur;u.actT=st.t;u.actK='aw';
+/* 奥義（ver0.60）：星臨の間だけ・1 回の星臨に 1 回（c.ult）。星片は使わない。出すと星臨の残りが半分になる */
+function canUlt(st,uid){const u=st.units.find(u=>u.uid===uid),c=u&&st.deck.find(c=>c.on===u);return!!(u&&c&&!c.ult&&u.awT>0&&!st.over);}
+/* 星臨（ver0.60）：星片のゲージ（K.AW＝満タン）を使う。AWK.dur 秒、攻撃と技の溜めが上がり、役割ごとの専用の強化（AWK.ab）が付く。出した時に HP を回復。何度でも出せる（星臨中は重ねない） */
+function canAw(st,uid){const u=st.units.find(u=>u.uid===uid),c=u&&st.deck.find(c=>c.on===u);return!!(u&&c&&!(u.awT>0)&&st.star>=K.AW&&!st.over);}
+function aw(st,uid){if(!canAw(st,uid))return false;const u=st.units.find(u=>u.uid===uid),c=st.deck.find(c=>c.on===u),A=D.AWK;c.aw=true;c.ult=false;st.star-=K.AW;u.awT=A.dur;u.awA=A.ab[u.h.role]||{};u.actT=st.t;u.actK='aw';
  const a=Math.round(u.h.hp*A.heal);u.hp=Math.min(u.h.hp,u.hp+a);ev(st,{k:'aw',u});ev(st,{k:'heal',u,v:a});return true;}
-function ult(st,uid){if(!canUlt(st,uid))return false;const u=st.units.find(u=>u.uid===uid),c=st.deck.find(c=>c.on===u),U=u.h.ult;c.ult=true;st.star-=K.STAR_MAX;u.actT=st.t;u.actK='ult';
+function ult(st,uid){if(!canUlt(st,uid))return false;const u=st.units.find(u=>u.uid===uid),c=st.deck.find(c=>c.on===u),U=u.h.ult;c.ult=true;u.awT=u.awT/2;u.actT=st.t;u.actK='ult';
  const live=st.foes.filter(f=>f.hp>0),am=u.awT>0?D.AWK.ou:1,extra=L=>{for(const f of L){if(f.hp<=0)continue;if(U.stun)f.stun=Math.max(f.stun,f.boss?U.stun*.4:U.stun);if(U.curse)f.curse=Math.max(f.curse,U.curse);}
   if(U.heal)for(const v of st.units){const a=Math.round(v.h.hp*U.heal);v.hp=Math.min(v.h.hp,v.hp+a);ev(st,{k:'heal',u:v,v:a});}if(U.buff){st.buff=U.buff;st.buffT=8;}};
  if(U.k==='uheal'){for(const v of st.units)v.hp=v.h.hp;st.lives=Math.min(K.LIVES,st.lives+1);st.lightR=st.r0;lightUpdate(st);ev(st,{k:'ult',u,x:u.x,y:u.y,r:999});return true;}
@@ -130,19 +131,21 @@ function ult(st,uid){if(!canUlt(st,uid))return false;const u=st.units.find(u=>u.
  let best=live[0],bn=-1;for(const f of live){const n=live.filter(g=>dist(f.x,f.y,g.x,g.y)<=U.r).length+(f.boss?2:0);if(n>bn){bn=n;best=f;}}
  const cx=best.x,cy=best.y,L=live.filter(f=>dist(cx,cy,f.x,f.y)<=U.r);ev(st,{k:'ult',u,x:cx,y:cy,r:U.r});for(const f of L)hit(st,u,f,U.m*am,{sk:1,big:1});extra(L);return true;}
 /* ---------- 技 ---------- */
+/* 射程：星臨の専用の強化（rng）で伸びる */
+const rngOf=u=>u.h.rng*(u.awT>0&&u.awA.rng||1);
 const inRange=(st,u,r)=>st.foes.filter(f=>f.hp>0&&dist(u.x,u.y,f.x,f.y)<=r);
 const rem=f=>f.P.L-f.s,front=L=>L.reduce((a,f)=>!a||rem(f)<rem(a)?f:a,null);
-function target(st,u){if(u.blocking.length)return front(u.blocking);const L=inRange(st,u,u.h.rng);
+function target(st,u){if(u.blocking.length)return front(u.blocking);const L=inRange(st,u,rngOf(u));
  /* 特殊は HP のいちばん多い敵（ボス）を、回り込みの近距離は止められている敵を狙う */
  if(u.h.role==='special'&&L.length)return L.reduce((a,f)=>f.hp>a.hp?f:a);if(u.dy>0){const B=L.filter(f=>f.by);if(B.length)return front(B);}return front(L);}
 function cast(st,u,k){let t=null;
- if(k.k==='heal'){const L=st.units.filter(v=>dist(u.x,u.y,v.x,v.y)<=k.r&&v.hp<v.h.hp*.8);if(!L.length)return false;for(const v of L){const a=Math.round(v.h.hp*k.m);v.hp=Math.min(v.h.hp,v.hp+a);ev(st,{k:'heal',u:v,v:a});}ev(st,{k:'cast',u,sk:k});return true;}
+ if(k.k==='heal'){const L=st.units.filter(v=>dist(u.x,u.y,v.x,v.y)<=k.r*(u.awT>0&&u.awA.rng||1)&&v.hp<v.h.hp*.8);if(!L.length)return false;for(const v of L){const a=Math.round(v.h.hp*k.m);v.hp=Math.min(v.h.hp,v.hp+a);ev(st,{k:'heal',u:v,v:a});}ev(st,{k:'cast',u,sk:k});return true;}
  if(k.k==='guard'){if(!u.blocking.length)return false;const a=Math.round(u.h.hp*.25);u.hp=Math.min(u.h.hp,u.hp+a);u.blkUp=6;ev(st,{k:'heal',u,v:a});ev(st,{k:'cast',u,sk:k});return true;}
  t=target(st,u);if(!t)return false;ev(st,{k:'cast',u,sk:k,f:t});u.face=Math.sign(t.x-u.x)||u.face;
  if(k.k==='strike'){hit(st,u,t,k.m,{sk:1});if(k.kb&&!t.boss&&t.hp>0){if(t.by){t.by.blocking=t.by.blocking.filter(x=>x!==t);t.by=null;}t.s=Math.max(0,t.s-k.kb);}}
  else if(k.k==='stun'){hit(st,u,t,k.m,{sk:1});t.stun=Math.max(t.stun,t.boss?k.dur*.4:k.dur);}
  else if(k.k==='nova'){const cx=k.at==='foe'?t.x:u.x,cy=k.at==='foe'?t.y:u.y;ev(st,{k:'area',u,x:cx,y:cy,r:k.r});for(const f of st.foes.slice())if(f.hp>0&&dist(cx,cy,f.x,f.y)<=k.r)hit(st,u,f,k.m,{sk:1});}
- else if(k.k==='chain'){const L=inRange(st,u,u.h.rng).sort((a,b)=>b.s-a.s).slice(0,k.cnt);for(const f of L)hit(st,u,f,k.m,{sk:1});}
+ else if(k.k==='chain'){const L=inRange(st,u,rngOf(u)).sort((a,b)=>b.s-a.s).slice(0,k.cnt);for(const f of L)hit(st,u,f,k.m,{sk:1});}
  else if(k.k==='curse'){for(const f of st.foes.slice())if(f.hp>0&&dist(t.x,t.y,f.x,f.y)<=40){f.curse=k.dur;hit(st,u,f,k.m,{sk:1});}}
  else if(k.k==='slow'){st.fields.push({x:t.x,y:t.y,r:k.r,m:k.m,t:k.dur,u});ev(st,{k:'area',u,x:t.x,y:t.y,r:k.r,slow:1});}
  return true;}
@@ -158,7 +161,7 @@ function gimmick(st,f,dt){const G=f.gim;
  if(G.k==='charge'){G.ch=3;ev(st,{k:'charge',f});return true;}
  if(G.k==='shift'&&st.Ps.length>1){const r=f.s/f.P.L;if(f.by){f.by.blocking=f.by.blocking.filter(x=>x!==f);f.by=null;}f.lane=(f.lane+1)%st.Ps.length;f.P=st.Ps[f.lane];f.s=r*f.P.L;
   const a=at(f.P,f.s);f.x=a.x;f.y=a.y;ev(st,{k:'shift',f});return false;}
- if(G.k==='drain'){st.lightR=Math.max(st.r0*.5,st.lightR-st.r0*.18);lightUpdate(st);ev(st,{k:'drain',f});}
+ if(G.k==='drain'){st.lightR=Math.max(st.r0*.7,st.lightR-st.r0*.12);lightUpdate(st);ev(st,{k:'drain',f});}
  return false;}
 /* 追撃（アビリティ）：技のあと（sk）か攻撃のあと、確率で狙いへもう 1 撃 */
 function follow(st,u,isSk,t){for(const F of u.h.fu||[]){if(!!F.sk!==!!isSk)continue;const f=t&&t.hp>0?t:target(st,u);if(f&&st.R()<F.p)hit(st,u,f,F.pow,{el:F.el||undefined});}}
@@ -174,7 +177,8 @@ function tick(st){if(st.over)return;const dt=K.STEP;st.t+=dt;
  /* 場の効果 */
  if(st.timeSlow>0)st.timeSlow-=dt;if(st.buffT>0)st.buffT-=dt;st.fields=st.fields.filter(z=>(z.t-=dt)>0);
  /* 虚蝕：灯の光を削る */
- const nv=st.foes.filter(f=>f.hp>0&&f.tr.includes('void')).length;st.lightR=nv?Math.max(st.r0*.6,st.lightR-1.5*nv*dt):Math.min(st.r0,st.lightR+4*dt);
+ /* ver0.60：削るのは灯の光の縁の近く（光の半径＋40 以内）まで来た虚蝕だけ。遠くにいるだけでは縮まない。下限は 75%・戻りは速く */
+ const[lbx,lby]=st.S.base,nv=st.foes.filter(f=>f.hp>0&&f.tr.includes('void')&&dist(f.x,f.y,lbx,lby)<=st.lightR+40).length;st.lightR=nv?Math.max(st.r0*.75,st.lightR-1.2*nv*dt):Math.min(st.r0,st.lightR+14*dt);
  if(Math.round(st.t*30)%6===0)lightUpdate(st);
  /* 敵 */
  for(const f of st.foes){if(f.hp<=0)continue;if(f.stun>0){f.stun-=dt;if(f.gim&&f.gim.ch>0){f.gim.ch=0;ev(st,{k:'gcancel',f});}continue;}if(f.curse>0)f.curse-=dt;
@@ -198,20 +202,22 @@ function tick(st){if(st.over)return;const dt=K.STEP;st.t+=dt;
  /* 仲間：隊形 → 歩く → 技と攻撃 */
  form(st);walk(st,dt);
  for(const u of st.units.slice()){if(u.hp<=0)continue;if(u.blkUp>0)u.blkUp-=dt;
-  let hs=1;for(const v of st.units)if(v!==u&&v.h.haste&&dist(u.x,u.y,v.x,v.y)<=110)hs=1+v.h.haste;
-  if(u.awT>0){u.awT-=dt;hs*=D.AWK.ch;}
+  let hs=1;for(const v of st.units)if(v!==u&&v.h.haste&&dist(u.x,u.y,v.x,v.y)<=160)hs=1+v.h.haste;
+  if(u.awT>0){u.awT-=dt;hs*=D.AWK.ch*(u.awA.ch||1);const A=u.awA;if(A.blk)u.blkUp=Math.max(u.blkUp,.1);
+   if(A.regen)for(const v of st.units)if(v.hp>0&&v.hp<v.h.hp&&dist(u.x,u.y,v.x,v.y)<=rngOf(u))v.hp=Math.min(v.h.hp,v.hp+v.h.hp*A.regen*dt);
+   if(u.awT<=0){u.awT=0;const c=st.deck.find(c=>c.on===u);if(c)c.ult=false;}}
   if(u.h.regen&&u.hp<u.h.hp)u.hp=Math.min(u.h.hp,u.hp+u.h.hp*u.h.regen*dt/3);
   /* 技 3 つ：溜めが終わった技から自動で出す（技と技の間は K.GCD 秒） */
   u.gcd-=dt;const SK=u.h.sks;for(let i=0;i<SK.length;i++){if(u.ch[i]<SK[i].ch)u.ch[i]=Math.min(SK[i].ch,u.ch[i]+dt*hs);}
   if(u.gcd<=0)for(let i=0;i<SK.length;i++)if(u.ch[i]>=SK[i].ch&&cast(st,u,SK[i])){u.ch[i]=0;u.gcd=K.GCD;u.actT=st.t;u.actK='cast';follow(st,u,1);break;}
-  u.atkT-=dt;if(u.atkT<=0){const t=target(st,u);if(t){u.atkT=u.h.iv;u.actT=st.t;u.actK='atk';u.face=Math.sign(t.x-u.x)||u.face;
-   if(u.h.splash){ev(st,{k:'area',u,x:t.x,y:t.y,r:u.h.splash,small:1});for(const f of st.foes.slice())if(f.hp>0&&dist(t.x,t.y,f.x,f.y)<=u.h.splash)hit(st,u,f,f===t?1:.6);}
+  u.atkT-=dt;if(u.atkT<=0){const t=target(st,u);if(t){u.atkT=u.h.iv*(u.awT>0&&u.awA.iv||1);u.actT=st.t;u.actK='atk';u.face=Math.sign(t.x-u.x)||u.face;
+   const spl=u.h.splash*(u.awT>0&&u.awA.spl||1);if(spl){ev(st,{k:'area',u,x:t.x,y:t.y,r:spl,small:1});for(const f of st.foes.slice())if(f.hp>0&&dist(t.x,t.y,f.x,f.y)<=spl)hit(st,u,f,f===t?1:.6);}
    else hit(st,u,t,1);follow(st,u,0,t);}else u.atkT=.15;}}
 }
 function end(st,win){st.over={win,lives:st.lives,t:Math.round(st.t),wave:st.S.inf?Math.max(0,st.wave):st.wave+1,stars:win?[1,st.lives>=K.LIVES?1:0,st.t<=(st.S.star.time||999)?1:0]:[0,0,0]};ev(st,{k:'end',win});}
 /* ---------- 自動の配置（計測と、将来の AUTO 用） ----------
  前衛：前衛の少ない道へ。光の届く一番前から光の半径の 0.25（タンク。敵はすり抜けないのでタンクが前）・0.4（近距離）内側（虚蝕に光を削られても光の中に残る）。同じ役割がいればその後ろ 22。後衛：前衛の多い道（隊形で前衛の後ろへ並ぶ） */
-function frontier(st,li){const P=st.Ps[li];for(let s=20;s<P.L;s+=6){const a=at(P,s);if(litAt(st,a.x,a.y))return s;}return P.L-30;}
+function frontier(st,li,ex){const P=st.Ps[li];for(let s=20;s<P.L;s+=6){const a=at(P,s);if(litAt(st,a.x,a.y,ex))return s;}return P.L-30;}
 function bot(st){if(st.over)return;if(st.phase==='gap'&&st.wave<0&&st.t>2)callWave(st);
  const has=f=>st.units.some(f),ord=st.deck.slice().sort((a,b)=>pr(a)-pr(b));
  function pr(c){if(c.h.lt&&!has(u=>u.h.lt))return 0;if(c.h.role==='guard'&&!has(u=>u.h.role==='guard'))return 1;return 2;}
@@ -224,9 +230,9 @@ function bot(st){if(st.over)return;if(st.phase==='gap'&&st.wave<0&&st.t>2)callWa
  const can=st.units.length<st.cap&&st.deck.some(c=>!c.on&&c.cd<=0);
  if(lampCost(st)&&st.cost>=lampCost(st)+(can?14:0))lampUp(st);
  const busy=st.foes.length>=4||st.foes.some(f=>f.boss);
- if(st.star>=K.STAR_MAX&&busy){const u=st.units.find(u=>{const c=st.deck.find(c=>c.on===u);return c&&!c.ult;});if(u)ult(st,u.uid);}
- /* 星臨は奥義のぶんを残して（星片が奥義＋星臨ぶんあるとき） */
- if(st.star>=K.STAR_MAX+K.AW&&busy){const u=st.units.find(u=>canAw(st,u.uid));if(u)aw(st,u.uid);}}
+ /* 星臨：敵が多い時に出す。奥義：星臨の残りが 8 秒を切ったら（半分にしても損が少ない時に）出す */
+ if(st.star>=K.AW&&busy){const u=st.units.find(u=>canAw(st,u.uid));if(u)aw(st,u.uid);}
+ for(const u of st.units)if(canUlt(st,u.uid)&&(u.awT<8||st.foes.some(f=>f.boss)))ult(st,u.uid);}
 function run(stageId,deck,lv,seed=1,maxT=900){const st=create(stageId,deck,{lv,seed,prep:3});let n=0;while(!st.over&&st.t<maxT){if(n++%15===0)bot(st);tick(st);st.ev.length=0;}
  return st.over||{win:false,lives:st.lives,t:Math.round(st.t),stars:[0,0,0],timeout:1};}
 return{yo,infWave,lampUp,lampCost,create,tick,deploy,move,retreat,ult,canUlt,aw,canAw,canDeploy,callWave,bot,run,at,sOf,spot,litAt,frontier,lightUpdate};})();
