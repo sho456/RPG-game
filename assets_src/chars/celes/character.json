@@ -1,489 +1,321 @@
 {
-  "_doc": "全アニメ PixelLab の本番コマ（assets_src/pixel-art/celes-hd/import_pl.py が src/master/pl/ から作る。エフェクトは fx/<名>/ に分離）。aw_*＝星臨（aw_walk は aw_idle・aw_atk は aw_cast のコピー）。コマは全て同じキャンバス、足元の基準点 anchor は元の解像度で。詳しくは docs/PIPELINE.md・tools/spx_import.py",
-  "id": "celes_hd",
-  "kind": "hum",
-  "name": "セレス（案2）",
-  "identity": "銀髪ロングの魔女。紫のローブと金の縁取り・紫のとんがり帽子・青い宝石の金の杖",
-  "face": "L",
-  "key": null,
-  "palette": {
-    "colors": 80,
-    "seirinColors": 32
-  },
-  "scale": {
-    "ref": "front",
-    "refK": 1.0,
-    "seirin": 1.0
-  },
-  "sizes": [
-    [
-      "b50",
-      50
-    ],
-    [
-      "b66",
-      66
-    ],
-    [
-      "b83",
-      83
-    ],
-    [
-      "b99",
-      99
-    ]
+ "_doc": "全アニメ PixelLab の新しい絵（assets_src/pixel-art/celes-new/import_new.py が src/ から作る。aw_*＝星臨は通常のコマを青白く染めたもの・walk は idle のコピー）。コマは全て同じキャンバス、足元の基準点 anchor は元の解像度で。",
+ "id": "celes_hd",
+ "kind": "hum",
+ "name": "セレス",
+ "identity": "銀髪ロングの魔女。紫のローブと金の縁取り・紫のとんがり帽子・青い宝石の金の杖",
+ "face": "L",
+ "key": null,
+ "palette": {
+  "colors": 80,
+  "seirinColors": 32
+ },
+ "scale": {
+  "ref": "front",
+  "refK": 1.0,
+  "seirin": 1.0
+ },
+ "sizes": [
+  [
+   "b50",
+   50
   ],
-  "poses": {
-    "front": "master/front.png",
-    "side": "master/side.png",
-    "ready": "master/ready.png",
-    "dying": "master/dying.png",
-    "faint": "master/faint.png"
+  [
+   "b66",
+   66
+  ],
+  [
+   "b83",
+   83
+  ],
+  [
+   "b99",
+   99
+  ]
+ ],
+ "poses": {
+  "front": "master/front.png",
+  "side": "master/side.png",
+  "ready": "master/ready.png",
+  "dying": "master/dying.png",
+  "faint": "master/faint.png"
+ },
+ "anims": {
+  "idle": {
+   "dir": "anim/idle",
+   "ms": [
+    150,
+    150,
+    150,
+    150,
+    150,
+    150,
+    150,
+    150,
+    150
+   ],
+   "loop": true,
+   "scale": 1.0,
+   "anchor": [
+    79,
+    126
+   ]
   },
-  "anims": {
-    "idle": {
-      "dir": "anim/idle",
-      "ms": [
-        150,
-        150,
-        150,
-        150,
-        150,
-        150,
-        150,
-        150,
-        150
-      ],
-      "loop": true,
-      "scale": 1.0,
-      "anchor": [
-        57,
-        121
-      ]
-    },
-    "walk": {
-      "dir": "anim/walk",
-      "ms": [
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100,
-        100
-      ],
-      "loop": true,
-      "scale": 1.0,
-      "anchor": [
-        57,
-        121
-      ]
-    },
-    "atk": {
-      "dir": "anim/atk",
-      "ms": [
-        80,
-        70,
-        70,
-        70,
-        70,
-        60,
-        60,
-        60,
-        80
-      ],
-      "loop": false,
-      "scale": 1.0,
-      "anchor": [
-        57,
-        121
-      ],
-      "hit": 5
-    },
-    "cast": {
-      "dir": "anim/cast",
-      "ms": [
-        90,
-        90,
-        100,
-        100,
-        100,
-        110,
-        110,
-        100,
-        120
-      ],
-      "loop": false,
-      "scale": 1.0,
-      "anchor": [
-        57,
-        121
-      ],
-      "hit": 6
-    },
-    "hurt": {
-      "dir": "anim/hurt",
-      "ms": [
-        50,
-        60,
-        70,
-        60,
-        60
-      ],
-      "loop": false,
-      "scale": 1.0,
-      "anchor": [
-        57,
-        121
-      ]
-    },
-    "down": {
-      "dir": "anim/down",
-      "ms": [
-        100,
-        100,
-        100,
-        120,
-        140,
-        160,
-        160,
-        160,
-        300
-      ],
-      "loop": false,
-      "scale": 1.0,
-      "anchor": [
-        57,
-        121
-      ]
-    },
-    "aw_in": {
-      "dir": "anim/aw_in",
-      "ms": [
-        100,
-        90,
-        80,
-        80,
-        80,
-        80,
-        80,
-        80,
-        80,
-        80,
-        80,
-        80,
-        70,
-        90,
-        90,
-        70,
-        70,
-        60,
-        60,
-        60,
-        60,
-        60,
-        60,
-        60,
-        60
-      ],
-      "loop": false,
-      "scale": 1.0,
-      "anchor": [
-        57,
-        121
-      ]
-    },
-    "aw_idle": {
-      "dir": "anim/aw_idle",
-      "ms": [
-        150,
-        150,
-        150,
-        150,
-        150,
-        150,
-        150,
-        150,
-        150
-      ],
-      "loop": true,
-      "scale": 1.0,
-      "anchor": [
-        57,
-        121
-      ]
-    },
-    "aw_cast": {
-      "dir": "anim/aw_cast",
-      "ms": [
-        90,
-        90,
-        100,
-        100,
-        100,
-        110,
-        110,
-        100,
-        120
-      ],
-      "loop": false,
-      "scale": 1.0,
-      "anchor": [
-        57,
-        121
-      ],
-      "hit": 5
-    },
-    "aw_ult": {
-      "dir": "anim/aw_ult",
-      "ms": [
-        120,
-        120,
-        110,
-        110,
-        110,
-        110,
-        110,
-        110,
-        100,
-        100,
-        100,
-        100,
-        100,
-        90,
-        90,
-        90,
-        90,
-        70,
-        70,
-        70,
-        70,
-        110,
-        110,
-        130,
-        200
-      ],
-      "loop": false,
-      "scale": 1.0,
-      "anchor": [
-        57,
-        121
-      ],
-      "hit": 17
-    },
-    "aw_walk": {
-      "dir": "anim/aw_walk",
-      "ms": [
-        110,
-        110,
-        110,
-        110,
-        110,
-        110,
-        110,
-        110,
-        110
-      ],
-      "loop": true,
-      "scale": 1.0,
-      "anchor": [
-        57,
-        121
-      ]
-    },
-    "aw_atk": {
-      "dir": "anim/aw_atk",
-      "ms": [
-        60,
-        60,
-        70,
-        70,
-        70,
-        70,
-        70,
-        70,
-        60
-      ],
-      "loop": false,
-      "scale": 1.0,
-      "anchor": [
-        57,
-        121
-      ],
-      "hit": 5
-    }
+  "walk": {
+   "dir": "anim/walk",
+   "ms": [
+    90,
+    90,
+    90,
+    90,
+    90,
+    90,
+    90,
+    90,
+    90
+   ],
+   "loop": true,
+   "scale": 1.0,
+   "anchor": [
+    79,
+    126
+   ]
   },
-  "seirinAnims": {},
-  "rig": null,
-  "fxAnims": {
-    "atk": {
-      "dir": "fx/atk",
-      "ms": [
-        80,
-        70,
-        70,
-        70,
-        70,
-        60,
-        60,
-        60,
-        80
-      ],
-      "loop": false,
-      "scale": 1.0,
-      "anchor": [
-        57,
-        121
-      ]
-    },
-    "cast": {
-      "dir": "fx/cast",
-      "ms": [
-        90,
-        90,
-        100,
-        100,
-        100,
-        110,
-        110,
-        100,
-        120
-      ],
-      "loop": false,
-      "scale": 1.0,
-      "anchor": [
-        57,
-        121
-      ]
-    },
-    "hurt": {
-      "dir": "fx/hurt",
-      "ms": [
-        50,
-        60,
-        70,
-        60,
-        60
-      ],
-      "loop": false,
-      "scale": 1.0,
-      "anchor": [
-        57,
-        121
-      ]
-    },
-    "aw_in": {
-      "dir": "fx/aw_in",
-      "ms": [
-        100,
-        90,
-        80,
-        80,
-        80,
-        80,
-        80,
-        80,
-        80,
-        80,
-        80,
-        80,
-        70,
-        90,
-        90,
-        70,
-        70,
-        60,
-        60,
-        60,
-        60,
-        60,
-        60,
-        60,
-        60
-      ],
-      "loop": false,
-      "scale": 1.0,
-      "anchor": [
-        57,
-        121
-      ]
-    },
-    "aw_cast": {
-      "dir": "fx/aw_cast",
-      "ms": [
-        90,
-        90,
-        100,
-        100,
-        100,
-        110,
-        110,
-        100,
-        120
-      ],
-      "loop": false,
-      "scale": 1.0,
-      "anchor": [
-        57,
-        121
-      ]
-    },
-    "aw_ult": {
-      "dir": "fx/aw_ult",
-      "ms": [
-        120,
-        120,
-        110,
-        110,
-        110,
-        110,
-        110,
-        110,
-        100,
-        100,
-        100,
-        100,
-        100,
-        90,
-        90,
-        90,
-        90,
-        70,
-        70,
-        70,
-        70,
-        110,
-        110,
-        130,
-        200
-      ],
-      "loop": false,
-      "scale": 1.0,
-      "anchor": [
-        57,
-        121
-      ]
-    },
-    "aw_atk": {
-      "dir": "fx/aw_atk",
-      "ms": [
-        60,
-        60,
-        70,
-        70,
-        70,
-        70,
-        70,
-        70,
-        60
-      ],
-      "loop": false,
-      "scale": 1.0,
-      "anchor": [
-        57,
-        121
-      ]
-    }
+  "atk": {
+   "dir": "anim/atk",
+   "ms": [
+    80,
+    70,
+    70,
+    70,
+    70,
+    60,
+    60,
+    60,
+    80
+   ],
+   "loop": false,
+   "scale": 1.0,
+   "anchor": [
+    79,
+    126
+   ],
+   "hit": 4
+  },
+  "cast": {
+   "dir": "anim/cast",
+   "ms": [
+    90,
+    90,
+    100,
+    100,
+    100,
+    110,
+    110,
+    100,
+    120
+   ],
+   "loop": false,
+   "scale": 1.0,
+   "anchor": [
+    79,
+    126
+   ],
+   "hit": 6
+  },
+  "hurt": {
+   "dir": "anim/hurt",
+   "ms": [
+    50,
+    60,
+    70,
+    60,
+    60
+   ],
+   "loop": false,
+   "scale": 1.0,
+   "anchor": [
+    79,
+    126
+   ]
+  },
+  "down": {
+   "dir": "anim/down",
+   "ms": [
+    100,
+    100,
+    100,
+    120,
+    140,
+    160,
+    160,
+    160,
+    300
+   ],
+   "loop": false,
+   "scale": 1.0,
+   "anchor": [
+    79,
+    126
+   ]
+  },
+  "aw_in": {
+   "dir": "anim/aw_in",
+   "ms": [
+    100,
+    90,
+    80,
+    80,
+    80,
+    80,
+    80,
+    80,
+    80,
+    80,
+    80,
+    80,
+    70,
+    90,
+    90,
+    70,
+    70,
+    60,
+    60,
+    60,
+    60,
+    60,
+    60,
+    60,
+    60
+   ],
+   "loop": false,
+   "scale": 1.0,
+   "anchor": [
+    79,
+    126
+   ]
+  },
+  "aw_idle": {
+   "dir": "anim/aw_idle",
+   "ms": [
+    150,
+    150,
+    150,
+    150,
+    150,
+    150,
+    150,
+    150,
+    150
+   ],
+   "loop": true,
+   "scale": 1.0,
+   "anchor": [
+    79,
+    126
+   ]
+  },
+  "aw_walk": {
+   "dir": "anim/aw_walk",
+   "ms": [
+    110,
+    110,
+    110,
+    110,
+    110,
+    110,
+    110,
+    110,
+    110
+   ],
+   "loop": true,
+   "scale": 1.0,
+   "anchor": [
+    79,
+    126
+   ]
+  },
+  "aw_atk": {
+   "dir": "anim/aw_atk",
+   "ms": [
+    60,
+    60,
+    70,
+    70,
+    70,
+    70,
+    70,
+    70,
+    60
+   ],
+   "loop": false,
+   "scale": 1.0,
+   "anchor": [
+    79,
+    126
+   ],
+   "hit": 4
+  },
+  "aw_cast": {
+   "dir": "anim/aw_cast",
+   "ms": [
+    90,
+    90,
+    100,
+    100,
+    100,
+    110,
+    110,
+    100,
+    120
+   ],
+   "loop": false,
+   "scale": 1.0,
+   "anchor": [
+    79,
+    126
+   ],
+   "hit": 6
+  },
+  "aw_ult": {
+   "dir": "anim/aw_ult",
+   "ms": [
+    120,
+    120,
+    110,
+    110,
+    110,
+    110,
+    110,
+    110,
+    100,
+    100,
+    100,
+    100,
+    100,
+    90,
+    90,
+    90,
+    90,
+    70,
+    70,
+    70,
+    70,
+    110,
+    110,
+    130,
+    200
+   ],
+   "loop": false,
+   "scale": 1.0,
+   "anchor": [
+    79,
+    126
+   ],
+   "hit": 17
   }
+ },
+ "seirinAnims": {},
+ "rig": null,
+ "fxAnims": {}
 }

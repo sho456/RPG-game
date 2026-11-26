@@ -5,14 +5,16 @@
 'use strict';
 const SHOW=(()=>{
 const IMG={},esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function art(id,h){const k=id+h;if(IMG[k]!=null)return IMG[k];let s='';try{const f=SPX.unitCv(id,id,0,h);if(f){const c=document.createElement('canvas');c.width=f.w;c.height=f.h;c.getContext('2d').drawImage(f.cv,0,0);s=c.toDataURL();}}catch(e){}return IMG[k]=s;}
+/* セレスは新しく描いた大きな立ち絵（img/cutin/。星臨は青白い光をまとった姿） */
+const CIMG={celes:{aw:'img/cutin/celes_aw.png',ou:'img/cutin/celes_ougi.png'}};
+function art(id,h,kind){if(CIMG[id])return CIMG[id][kind==='aw'?'aw':'ou'];const k=id+h;if(IMG[k]!=null)return IMG[k];let s='';try{const f=SPX.unitCv(id,id,0,h);if(f){const c=document.createElement('canvas');c.width=f.w;c.height=f.h;c.getContext('2d').drawImage(f.cv,0,0);s=c.toDataURL();}}catch(e){}return IMG[k]=s;}
 const K=()=>({1:1,2:.72,4:.5})[typeof speed!=='undefined'?speed:1]||1;
 let el=null;
 function cut(kind,u,title,label,ms){return new Promise(res=>{try{
  if(!el){el=document.createElement('div');el.id='show';document.body.appendChild(el);}
  const d=Math.round(ms*K());el.style.setProperty('--d',d+'ms');el.className='';void el.offsetWidth;
  el.innerHTML=`<i class="sh-dim"></i><i class="sh-flash"></i><div class="sh-band b1"></div><div class="sh-band b2"></div><i class="sh-stars"></i>
-  <img class="sh-art" src="${art(u.id,220)}" alt=""><div class="sh-tt"><small>${esc(label)}</small><b>${esc(title)}</b><em>${esc(u.name)}</em></div>`;
+  <img class="sh-art" src="${art(u.id,220,kind)}" alt=""><div class="sh-tt"><small>${esc(label)}</small><b>${esc(title)}</b><em>${esc(u.name)}</em></div>`;
  el.className=kind+' on';try{SFX.aw();}catch(e){}
  setTimeout(()=>{el.className=kind;res();},d);}catch(e){res();}});}
 /* 星臨 */
