@@ -1,10 +1,7 @@
 /* ===== TD：セレスの星臨に入る演出と奥義「刻の巻き戻し」（FXU）。部品は FXK（fxkit.js）。fx.js の celesAw/celesUlt・cultB/cultF を置き換えた =====
  星臨（TDA の aw_in：0〜.99 秒＝溜め・.99〜1.38 秒＝白いシルエット・〜1.86 秒＝星臨の姿）：
   足元に時計の陣（金の縁が走る・星の六芒）→ 星がらせんで昇り胸に光が集まる → シルエットの瞬間に光の柱・星の閃光・輪 3 重 → 姿が現れたら星の粒が降って消える。星臨中は足元に小さな星の陣を薄く。
- 奥義（アニメの hit＝H。H≒1.8 秒。s＝t/H）：
-  溜め 0〜.25（背景が紺へ・足元から光の柱と星のらせん）→ 天空の文字盤 .16〜.58（金の外縁が走り・目盛り・紺の内縁・12 の星が順に灯り・星座の光の糸・中心の宝石）
-  → 巻き戻し .62〜.84（針が逆回り・外周の輪も逆回り）→ いちばん暗く静か（H−.3〜H・紫の単色の時間停止 .3 秒・針が光の槍になって降る）
-  → H：白飛び（.1 秒）・輪 3 重（速く広がりゆっくり消える）・光の柱・放射・揺れ → 星の雨 → 粒が星になって昇る → 敵に時計の印。暗転は背景だけ（back 層）。当たった敵は FXK.hit。
+ 奥義（アニメの hit＝H）：段ごとに主役 1 つ。溜め→空の高みの時計（12 の刻み・12 の星）→巻き戻し→静寂→長針の光の槍（敵の密集へ）→白飛び・柱・輪 2 つ→欠片と星の雨。暗転は背景だけ（back 層）。
  描くだけで、ロジック（TDS）の結果には触れない */
 'use strict';
 const FXU=(()=>{
@@ -59,71 +56,71 @@ function aw(u,st){const id=u.id,X=()=>u.x+(u.ox||0),Y=()=>u.y;let tw=.99,te=1.38
  K.fx({layer:'back',dl:Math.max(0,du-.3),d:Math.max(1,u.awT||1),draw(g,p,t,e){if(!(u.awT>0)||!st.units.includes(u)){e.t=e.d;return;}const x=X(),y=Y()+1,a=sm(cl(t/.5))*.5*cl(u.awT/.6);
   K.ring(g,x,y,19,19*.42,1,GL,a*.45);g.globalCompositeOperation='lighter';for(let i=0;i<6;i++){const an=t*.7+i*TAU/6;K.dot(g,x+Math.cos(an)*19,y+Math.sin(an)*19*.42,i%2?1:2,i%2?BL:GL,a);}}});}
 /* ====================== 奥義 ====================== */
+/* 段ごとに主役を 1 つ：溜め（光が胸へ吸い込まれる）→ 天空の時計（空の高みに太い金の円・12 の星・12 の刻み）→ 巻き戻し（長針・短針が逆回り）
+   → 静寂（いちばん暗い）→ 長針が光の槍になって敵の密集へ落ちる → 刺さる瞬間（白飛び・太い柱・輪 2 つ・揺れ）→ 余韻（時計が砕けて欠片が降る・ゆっくりの星の雨・背景は長く戻る） */
 function ult(e,st,B){const u=e.u;let H=1.8;try{H=TDA.hitT(u.id,0,u.awT>0)||1.8;}catch(x){}H=cl(H,.9,2.6);
- const vw=()=>B.vw(),cam=()=>B.cam(),C=()=>{const R=Math.min(vw()*.44,150);return{x:cam()+vw()/2,y:Math.min(110,R+22),R};},ux=()=>u.x+(u.ox||0),uy=()=>u.y;
- const tq=Math.max(H-.3,H*.78+.05);
- /* 敵の中心（槍の落ちる先）。見えている敵の平均 */
- const vis=st.foes.filter(f=>f.x>cam()-10&&f.x<cam()+vw()+10);const T={x:vis.length?vis.reduce((a,f)=>a+f.x,0)/vis.length:cam()+vw()/2,y:vis.length?vis.reduce((a,f)=>a+f.y,0)/vis.length:uy()};
+ const vw=()=>B.vw(),cam=()=>B.cam(),C=()=>{const R=Math.min(vw()*.24,70);return{x:cam()+vw()/2,y:R+36,R};},ux=()=>u.x+(u.ox||0),uy=()=>u.y;
+ const tq=H-.2,s0=-Math.PI/2;
+ /* 槍の落ちる先：見えている範囲でいちばん敵が密集している所（近くの敵 60px 以内の数が最大の敵とその仲間の中心） */
+ const vis=st.foes.filter(f=>f.hp>0&&f.x>cam()+8&&f.x<cam()+vw()-8);let T={x:cam()+vw()/2,y:uy()};
+ if(vis.length){let bn=-1,bd=1e9;for(const f of vis){const nb=vis.filter(g=>Math.abs(g.x-f.x)<60&&Math.abs(g.y-f.y)<70),d=Math.abs(f.x-(cam()+vw()/2));if(nb.length>bn||(nb.length===bn&&d<bd)){bn=nb.length;bd=d;T={x:nb.reduce((a,g)=>a+g.x,0)/nb.length,y:nb.reduce((a,g)=>a+g.y,0)/nb.length};}}}
+ const hx=T.x,hy=T.y,c0=C(),aT=Math.atan2(hy-8-c0.y,hx-c0.x);
  cur=K.fx({d:H+2,draw(){}});cur.H=H;u._ultT=st.t;u._ultH=H;
- /* --- 背景の暗転（back・背景だけ）：紺へ → いちばん暗く静か → 槍の刺さる瞬間に消える --- */
- K.fx({layer:'back',d:H+.6,draw(g,p,t){const t1=H*.72;let a=.5*sm(cl(t/(H*.25)))+.3*sm(cl((t-t1)/Math.max(.1,tq-t1)));if(t>H)a*=1-sm(cl((t-H)/.45));if(a<=.005)return;
-  const x0=cam()-4,w=vw()+8,h=FH();g.globalAlpha=a;g.fillStyle='#050a2a';g.fillRect(x0,0,w,h);
-  if(t>tq&&t<=H){g.globalAlpha=.28*sm(cl((t-tq)/.1));g.fillStyle='#1a1040';g.fillRect(x0,0,w,h);}g.globalAlpha=1;}});
- /* --- 溜め：足元の光の柱と星のらせん --- */
- K.fx({d:H,draw(g,p,t){const x=ux(),y=uy(),A=sm(cl(t/(H*.14)))*(1-sm(cl((t-H*.62)/(H*.18))));if(A<=.01)return;
-  column(g,x,y-(120+t*40)*sm(cl(t/(H*.2))),y,6+Math.sin(t*24)*1.2,BL,GL,A*.9);
-  g.globalCompositeOperation='lighter';for(let s=0;s<3;s++)for(let i=0;i<16;i++){const ph=((i/16+t*1.1+s/3)%1),an=ph*14+s*2.1,r=26*(1-ph)+4,a=A*(1-ph*.6);
-   if(i%3===0)K.star4(g,x+Math.cos(an)*r,y-6-ph*100,2+(s?0:1),s?BL:GL,a);else K.dot(g,x+Math.cos(an)*r,y-6-ph*100,1,s?BL:W,a);}
-  if(t<.3){const q=t/.3;K.ring(g,x,y+1,20+q*40,(20+q*40)*.42,2,BL,1-q,W);}}});
- /* --- 天空の文字盤（back）：外から内へ描かれる --- */
- K.fx({layer:'back',d:H+1.3,draw(g,p,t){const c=C(),R=c.R,s=t/H,fo=1-cl((t-H-.25)/.8);if(s<.14||fo<=.01)return;const P=(an,k)=>[c.x+Math.cos(an)*R*k,c.y+Math.sin(an)*R*k*.92];
-  const sw=K.eo(cl((s-.16)/.24)),sw2=K.eo(cl((s-.24)/.22)),face=sm(cl((s-.2)/.3)),rew=K.eoc((s-.62)/.22),rot=.25*t-2.5*rew;
-  g.save();g.translate(c.x,c.y);g.scale(1,.92);K.glow(g,0,0,R*1.15,'#2a3fa0',.55*face*fo);K.glow(g,0,0,R*.85,'#6f4fd8',.2*face*fo);g.restore();
-  arcRing(g,c.x,c.y,R,R*.92,3,G,fo,sw,GL);arcRing(g,c.x,c.y,R*.88,R*.88*.92,2,'#3a56d8',fo*.9,sw2,BD);
-  g.globalCompositeOperation='lighter';
-  for(let i=0;i<60;i++){const f=i/60;if(f>sw2)break;const an=f*TAU-Math.PI/2,m5=i%5===0,q=P(an,m5?.935:.955);K.dot(g,q[0],q[1],m5?2:1,m5?W:G,fo*(m5?1:.7));}
-  for(let i=0;i<40;i++){const an=i*TAU/40+rot,q=P(an,1.1),a=fo*face;K.dot(g,q[0],q[1],i%3?1:2,i%3?BD:G,a*(i%3?.55:.9));}
-  K.ring(g,c.x,c.y,R*1.1,R*1.1*.92,1,BD,fo*face*.3);
-  /* 星座の光の糸（12 の星を 5 つ飛びで結ぶ） */
-  const tl=i=>H*(.34+i*.022);for(let i=0;i<12;i++){const j=(i+5)%12,q=K.eo(cl((t-tl(i)-.06)/(H*.2)));if(q<=0)continue;const A=P(i*TAU/12-Math.PI/2,.8),Bp=P(j*TAU/12-Math.PI/2,.8);thread(g,A[0],A[1],A[0]+(Bp[0]-A[0])*q,A[1]+(Bp[1]-A[1])*q,BL,fo*.5);}
-  for(let i=0;i<12;i++){const q=cl((t-tl(i))/.2);if(q<=0)continue;const pt=P(i*TAU/12-Math.PI/2,.8),sc=q<.6?q/.6*1.3:1.3-.3*(q-.6)/.4,big=i%3===0;K.bloom(g,pt[0],pt[1],(big?9:6)*sc,big?W:GL,fo*.8,0);K.star4(g,pt[0],pt[1],(big?9:6)*sc,big?W:GL,fo);}
-  /* 針（巻き戻しで逆回り・残像つき）。長針は tq で槍になって離れる */
-  const ha=s<.45?0:sm(cl((s-.45)/.06));
-  if(ha>0){const fw=sm(cl((s-.45)/.17)),m0=-Math.PI/2+TAU*1.2*fw,mT=-Math.PI/2-TAU*2,mAng=k=>{const sk=k<.62?k:.62;const f0=sm(cl((sk-.45)/.17)),a0=-Math.PI/2+TAU*1.2*f0;return k<.62?a0:a0+(mT-(-Math.PI/2+TAU*1.2))*K.eoc((k-.62)/.22);};
-   const hand=(an,L,w,col,a)=>{const q=P(an,L);thread(g,c.x,c.y,q[0],q[1],col,a);if(w>2){g.globalCompositeOperation='lighter';g.globalAlpha=a;g.lineCap='round';g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.moveTo(c.x,c.y);g.lineTo(q[0],q[1]);g.stroke();g.lineCap='butt';g.globalAlpha=1;}};
-   hand(-Math.PI/2+.5-.5*rew+TAU*.1*fw,.5,3,G,fo*ha);
-   if(t<tq){if(rew>0&&rew<1)for(let k=3;k>=1;k--)hand(mAng(Math.max(.45,s-k*.03)),.86,1,BL,fo*ha*.28/k);hand(mAng(s),.88,3,GL,fo*ha);const q=P(mAng(s),.88);K.bloom(g,q[0],q[1],5,GL,fo*ha*.8,.3);}}
-  /* 中心の宝石：槍の発射で最も明るい */
-  const gem=sm(cl((s-.5)/.1))*(.7+.3*Math.sin(t*6)),fl=1-cl((t-tq)/.35);K.bloom(g,c.x,c.y,6+5*gem+(t>tq?10*fl:0),t>tq?W:GL,fo*(gem*.9+(t>tq?fl:0)*.3),.35);K.diamond(g,c.x,c.y,3,W,fo*gem);}});
- /* --- 時間停止：紫の単色（0.3 秒）。輪郭は読める薄さ --- */
- K.fx({dl:H-.3,d:.3,draw(g,p,t){const x0=cam()-4,w=vw()+8;g.globalAlpha=.15*sm(cl(t/.08));g.fillStyle=VI;g.fillRect(x0,0,w,FH());g.globalAlpha=1;}});
- /* --- 光の槍：dial の中心から敵の中心へ。だんだん速く --- */
- K.fx({dl:tq,d:H-tq+.02,draw(g,p,t){const c=C(),q=cl(t/(H-tq)),k=q*q,tx=T.x,ty=T.y-8,x=c.x+(tx-c.x)*k,y=c.y+(ty-c.y)*k,an=Math.atan2(ty-c.y,tx-c.x),L=56*Math.min(1,.3+q*1.5);
-  for(let i=1;i<=6;i++){const kk=Math.max(0,k-i*.05);K.glow(g,c.x+(tx-c.x)*kk,c.y+(ty-c.y)*kk,12-i,G,.35*(1-i/7));}
-  g.save();g.translate(x,y);g.rotate(an);g.globalCompositeOperation='lighter';
-  const poly=(l,w,col,a)=>{g.globalAlpha=a;g.fillStyle=col;g.beginPath();g.moveTo(0,0);g.lineTo(-l*.2,-w);g.lineTo(-l,-w*.25);g.lineTo(-l,w*.25);g.lineTo(-l*.2,w);g.closePath();g.fill();};
-  poly(L*1.05,6,G,.45);poly(L,4,GL,.85);poly(L*.9,1.6,W,1);g.restore();g.globalAlpha=1;
-  K.bloom(g,x,y,9+6*q,GL,1,.3);K.star4(g,x,y,5+7*q,W,1,W);}});
- /* --- 着弾：白飛び 0.1 秒・光の柱・放射・輪 3 重・星の雨 --- */
- const hx=T.x,hy=T.y;
- K.fx({dl:H,d:.1,draw(g,p){g.globalAlpha=.95*(1-p)*(1-p*.5);g.fillStyle='#fffbe8';g.fillRect(cam()-4,-4,vw()+8,FH()+8);g.globalAlpha=1;}});
- K.fx({dl:H,d:1.1,draw(g,p,t){const q=cl(t/.7),a=Math.pow(1-q,.8);
-  K.glow(g,hx,hy-12,Math.min(vw(),200)*.7,GL,.55*Math.pow(1-cl(t/.6),2));
-  column(g,hx,-10,hy,40*(1-q)+4,G,GL,a);
-  g.globalCompositeOperation='lighter';const rq=K.eo(cl(t/.35));for(let i=0;i<14;i++){const an=i*TAU/14+.1,lg=i%2===0;ray(g,hx,hy-10,an,10+rq*20,16+rq*(lg?110:62),lg?3:2,lg?GL:G,(1-q)*(lg?.9:.6));}g.globalAlpha=1;
-  if(q<1){K.bloom(g,hx,hy-10,40*(1-q*.6)+8,GL,a,.3);K.star4(g,hx,hy-10,62*(1-q*.6)+6,W,a,W);}
-  const cols=[W,G,BL],wd=[4,3,2],mx=Math.min(vw()*.62,230);for(let i=0;i<3;i++){const qq=cl((t-i*.09)/.95);if(qq<=0||qq>=1)continue;const r=K.eo(cl(qq/.3))*mx*(1-i*.13);K.ring(g,hx,hy+1,r,r*.28,wd[i],cols[i],Math.pow(1-qq,2.2),i?null:W);}},
-  upd(dt,t){if(t-dt<=0){K.sparks(hx,hy-10,40,G,{sp:190,d:.55,gr:120});K.sparks(hx,hy-10,16,W,{sp:120,d:.4});K.stars(hx,hy-10,14,GL,{w:30,h:14,up:20,d:1.0,s:1.5});}}});
- K.fx({dl:H+.05,d:1.0,upd(dt,t){if(Math.random()<dt*70){const x=cam()+Math.random()*vw();K.p({k:'star',x,y:-4,vx:rnd(-8,8),vy:rnd(170,260),d:rnd(.7,1.2),c:Math.random()<.4?GL:BL,s:rnd(1.2,1.9),ph:Math.random()*9});}
-  if(Math.random()<dt*30)K.p({k:'spark',x:cam()+Math.random()*vw(),y:-4,vx:rnd(-12,12),vy:rnd(200,280),gr:80,d:.6,c:G});},draw(){}});
- /* 余韻：粒が星になって昇る */
- K.fx({dl:H+.3,d:1.5,upd(dt,t){const L=st.foes.filter(f=>f.hp>0);if(Math.random()<dt*26){const f=L.length?L[Math.floor(Math.random()*L.length)]:null,x=f?f.x:hx,y=f?f.y-8:hy-8;K.stars(x,y,1,GL,{w:10,h:10,up:14,d:1.1,s:1.3});}
-  if(Math.random()<dt*20)K.embers(hx+rnd(-60,60),hy,1,G,{w:4,d:1.0});},draw(){}});
+ /* --- 背景の暗転（back）：紺へ → 静寂でいちばん暗い → 槍の刺さる瞬間から長くゆっくり戻る --- */
+ K.fx({layer:'back',d:H+1.3,draw(g,p,t){const t1=H*.55;let a=.5*sm(cl(t/(H*.22)))+.32*sm(cl((t-t1)/(tq-t1)));if(t>H)a*=1-sm(cl((t-H)/1.15));if(a<=.005)return;
+  const x0=cam()-4,w=vw()+8,h=FH();g.globalAlpha=a;g.fillStyle='#03061c';g.fillRect(x0,0,w,h);
+  if(t>H*.78&&t<=H){g.globalAlpha=.22*sm(cl((t-H*.78)/.15));g.fillStyle='#160d38';g.fillRect(x0,0,w,h);}g.globalAlpha=1;}});
+ /* --- ① 溜め：太い光の筋が胸へ吸い込まれる（10 本） --- */
+ K.fx({d:H*.3,draw(g,p,t){const x=ux(),y=uy()-30,tc=H*.3,A=sm(cl(t/.1))*(1-sm(cl((t-tc*.75)/(tc*.25))));if(A<=.01)return;g.globalCompositeOperation='lighter';g.lineCap='round';
+  for(let i=0;i<10;i++){const an=i*TAU/10+.3,ph=((t*1.8+i*.37)%1),r1=95*(1-ph)+8,r0=r1+26*(1-ph*.5),a=A*Math.min(1,ph*5)*(.4+.6*ph),X1=x+Math.cos(an)*r1,Y1=y+Math.sin(an)*r1*.7,X0=x+Math.cos(an)*r0,Y0=y+Math.sin(an)*r0*.7;
+   g.globalAlpha=a*.35;g.strokeStyle=BL;g.lineWidth=4;g.beginPath();g.moveTo(X0,Y0);g.lineTo(X1,Y1);g.stroke();g.globalAlpha=a;g.strokeStyle=GL;g.lineWidth=2;g.beginPath();g.moveTo(X0,Y0);g.lineTo(X1,Y1);g.stroke();}
+  g.lineCap='butt';g.globalAlpha=1;K.bloom(g,x,y,4+14*K.ei(cl(t/tc)),BL,.2+.7*K.ei(cl(t/tc)),.3);
+  if(t<.25){const q=t/.25;K.ring(g,x,uy()+1,16+q*34,(16+q*34)*.42,2,BL,1-q,W);}}});
+ /* --- ② 天空の時計（back）：太い金の円が走る → 12 の刻み → 12 の星が順に灯る。星座の線は無し --- */
+ const clockA=t=>{const fo=t>H?1-cl((t-H)/.2):1;return fo<=0?0:fo*(1-.65*sm(cl((t-(H*.78))/(tq-H*.78+.01))));};
+ K.fx({layer:'back',d:H+.4,draw(g,p,t){const c=C(),R=c.R,fa=clockA(t),t0=H*.22;if(t<t0*.9||fa<=.01)return;const q=t-t0,sw=K.eo(cl(q/.3)),face=sm(cl(q/.4));
+  K.glow(g,c.x,c.y,R*1.7,'#2a3fa0',.5*face*fa);K.glow(g,c.x,c.y,R*.9,'#5a46c8',.18*face*fa);
+  arcRing(g,c.x,c.y,R,R,4,G,fa,sw,GL);
+  g.globalCompositeOperation='lighter';g.lineCap='butt';
+  for(let i=0;i<12;i++){if(i/12>sw)break;const an=s0+i*TAU/12,m=i%3===0,r0=R*(m?.76:.84),r1=R*.95,cs=Math.cos(an),sn=Math.sin(an);g.globalAlpha=fa;g.strokeStyle=m?W:G;g.lineWidth=m?4:3;g.beginPath();g.moveTo(c.x+cs*r0,c.y+sn*r0);g.lineTo(c.x+cs*r1,c.y+sn*r1);g.stroke();}
+  g.globalAlpha=1;
+  for(let i=0;i<12;i++){const k=cl((q-.12-i*.025)/.18);if(k<=0)continue;const an=s0+i*TAU/12,sc=k<.6?k/.6*1.3:1.3-.3*(k-.6)/.4,big=i%3===0,r=R*.58;K.bloom(g,c.x+Math.cos(an)*r,c.y+Math.sin(an)*r,(big?8:5)*sc,big?W:GL,fa*.7,0);K.star4(g,c.x+Math.cos(an)*r,c.y+Math.sin(an)*r,(big?7:4)*sc,big?W:GL,fa);}
+  /* ③ 巻き戻し：長針（槍の向きで止まる）と短針が逆回り。残像は 2 本 */
+  const r0=H*.5,r1=H*.8,hv=sm(cl((t-t0-.15)/.2)),rw=t=>sm(cl((t-r0)/(r1-r0))),ang=(t,k)=>aT+TAU*k*(1-rw(t)),hand=(an,L,w,col,a)=>{if(a<=.01)return;const ex=c.x+Math.cos(an)*R*L,ey=c.y+Math.sin(an)*R*L;g.globalCompositeOperation='lighter';g.lineCap='round';
+   g.globalAlpha=a*.25;g.strokeStyle=col;g.lineWidth=w+4;g.beginPath();g.moveTo(c.x,c.y);g.lineTo(ex,ey);g.stroke();g.globalAlpha=a;g.lineWidth=w;g.beginPath();g.moveTo(c.x,c.y);g.lineTo(ex,ey);g.stroke();g.globalAlpha=a*.9;g.strokeStyle=W;g.lineWidth=Math.max(1,w-4);g.beginPath();g.moveTo(c.x,c.y);g.lineTo(ex,ey);g.stroke();g.lineCap='butt';g.globalAlpha=1;};
+  if(hv>0&&t<tq){const mid=t>r0&&t<r1;if(mid)for(let k=2;k>=1;k--)hand(ang(t-k*.045,1.5),.82,5,BL,fa*hv*.3/k);
+   hand(ang(t,1.5),.82,6,GL,fa*hv);hand(ang(t,.75)+.6,.5,7,G,fa*hv);}
+  const gm=sm(cl((t-t0-.2)/.15)),fl=t>tq?1-cl((t-tq)/.25):1;K.bloom(g,c.x,c.y,6+5*gm+(t>tq&&t<=H?8*fl:0),t>tq?W:GL,fa*gm*.9,.35);K.diamond(g,c.x,c.y,3,W,fa*gm);}});
+ /* --- ⑤ 光の槍：長針が離れ、敵の密集へ一直線（だんだん速く・尾を引く） --- */
+ K.fx({dl:tq,d:H-tq+.02,draw(g,p,t){const c=C(),R=c.R,q=cl(t/(H-tq)),k=q*q,sx=c.x+Math.cos(aT)*R*.82,sy=c.y+Math.sin(aT)*R*.82,tx=hx,ty=hy-8,x=sx+(tx-sx)*k,y=sy+(ty-sy)*k,an=Math.atan2(ty-sy,tx-sx),dist=Math.hypot(x-sx,y-sy),TL=Math.min(dist,150),L=60;
+  g.save();g.translate(sx,sy);g.rotate(an);g.globalCompositeOperation='lighter';
+  const trail=(w,col,a)=>{const gr=g.createLinearGradient(dist-TL,0,dist,0);gr.addColorStop(0,rgba(col,0));gr.addColorStop(1,rgba(col,a));g.fillStyle=gr;g.beginPath();g.moveTo(dist-TL,0);g.lineTo(dist,-w);g.lineTo(dist,w);g.closePath();g.fill();};
+  trail(9,G,.5);trail(4,W,.8);g.translate(dist,0);
+  const poly=(l,w,col,a)=>{g.globalAlpha=a;g.fillStyle=col;g.beginPath();g.moveTo(8,0);g.lineTo(-l*.2,-w);g.lineTo(-l,-w*.3);g.lineTo(-l,w*.3);g.lineTo(-l*.2,w);g.closePath();g.fill();};
+  poly(L*1.05,9,G,.55);poly(L,6,GL,.9);poly(L*.85,2.5,W,1);g.restore();g.globalAlpha=1;
+  K.bloom(g,x,y,10+8*q,GL,1,.3);K.star4(g,x,y,8+10*q,W,1,W);}});
+ /* --- 着弾：白飛び 0.08 秒・太い 1 本の柱・輪 2 つ（速く大きい／遅い）・星 1 つ --- */
+ K.fx({dl:H,d:.08,draw(g,p){g.globalAlpha=.9*(1-p);g.fillStyle='#fffbe8';g.fillRect(cam()-4,-4,vw()+8,FH()+8);g.globalAlpha=1;}});
+ K.fx({dl:H,d:1.1,draw(g,p,t){const q=cl(t/.7),a=Math.pow(1-q,.9);
+  K.glow(g,hx,hy-12,Math.min(vw(),190)*.6,GL,.5*Math.pow(1-cl(t/.5),2));
+  column(g,hx,-10,hy,46*(1-q)+6,G,GL,a);
+  if(q<1){K.bloom(g,hx,hy-10,36*(1-q*.6)+8,GL,a,.3);K.star4(g,hx,hy-10,60*(1-q*.6)+6,W,a,W);}
+  const q1=cl(t/.7),r1=K.eo(cl(q1/.35))*Math.min(vw()*.6,225);if(q1<1)K.ring(g,hx,hy+1,r1,r1*.28,5,W,Math.pow(1-q1,2),G);
+  const q2=cl((t-.08)/1.0),r2=K.eoc(q2)*120;if(q2>0&&q2<1)K.ring(g,hx,hy+1,r2,r2*.28,3,G,Math.pow(1-q2,1.5),null);},
+  upd(dt,t){if(t-dt<=0){K.sparks(hx,hy-10,16,G,{sp:170,d:.5,gr:110});K.stars(hx,hy-10,6,GL,{w:26,h:12,up:20,d:1.1,s:1.7});}}});
+ /* --- ⑥ 余韻：時計が砕けて大きな欠片がゆっくり降る（12 枚） --- */
+ const SH=[];for(let i=0;i<12;i++){const an=s0+(i+rnd(-.3,.3))*TAU/12,k=rnd(.35,.95);SH.push({an,k,vx:Math.cos(an)*rnd(8,26),vy:rnd(6,22),rot:rnd(0,6),vr:rnd(-2.2,2.2),s:rnd(5,9),c:i%3?G:GL});}
+ K.fx({dl:H,d:1.7,draw(g,p,t){const c=C(),fa=1-cl((t-.9)/.8);if(fa<=.01)return;g.globalCompositeOperation='lighter';
+  const f0=cl(t/.12);if(f0<1){arcRing(g,c.x,c.y,c.R*(1+t*.8),c.R*(1+t*.8),4,GL,1-f0,1,null);}
+  for(const s of SH){const x=c.x+Math.cos(s.an)*c.R*s.k+s.vx*t,y=c.y+Math.sin(s.an)*c.R*s.k+s.vy*t+22*t*t,r=s.rot+s.vr*t;g.save();g.translate(x,y);g.rotate(r);
+   for(const[m,col,a]of[[1.5,s.c,.28],[1,s.c,.8],[.45,W,.9]]){g.globalAlpha=fa*a;g.fillStyle=col;g.beginPath();g.moveTo(s.s*m,0);g.lineTo(-s.s*.6*m,-s.s*.5*m);g.lineTo(-s.s*.3*m,s.s*.6*m);g.closePath();g.fill();}g.restore();}g.globalAlpha=1;}});
+ /* 星の雨：粒は少なく・大きく・ゆっくり */
+ K.fx({dl:H+.1,d:1.1,upd(dt,t){if(Math.random()<dt*14)K.p({k:'star',x:cam()+Math.random()*vw(),y:-4,vx:rnd(-6,6),vy:rnd(70,105),d:rnd(1.3,1.8),c:Math.random()<.4?GL:BL,s:rnd(2.2,2.8),ph:Math.random()*9});},draw(){}});
  /* 敵に時計の印（金の輪＋逆回りの針） */
- K.fx({dl:H+.15,d:1.9,draw(g,p,t){const fa=cl(t/.2)*(1-cl((t-1.3)/.6));if(fa<=.01)return;
+ K.fx({dl:H+.15,d:1.7,draw(g,p,t){const fa=cl(t/.2)*(1-cl((t-1.1)/.6));if(fa<=.01)return;
   for(const f of st.foes){if(f.hp<=0)continue;const r=f.boss?9:6,fy=f.y-(f.boss?88:52)-Math.sin(t*3+f.uid)*1.5,fx=Math.round(f.x);
-   K.glow(g,fx,fy,r*2.2,G,.4*fa);K.ring(g,fx,fy,r,r,1,G,fa,GL);g.globalCompositeOperation='lighter';g.globalAlpha=fa;g.strokeStyle=W;g.lineWidth=1;g.beginPath();g.moveTo(fx,Math.round(fy));
-   g.lineTo(Math.round(fx+Math.cos(-t*5+f.uid)*r*.8),Math.round(fy+Math.sin(-t*5+f.uid)*r*.8));g.moveTo(fx,Math.round(fy));g.lineTo(fx,Math.round(fy-r*.55));g.stroke();g.globalAlpha=1;K.dot(g,fx,fy-r-3,1,G,fa);}}});
+   K.glow(g,fx,fy,r*2.2,G,.4*fa);K.ring(g,fx,fy,r,r,2,G,fa,GL);g.globalCompositeOperation='lighter';g.globalAlpha=fa;g.strokeStyle=W;g.lineWidth=2;g.beginPath();g.moveTo(fx,Math.round(fy));
+   g.lineTo(Math.round(fx+Math.cos(-t*5+f.uid)*r*.8),Math.round(fy+Math.sin(-t*5+f.uid)*r*.8));g.stroke();g.globalAlpha=1;}}});
  /* 当たった敵に手応え（槍の刺さる瞬間・白→金） */
  for(const f of st.foes)K.hit(f,st,{dl:H,c:'#fff1a8',stop:.1,pw:1.4});
  return H;}
