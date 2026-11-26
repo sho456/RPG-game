@@ -1,0 +1,29 @@
+/* ===== 戦闘の 2D-HD とカメラ・アップの専用画面（js/battle/hd2d.js・HD2D）・コンパクトな敵の表示 ===== */
+#hd-bg{position:absolute;left:0;top:0;pointer-events:none;image-rendering:auto;will-change:transform}
+#hd-fx{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+#app[data-sc="battle"] #cv{background:transparent!important}
+#app[data-sc="battle"] #cv,#app[data-sc="battle"] #labels,#app[data-sc="battle"] #pops{will-change:transform}
+#app.v38.in38[data-sc="battle"] #hd-bg{translate:0 var(--sl38);transition:translate .42s var(--ez38)}
+#app:not([data-sc="battle"]) #hd-bg,#app:not([data-sc="battle"]) #hd-fx,#app:not([data-sc="battle"]) #hd-lb{display:none}
+/* アップの専用画面：上下の黒帯・上の帯と下の操作を隠す */
+#hd-lb{position:absolute;inset:0;pointer-events:none;z-index:40}
+#hd-lb i{position:absolute;left:0;right:0;height:11%;background:#000;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+#hd-lb i:first-child{top:0;transform:translateY(-101%)}#hd-lb i:last-child{bottom:0;transform:translateY(101%)}
+#app.cu66 #hd-lb i{transform:none}
+#app.cu66[data-sc="battle"] #bt22 .b22hd,#app.cu66[data-sc="battle"] #bbar,#app.cu66[data-sc="battle"] #bt22 .b22btn,#app.cu66[data-sc="battle"] #top{opacity:0;transition:opacity .2s}
+#app[data-sc="battle"] #bt22 .b22hd,#app[data-sc="battle"] #bbar{transition:opacity .3s}
+/* 敵の表示をコンパクトに：名前・Lv・弱点の印を 1 行、その下に細い HP */
+#app.v25 #bt22 .b22hd{min-height:0;padding-bottom:4px}
+#app.v25 #bt22 .b22hd::after{bottom:1px}
+#app.v25 .b22tg{display:flex;flex-wrap:wrap;align-items:center;column-gap:6px;row-gap:2px;margin:2px 0 0 8px}
+#app.v25 .b22tg .nm b{font-size:13px}
+#app.v25 .b22tg .nm small{font-size:11px}
+#app.v25 .b22tg .hp{order:3;flex:0 0 100%;margin-top:1px}
+#app.v25 .b22tg .bar{height:4px}#app.v25 .b22tg.boss .bar{height:5px}
+#app.v25 .b22tg .cnt{font-size:11px}
+#app.v25 .b22tg .wk{order:2;margin-top:0;gap:1px}
+#app.v25 .b22tg .wk span{width:13px}
+#app.v25 .b22tg .wk span i{width:12px;height:13px;font-size:8px}
+#app.v25 .b22tg .st{order:4;margin-top:1px;max-height:14px}
+#app.v25 .b22tg .st .tg{height:13px;font-size:9px;padding:0 3px}
+#app.v25 .b22tg .hp{max-width:62%}

@@ -58,8 +58,8 @@ function placeHeroes(){const hs=B.heroes,n=hs.length;if(!n)return;LY.ebot=null;i
   fy=Math.min(fy,LY.bot);h.x=fx-8*h.sc;h.y=Math.round(fy-16*h.sc+2);h._fx23=fx;});
  LY.heroL=Math.min(...hs.map(h=>h._fx23))-ww/2;}
 /* 敵：演技エリアの中で、互いに重ならない位置を探す（ボスは中央寄り、手下は手前と上下へ） */
-const ANC={1:[[.5,.6]],2:[[.42,.2],[.54,.9]],3:[[.4,.05],[.54,.52],[.4,.98]],4:[[.4,0],[.54,.34],[.4,.67],[.54,1]],5:[[.4,0],[.54,.25],[.4,.5],[.54,.75],[.4,1]]};/* ver0.65：敵は左側に縦一列（少し千鳥） */
-const BANC=[[.86,.22],[.86,.92],[.14,.18],[.14,.96]];
+const ANC={1:[[.32,1]],2:[[.12,1],[.55,.84]],3:[[.02,1],[.38,.84],[.74,1]],4:[[0,1],[.3,.82],[.6,1],[.9,.82]],5:[[0,1],[.25,.82],[.5,1],[.75,.82],[1,1]]};/* ver0.66：2D-HD。敵は奥の列に横一列（少し千鳥・左寄り） */
+const BANC=[[.92,.8],[0,1],[1,1],[.62,.7]];
 /* ver0.41：リグの寸法に加え、実際に描かれる絵の広がり（尻尾・腕など）も含める。大型の敵が画面の左端で切れないように */
 function eDims(e){const D=V19.dims(e),X=SPX.boxB(e);if(!X)return{w:D.w,h:D.h};return{w:Math.max(D.w,2*Math.max(X.l,X.r)+2),h:Math.max(D.h,X.t+1)};}
 function capScale(e,band,wid){const A=e.A;if(!A||A.none)return;if(A.sc23==null)A.sc23=A.sc;A.sc=A.sc23;e._cap23=0;const D=eDims(e),k=Math.min(1,band*.96/D.h,wid*.96/D.w);e._capB23=k;if(k<1){A.sc=A.sc23*k;e._cap23=A.sc;}}
@@ -87,7 +87,7 @@ function placeEnemies(full){const x0=3,x1=Math.max(60,LY.heroL-10),EB=LY.ebot!=n
  const SL=[1,.9,.8,.7,.6,.52],S0=!full&&B._mobS23?B._mobS23:null;
  for(const S of S0?[S0]:SL){const placed=fixed.map(box);let mi=full?0:fixed.filter(e=>!e.boss).length,tot=0;
   for(const e of order){let ax,ay;
-   if(e.boss){ax=.4;ay=.62;}else{const k=mi++;const L=boss?BANC:(ANC[Math.min(5,Math.max(1,nM))]||ANC[5]);const a=L[k%L.length];ax=a[0];ay=a[1];}
+   if(e.boss){ax=.34;ay=.92;}else{const k=mi++;const L=boss?BANC:(ANC[Math.min(5,Math.max(1,nM))]||ANC[5]);const a=L[k%L.length];ax=a[0];ay=a[1];}
    let r;
    if(e.boss){/* ボス：重ならない場所が無ければ、そのボスだけ少しずつ縮める（最小 52%） */
     for(const sh of SL){if(sh<1&&e.A&&!e.A.none){e.A.sc=(e.A.sc23*(e._capB23||1))*sh;e._cap23=e.A.sc;}r=pos(e,ax,ay,placed);if(r.bo<=0)break;}}

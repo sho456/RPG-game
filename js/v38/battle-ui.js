@@ -1,5 +1,5 @@
 /* ===== ver0.38 戦闘画面 =====
- 1. 配置：敵は左・味方は右で向き合い、それぞれ縦一列（ver0.65）
+ 1. 配置：ver0.66 から 2D-HD。敵は奥の列・味方は手前の列に、それぞれ横一列（カメラは js/battle/hd2d.js）
  2. 画面を広く：戦場は画面の高さいっぱい。上は細い帯（ターン・対象・弱点／耐性・速度・メニュー）、下は AUTO の帯だけ
     （行動順のアイコンは ver0.39 で削除）
  3. コマンド入力中は「戦場ごと上へスライド」して、下半分にコマンド欄を出す（ロマサガRS の見せ方）。
@@ -29,10 +29,11 @@ HK23.botPx=()=>{const g=GEO||geo();return Math.round(g.sh-g.bandBot-3);};
 function heroK(h,k){const A=ANIM.setup(h);if(!A||A.none)return;if(A._key25!==A.key||A._sc0==null){A._key25=A.key;A._sc0=A.sc;}h._k25=k;const s=A._sc0*k;if(Math.abs(A.sc-s)>1e-6)A.sc=s;}
 let SLOT=[],KH=1;
 HK23.placeHeroes=(hs,LY)=>{hs.forEach(h=>heroK(h,1));let ww=0,hh=0;hs.forEach(h=>{const Dm=V19.dims(h);ww=Math.max(ww,Dm.w);hh=Math.max(hh,Dm.h);});
- const n=hs.length,band=LY.bot-LY.top,k=clamp(Math.min(V23.appW()*.15/(hh*SC),(band*(n>2?.36:.46))/hh),.6,1.35);KH=k;hs.forEach(h=>heroK(h,k));ww*=k;hh*=k;
- const xC=W-Math.max(ww*.5+8,32);SLOT=[];
- hs.forEach((h,i)=>{const fx=xC+(n>1?(i%2?-7:3):0),fy=LY.top+hh+(band-hh)*(n>1?i/(n-1):.5);SLOT[i]=[fx,fy];h.x=fx-8*h.sc;h.y=Math.round(fy-16*h.sc+2);h._fx23=fx;});
- LY.heroL=xC-7-ww/2-12;};
+ /* ver0.66：2D-HD。味方は手前の列に横一列（右下）。奥へ行くほど少し上＝斜めの奥行き。敵は奥の列（LY.ebot より上） */
+ const n=hs.length,band=LY.bot-LY.top,k=clamp(Math.min((W*.8/Math.max(1,n))/(ww*.68),band*.34/hh),.6,1.7);KH=k;hs.forEach(h=>heroK(h,k));ww*=k;hh*=k;
+ const xL=Math.min(W*.4,W-ww*.5-3),xR=W-ww*.42-2,fyB=LY.top+band*.76;SLOT=[];
+ hs.forEach((h,i)=>{const t=n>1?i/(n-1):.6,fx=xL+(xR-xL)*t,fy=fyB-(1-t)*7-(n>1&&i%2?4:0);SLOT[i]=[fx,fy];h.x=fx-8*h.sc;h.y=Math.round(fy-16*h.sc+2);h._fx23=fx;});
+ LY.heroL=W*.84;LY.ebot=Math.max(LY.top+30,Math.min(fyB-hh*.8,LY.top+band*.5));};
 /* 交代で入った味方：同じ大きさ・同じ持ち場に */
 function fitNew(){if(!inB())return;B.heroes.forEach((h,i)=>{if(h._k25)return;heroK(h,KH);const sl=SLOT[i];if(sl&&!(h.A&&h.A.mv)){h.x=sl[0]-8*h.sc;h.y=Math.round(sl[1]-16*h.sc+2);h._fx23=sl[0];}});}
 

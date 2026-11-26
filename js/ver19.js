@@ -197,7 +197,7 @@ function drawU(u,k,p,sx,sy){const A=setup(u);if(A.none)return;
  const top=Y0-Math.round(R.hgt*S)*p,hw=Math.round(R.wid*S/2)*p,t=ANIM.now;
  if(u.aw&&u.alive&&Math.random()<.3+.2*(u.awLv||1))B.parts.push({x:fx+wx+(Math.random()-.5)*14,y:fy-2,vy:-.4-Math.random()*.5*(u.awLv||1),l:30,c:(u.awLv||1)>=3&&Math.random()<.4?'#ffffff':(u.awLv||1)>=2&&Math.random()<.3?'#7fd6ff':'#ffe27a'});
  if(u.side===1&&u.alive){if(u.charging&&Math.random()<.6)FX19.part(fx+(Math.random()-.5)*dims(u).w*1.2,fy,(Math.random()-.5)*.3,-.9-Math.random()*.9,Math.random()<.5?'#ffb030':'#ffe27a',20,0,Math.random()<.3?2:1);
-  if(B.tgt===u&&aliveE().length>1&&!B.rt22){const q=(Math.floor(t/260)%2)*p,L=4*p,x0=X0-hw-2*p-q,x1=X0+hw+2*p+q,y0=top-2*p-q,y1=Y0+3*p+q;ctx.fillStyle='#ffd65a';for(const[cx,cy,dx,dy]of[[x0,y0,1,1],[x1,y0,-1,1],[x0,y1,1,-1],[x1,y1,-1,-1]]){ctx.fillRect(dx>0?cx:cx-L,dy>0?cy:cy-p,L,p);ctx.fillRect(dx>0?cx:cx-p,dy>0?cy:cy-L,p,L);}}}
+  if(B.tgt===u&&aliveE().length>1&&!B.rt22&&(!V19.tgOk||V19.tgOk())){/* ver0.66：狙いの枠はコマンド入力中だけ（js/battle/hd2d.js） */const q=(Math.floor(t/260)%2)*p,L=4*p,x0=X0-hw-2*p-q,x1=X0+hw+2*p+q,y0=top-2*p-q,y1=Y0+3*p+q;ctx.fillStyle='#ffd65a';for(const[cx,cy,dx,dy]of[[x0,y0,1,1],[x1,y0,-1,1],[x0,y1,1,-1],[x1,y1,-1,-1]]){ctx.fillRect(dx>0?cx:cx-L,dy>0?cy:cy-p,L,p);ctx.fillRect(dx>0?cx:cx-p,dy>0?cy:cy-L,p,L);}}}
  if(B.cur===u&&u.side===0&&!u._act){const ay=top-6*p+(Math.floor(t/270)%2)*p;ctx.fillStyle='#3a2a08';ctx.fillRect(X0-3*p,ay-p,7*p,p);ctx.fillStyle='#f3c64b';ctx.fillRect(X0-2*p,ay,5*p,p);ctx.fillRect(X0-p,ay+p,3*p,p);ctx.fillRect(X0,ay+2*p,p,p);}}
 function drawBattle(){const k=bK();if(cv.width!==W*k||cv.height!==H*k){cv.width=W*k;cv.height=H*k;}const p=Math.max(1,Math.round(k*2/3));PXL=p/k;DS=Math.round(k/p/1.5*1000)/1000;ANIM.tick();
  let sx=0,sy=0;if(B&&B.shake>0){const m=Math.min(4,1+Math.floor(B.shake/5));sx=((tick&1)?m:-m)*p;sy=(((tick>>1)&1)?1:-1)*Math.ceil(m/2)*p;B.shake--;}
@@ -206,7 +206,7 @@ function drawBattle(){const k=bK();if(cv.width!==W*k||cv.height!==H*k){cv.width=
  /* 旧来の簡易エフェクト要求（B.fx）は新しいエフェクトに置き換える */
  if(B.fx.length){for(const f of B.fx)if(!f.t||f.t<=0){if(f.m)FX19.ring(f.x,f.y,f.c,{r1:20,delay:Math.max(0,-f.t)*16});else FX19.burst(f.x,f.y,f.c);}B.fx.length=0;}
  ctx.setTransform(1,0,0,1,0,0);FX19.draw(ctx,k,p,0,sx,sy);
- const us=[...B.enemies,...B.heroes].map(u=>{const A=setup(u);return[u,u.y+16*u.sc+(A.wy||0)+(u._act?.5:0)];}).sort((a,b)=>a[1]-b[1]);for(const[u]of us)drawU(u,k,p,sx,sy);
+ const us=[...B.enemies,...B.heroes].map(u=>{const A=setup(u);return[u,u.y+16*u.sc+(A.wy||0)+(u._act?.5:0)];}).sort((a,b)=>a[1]-b[1]);for(const[u]of us){const uf=V19.uf&&V19.uf(u);if(uf)ctx.filter=uf;drawU(u,k,p,sx,sy);if(uf)ctx.filter='none';}/* ver0.66：アップの画面で注目しないキャラを暗く（hd2d.js の V19.uf） */
  FX19.draw(ctx,k,p,1,sx,sy);ctx.setTransform(k,0,0,k,sx,sy);
  if(B.domain){ctx.fillStyle='rgba(255,220,120,.10)';ctx.fillRect(0,0,W,H);ctx.strokeStyle='rgba(255,230,150,.35)';for(const[gx,gy,gr,sp]of[[28,22,14,1],[150,30,10,-1.4],[96,10,7,2]]){const a0=tick/60*sp;ctx.beginPath();ctx.arc(gx,gy,gr,0,7);ctx.stroke();for(let i=0;i<8;i++){const an=a0+i/8*6.283;ctx.fillStyle='rgba(255,230,150,.35)';ctx.fillRect(gx+Math.cos(an)*(gr+2)-1|0,gy+Math.sin(an)*(gr+2)-1|0,3,3);}}}
  if(B.barrier>0){ctx.fillStyle='rgba(127,214,255,.5)';for(let j=0;j<H;j+=PXL*2)ctx.fillRect(Math.round((100+Math.sin(j*.11+tick/14)*2)/PXL)*PXL,j,PXL,PXL);}
@@ -242,4 +242,4 @@ function icon(u){const key=sprKey(u),A=setup(u);if(A.none)return null;let c=ICO.
 try{for(const k in IMG){if(/_(w|aw)$/.test(k)||!SPRX.info(k))continue;for(const sil of[0,1])Object.defineProperty(ZIMG,k+(sil?'_w':''),{configurable:true,enumerable:true,get(){const ed=ED[k],c=still(k,48,ed&&!ed.flip);const v=c?(sil?PX.whiteOf(c):c).toDataURL():'';Object.defineProperty(ZIMG,k+(sil?'_w':''),{value:v,writable:true,configurable:true,enumerable:true});return v;}});}}catch(e){}
 /* 版表示 */
 const VER19='ver0.19';{const _t=title;title=function(){_t();const v=$('#verL');if(v)v.textContent=VER19;};const v=$('#verL');if(v)v.textContent=VER19;}
-return{foot,mid,dims,near,dash,WP,MA,CAST,BOW,VIC,AWK,still,icon,drawBattle,ext:null,dr:null};})();
+return{foot,mid,dims,near,dash,WP,MA,CAST,BOW,VIC,AWK,still,icon,drawBattle,ext:null,dr:null,uf:null,tgOk:null};})();

@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.65';
+const VER='ver0.66';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,12 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　星臨と奥義のカットイン・強化と弱体のアイコン・縦一列の並び<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　2D-HD の戦闘・カメラ・技のアップ・新しいセレス<br><small>`+
+ `・奥行きのある 2D-HD の戦場に。敵は奥、味方は手前にそれぞれ横一列<br>`+
+ `・カメラが寄ったり振ったりする。技・術・星臨・奥義（敵は溜め攻撃）は使うキャラと相手に寄るアップの画面に<br>`+
+ `・強化・弱体のアイコンは頭上ではなく、コマンド選択のときにコマンド欄の上へ<br>`+
+ `・敵の狙いの枠はコマンド入力中だけ。敵の表示をコンパクトに<br>`+
+ `・セレスの絵とカットインを新しく<br></small></div><div class="nt"><b>ver0.65</b>　星臨と奥義のカットイン・強化と弱体のアイコン・縦一列の並び<br><small>`+
  `・敵は左、味方は右にそれぞれ縦一列。右端から離して、技名や演出が切れないように<br>`+
  `・強化（青）・弱体（赤）・状態異常（紫）を頭上にアイコンで。タップで味方／敵のタブ<br>`+
  `・星臨は星の帯、奥義は閃光と金の帯で立ち絵と名前が大きく入る見せ場に<br>`+
