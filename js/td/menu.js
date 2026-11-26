@@ -45,7 +45,7 @@ function infMap(){const S=TDD.STAGE[TDD.INF],b=best();
  try{skyArt(root.querySelector('.tdm-sky'),S.th);}catch(e){}tabSee();}
 /* 選んでいるタブ（塔が開いていれば塔のタブ）を横スクロールの中で見える位置へ */
 function tabSee(){try{const n=root.querySelector('.tdm-tabs'),b=n.querySelector('.inf')||n.querySelector('.on');if(b)n.scrollLeft=Math.max(0,b.offsetLeft-n.clientWidth+b.offsetWidth+10);}catch(e){}}
-function skyArt(c,th){const st={S:{W:900,th,base:[870,300],paths:[[[-30,262],[900,262]],[[-30,338],[900,338]]]}};st.Ps=[];
+function skyArt(c,th){const st={S:{W:900,th}};
  const b=TDBG.make(st,360),g=c.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(b.sky,40,0,360,236,0,0,360,236);g.drawImage(b.far,-40,-70);g.drawImage(b.mid,-20,-60);
  const gr=g.createLinearGradient(0,40,0,96);gr.addColorStop(0,'rgba(18,19,42,0)');gr.addColorStop(1,'rgba(18,19,42,1)');g.fillStyle=gr;g.fillRect(0,0,360,96);}
 /* ---------- 出撃準備 ---------- */
@@ -57,7 +57,7 @@ function prep(id){const S=TDD.STAGE[id];if(!S||(S.inf?!infOpen():!open(id)))retu
  show(`<header class="tdm-h"><button class="td-btn" data-a="map" aria-label="戻る">◀</button><b>出撃準備</b><span class="tdm-sum">${esc(C.ch)}</span></header>
  <section class="tdm-st"><h2>${S.boss?'<i class="bs">◆</i>':''}${esc(S.name)}</h2><canvas class="tdm-prev" width="360" height="90"></canvas>
  <div class="tdm-tags">${avg<S.lv&&typeof UNIT!=='undefined'?`<button class="lv warn" data-a="grow" title="推奨 Lv${S.lv}・平均 Lv${avg}">Lv${S.lv} ↑</button>`:`<span class="lv" title="推奨 Lv${S.lv}">Lv${S.lv}</span>`}<span title="WAVE">≋ ${S.inf?'∞':W.length}</span>${S.inf?`<span class="tdm-best" title="到達の最高"><i class="ic-tower"></i>${best()}</span>`:''}</div></section>
- <ul class="tdm-foes">${kinds.map(k=>{const e=ED[k];if(!e)return'';const boss=!!e.boss;return`<li><img src="${pic(e.spr||k,k,1,28)}" alt=""><span class="tx"><b>${boss?'<i class="bs">◆</i>':''}${esc(e.name)}</b></span><span class="wk">${(e.weak||[]).slice(0,2).map(el=>`<i style="--c:${ELC[el]}">${el}</i>`).join('')}</span>${S.inf?'':`<span class="n">×${cnt(k)}</span>`}</li>`;}).join('')}</ul>
+ <ul class="tdm-foes">${kinds.map(k=>{const e=ED[k];if(!e)return'';const boss=!!e.boss;return`<li><img src="${pic(e.spr||(TDD.SPRALT||{})[k]||k,k,1,28)}" alt=""><span class="tx"><b>${boss?'<i class="bs">◆</i>':''}${esc(e.name)}</b></span><span class="wk">${(e.weak||[]).slice(0,2).map(el=>`<i style="--c:${ELC[el]}">${el}</i>`).join('')}</span>${S.inf?'':`<span class="n">×${cnt(k)}</span>`}</li>`;}).join('')}</ul>
   <div class="tdm-pool">${mem.map(h=>{const on=deck.includes(h),lv=G.h[h]?G.h[h].lv:1;
   return`<button class="${on?'on':''}" data-a="pick" data-v="${h}"><img src="${pic(h,h,0,40)}" alt=""><span class="r" style="background:${TDD.ROLE[TDD.HERO[h].role].col}"></span>
   <b>${esc(HB[h].name)}</b><small>Lv${lv}</small>${on?`<i class="k">${deck.indexOf(h)+1}</i>`:''}</button>`;}).join('')}</div>

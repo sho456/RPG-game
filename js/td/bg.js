@@ -1,5 +1,5 @@
-/* ===== TD の戦場の背景（TDBG）：章ごとの空・遠景・中景・地面と道・灯（拠点）。横スクロールの奥行き（遠いほどゆっくり動く） =====
- make(stage, st) → {sky, far, mid, ground}（論理 1px＝1 ドットで描いた画像。表示で拡大してドット絵に見せる）。base(g, x, y, t) で灯を描く。
+/* ===== 戦闘と章の地図の背景（TDBG）：章ごとの空・遠景・中景・地面。コマンド戦闘（js/cb/view.js）が被写界深度をかけて重ねる =====
+ make({S:{W,th}}, vw) → {sky, far, mid, ground, P}（論理 1px＝1 ドットで描いた画像。表示で拡大してドット絵に見せる）。
  テーマ：ash（灰の街道）・forest（翠の森）・chapel（祈りの廃聖堂）。絵はすべてコードで描く（色は各テーマの PAL だけ） */
 'use strict';
 const TDBG=(()=>{
@@ -49,15 +49,12 @@ function mid(P,th,w,R){const c=cv(w,H),g=c.getContext('2d');g.fillStyle=P.mid;
   else{const h=40+R()*40;g.fillRect(x,GT-h,4,h+6);for(let i=0;i<3;i++){const y=GT-h+8+i*10,d=R()>.5?1:-1;g.fillRect(d>0?x+4:x-12,y,12,2);}
    for(let i=0;i<5;i++)g.fillRect(x+20+i*8,GT-10,2,14);g.fillRect(x+20,GT-6,40,2);}}
  return c;}
-/* 地面：世界の幅いっぱい。土の段・道（縁と石）・草 */
+/* 地面：世界の幅いっぱい。土の段・草（ver0.60 で TD の道を削除） */
 function ground(P,st,R){const W=st.S.W,c=cv(W,H),g=c.getContext('2d');
  for(let y=GT;y<H;y+=4){g.fillStyle=P.ground[Math.min(2,Math.floor((y-GT)/((H-GT)/3)))];g.fillRect(0,y,W,4);}
  g.fillStyle=P.edge;g.fillRect(0,GT,W,2);
  for(let i=0;i<W*.6;i++){g.fillStyle=R()>.5?P.ground[0]:P.ground[2];g.fillRect(Math.floor(R()*W),GT+4+Math.floor(R()*(H-GT-4)),2+Math.floor(R()*3),1);}
- for(const L of(typeof TDS!=='undefined'?st.Ps:[])){const pts=st.S.paths[st.Ps.indexOf(L)];
-  for(const[w,col]of[[30,P.edge],[26,P.road]]){g.strokeStyle=col;g.lineWidth=w;g.lineCap='butt';g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.stroke();}
-  for(let s=0;s<L.L;s+=7){const a=TDS.at(L,s);g.fillStyle=R()>.5?P.roadE:P.edge;g.fillRect(Math.round(a.x),Math.round(a.y-12+R()*24),3,2);}}
- for(let i=0;i<W/14;i++){const x=Math.floor(R()*W),y=GT+8+Math.floor(R()*(H-GT-12));if(typeof TDS!=='undefined'&&st.Ps.some(L=>Math.abs(TDS.at(L,Math.max(0,Math.min(L.L,x+30))).y-y)<20))continue;
+ for(let i=0;i<W/14;i++){const x=Math.floor(R()*W),y=GT+8+Math.floor(R()*(H-GT-12));
   g.fillStyle=P.tuft;g.fillRect(x,y,1,3);g.fillRect(x+2,y-1,1,4);g.fillRect(x+4,y+1,1,2);}
  /* 入口の虚蝕の霧 */
  const gr=g.createLinearGradient(0,0,90,0);gr.addColorStop(0,'rgba(90,60,130,.75)');gr.addColorStop(1,'rgba(90,60,130,0)');g.fillStyle=gr;g.fillRect(0,GT,90,H-GT);
@@ -65,10 +62,4 @@ function ground(P,st,R){const W=st.S.W,c=cv(W,H),g=c.getContext('2d');
 function mix(a,b,t){const h=x=>[1,3,5].map(i=>parseInt(x.slice(i,i+2),16)),A=h(a),B=h(b);return'#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join('');}
 function make(st,vw){const th=st.S.th||'ash',P=PAL[th]||PAL.ash,R=rnd(th.length*977+st.S.W),W=st.S.W;
  return{sky:sky(P,R),far:far(P,th,(W-vw)*.25+vw+40,R),mid:mid(P,th,(W-vw)*.55+vw+40,R),ground:ground(P,st,R),P};}
-/* 灯（拠点）：石の台・真鍮の柱・浮かぶ星の水晶（光は脈打つ） */
-function base(g,x,y,t,hit){g.fillStyle='#0b0b1e';g.fillRect(x-24,y-4,48,12);g.fillStyle='#3a3d6a';g.fillRect(x-22,y-8,44,10);g.fillStyle='#575b96';g.fillRect(x-22,y-8,44,2);
- g.fillStyle='#4a3410';g.fillRect(x-6,y-96,12,88);g.fillStyle='#8a6420';g.fillRect(x-5,y-96,3,88);g.fillStyle='#c08a2c';for(const yy of[y-30,y-60,y-92])g.fillRect(x-8,yy,16,3);
- const fy=y-118+Math.sin(t*2)*3,k=.75+.25*Math.sin(t*3);
- const gr=g.createRadialGradient(x,fy,2,x,fy,46);gr.addColorStop(0,`rgba(255,226,160,${.65*k})`);gr.addColorStop(1,'rgba(242,179,71,0)');g.fillStyle=gr;g.fillRect(x-46,fy-46,92,92);
- g.fillStyle=hit?'#ff9a7a':'#ffe2a0';g.beginPath();g.moveTo(x,fy-14);g.lineTo(x+8,fy);g.lineTo(x,fy+14);g.lineTo(x-8,fy);g.fill();g.fillStyle='#fff8e0';g.fillRect(x-2,fy-6,3,9);}
-return{make,base,H,GT};})();
+return{make,H,GT};})();

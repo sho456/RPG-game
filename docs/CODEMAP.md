@@ -76,7 +76,7 @@
 | 70 | `js/data/equip7.js` | 4 | 装備の能力影響（EQ7：装備が上げるのは基礎ステータスだけ。ver0.45 新規の正本） | EQ7 |
 | 71 | `js/rs/mastery.js` | 17 | 技・術の練達（RSM。ver0.47 新規の正本。旧「技Lv（熟練）」を置き換え） | RSM |
 | 72 | `js/v38/core.js` | 4 | ver0.38 土台：攻撃属性 8 種・武器種 8 種・セーブの移行・LP | V38 |
-| 73 | `js/v38/menu.js` | 20 | ver0.38 画面全体の整理 | V38M |
+| 73 | `js/v38/menu.js` | 21 | ver0.38 画面全体の整理 | V38M |
 | 74 | `js/ui/skill-icons.js` | 5 | 技・術のアイコン（SKICON：白いシルエットの絵柄 27 種＋技 → 絵柄の対応。js/rs/ui.js の skIcon が使う） |  |
 | 75 | `js/ui/board.js` | 5 | 星盤・天星盤の画面（ver0.39 で 1 ファイルにまとめた。画面の正本はここ） | BOARDUI |
 | 76 | `js/ui/equip-info.js` | 4 | 装備品の詳細（EQINFO：装備アイコンのタップで出るポップアップの正本。新規） | EQINFO |
@@ -85,19 +85,19 @@
 | 79 | `js/ui/smith.js` | 7 | 鍛冶屋の画面（ver0.54。正本：town.js の smith・enhance・opSwap・sockMenu と v31/items.js・ver18-town.js の包み | SMITH44 |
 | 80 | `js/ui/keywords.js` | 8 | 用語のハイライト（KW：効果の説明文の用語を緑で示し、タップで詳しい説明を出す正本。ver0.45 新規） | KW |
 | 81 | `js/ui/growth.js` | 5 | 強化メニュー（経験値のストックとレベルアップ・旧「酒場」を統合した正本。ver0.48 新規） | GROW |
-| 82 | `js/td/data.js` | 18 | TD のデータ（仲間・敵の変換・数値の定数・報酬。ステージは js/td/stages.js）。設計は docs/TD-DESIGN.md | TDD |
-| 83 | `js/td/stages.js` | 12 | TD のステージと章（TDD.STAGE・TDD.CH・TDD.ORDER の正本）。書式は docs/TD-DESIGN.md 6 章・スキル td-stage-author |  |
-| 84 | `js/td/bg.js` | 9 | TD の戦場の背景（TDBG）：章ごとの空・遠景・中景・地面と道・灯（拠点）。横スクロールの奥行き（遠いほどゆっくり動く） | TDBG |
-| 85 | `js/td/sfx.js` | 10 | TD の音（TDSFX）：WebAudio で合成する効果音と、章ごとの短い BGM。音源ファイルなし | TDSFX |
+| 82 | `js/td/data.js` | 15 | 仲間・敵・報酬のデータ（TDD。ver0.60 からコマンド戦闘の補助。ステージは js/td/stages.js） | TDD |
+| 83 | `js/td/stages.js` | 9 | 章とステージ（TDD.STAGE・TDD.CH・TDD.ORDER の正本）。ver0.60 からコマンド戦闘のステージ（マップなし） |  |
+| 84 | `js/td/bg.js` | 7 | 戦闘と章の地図の背景（TDBG）：章ごとの空・遠景・中景・地面。コマンド戦闘（js/cb/view.js）が被写界深度をかけて重ねる | TDBG |
+| 85 | `js/td/sfx.js` | 9 | TD の音（TDSFX）：WebAudio で合成する効果音と、章ごとの短い BGM。音源ファイルなし | TDSFX |
 | 86 | `js/td/fxkit.js` | 8 | TD の演出の共通部品（FXK）：光のスプライト・ドットの格子にそろえた形・粒のプール・緩急・命中の手応え | FXK |
 | 87 | `js/td/fx-celes.js` | 12 | TD：セレスの演出（FXC）。通常攻撃（彗星の光弾）と技 3 種（遅延の砂＝時計の陣・刻の矢＝時計の針の矢 3 連・クロノスロウ＝時計の波）。部品は FXK（fxkit.js） | FXC |
 | 88 | `js/td/fx-celes-ult.js` | 15 | TD：セレスの星臨に入る演出と奥義「刻の巻き戻し」（FXU）。部品は FXK（fxkit.js）。fx.js の celesAw/celesUlt・cultB/cultF を置き換 | FXU |
-| 89 | `js/td/fx.js` | 22 | TD の戦闘の演出（TDFX）：技ごとのエフェクト・星臨の短い暗転・粒・敵の歩き/被弾/崩れ。描くだけで、ロジック（TDS）の結果に触れない | TDFX |
+| 89 | `js/td/fx.js` | 21 | TD の戦闘の演出（TDFX）：技ごとのエフェクト・星臨の短い暗転・粒・敵の歩き/被弾/崩れ。描くだけで、ロジック（TDS）の結果に触れない | TDFX |
 | 90 | `js/td/skicon.js` | 4 | 戦闘の技ボタンの絵（TDI）：SKICON の白いシルエットから、技ごとのドット絵のアイコンを作る（ver0.58） | TDI |
 | 91 | `js/td/uanim.js` | 6 | TD：味方の状態ごとのコマ送り（TDA。素材パック assets_src/chars の anims を引く） | TDA |
 | 92 | `js/cb/tune.js` | 0 | コマンド戦闘：ステージごとの敵の補正（CBT）。tools/cb_sim.js --tune が書く。[HP の倍率, 攻撃の倍率] |  |
 | 93 | `js/cb/engine.js` | 23 | コマンド戦闘の進行（CBE。ver0.60 で TD の TDS を置き換えた正本）。DOM・描画に触れない純粋なロジック | CBE |
-| 94 | `js/cb/view.js` | 25 | コマンド戦闘の画面（CB。ver0.60 で TD の戦闘画面 js/td/view.js を置き換えた正本）：2D-HD の舞台・カメラ・行動の振り付け | CB |
+| 94 | `js/cb/view.js` | 26 | コマンド戦闘の画面（CB。ver0.60 で TD の戦闘画面 js/td/view.js を置き換えた正本）：2D-HD の舞台・カメラ・行動の振り付け | CB |
 | 95 | `js/cb/hud.js` | 5 | コマンド戦闘の操作盤（CBH。ver0.60 で TD の操作盤 js/td/hud.js を置き換えた正本）：上の帯・技と術のボタン・仲間の札 | CBH |
 | 96 | `js/td/menu.js` | 14 | TD の章の地図・出撃準備・会話・仲間の加入（TDM）。戦闘画面は js/td/view.js（TD） | TDM |
 | 97 | `js/ui/home.js` | 4 | ホーム画面（灯都ルミナス）の正本：「出撃」（コマンド戦闘のステージ）を主役にした重ね表示 | HOME |
@@ -134,7 +134,6 @@
 | `voidKind` | ch8.js → ver19-pre.js → ver18-art.js → sprite/spx.js |
 | `add` | data/terms.js → ui/growth.js → td/fx.js |
 | `art` | ver17.js → ver19-art.js → sprite/spx.js |
-| `base` | motion/anim.js → sprite/facing.js → td/bg.js |
 | `bonus` | items.js → ch9.js → v31/board.js |
 | `cap` | sprite/legacy/dot-rig.js → ui/inv.js → ui/growth.js |
 | `costOf` | rs/core.js → rs/mastery.js → cb/engine.js |
@@ -172,6 +171,7 @@
 | `auto` | cb/engine.js → ui/unit.js |
 | `awaken` | cb/engine.js → cb/view.js |
 | `back` | zukan/zukan.js → td/fx.js |
+| `base` | motion/anim.js → sprite/facing.js |
 | `best` | cb/engine.js → td/menu.js |
 | `blade` | sprite/legacy/dot-rig.js → items/icons36.js |
 | `board` | town.js → ui/party.js |
@@ -195,7 +195,6 @@
 | `ensure` | v21.js → ui/inv.js |
 | `fixedItem` | items.js → v31/items.js |
 | `flask` | ver18-art.js → v21-art.js |
-| `foe` | td/data.js → cb/engine.js |
 | `fuQ` | v20-battle.js → v31/board.js |
 | `hand` | sprite/legacy/px-enemy.js → td/fx-celes.js |
 | `has` | sprite/facing.js → td/uanim.js |
@@ -217,7 +216,6 @@
 | `makeKairouArea` | ch8.js → ver18-field.js |
 | `makeTowerArea` | ch6.js → ver18-field.js |
 | `makeTown` | field.js → ver18-town.js |
-| `map` | td/stages.js → td/menu.js |
 | `mark` | zukan/zukan.js → ui/keywords.js |
 | `mid` | ver19.js → td/bg.js |
 | `move` | motion/anim.js → cb/view.js |

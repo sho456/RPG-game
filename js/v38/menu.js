@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.60';
+const VER='ver0.61';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,12 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　2D-HD のコマンド RPG へ<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　並びと敵の大きさを整え、使わなくなったデータを整理<br><small>`+
+ `・味方も敵も 2 列×2 段に並べ、キャラ同士が重ならないように。敵と味方の間も広く<br>`+
+ `・敵の大きさを味方と同じ目盛りに（人型は味方と同じ背丈、獣・魔物は少し低く、ボスは 1.3〜1.5 倍）<br>`+
+ `・奥義の説明が TD の頃の文のままだったのを、本来の説明に戻した。アビリティの説明も本来の文に<br>`+
+ `・TD の頃のデータ（戦場の道・灯・コスト・溜めの秒など）・画面のスタイル・試作の素材を削除</small></div>`+
+ `<div class="nt n38"><b>ver0.60</b>　2D-HD のコマンド RPG へ<br><small>`+
  `・戦いをタワーディフェンスからターン制のコマンド戦闘に。技・術・BP・LP・アビリティ・星臨・奥義は本編のものを引き継いだ<br>`+
  `・味方 4 人まで（前 1・中 2・後 1 の菱形）。敵との間を広く。ターンの始めに全員の技を選ぶ → 素早さの順に動く。敵は戦場をタップで狙う<br>`+
  `・星臨ゲージが満ちたら札の星を押して星臨（行動を使わない）。星臨中は奥義を 1 度だけ<br>`+

@@ -1,14 +1,12 @@
-/* ===== TD のデータ（仲間・敵の変換・数値の定数・報酬。ステージは js/td/stages.js）。設計は docs/TD-DESIGN.md =====
- RPG 版のデータ（HB・ED・AW・SK・RSD.HERO）を読むだけで、書き換えない。数値の尺度は TD 用に引き直す（9999 万・Lv60 以降のインフレは使わない）。
- 正本：仲間＝HERO、敵の型＝TRAIT、ステージ＝STAGE。変換＝hero(id,lv)・foe(kind,lv)。技 5 つの読み替え＝mapSk、アビリティ＝abTd・abSum、奥義＝ULT・星臨＝AWK
- ver0.57：戦闘で使う技は 1 人 3 つ（skSel3・G.h[id].tdsk3）。それぞれの溜め（リキャスト）が終わると自動で出る。星臨と奥義は手で出す */
+/* ===== 仲間・敵・報酬のデータ（TDD。ver0.60 からコマンド戦闘の補助。ステージは js/td/stages.js） =====
+ RPG 版のデータ（HB・ED・AW・SK・RSD.HERO）を読むだけで、書き換えない。
+ hero(id,lv,real(id))＝演出（TDFX・FXC・FXU）が読む仲間の形（属性・射程・技の働き mapSk・奥義 ULT）と、仲間画面の奥義の位階。
+ ROLE＝役割の名前と色（一覧・出撃準備）。TRAIT＝敵の型（霊体・飛行などの動き）。SPRALT＝原画の無い敵が借りる絵。reward＝報酬。deckOf＝出撃メンバー。
+ ver0.60 で TD 専用の定数・敵の TD 変換・技の溜めの説明・星臨の TD 値・奥義の説明の上書きを削除 */
 'use strict';
 const TDD=(()=>{
 /* ---------- 定数 ---------- */
-const K={FH:420,STEP:1/30,LIVES:7,COST0:10,COST_EVERY:.9,STAR_MAX:10,DARK:.6/*光の外の攻撃の倍率*/,GAP:8/*WAVE の間の秒*/,
- SKCH:2.2/*技 3 つの溜めの倍率（1 つだった頃より長く）*/,GCD:.7/*技と技の間の最短の秒*/,AW:6/*星臨の星片*/};
-/* 星臨（戦闘中 1 人 1 回・手で出す）：dur 秒のあいだ攻撃 +atk・技の溜めが ch 倍の速さ・出した時に HP を heal 回復。星臨中の奥義は威力 ×ou */
-const AWK={dur:15,atk:.3,ch:1.6,heal:.3,ou:1.3};
+const K={FH:420/*論理の高さ（演出の座標）*/,SKCH:2.2/*技の演出の数値の互換*/};
 /* 役割：line＝隊列（f＝前衛：道の上で敵を止める／b＝後衛：前衛の後ろ・道の脇）・射程・攻撃間隔・止める数・コスト・攻撃の形
  mv＝歩く速さ（px/秒）・chase＝斬るが持ち場から敵へ詰め寄る間合い・off＝後衛が一番前の前衛から下がる間合い */
 /* 役割（ver0.58 で名前を統一）：タンク・近距離物理アタッカー・遠距離物理アタッカー・魔法アタッカー・サポーター・ヒーラー・特殊（上に当てはまらない）。動きは sim.js の BR */
@@ -50,14 +48,10 @@ const ULT={
  jin:  {m:8.5,r:80,d:'ポポと一つになった全力の一撃'},
  celes:{k:'utime',m:4,dur:8,d:'刻を巻き戻し、敵全体を 8 秒のあいだ遅くする'},
  valk: {m:8,r:100,d:'竜の咆哮で広い範囲を焼く'}};
-/* 図鑑・本編の奥義の説明も TD の効果に揃える（奥義の正本はここ） */
-try{for(const id in ULT){const k=RSD.AWX[id].ou;if(SK[k])SK[k].d=ULT[id].d;}}catch(e){}
 /* 敵の型：キー → 特性。void＝虚蝕を撒く（生きている間、灯の光を毎秒削る）、fly＝止められない、armor＝物理に強い、ghost＝術に強い */
 /* 原画（SPX）の無い敵は、似た型の敵の絵を借りる */
 const SPRALT={bookghost:'shade'};
 const TRAIT={slime:['void'],moss:['void'],cursedslime:['void'],bookghost:['ghost'],shade:['ghost'],darkknight:['armor'],m_knight:['armor'],boss2:['armor']};
-const TRN={void:'虚蝕を撒く（光を削る）',ghost:'霊体（物理が効きにくく、術がよく効く）',armor:'重装（物理に強い。打で割れる）',fly:'飛行'};
-
 /* ---------- 変換 ---------- */
 const lvK=lv=>1+.05*(Math.max(1,lv)-1);
 const skName=k=>{try{return(SK[k]&&(SK[k].n||SK[k].name))||k;}catch(e){return k;}};
@@ -79,20 +73,12 @@ function mapSk(k,role){const s=(typeof SK!=='undefined'&&SK[k])||{},rk=s.rk||'B'
 /* そのキャラの 5 つ：[{k, how, lv, on（覚えた）}]。how：lv＝レベル／board＝星盤 */
 function skills(id){let L=[];try{L=RSD.LEARN[id]||[];}catch(e){}const h=typeof G!=='undefined'&&G&&G.h&&G.h[id];
  return L.map(([k,how,lv])=>({k,how,lv,on:!!h&&(how==='lv'?h.lv>=lv:(h.board||[]).includes('2,-2'))}));}
-/* 戦闘で使う技の 1 つめ（互換） */
-function skSel(id){return skSel3(id)[0];}
 /* 計測用（セーブなし）：既定の技＋その Lv で覚えている技（星盤の技は除く）を習得の早い順に 3 つ */
 function skDef(id,lv){const d=HERO[id].sk;let L=[];try{L=(RSD.LEARN[id]||[]).filter(([k,how,l])=>how==='lv'&&l<=lv&&k!==d).map(x=>x[0]);}catch(e){}return[d,...L].slice(0,3);}
 /* 戦闘で使う技 3 つ：選んだ技（覚えているものだけ）→ 足りなければ既定の技・覚えた順で埋める。セーブが無い（計測）ときは既定＋習得の早い順 */
 function skSel3(id){const d=HERO[id].sk,all=skills(id),hasG=typeof G!=='undefined'&&G&&G.h&&G.h[id],on=hasG?all.filter(x=>x.on).map(x=>x.k):all.map(x=>x.k);let L=[];
  try{if(hasG){const h=G.h[id];L=(h.tdsk3||(h.tdsk?[h.tdsk]:[])).filter(k=>on.includes(k));}}catch(e){}
  for(const k of[d,...on])if(L.length<3&&!L.includes(k)&&(k===d||on.includes(k)))L.push(k);return L.slice(0,3);}
-/* TD の技の説明（詳しい窓に出す） */
-function skTxt(sk){const m=x=>`攻撃×${x}`;switch(sk.k){
- case'strike':return`近くの敵 1 体に ${m(sk.m)}${sk.kb?'・はじき返す':''}`;case'stun':return`敵 1 体に ${m(sk.m)}・${sk.dur} 秒止める`;
- case'nova':return`${sk.at==='foe'?'狙った敵の':'自分の'}周り（半径 ${sk.r}）に ${m(sk.m)}`;case'chain':return`最大 ${sk.cnt} 体に ${m(sk.m)}`;
- case'curse':return`狙った敵の周りに ${m(sk.m)}・防御 −40%（${sk.dur} 秒）`;case'slow':return`狙った場所（半径 ${sk.r}）の敵を ${Math.round(sk.m*100)}% 遅く（${sk.dur} 秒）`;
- case'heal':return`周り（半径 ${sk.r}）の仲間の HP を ${Math.round(sk.m*100)}% 回復`;case'guard':return'止めている間、HP を 25% 回復・止める数 +2（6 秒）';}return'';}
 /* ---------- アビリティ（1 人 3 つ。本編の AB）を TD の能力へ読み替える ----------
  td(e)：TD で効く効果なら {k, v, txt}、効かないなら null（画面では灰色）。合計は abSum(id) */
 function abTd(e,id){const d=HERO[id],el=d&&d.el,c=e.c,v=e.v;let mag=false;try{mag=RSD.WPN[RSD.HERO[id].w].mag===1||d.role==='spell'||d.role==='special';}catch(x){}
@@ -116,7 +102,7 @@ function abSum(id){const o={atk:0,hp:0,def:0,cut:0,crit:0,critd:0,regen:0,drain:
  try{for(const e of RSC.abEffects(id)){const t=abTd(e,id);if(!t)continue;if(t.k==='fu')o.fu.push(t.v);else o[t.k]+=t.v;}}catch(e){}return o;}
 /* 仲間：HB（RPG 版の能力）と Lv から TD の能力を作る。杖（術の武器）は知力が主 */
 /* 育成の反映（ver0.52）：o＝real(id) の結果。gear＝装備ありとなしの本編の能力の比（攻撃・HP・防御・術防）、mas＝技の練達の段階（0〜3）、aw＝星臨の位階（1〜3）。
- 計測（tools/td_sim.js）は o なし＝装備なし・練達 0 の基準で回す */
+ o なし＝装備なし・練達 0 の基準 */
 function hero(id,lv=1,o){const h=HB[id],d=HERO[id],R=ROLE[d.role];if(!h||!d)return null;
  let mag=false;try{mag=RSD.WPN[RSD.HERO[id].w].mag===1;}catch(e){}
  const prim=mag?h.mag:h.atk,k=lvK(lv),gk=(o&&o.gear)||{},q=x=>Math.max(.8,Math.min(3,x||1)),mas=Math.min(3,(o&&o.mas)||0),aw=Math.max(1,Math.min(3,(o&&o.aw)||1));
@@ -137,13 +123,6 @@ function real(id){const o={gear:null,mas:0,aw:1,sks:null,masM:{},ab:null};try{co
  if(h.eq&&typeof stats==='function'){let mag=false;try{mag=RSD.WPN[RSD.HERO[id].w].mag===1;}catch(e){}const P=mag?'mag':'atk',s1=stats(id),eq=h.eq;
   h.eq={w:null,main:null,sub:null,acc1:null,acc2:null};let s0;try{s0=stats(id);}finally{h.eq=eq;}
   o.gear={atk:s1[P]/Math.max(1,s0[P]),hp:s1.mhp/Math.max(1,s0.mhp),def:s1.def/Math.max(1,s0.def),res:s1.res/Math.max(1,s0.res)};}}catch(e){console.error(e);}return o;}
-/* 敵：ED（RPG 版）とステージの Lv から。移動 = 14 + 素早さ × 2.4 px/秒 */
-function foe(kind,lv=1){const e=ED[kind];if(!e)return null;const hk=1+.05*(Math.max(1,lv)-1),ak=1+.04*(Math.max(1,lv)-1);
- const boss=!!e.boss||kind==='ernaE'||kind==='valkE',bh=boss?1:hk,ba=boss?1:ak,tr=(TRAIT[kind]||[]).slice();
- return{kind,name:e.name,spr:e.spr||SPRALT[kind]||kind,boss,rank:e.rank||(boss?'big':''),hp:Math.round(e.mhp*(boss?2.3:2.3+Math.min(.25,Math.max(0,lv-8)*.02))*bh*(boss?1.6:1)),atk:Math.round((e.atk||30)*(boss?.9:1.15+Math.min(.3,(lv-1)*.015))*ba),
-  def:e.def||0,res:e.res||0,spd:+(14+(e.spd||8)*2.4).toFixed(1)*(boss?.7:1),weak:(e.weak||[]).slice(0,2),resist:(e.resist||[]).slice(0,1),
-  iv:boss?1:1.2,leak:boss?3:1,cost:boss?10:1,star:boss?5:1,tr,ai:boss&&e.ai?{every:Math.max(6,(e.ai.every||4)*3),summon:e.ai.summon||null,n:2}:null};}
-
 /* ---------- ステージ（中身は js/td/stages.js） ---------- */
 const STAGE={},CH=[],ORDER=[];
 /* 報酬：本編の経験値・ゴールドの表（ED.xp・gold）を、そのステージに出る敵の数で合計。初回は経験値 ×1.5・ゴールド ×2、
@@ -152,13 +131,13 @@ const STAGE={},CH=[],ORDER=[];
 const STONE='renma';
 function reward(id,stars,first,prev){const S=STAGE[id];
  if(S.inf){const w=Math.max(0,stars|0);return{xp:Math.round(60*w+12*w*w),gold:Math.round(20*w+5*w*w),stone:Math.floor(w/5),s3:false,rep:false};}
- let xp=0,g=0;for(const w of S.waves)for(const[,k,n]of w.e){const e=ED[k];if(!e)continue;xp+=(e.xp||10)*n;g+=(e.gold||5)*n;}
+ let xp=0,g=0;for(const w of S.waves)for(const[k,n]of w.e){const e=ED[k];if(!e)continue;xp+=(e.xp||10)*n;g+=(e.gold||5)*n;}
  const k=.6+.2*stars,rep=!first,s3=stars>=3&&(prev||0)<3,rk=rep?.5:1;
  return{xp:Math.round(xp*k*(first?1.5:rk)),gold:Math.round(g*.5*k*(first?2:rk)*(s3?1.5:1)),stone:s3?(S.boss?5:3):0,s3,rep};}
-/* 既定の手札（8 枚）：仲間の加入順から */
+/* 既定の出撃メンバー：仲間の加入順から（コマンド戦闘は 4 人） */
 function deckOf(){const L=(typeof G!=='undefined'&&G&&G.members?G.members:Object.keys(HERO)).filter(id=>HERO[id]);
- const saved=typeof G!=='undefined'&&G&&G.td&&G.td.deck;if(saved){const d=saved.filter(id=>L.includes(id));if(d.length)return d.slice(0,8);}
+ const saved=typeof G!=='undefined'&&G&&G.td&&G.td.deck;if(saved){const d=saved.filter(id=>L.includes(id));if(d.length)return d.slice(0,4);}
  const pri=['rio','gald','mire','celes','noah','erna','shion','hakua','balza','crow','jin','valk'];
- return pri.filter(id=>L.includes(id)).slice(0,8);}
-return{K,AWK,skSel3,ROLE,HERO,ULT,TRAIT,TRN,hero,real,foe,STAGE,CH,ORDER,deckOf,skName,reward,STONE,skills,skSel,mapSk,skTxt,abTd,abSum,ouName,awName};})();
+ return pri.filter(id=>L.includes(id)).slice(0,4);}
+return{K,skSel3,ROLE,HERO,ULT,TRAIT,SPRALT,hero,real,STAGE,CH,ORDER,deckOf,skName,reward,STONE,skills,mapSk,abTd,abSum,ouName,awName};})();
 if(typeof module!=='undefined')module.exports=TDD;

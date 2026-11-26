@@ -51,7 +51,7 @@
 
 **引き継ぎ（2026-11-26・ver0.60）**：タワーディフェンスをやめ、2D-HD のコマンド戦闘に移した（`docs/CB-DESIGN.md`）。TD の戦闘画面・ロジック（`js/td/sim.js` `view.js` `hud.js` `guide.js`・`tools/td_sim.js`）は削除。次の作業：セレス以外の仲間のコマ送り（PixelLab）と固有の演出、敵の行動の演出、技の説明を長押しで、旧コードの整理（dot-mon/dot-rig/ver19-art・v20-battle・v22 の旧 HUD など）。
 旧コードの整理の道具：`node tools/smoke.js --cov cov.json`（一度も呼ばれなかった関数）→ `python3 tools/deadcode.py cov.json`（ファイルごとの候補）・`python3 tools/prune.py cov.json [--apply]`（名前でも参照されない宣言を消す）。smoke が通らない画面の関数も 0 回になるので、消す前に画面で確かめる。
-現在地と次の作業は `docs/CB-DESIGN.md` と上の引き継ぎ。TD の頃の記録は `docs/TD-DESIGN.md`。
+現在地と次の作業は `docs/CB-DESIGN.md` と上の引き継ぎ。
 
 **方針（2026-11-26）：タワーディフェンス → 2D-HD のコマンド RPG へ移行**（ver0.60。縦画面・マップなし・章のステージを選んで戦う）。ファイル名の `td` は章・ステージ・演出の部品として残っている（`TDD` `TDM` `TDFX` `TDA` など）。戦闘の作業は `js/cb/` と `docs/CB-DESIGN.md` に。古い版ファイル（ver16〜v38）には、ホーム・図鑑・持ち物・鑑定・鍛冶・星盤・セーブが使う部分だけが残っている（旧画面の入口は `js/ui/party.js` で仲間画面へ）。
 
@@ -95,8 +95,7 @@
 | `rpg-hero-motion` | 戦闘モーション・技の演出 |
 | `rpg-equipment-icon` | 装備アイコン |
 | `rs-battle-fx` | 技・術の演出の設計（録画の実測：吹き出し→暗転→溜め→放出→着弾→明けの時間割・剣の振りの周期・術の段取り・エフェクトの色・効果音のレシピ・背景）と、参考を写さず応用・進化させる決まり。録画の分析 `scripts/vref.py` |
-| `td-stage-author` | 章のステージ・WAVE・敵・仲間の加入と会話（`js/td/stages.js`）。ver0.60 から WAVE は `CBE.wavesOf` で 1 戦 4 体までに読み替える（道・灯域・台座の項は TD の頃のもの） |
-| `td-sim-balance` | （TD の頃のもの。`tools/td_sim.js` は削除）コマンド戦闘の難易度は `node tools/cb_sim.js`（`--tune` で `js/cb/tune.js` を作る）。目安は `docs/CB-DESIGN.md` |
+| `td-stage-author` | 章のステージ・WAVE・敵・仲間の加入と会話（`js/td/stages.js`）。WAVE は `CBE.wavesOf` で 1 戦 4 体までに読み替え。足したら `node tools/cb_sim.js --tune` |
 | `rs-battle-flow` | ロマサガRS風の戦闘の流れと表示（HP/BP のタイミング・Critical/Weak・強化弱体・数字・区切り）。デモ `tools/battle_demo.js`・コマの一覧 `tools/frame_grid.py` |
 
 **PixelLab（MCP サーバー `pixellab`、AI のドット絵生成・アニメ・タイル・効果音。有料の回数制）**：クラウドでは環境「rpg-game」の起動スクリプトが `claude mcp add -s user -t http pixellab https://api.pixellab.ai/mcp` で登録し、API キーは環境のネットワークシークレット（api.pixellab.ai）からプロキシが付ける（キーをリポジトリに書かない）。手元の PC では `claude mcp add pixellab https://api.pixellab.ai/mcp -t http -H "Authorization: Bearer <キー>"`。使い方は `search_help`、残りの回数は `get_balance`。生成した絵はセレス案1・案2の絵柄（`assets_src/pixel-art/celes-48`・`celes-hd`）に合わせて手直ししてから取り込む。

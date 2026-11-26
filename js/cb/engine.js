@@ -31,10 +31,10 @@ function hero(id,i,b){const s=stats(id),h0=G.h[id]||{},lv=h0.lv||1,keys=skKeys(i
 /* ステージごとの補正（js/cb/tune.js の CBT＝[HP の倍率, 攻撃の倍率]。tools/cb_sim.js --tune で作る） */
 function foe(kind,lv,b){const e=ED[kind];if(!e)return null;const boss=!!e.boss||kind==='ernaE'||kind==='valkE',T=(typeof CBT!=='undefined'&&b.S&&CBT[b.S.id])||[1,1],k=boss?1:1+.035*Math.max(0,lv-1),hk=(boss?1.15:1.2)*T[0]*(b.hk||1),ak=T[1]*(b.ak||1);
  let tr=[];try{tr=(TDD.TRAIT[kind]||[]).slice();}catch(x){}
- return{side:1,kind,uid:++b.uid,name:e.name,spr:e.spr||kind,boss,lv,mhp:Math.round(e.mhp*k*hk),hp:0,atk:Math.round((e.atk||30)*k*ak),def:Math.round((e.def||10)*k),mag:Math.round((e.mag||e.atk||20)*k*ak),res:Math.round((e.res||10)*k),
+ return{side:1,kind,uid:++b.uid,name:e.name,spr:e.spr||(TDD.SPRALT||{})[kind]||kind,boss,lv,mhp:Math.round(e.mhp*k*hk),hp:0,atk:Math.round((e.atk||30)*k*ak),def:Math.round((e.def||10)*k),mag:Math.round((e.mag||e.atk||20)*k*ak),res:Math.round((e.res||10)*k),
   spd:e.spd||8,weak:(e.weak||[]).slice(),resist:(e.resist||[]).slice(),acts:e.acts||(e.ai&&e.ai.acts)||null,ai:boss?e.ai||null:null,bufs:[],sts:{},shield:0,tr,dir:1,face:1,cnt:0,spdT:0};}
 /* TD の WAVE（大群）→ 1 戦 4 体まで。ボスは必ず出す。雑魚は数を 1/3 に */
-function wavesOf(S){return S.waves.map(w=>{const L=[];for(const[,k,n]of w.e){const e=ED[k];if(!e)continue;const boss=!!e.boss||k==='ernaE'||k==='valkE';const c=boss?1:Math.max(1,Math.round(n/3));for(let i=0;i<c;i++)L.push({k,boss});}
+function wavesOf(S){return S.waves.map(w=>{const L=[];for(const[k,n]of w.e){const e=ED[k];if(!e)continue;const boss=!!e.boss||k==='ernaE'||k==='valkE';const c=boss?1:Math.max(1,Math.round(n/3));for(let i=0;i<c;i++)L.push({k,boss});}
  L.sort((a,b)=>b.boss-a.boss);const out=[];for(const x of L){if(out.length>=4)break;if(!x.boss&&out.length&&ED[out[0]].boss&&out.length>=3)break;out.push(x.k);}return out;});}
 /* 天への塔（S.inf）：WAVE を毎回作る。5 の倍数はボス。敵の Lv は WAVE ごとに +2 */
 function infWave(b,i){const S=b.S,R=b.r,pick=L=>L[Math.floor(R()*L.length)];if((i+1)%5===0)return[pick(S.bosses),pick(S.pool)];const n=i<10?3:4,o=[];for(let k=0;k<n;k++)o.push(pick(S.pool));return o;}
@@ -165,7 +165,7 @@ function act(b,u){if(u.hp<=0)return null;const again=u.side===1&&(u._n=(u._n||0)
  if(u.sts.para&&b.r()<.35){rec.skip='マヒ';return rec;}
  if(u.side===1){if(u.charging&&!again){u.charging=0;u.chargeN=1;rec.charge=1;rec.skip='溜め';return rec;}
   const c=foeAct(b,u);rec.sk=c.sk;const t=foeTarget(b,u,c.sk);if(!t)return null;rec.tg=c.sk.t==='all'?H(b):[t];hitAll(b,u,c.sk,rec);
-  if(u.ai&&u.ai.summon&&u.cnt%4===2&&F(b).length<4&&!again&&ED[u.ai.summon]){const f=foe(u.ai.summon,Math.max(1,b.S.lv-1),b);f.hp=f.mhp;b.foes.push(f);rec.summon=f;}
+  if(u.ai&&u.ai.summon&&u.cnt%4===2&&F(b).length<3&&!again&&ED[u.ai.summon]){const f=foe(u.ai.summon,Math.max(1,b.S.lv-1),b);f.hp=f.mhp;b.foes.push(f);rec.summon=f;}
   return rec;}
  let c=u.cmd||autoPick(b,u);u.cmd=null;let sk=c.sk;const cost=costOf(u,sk);if(cost>u.bp){sk=u.basic;c={sk,tg:best(b,u,sk)};}
  u.bp-=cost;rec.sk=sk;rec.cost=cost;if(sk.ougi)u.ouUsed=1;

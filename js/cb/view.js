@@ -7,10 +7,14 @@
  進行はジェネレーター（yield 秒）で書き、毎コマ st.t（×1/×2）で進める。 */
 'use strict';
 const CB=(()=>{
-const VW=270,W=420,X0=(W-VW)/2,FOOT=380;/* 見せる幅（論理 px）・背景の幅・左端・足元の帯の下端 */
-/* 4 人：前 1・中 2・後 1 の菱形。敵は左右対称（前列どうしの間 100px） */
-const HS=[[260,304],[292,264],[294,346],[326,306]],FS=HS.map(([x,y])=>[W-x,y]),BOSS=[122,322],BADD=[[168,266],[166,362],[86,300]];
-const HG={hero:74,foe:60,boss:124};
+const VW=300,W=420,X0=(W-VW)/2,FOOT=380;/* 見せる幅（論理 px）・背景の幅・左端・足元の帯の下端 */
+/* 並び：2 列×2 段。段の差 92px（いちばん背の高いセレス 86 より大きい）・列の差 56px（体の幅より大きい）でキャラが重ならない。
+ 敵は左右対称。前列どうしの間は約 104px。ボスは左の列の中ほど、取り巻きは前の列の上下 */
+const HS=[[258,276],[262,368],[314,276],[318,368]],FS=HS.map(([x,y])=>[W-x,y]),BOSS=[108,326],BADD=[[180,264],[182,370]];
+const HG={hero:74};
+/* 敵の背丈：味方と同じ目盛り。人型は味方と同じ 74、獣・魔物は 64。中ボス（sc 2）は 1.3 倍、ボス（sc 3）は 1.5 倍まで */
+function foeHg(f){let hum=false;try{const r=SPX.parse(f.spr),c=r&&SPX.D[r.id];hum=!!c&&c.kind==='hum';}catch(e){}const e=ED[f.kind]||{},base=hum?74:64;
+ return Math.round(base*(f.boss?((e.sc||3)>=3&&e.rank!=='mid'?1.5:1.3):1));}
 let root=null,cv=null,g=null,OC=null,O=null,DPR=1,S=1,CW=0,CHh=0,Y0=0,raf=0,last=0,speed=1,b=null,st=null,sid=null,bg=null,blur=null,gen=null,wake=0,phase='idle',sel=null,tgt=null,ended=false;
 let cam={x:0,y:0,z:1,tx:0,ty:0,tz:1,kick:0,shake:0};const nums=[],tx=[],motes=[];
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -26,7 +30,7 @@ function sprite(f,x,y,mir,hgt,flash,alpha,o){if(!f)return;const sc=Math.min(1.25
 function soft(src,k,haze){const w=Math.max(1,Math.round(src.width*k)),h=Math.max(1,Math.round(src.height*k)),a=document.createElement('canvas');a.width=w;a.height=h;const x=a.getContext('2d');x.imageSmoothingEnabled=true;x.drawImage(src,0,0,w,h);
  const c=document.createElement('canvas');c.width=src.width;c.height=src.height;const y=c.getContext('2d');y.imageSmoothingEnabled=true;y.drawImage(a,0,0,c.width,c.height);
  if(haze){y.globalCompositeOperation='source-atop';y.fillStyle=haze;y.fillRect(0,0,c.width,c.height);}return c;}
-function makeBg(){const th=b.S.th||'ash',fst={S:{W,th,base:[W+200,300],paths:[]},Ps:[]};bg=TDBG.make(fst,VW);const P=bg.P;
+function makeBg(){const th=b.S.th||'ash',fst={S:{W,th}};bg=TDBG.make(fst,VW);const P=bg.P;
  blur={far:soft(bg.far,.34,hexA(P.sky[2],.35)),mid:soft(bg.mid,.55,hexA(P.sky[1],.18)),fg:soft(fore(P),.25)};}
 /* 手前の層（草・岩の影。強くぼかして画面の下の両端に置く＝手前にピントが合っていない HD-2D の奥行き） */
 function fore(P){const c=document.createElement('canvas');c.width=W;c.height=140;const x=c.getContext('2d'),R=(s=>()=>(s=(s*16807)%2147483647)/2147483647)(P.prop.length*131+7);x.fillStyle=P.prop;
@@ -55,7 +59,7 @@ const SX=x=>(x-cam.x)*S*cam.z+CW/2,SY=y=>(y-cam.y)*S*cam.z+CHh/2;
 /* ---------- 並び ---------- */
 function place(){b.heroes.forEach((u,i)=>{const[x,y]=HS[i]||HS[0];u.hx=x;u.hy=y;if(u.x==null){u.x=x+120;u.y=y;}u.face=-1;});
  const L=b.foes,boss=L.find(f=>f.boss);let k=0;
- for(const f of L){let p;if(boss){p=f===boss?BOSS:BADD[k++%3];}else p=FS[L.indexOf(f)]||FS[0];f.hx=p[0];f.hy=p[1];if(f.x==null){f.x=p[0]-150-Math.random()*30;f.y=p[1];f.enter=1;}f.dir=1;f.face=1;f.hg=f.boss?HG.boss:HG.foe;f.dhp=f.dhp??f.hp;f.hitT=f.hitT??-9;f.stun=0;f.by=f.enter?null:{};}}
+ for(const f of L){let p;if(boss){p=f===boss?BOSS:BADD[k++%2];}else p=FS[L.indexOf(f)]||FS[0];f.hx=p[0];f.hy=p[1];f.hg=foeHg(f);if(f.x==null){f.x=p[0]-150-Math.random()*30;f.y=p[1];f.enter=1;}f.dir=1;f.face=1;f.dhp=f.dhp??f.hp;f.hitT=f.hitT??-9;f.stun=0;f.by=f.enter?null:{};}}
 /* ---------- 毎コマ ---------- */
 function loop(now){raf=requestAnimationFrame(loop);const dt=Math.min(.1,(now-last)/1000||0);last=now;if(!st)return;
  const sdt=dt*speed;st.t+=sdt;runQ();if(phase==='input'&&!gen&&CBH.auto())start();
@@ -93,7 +97,7 @@ function stage(t){/* 舞台の光だまり：両陣の間を明るく、外は�
  if(tgt&&tgt.dhp>0&&phase==='input'){const p=.5+.5*Math.sin(t*6),r=(tgt.boss?30:17);g.strokeStyle=`rgba(255,226,160,${.55+.35*p})`;g.lineWidth=1.5;g.beginPath();g.ellipse(tgt.x,tgt.y+1,r+p*2,(r+p*2)*.32,0,0,7);g.stroke();
   g.fillStyle='#ffe2a0';const yy=tgt.y-tgt.hg-10-p*3;g.beginPath();g.moveTo(tgt.x-5,yy);g.lineTo(tgt.x+5,yy);g.lineTo(tgt.x,yy+6);g.fill();}}
 function shadow(x,y,r){g.fillStyle='rgba(7,7,26,.45)';g.beginPath();g.ellipse(x,y+1,r,r*.26,0,0,7);g.fill();}
-function drawFoe(f,t){if(f.gone)return;const o=TDFX.pose(f,t,st),F=spr(f.spr,f.kind,1,f.boss?128:72),fl=st.t-f.hitT<.08;
+function drawFoe(f,t){if(f.gone)return;const o=TDFX.pose(f,t,st),F=spr(f.spr,f.kind,1,f.hg),fl=st.t-f.hitT<.08;
  sprite(F,f.x+o.dx,f.y+o.dy,f.dir<0,f.hg,o.fl||fl,o.a*(f.fade==null?1:f.fade),o);
  if(f.dhp<f.mhp&&f.dhp>0){const w=f.boss?54:30,x=Math.round(f.x-w/2),y=Math.round(f.y+5),r=f.dhp/f.mhp;g.fillStyle='#07071a';g.fillRect(x-1,y-1,w+2,4);g.fillStyle='#3b3f72';g.fillRect(x,y,w,2);g.fillStyle=f.boss?'#ff8a6a':'#e86a6a';g.fillRect(x,y,Math.max(1,Math.round(w*r)),2);}
  if(f.charging||f.chargeN){const p=.5+.5*Math.sin(t*10);g.strokeStyle=`rgba(255,106,74,${.4+.5*p})`;g.lineWidth=2;g.beginPath();g.ellipse(f.x,f.y-f.hg*.5,f.hg*.55+p*3,f.hg*.6+p*3,0,0,7);g.stroke();}
@@ -217,7 +221,7 @@ function sheet(html){const s=root.querySelector('.cb-sheet');if(!html){s.hidden=
 /* ---------- 開く・閉じる ---------- */
 let party0=[];
 function open(id,party){build();sid=id;party0=party.slice(0,4);cancelAnimationFrame(raf);
- b=CBE.create(id,party0,{});st={t:0,units:b.heroes,foes:b.foes,ev:[],S:{th:b.S.th,base:[W+200,300]},fields:[],deck:[]};Object.defineProperty(st,'foes',{get:()=>b.foes});Object.defineProperty(st,'units',{get:()=>b.heroes.filter(u=>u.hp>0)});
+ b=CBE.create(id,party0,{});st={t:0,units:b.heroes,foes:b.foes,ev:[],S:{th:b.S.th}};Object.defineProperty(st,'foes',{get:()=>b.foes});Object.defineProperty(st,'units',{get:()=>b.heroes.filter(u=>u.hp>0)});
  for(const u of b.heroes){u.dhp=u.hp;u.x=null;u.actT=-9;u.hitT=-9;}
  TDA.clear();TDFX.reset();Q.length=0;nums.length=0;tx.length=0;gen=null;phase='idle';speed=CBH.speed();ended=false;sel=null;tgt=null;
  root.classList.remove('hide');sheet(null);makeBg();CBH.open(root.querySelector('.cb-ui'),root.querySelector('.cb-top'));

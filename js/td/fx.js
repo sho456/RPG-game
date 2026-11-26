@@ -61,7 +61,6 @@ const H={
 function ev(e,st){curSt=st;const u=e.u,el=u&&u.h?u.h.el:'陽',c=ELC[el]||'#fff',c2=EL2[el]||'#fff';
  switch(e.k){
  case'hit':{const f=e.f,hx=f.x,hy=f.y-14;
-  if(u.id==='lamp'){add({k:'shot',x0:u.x,y0:u.y,x1:hx,y1:hy,c:'#f2b347',c2:'#fff1a8',d:.2,big:1});sparks(hx,hy,4,'#f2b347');return;}
   if(u.id==='celes'&&!e.big){if(e.sk){if(u._skDl!=null&&st.t-u._skT<=.05){e._dl=FXC.skHit(u,f,e,st);return;}}else if(u.h.rng>60){e._dl=FXC.atk(u,f,e,st);return;}}
   if(e.big){if(u.id==='celes'){const D=FXU.hitDl(u,st);if(D){e._dl=D;if(f.hp<=0)f._hold=D+.1;return;}}if(f.hp<=0)f._hold=.24;sparks(hx,hy,6,c,{dl:.24});return;}
   if(e.sk){if((u.cs||u.h.sk).k==='chain')add({k:'bolt',x0:u.x,y0:u.y-26,x1:hx,y1:hy,c,seed:Math.random()*99,d:.22});sparks(hx,hy,8,c);return;}
@@ -75,18 +74,11 @@ function ev(e,st){curSt=st;const u=e.u,el=u&&u.h?u.h.el:'陽',c=ELC[el]||'#fff',
  case'kill':{const f=e.f,F=B.spr(f.spr,f.kind,1);if(L.filter(x=>x.k==='corpse').length>14){const i=L.findIndex(x=>x.k==='corpse');L.splice(i,1);}
   add({k:'corpse',F,x:f.x,y:f.y,mir:f.dir<0,hg:f.hg||(f.boss?76:40),gh:f.tr.includes('ghost'),boss:f.boss,seed:f.uid,hold:f._hold||0,d:(f.boss?.9:.45)+(f._hold||0)});
   sparks(f.x,f.y-14,f.boss?40:10,f.tr.includes('void')?'#b07aff':'#e86a6a',{sp:f.boss?140:80,d:.45});if(f.boss){add({k:'star',x:f.x,y:f.y-30,r:30,c:'#f2b347',d:.6});rise(f.x,f.y-30,16,'#f2b347',{w:50,d:.9});}return;}
- case'area':if(e.small)add({k:'gring',x:e.x,y:e.y,r:e.r,c,c2,d:.2,thin:1});return;
  case'heal':rise(e.u.x,e.u.y-30,3,'#9fe8b8',{w:16,d:.5});return;
  case'ult':ult(e,c,c2);return;
  case'deploy':add({k:'pillar',x:u.x,y:u.y,w:14,h:60,c:'#f2b347',d:.35});add({k:'gring',x:u.x,y:u.y,r:18,c:'#f2b347',c2:'#fff',d:.35});return;
- case'retreat':rise(u.x,u.y-20,8,'#f2b347',{k:'ember',w:20,d:.4});return;
- case'lamp':{const[bx,by]=st.S.base;add({k:'gring',x:bx,y:by,r:st.lightR*.6,c:'#f2b347',c2:'#fff1a8',d:.7});add({k:'star',x:bx,y:by-110,r:20,c:'#fff1a8',d:.5});rise(bx,by-100,12,'#f2b347',{w:30});return;}
  case'fall':add({k:'puff',x:u.x,y:u.y-18,d:.4});return;
- case'summon':add({k:'gring',x:e.f.x,y:e.f.y,r:30,c:'#b07aff',c2:'#ff7ad0',d:.4});return;
- case'beam':{const T=e.u||{x:st.S.base[0],y:st.S.base[1]-110};add({k:'beam',x0:e.f.x,y0:e.f.y-30,x1:T.x,y1:T.y-(e.u?20:0),d:.35});sparks(T.x,T.y-(e.u?20:0),16,'#ff6a4a');return;}
- case'gcancel':add({k:'gring',x:e.f.x,y:e.f.y-30,r:26,c:'#ffe14a',c2:'#fff',d:.4});return;
- case'shift':add({k:'puff',x:e.f.x,y:e.f.y-20,boss:1,d:.45});return;
- case'drain':add({k:'gring',x:st.S.base[0],y:st.S.base[1],r:st.r0,c:'#b07aff',c2:'#6f6888',d:.8,shrink:1});return;}}
+ }}
 /* 星臨：短い暗転（背景だけ・0.75 秒）→ 溜め（粒が集まる 0.2 秒）→ 放出（光の筋・白い芯・星・放射・輪）→ 星が昇る余韻 */
 function ult(e,c,c2){if(e.u.id==='celes'&&e.u.h.ult.k==='utime'){FXU.ult(e,curSt,B);return;}const u=e.u,full=e.r>500,cx=full?B.cam()+B.vw()/2:e.x,cy=full?250:e.y-10;dimT=0;
  motes(u.x,u.y-24,26,c2,46,.2);add({k:'gring',x:u.x,y:u.y,r:34,c,c2,d:.22,shrink:1});
@@ -152,7 +144,6 @@ function draw(g,e,p){g.globalAlpha=1;const ea=1-p;
  case'streak':{const k=Math.min(1,p*3);g.globalCompositeOperation='screen';g.globalAlpha=ea;g.strokeStyle=e.c;g.lineWidth=6*ea+1;g.beginPath();g.moveTo(e.x0,e.y0);g.lineTo(e.x0+(e.x1-e.x0)*k,e.y0+(e.y1-e.y0)*k);g.stroke();
   g.strokeStyle='#fff';g.lineWidth=2*ea;g.stroke();g.globalCompositeOperation='source-over';break;}
  case'flash':g.globalAlpha=.16*ea;g.fillStyle='#fff8e0';g.fillRect(B.cam()-4,0,B.vw()+8,FHH());break;
- case'beam':g.globalAlpha=ea;g.strokeStyle='#ff6a4a';g.lineWidth=6*ea+1;g.beginPath();g.moveTo(e.x0,e.y0);g.lineTo(e.x1,e.y1);g.stroke();g.strokeStyle='#fff';g.lineWidth=2*ea;g.stroke();break;
  case'puff':g.globalAlpha=ea;g.fillStyle=e.boss?'#f2b347':'#b07aff';for(let i=0;i<8;i++){const a=i*.785,d=4+p*(e.boss?28:16);g.fillRect(e.x+Math.cos(a)*d-1,e.y+Math.sin(a)*d*.6-1,2,2);}break;
  case'corpse':corpse(g,e,Math.max(0,(e.t-e.hold)/(e.d-e.hold)));break;}
  g.globalAlpha=1;}

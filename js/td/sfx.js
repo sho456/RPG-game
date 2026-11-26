@@ -36,25 +36,18 @@ function gate(k,min){const n=AC.currentTime;if(n-(last[k]||-9)<min)return false;
 /* ---------- 音の一覧 ---------- */
 const R={
  deploy:()=>{thump(.08);chime([1047,1568],.06,.022,.02);},
- retreat:()=>{swoosh(2400,500,.18,.03);osc(660,.14,'triangle',.025,330);},
  slash:m=>{swoosh(1100*m,3200*m,.08,.032,1.4);ring(4000*m,.06,.01,.03);},
  arrow:m=>{swoosh(5000,2500,.05,.02,2,0,'highpass');osc(2400*m,.05,'square',.007,1300*m,.01);},
  spell:m=>{swoosh(500*m,1600*m,.12,.03,3);osc(880*m,.1,'sine',.016,440*m,.02);},
- lampshot:()=>{osc(1700,.08,'sine',.012,850);},
  weak:m=>{ring(7500*m,.08,.012);},
  crit:()=>{thump(.06,0,180,60,.09);ring(5200,.07,.012);},
  kill:()=>{thump(.07,0,180,50,.12);swoosh(1800,300,.14,.025,.8,0,'lowpass');chime([6500,5700],.05,.008,.05,.12);},
  bosskill:()=>{thump(.13);thump(.1,.12);swoosh(3000,200,.7,.06,.8);chime([8300,6500,6100,5700],.12,.014,.2,.25);},
  boss:()=>{osc(55,1.1,'sawtooth',.035,48);osc(82,1.1,'triangle',.05,70);thump(.12);thump(.12,.28);},
  wave:()=>{osc(392,.14,'triangle',.04);osc(523,.22,'triangle',.04,0,.12);},
- call:()=>{osc(523,.07,'triangle',.03);osc(784,.1,'triangle',.03,0,.06);},
- clear:()=>{chime([1568,1319,1175],.08,.016);},
- life:()=>{osc(220,.22,'sawtooth',.045,110);thump(.12);osc(196,.26,'sawtooth',.04,98,.2);},
  lamp:()=>{swoosh(300,2400,.4,.03,1.5);chime([784,988,1175,1568],.07,.02,.04,.26);},
  heal:()=>{chime([1319,1568,2093],.06,.014,0,.25);swoosh(800,2600,.3,.012,3);},
  charge:()=>{osc(180,1,'sine',.025,720);swoosh(400,2400,1,.015,6);},
- cancel:()=>{ring(3000,.12,.016);swoosh(2400,400,.2,.02);},
- drain:()=>{swoosh(2000,250,.6,.035,2);osc(300,.5,'triangle',.02,120);},
  summon:()=>{swoosh(200,900,.35,.03,4);osc(110,.35,'sawtooth',.02,220);},
  fall:()=>{osc(440,.35,'triangle',.04,110);swoosh(1500,200,.3,.02);},
  win:()=>{[523,659,784,1047].forEach((f,i)=>osc(f,.24,'triangle',.045,0,i*.11));chime([2093,2637,3136],.08,.014,.5,.4);},
@@ -76,26 +69,16 @@ function play(k,m=1){if(!live())return;try{(R[k]||SK[k])&&(R[k]||SK[k])(m);}catc
 /* ---------- 出来事 → 音 ---------- */
 function ev(e){if(!live())return;const m=e.u&&e.u.h?ELF[e.u.h.el]||1:1;
  try{switch(e.k){
-  case'hit':{if(e.big)return;const u=e.u;if(u.id==='lamp'){if(gate('lamp',.12))R.lampshot();return;}
-   const far=u.h.rng>60,mag=u.h.dmgK==='mag';if(!e.sk){if(far&&!mag){if(gate('arrow',.06))R.arrow(m);}else if(mag){if(gate('spell',.07))R.spell(m);}else if(gate('slash',.05))R.slash(m);}
+  case'hit':{if(e.big)return;const u=e.u;   const far=u.h.rng>60,mag=u.h.dmgK==='mag';if(!e.sk){if(far&&!mag){if(gate('arrow',.06))R.arrow(m);}else if(mag){if(gate('spell',.07))R.spell(m);}else if(gate('slash',.05))R.slash(m);}
    if(e.weak&&gate('weak',.1))R.weak(m);if(e.cr&&gate('crit',.12))R.crit();return;}
   case'cast':if(e.sk.k==='heal'||gate('sk'+e.sk.k,.12))SK[e.sk.k]&&SK[e.sk.k](m);return;
   case'kill':if(e.f.boss)R.bosskill();else if(gate('kill',.06))R.kill();return;
-  case'spawn':if(e.f.boss&&gate('boss',2))R.boss();return;
   case'wave':if(gate('wave',.5))R.wave();return;
-  case'call':R.call();return;
-  case'clear':R.clear();return;
-  case'leak':if(gate('life',.25))R.life();return;
-  case'beam':if(!e.u){if(gate('life',.25))R.life();}else{thump(.12);swoosh(2600,300,.3,.04);}return;
-  case'lamp':R.lamp();return;
   case'ult':R.ult(m);return;
   case'aw':R.lamp();return;
   case'deploy':R.deploy();return;
-  case'retreat':R.retreat();return;
   case'fall':R.fall();return;
   case'charge':R.charge();return;
-  case'gcancel':R.cancel();return;
-  case'drain':R.drain();return;
   case'summon':if(gate('summon',.5))R.summon();return;
   case'end':(e.win?R.win:R.lose)();return;}}catch(err){}}
 /* ---------- BGM（ver16 の合成エンジンに曲を足すだけ） ---------- */

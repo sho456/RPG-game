@@ -73,7 +73,7 @@ function skPop(id,k){const x=TDD.skills(id).find(x=>x.k===k);if(!x)return'';cons
 function ouPop(id){const s=stats(id),U=s.ult,X=RSD.AWX[id]||{},o=SK[X.ou]||{};
  return ph(skI(X.ou),U.n,dots(U.lv))+`<p class="un-tx">${esc(o.d||U.d||'')}</p><ul class="un-kv"><li><i>星臨</i><b>${esc(X.n||'')}</b></li><li><i>ターン</i><b>${RSD.AW_TURNS}</b></li></ul>${(X.note||[]).length?`<p class="un-tx aw">${esc(X.note.join('／'))}</p>`:''}`;}
 function abPop(id,i){const A=(RSD.AB[id]||[])[i];if(!A)return'';const r=RSC.abRank(id,i);
- const row=(e,sp)=>{const t=TDD.abTd(e,id);return`<li class="${t?'on':''}${sp?' sp':''}">${esc(t?t.txt:RSC.effTxt(e))}</li>`;};
+ const row=(e,sp)=>`<li class="on${sp?' sp':''}">${esc(RSC.effTxt(e))}</li>`;
  /* 今の段階だけ（未習得は段階Ⅰを薄く）。段階別のタブで 3 段を並べる */
  const all=pop.tab==='all',rs=all?[1,2,3]:[Math.max(1,r)];
  const tabs=`<nav class="un-tabs"><button class="${all?'':'on'}" data-a="abt" data-v="now">効果</button><button class="${all?'on':''}" data-a="abt" data-v="all">段階</button></nav>`;
