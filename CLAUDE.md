@@ -49,6 +49,7 @@
 | **仲間のコマ送り・エフェクト**（ver0.59。まずセレス。コマンド戦闘でもそのまま使う） | 状態→アニメ・再生ロック・表示用の向き・整数倍の描画・焼き込み fx 層 `js/td/uanim.js`（`TDA`。u.actK/actT/hitT/awT/mv を見る）。光と粒の共通部品 `js/td/fxkit.js`（`FXK`）。セレスの通常攻撃・技 `js/td/fx-celes.js`（`FXC`）、星臨・奥義 `js/td/fx-celes-ult.js`（`FXU`）。素材：原画 `assets_src/pixel-art/celes-hd/src/master/`（PixelLab のシートは `pl/`）→ `import_pl.py` → `assets_src/chars/celes/` → `python3 tools/spx_import.py build celes`（パック `celes_hd`・`celes_hd_fx`） | — |
 | デザイントークン（新しい画面はこれ以外の色・角・影を使わない） | — | `css/ui/tokens.css` |
 
+**ver0.62（2026-11-26）**：戦闘の操作盤をロマサガRS風に（`js/cb/hud.js`：上＝TURN・TARGET の敵と 8 属性の弱点、下＝仲間の HP/LP/BP と技の一覧・戻る/AUTO通常/AUTO全力/リピート、行動中は行動順の帯と仲間 4 人）。キャンバスは下の盤より上だけ。敵の行動は赤の札・照準・縁。演出の例外で画面が固まる不具合を修正（`fx-celes.js` の `st.fields`・FXK/TDFX/view の守り）。背景 `js/td/bg.js` を 8 テーマ描き込み。
 **引き継ぎ（2026-11-26・ver0.60）**：タワーディフェンスをやめ、2D-HD のコマンド戦闘に移した（`docs/CB-DESIGN.md`）。TD の戦闘画面・ロジック（`js/td/sim.js` `view.js` `hud.js` `guide.js`・`tools/td_sim.js`）は削除。次の作業：セレス以外の仲間のコマ送り（PixelLab）と固有の演出、敵の行動の演出、技の説明を長押しで、旧コードの整理（dot-mon/dot-rig/ver19-art・v20-battle・v22 の旧 HUD など）。
 旧コードの整理の道具：`node tools/smoke.js --cov cov.json`（一度も呼ばれなかった関数）→ `python3 tools/deadcode.py cov.json`（ファイルごとの候補）・`python3 tools/prune.py cov.json [--apply]`（名前でも参照されない宣言を消す）。smoke が通らない画面の関数も 0 回になるので、消す前に画面で確かめる。
 現在地と次の作業は `docs/CB-DESIGN.md` と上の引き継ぎ。

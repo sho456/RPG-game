@@ -100,7 +100,7 @@ if (SHOTS) fs.mkdirSync(SHOTS, {recursive: true});
     await step('td-prep:' + id, `TDM.prep('${id}')`, 500);await shot('04_prep_' + id);
     await step('td-go:' + id, `(()=>{const b=document.querySelector('#tdm [data-a="go"]');b&&b.click();})()`, 400);
     await step('td-talk:' + id, `(()=>{for(let i=0;i<30;i++){const k=document.querySelector('#tdm .tdm-talk .skip');if(!k)break;k.click();}})()`, 400);
-    await step('cb-cmd:' + id, `(()=>{const b=[...document.querySelectorAll('#cb .cb-sk:not(.off)')];b[b.length-1]&&b[b.length-1].click();const g=document.querySelector('#cb [data-a="go"]');g&&g.click();})()`, QUICK ? 3000 : 5000);
+    await step('cb-cmd:' + id, `(()=>{for(let i=0;i<4;i++){const b=[...document.querySelectorAll('#cb .cb-sk:not(.off)')];if(!b.length)break;b[b.length-1].click();}})()`, QUICK ? 3000 : 5000);
     await shot('05_cb_' + id);
     await step('cb-menu:' + id, `(()=>{const m=document.querySelector('#cb [data-a="menu"]');m&&m.click();const r=document.querySelector('#cb [data-a="resume"]');r&&r.click();})()`, 300);
     await step('cb-end:' + id, `(()=>{CB.hide();TDM.map();})()`, 400);
@@ -144,12 +144,12 @@ if (SHOTS) fs.mkdirSync(SHOTS, {recursive: true});
       await step('fx-prep:' + id, `TDM.prep('${id}')`, 400);
       await step('fx-go:' + id, `(()=>{const b=document.querySelector('#tdm [data-a="go"]');b&&b.click();})()`, 400);
       await step('fx-talk:' + id, `(()=>{for(let i=0;i<30;i++){const k=document.querySelector('#tdm .tdm-talk .skip');if(!k)break;k.click();}})()`, 400);
-      await step('fx-x2:' + id, `(()=>{const s=document.querySelector('#cb [data-a="spd"]');if(s&&s.textContent.trim()!=='×2')s.click();const a=document.querySelector('#cb [data-a="auto"]');if(a&&!a.classList.contains('on'))a.click();})()`, 300);
+      await step('fx-x2:' + id, `(()=>{for(let i=0;i<3;i++){const s=document.querySelector('#cb [data-a="spd"]');if(s&&s.textContent.trim()!=='×2')s.click();}const a=document.querySelector('#cb [data-a="auto2"]');if(a&&!a.classList.contains('on'))a.click();})()`, 300);
       const t0 = Date.now();let over = false;
       while (Date.now() - t0 < 150000) {over = await p.evaluate(() => !!(CB.st && CB.st.over)).catch(() => false);if (over) break;await p.waitForTimeout(500);}
       if (!over) errs.push(['fx:' + id, '戦闘が終わらない（×2・AUTO・150 秒）']);
       await p.waitForTimeout(2200);await shot('10_fx_result_' + id);
-      await step('fx-end:' + id, `(()=>{const a=document.querySelector('#cb [data-a="auto"]');if(a&&a.classList.contains('on'))a.click();CB.hide();TDM.map();})()`, 400);
+      await step('fx-end:' + id, `(()=>{const a=document.querySelector('#cb [data-a="auto2"]');if(a&&a.classList.contains('on'))a.click();CB.hide();TDM.map();})()`, 400);
     }
     await step('fx-home', HOME, 400);
   }

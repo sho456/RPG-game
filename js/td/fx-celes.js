@@ -52,8 +52,8 @@ function prelude(u,P,H){const M=mz(u,'c');
 const rnd=K.rnd;
 /* 遅延の砂・加速の刻（slow）：敵の足元に地面に沿った楕円の時計の陣。縁が残り時間で減る・回る針・砂がらせんで降る・遅くなった敵に小さな時計 */
 function field(u,f,sk,P,H,st,haste){const T={x:f.x,y:f.y},R=sk.r||70,dur=sk.dur||6,c1=haste?P.ch:P.m,spd=haste?2.6:1.1;
- const zOf=()=>st.fields.find(z=>z.u===u&&Math.abs(z.x-T.x)<.6&&Math.abs(z.y-T.y)<.6);
- K.fx({layer:'back',dl:H,d:dur+.6,draw(g,p,t,e){const z=zOf();if(!z&&t>.3){e.t=e.d;return;}const rem=z?z.t:0,fr=cl(rem/dur),a=cl(rem/.5),op=K.eo(cl(t/.2));if(a<=0)return;const rx=R*op,ry=rx*.42;
+ const zOf=t=>st.fields?st.fields.find(z=>z.u===u&&Math.abs(z.x-T.x)<.6&&Math.abs(z.y-T.y)<.6):(t<1.6?{t:dur*(1-t/1.6)}:null);/* コマンド戦闘は陣なし：1.6 秒で消える */
+ K.fx({layer:'back',dl:H,d:dur+.6,draw(g,p,t,e){const z=zOf(t);if(!z&&t>.3){e.t=e.d;return;}const rem=z?z.t:0,fr=cl(rem/dur),a=cl(rem/.5),op=K.eo(cl(t/.2));if(a<=0)return;const rx=R*op,ry=rx*.42;
   g.save();g.translate(T.x,T.y);g.scale(1,.42);K.glow(g,0,0,rx*1.08,c1,.34*a);g.restore();
   K.ring(g,T.x,T.y,rx,ry,1,c1,.35*a);g.globalCompositeOperation='lighter';
   g.strokeStyle=P.c2;g.lineWidth=2;g.globalAlpha=.95*a;g.beginPath();g.ellipse(T.x,T.y,rx,ry,0,-Math.PI/2,-Math.PI/2+fr*TAU);g.stroke();g.globalAlpha=.25*a;g.lineWidth=5;g.stroke();
@@ -63,7 +63,7 @@ function field(u,f,sk,P,H,st,haste){const T={x:f.x,y:f.y},R=sk.r||70,dur=sk.dur|
   for(const[an,L,w,c]of[[hr,.5,2,P.c2],[ang,.8,2,P.c2]]){const x=T.x+Math.cos(an)*rx*L,y=T.y+Math.sin(an)*ry*L;g.globalAlpha=a;g.strokeStyle=c;g.lineWidth=w;g.beginPath();g.moveTo(T.x,T.y);g.lineTo(x,y);g.stroke();g.strokeStyle='#fff';g.lineWidth=1;g.beginPath();g.moveTo(T.x,T.y);g.lineTo(x,y);g.stroke();}
   g.lineCap='butt';K.dot(g,T.x,T.y,3,'#fff',a);
   if(t<.25){const q=t/.25;K.ring(g,T.x,T.y,R*(1+.18*(1-q)),R*.42*(1+.18*(1-q)),2,'#fff',(1-q)*.8);}}});
- K.fx({dl:H,d:dur+.6,draw(g,p,t,e){const z=zOf();if(!z&&t>.3)return;const rem=z?z.t:0,a=cl(rem/.5),op=K.eo(cl(t/.2));if(a<=0)return;
+ K.fx({dl:H,d:dur+.6,draw(g,p,t,e){const z=zOf(t);if(!z&&t>.3)return;const rem=z?z.t:0,a=cl(rem/.5),op=K.eo(cl(t/.2));if(a<=0)return;
   g.globalCompositeOperation='lighter';
   for(let i=0;i<16;i++){const ph=(t*.8+i/16)%1,an=ph*TAU*1.6+i*1.7,r=R*.78*op*(1-ph*.85),hh=46*(1-ph*ph),x=T.x+Math.cos(an)*r,y=T.y+Math.sin(an)*r*.42-hh,fa=Math.min(1,ph*8)*(1-Math.pow(ph,6))*a;
    K.glow(g,x,y,3,P.c2,fa*.5);K.dot(g,x,y,i%4===0?2:1,i%5===0?'#fff':P.c2,fa);}

@@ -15,7 +15,7 @@ const HG={hero:74};
 /* 敵の背丈：味方と同じ目盛り。人型は味方と同じ 74、獣・魔物は 64。中ボス（sc 2）は 1.3 倍、ボス（sc 3）は 1.5 倍まで */
 function foeHg(f){let hum=false;try{const r=SPX.parse(f.spr),c=r&&SPX.D[r.id];hum=!!c&&c.kind==='hum';}catch(e){}const e=ED[f.kind]||{},base=hum?74:64;
  return Math.round(base*(f.boss?((e.sc||3)>=3&&e.rank!=='mid'?1.5:1.3):1));}
-let root=null,cv=null,g=null,OC=null,O=null,DPR=1,S=1,CW=0,CHh=0,Y0=0,raf=0,last=0,speed=1,b=null,st=null,sid=null,bg=null,blur=null,gen=null,wake=0,phase='idle',sel=null,tgt=null,ended=false;
+let root=null,cv=null,g=null,OC=null,O=null,DPR=1,S=1,CW=0,CHh=0,Y0=0,raf=0,last=0,speed=1,b=null,st=null,sid=null,bg=null,blur=null,gen=null,wake=0,phase='idle',sel=null,tgt=null,ended=false,ord=[],acting=null,aim=[],foeT=-9;
 let cam={x:0,y:0,z:1,tx:0,ty:0,tz:1,kick:0,shake:0};const nums=[],tx=[],motes=[];
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const ELC={'斬':'#e8e8f0','打':'#d9a066','突':'#b0e0ff','熱':'#ff7a3c','冷':'#7fd8ff','雷':'#ffe14a','陽':'#fff1a8','陰':'#b07aff'};
@@ -44,9 +44,10 @@ function build(){if(root)return;root=document.createElement('div');root.id='cb';
  document.body.appendChild(root);cv=root.querySelector('canvas');g=cv.getContext('2d');OC=document.createElement('canvas');O=OC.getContext('2d');
  cv.addEventListener('pointerup',tap);addEventListener('resize',()=>{if(st)fit();});
  TDFX.bind({spr:(k,f,s)=>spr(k,f,s,s?64:64),cam:()=>X0,vw:()=>VW});}
-function fit(){const r=root.getBoundingClientRect();DPR=Math.max(1,Math.min(3,devicePixelRatio||1));CW=r.width;CHh=r.height;S=CW/VW;
+function fit(){const r=root.getBoundingClientRect();DPR=Math.max(1,Math.min(3,devicePixelRatio||1));const ui=root.querySelector('.cb-ui'),uh=ui?ui.getBoundingClientRect().height:r.height*.4;
+ /* キャンバスは下の盤より上だけ（寄りで盤の裏にキャラが隠れない） */CW=r.width;CHh=Math.max(200,r.height-uh+2);S=CW/VW;
  cv.width=Math.round(CW*DPR);cv.height=Math.round(CHh*DPR);cv.style.width=CW+'px';cv.style.height=CHh+'px';OC.width=cv.width;OC.height=cv.height;
- const ui=root.querySelector('.cb-ui'),uh=ui?ui.getBoundingClientRect().height:CHh*.4,fh=Math.max(200,CHh-uh);Y0=FOOT+10-fh/S;
+ Y0=FOOT+12-CHh/S;
  home();cam.x=cam.tx;cam.y=cam.ty;}
 /* 既定のカメラ（寄りなし） */
 const C0=()=>({x:X0+VW/2,y:Y0+CHh/S/2});
@@ -63,10 +64,12 @@ function place(){b.heroes.forEach((u,i)=>{const[x,y]=HS[i]||HS[0];u.hx=x;u.hy=y;
 /* ---------- 毎コマ ---------- */
 function loop(now){raf=requestAnimationFrame(loop);const dt=Math.min(.1,(now-last)/1000||0);last=now;if(!st)return;
  const sdt=dt*speed;st.t+=sdt;runQ();if(phase==='input'&&!gen&&CBH.auto())start();
- if(gen&&st.t>=wake){let n=0;while(gen&&st.t>=wake&&n++<20){const r=gen.next();if(r.done){gen=null;break;}wake=st.t+(r.value||0);}}
+ if(gen&&st.t>=wake){let n=0;while(gen&&st.t>=wake&&n++<20){let r;try{r=gen.next();}catch(e){console.error(e);gen=null;recover();break;}if(r.done){gen=null;break;}wake=st.t+(r.value||0);}}
  walk(sdt);cam.x+=(cam.tx-cam.x)*Math.min(1,sdt*5);cam.y+=(cam.ty-cam.y)*Math.min(1,sdt*5);cam.z+=(cam.tz-cam.z)*Math.min(1,sdt*4.5);
  cam.kick=Math.max(0,cam.kick-sdt*1.2);clampCam();cam.shake=Math.max(0,cam.shake-sdt*14);
- draw(now/1000,sdt);try{CBH.tick();}catch(e){}}
+ try{draw(now/1000,sdt);}catch(e){if(!loop.e){loop.e=1;console.error(e);}try{g=cv.getContext('2d');g.setTransform(1,0,0,1,0,0);g.globalAlpha=1;g.globalCompositeOperation='source-over';}catch(x){}}try{CBH.tick();}catch(e){}}
+/* 進行が例外で止まったとき：表示の HP を合わせ、勝敗が決まっていれば結果へ、そうでなければ次のターンの入力へ（画面が固まらない） */
+function recover(){try{for(const u of[...b.heroes,...b.foes]){u.dhp=u.hp;u.mvTo=null;if(u.hx!=null&&u.hp>0){u.x=u.hx;u.y=u.hy;}if(u.side===1&&u.hp<=0)u.gone=1;}home();const s=CBE.state(b);gen=s?outcome(s):(function*(){CBE.turnEnd(b);yield*begin();})();wake=st.t;}catch(e){console.error(e);phase='input';CBH.draw();}}
 /* 歩く・駆ける（x を目標へ）。入場は歩きのアニメ */
 function walk(dt){for(const u of[...b.heroes,...b.foes]){const T=u.mvTo;if(!T){continue;}const dx=T.x-u.x,dy=T.y-u.y,d=Math.hypot(dx,dy),v=T.v*dt;
   if(d<=v){u.x=T.x;u.y=T.y;u.mvTo=null;u.mv=0;if(u.side===1)u.by={};if(T.face!=null)u.face=T.face;}else{u.x+=dx/d*v;u.y+=dy/d*v;u.mv=1;if(u.side===1){u.by=null;u.dir=dx>=0?1:-1;}else u.face=dx>0?1:-1;}}}
@@ -107,7 +110,13 @@ function drawHero(u,t){if(u.dhp<=0){if(u.hp>0)return;const k=st.t-(u.downT||-9);
  u.awT=aw?999:0;const sel0=sel===u&&phase==='input';
  if(sel0){g.strokeStyle='#ffe2a0';g.lineWidth=1.5;g.beginPath();g.ellipse(x,u.y+1,17,4.5,0,0,7);g.stroke();}
  if(!TDA.draw(g,u,x,u.y,fl,1,st)){const lg=st.t-(u.actT||-9)<.14?fc*4:0,bob=u.mv?-Math.abs(Math.sin(t*11+u.uid))*2.5:Math.sin(t*2+u.uid)*.6;sprite(spr(u.id,u.id,0,80),x+lg,u.y+bob,fc>0,HG.hero,fl,1);}}
-function marks(t){}
+function marks(t){const p=.5+.5*Math.sin(t*8);
+ if(acting&&acting.hp>0&&!acting.gone){const u=acting,foe=u.side===1,h=foe?u.hg:HG.hero,y=u.y-h-12-p*3,c=foe?'#ff5a4a':'#ffd27a';
+  g.fillStyle='#07071a';g.beginPath();g.moveTo(u.x-7,y-1);g.lineTo(u.x+7,y-1);g.lineTo(u.x,y+8);g.fill();g.fillStyle=c;g.beginPath();g.moveTo(u.x-5,y);g.lineTo(u.x+5,y);g.lineTo(u.x,y+6);g.fill();
+  g.strokeStyle=foe?`rgba(255,90,74,${.5+.4*p})`:`rgba(255,210,122,${.45+.4*p})`;g.lineWidth=1.5;const r=u.boss?30:17;g.beginPath();g.ellipse(u.x,u.y+1,r,r*.3,0,0,7);g.stroke();}
+ const k=Math.min(1,(st.t-foeT)/.25);for(const u of aim){if(u.dhp<=0)continue;const x=u.x,y=u.y-HG.hero*.5,r=24-10*k;g.strokeStyle=`rgba(255,74,58,${.55+.4*p})`;g.lineWidth=1.5;
+  g.beginPath();g.arc(x,y,r,0,7);g.stroke();for(let i=0;i<4;i++){const a=i*Math.PI/2+.785;g.beginPath();g.moveTo(x+Math.cos(a)*(r-5),y+Math.sin(a)*(r-5));g.lineTo(x+Math.cos(a)*(r+5),y+Math.sin(a)*(r+5));g.stroke();}
+  g.fillStyle=`rgba(255,74,58,${.10+.08*p})`;g.beginPath();g.ellipse(x,u.y+1,18,5,0,0,7);g.fill();}}
 /* 光の筋（左上から）・漂う光の粒・周辺減光 */
 function light(t,dt){const P=bg.P;g.globalCompositeOperation='lighter';
  for(let i=0;i<3;i++){const x0=CW*(.12+i*.26)+Math.sin(t*.25+i*2)*18,w=40+i*16,a=.045+.02*Math.sin(t*.6+i);const gr=g.createLinearGradient(x0,0,x0-CHh*.35,CHh*.7);gr.addColorStop(0,`rgba(255,240,210,${a})`);gr.addColorStop(1,'rgba(255,240,210,0)');
@@ -115,7 +124,8 @@ function light(t,dt){const P=bg.P;g.globalCompositeOperation='lighter';
  while(motes.length<26)motes.push({x:Math.random()*CW,y:Math.random()*CHh*.7,v:4+Math.random()*8,s:Math.random()*1.6+.6,p:Math.random()*7});
  for(const m of motes){m.y-=m.v*dt;m.x+=Math.sin(t+m.p)*dt*6;if(m.y<-4){m.y=CHh*.72;m.x=Math.random()*CW;}const a=.25+.25*Math.sin(t*2+m.p);g.fillStyle=`rgba(255,236,190,${a})`;g.fillRect(m.x,m.y,m.s,m.s);}
  g.globalCompositeOperation='source-over';
- const vg=g.createRadialGradient(CW/2,CHh*.36,CHh*.2,CW/2,CHh*.36,CHh*.75);vg.addColorStop(0,'rgba(5,5,16,0)');vg.addColorStop(1,'rgba(5,5,16,.55)');g.fillStyle=vg;g.fillRect(0,0,CW,CHh);}
+ const vg=g.createRadialGradient(CW/2,CHh*.36,CHh*.2,CW/2,CHh*.36,CHh*.75);vg.addColorStop(0,'rgba(5,5,16,0)');vg.addColorStop(1,'rgba(5,5,16,.55)');g.fillStyle=vg;g.fillRect(0,0,CW,CHh);
+ if(acting&&acting.side===1){const a=.22+.08*Math.sin(t*9),rg=g.createRadialGradient(CW/2,CHh*.4,CHh*.3,CW/2,CHh*.4,CHh*.8);rg.addColorStop(0,'rgba(200,30,30,0)');rg.addColorStop(1,`rgba(200,30,30,${a})`);g.fillStyle=rg;g.fillRect(0,0,CW,CHh);}}
 /* 数字・状態の字（画面の px） */
 function num(t,v,o={}){nums.push(Object.assign({x:t.x+(Math.random()*8-4),y:t.y-(t.side===1?t.hg:HG.hero)-4,t:-(o.dl||0),v},o));if(nums.length>40)nums.shift();}
 function say(t,s,c,dl){tx.push({x:t.x,y:t.y-(t.side===1?t.hg:HG.hero)-18,t:-(dl||0),s,c:c||'#fff0b8'});}
@@ -129,7 +139,7 @@ function texts(dt){g.textAlign='center';g.lineJoin='round';
   g.font='800 12px "M PLUS 1p",sans-serif';g.lineWidth=3;g.strokeStyle='#07071a';g.strokeText(n.s,x,y);g.fillStyle=n.c;g.fillText(n.s,x,y);}
  g.globalAlpha=1;g.lineJoin='miter';}
 /* ---------- 札・帯 ---------- */
-let pT=0;function plate(s,o={}){const e=root.querySelector('.cb-plate');e.className='cb-plate'+(o.ou?' ou':'')+(o.foe?' foe':'');e.innerHTML=`${o.el?`<i style="--c:${ELC[o.el]||'#fff'}">${esc(o.el)}</i>`:''}<b>${esc(s)}</b>`;void e.offsetWidth;e.classList.add('show');clearTimeout(pT);pT=setTimeout(()=>e.classList.remove('show'),(o.ms||1000)/speed);}
+let pT=0;function plate(s,o={}){const e=root.querySelector('.cb-plate');e.className='cb-plate'+(o.ou?' ou':'')+(o.foe?' foe':'');e.innerHTML=`${o.who?`<small>${esc(o.who)}</small>`:''}${o.el?`<i style="--c:${ELC[o.el]||'#fff'}">${esc(o.el)}</i>`:''}<b>${esc(s)}</b>`;void e.offsetWidth;e.classList.add('show');clearTimeout(pT);pT=setTimeout(()=>e.classList.remove('show'),(o.ms||1000)/speed);}
 let bT=0;function banner(a,ms=1200,cls=''){const e=root.querySelector('.cb-banner');e.className='cb-banner '+cls;e.innerHTML=a;void e.offsetWidth;e.classList.add('show');clearTimeout(bT);bT=setTimeout(()=>e.classList.remove('show'),ms/speed);}
 /* ---------- 行動の振り付け（ジェネレーター：yield 秒） ---------- */
 const keyOf=sk=>sk._k||(()=>{try{return RSC.keyOf(sk);}catch(e){return null;}})();
@@ -140,7 +150,7 @@ function ev(e){try{TDSFX.ev(e);}catch(x){}try{TDFX.ev(e,st);}catch(x){console.er
 function* heroAct(r){const u=r.u,sk=r.sk,main=r.tg[0],ou=!!sk.ougi,sup=CBE.isSup(sk)&&!ou,basic=!!sk.basic,toFoe=main&&main.side===1,anim=TDA.has(u.id);
  const melee=!sup&&!ou&&toFoe&&u.h&&u.h.rng<=60&&sk.k!=='mag'&&!sk.fu&&!anim;
  if(ou)home();else focus(toFoe?(u.x+main.x)/2+20:u.x,u.y-30,1.32);
- if(!basic&&!sk.fu&&!ou)plate(sk.n,{el:sk.el});else if(sk.fu)say(u,sk.n,'#ffe2a0');
+ if(!basic&&!sk.fu&&!ou)plate(sk.n,{el:sk.el,who:u.name});else if(sk.fu)say(u,sk.n,'#ffe2a0');
  if(ou){banner(`<b>${esc(sk.n)}</b>`,1400,'ou');yield .3;}else yield .18;
  if(melee){move(u,main.x+(main.boss?40:26),main.y+1,520,-1);yield .2;}
  const ts=basic?null:tdSk(u,sk),fTo=toFoe?main:CBE.F(b)[0]||main;
@@ -153,7 +163,7 @@ function* heroAct(r){const u=r.u,sk=r.sk,main=r.tg[0],ou=!!sk.ougi,sup=CBE.isSup
  let maxDl=0;for(const[i,L]of[...G.entries()].sort((a,c)=>a[0]-c[0])){for(const h of L){const t=h.t;
    if(h.heal!=null){const dl=now?.4:0;later(dl,()=>{ev({k:'heal',u:t,v:h.heal});t.dhp=t.hp;if(h.rev)ev({k:'deploy',u:t});});num(t,h.heal,{heal:1,dl});continue;}
    if(h.miss){num(t,0,{miss:1,dl:now?.35+i*.1:0});continue;}
-   const e=ev({k:'hit',u,f:t,v:h.v,cr:h.cr,weak:h.weak,res:h.res,sk:basic?null:ts,big:ou||h.big?1:0}),dl=(e._dl||(now?.3:0))+(now?i*.1:0);maxDl=Math.max(maxDl,dl);
+   if(t.side===1){const el=sk.el||u.basic.el;t.kn=t.kn||{};if(el)t.kn[el]=h.weak?'w':h.res?'r':(t.kn[el]||'n');}const e=ev({k:'hit',u,f:t,v:h.v,cr:h.cr,weak:h.weak,res:h.res,sk:basic?null:ts,big:ou||h.big?1:0}),dl=(e._dl||(now?.3:0))+(now?i*.1:0);maxDl=Math.max(maxDl,dl);
    num(t,h.v,{cr:h.cr,weak:h.weak,res:h.res,big:ou,dl});later(dl,()=>{t.hitT=st.t;t.dhp=Math.max(0,t.dhp-h.v);if(h.cr||ou||h.weak)cam.kick=1;});
    if(h.kill)later(dl+.06,()=>{t.dhp=0;if(!t.gone){ev({k:'kill',f:t});t.gone=1;}});}
   if(!now)yield .11;}
@@ -162,8 +172,8 @@ function* heroAct(r){const u=r.u,sk=r.sk,main=r.tg[0],ou=!!sk.ougi,sup=CBE.isSup
  if(melee){move(u,u.hx,u.hy,460,-1);yield .2;}
  for(const f of r.fu)yield*play(f);}
 function* foeAct(r){const f=r.u,sk=r.sk,main=r.tg[0];if(!main)return;const melee=sk.k!=='mag'&&r.tg.length===1;
- focus((f.x+main.x)/2,main.y-30,1.22);if(sk.n&&sk.n!=='攻撃')plate(sk.n,{el:sk.el,foe:1,ms:900});
- yield .18;if(melee){move(f,main.x-(f.boss?48:28),main.y+1,480);yield .22;}else{f.hitT=st.t;yield .3;}
+ aim=r.tg.filter(t=>t.side===0);CB_aim(aim.length===1?aim[0]:null);foeT=st.t;if(r.tg.length>1)home();else focus((f.x+main.x)/2,main.y-30,1.22);plate(sk.n&&sk.n!=='攻撃'?sk.n:f.name,{el:sk.el,foe:1,ms:1000,who:sk.n&&sk.n!=='攻撃'?f.name:''});try{TDSFX.play('charge');}catch(e){}
+ yield .42;if(melee){move(f,main.x-(f.boss?48:28),main.y+1,480);yield .22;}else{f.hitT=st.t;yield .3;}
  const c=ELC[sk.el]||'#e86a6a';
  for(const h of r.hits){const t=h.t;if(h.heal!=null){num(t,h.heal,{heal:1});t.dhp=t.hp;continue;}if(h.miss){num(t,0,{miss:1});continue;}
   slash(t,c,melee);num(t,h.v,{foe:1,cr:h.cr});t.hitT=st.t;t.dhp=Math.max(0,t.dhp-h.v);cam.shake=Math.max(cam.shake,r.tg.length>1?3:1.6);
@@ -171,7 +181,7 @@ function* foeAct(r){const f=r.u,sk=r.sk,main=r.tg[0];if(!main)return;const melee
   if(h.kill){later(.15,()=>{TDA.fall(t,st);t.downT=st.t;try{TDSFX.play('fall');}catch(e){}});}
   if(r.tg.length>1)yield .06;}
  for(const t of r.tg)t.dhp=t.hp;for(const s of r.tx)say(s.t,s.s,'#ff9a9a');
- yield .45;if(melee){move(f,f.hx,f.hy,420);yield .15;}
+ aim=[];CB_aim(null);yield .45;if(melee){move(f,f.hx,f.hy,420);yield .15;}
  for(const x of r.fu)yield*play(x);}
 /* 敵の攻撃が仲間に当たる：属性の色の三日月の斬撃＋白い芯＋火花（FXK の部品） */
 function slash(t,c,melee){const x=t.x,y=t.y-30,d=1;
@@ -186,17 +196,18 @@ function* play(r){if(!r)return;const u=r.u;
  if(r.summon){const f=r.summon;place();try{TDSFX.play('summon');}catch(e){}yield .5;}
  home();}
 /* 1 ターンの流れ */
-function* turn(){phase='run';CBH.draw();yield .15;
- for(const u of CBE.order(b)){if(u.hp<=0)continue;if(u.side===0)CBH.acting(u);const r=CBE.act(b,u);yield*play(r);CBH.draw();const s=CBE.state(b);if(s){yield*outcome(s);return;}}
- home();const R=CBE.turnEnd(b);for(const x of R){if(x.heal){num(x.t,x.heal,{heal:1});x.t.dhp=x.t.hp;}else{num(x.t,x.v,{foe:x.t.side===0});x.t.dhp=x.t.hp;if(x.kill){if(x.t.side===1){ev({k:'kill',f:x.t});x.t.gone=1;}else TDA.fall(x.t,st);}}}
+function* turn(){phase='run';ord=CBE.order(b);acting=null;CBH.draw();yield .15;
+ for(const u of ord){if(u.hp<=0)continue;acting=u;CBH.acting(u);const r=CBE.act(b,u);yield*play(r);acting=null;aim=[];CB_aim(null);CBH.draw();const s=CBE.state(b);if(s){yield*outcome(s);return;}}
+ ord=[];CBH.acting(null);home();const R=CBE.turnEnd(b);for(const x of R){if(x.heal){num(x.t,x.heal,{heal:1});x.t.dhp=x.t.hp;}else{num(x.t,x.v,{foe:x.t.side===0});x.t.dhp=x.t.hp;if(x.kill){if(x.t.side===1){ev({k:'kill',f:x.t});x.t.gone=1;}else TDA.fall(x.t,st);}}}
  if(R.length)yield .5;{const s=CBE.state(b);if(s){yield*outcome(s);return;}}
  for(const u of b.heroes)if(u.awEnd){u.awEnd=0;say(u,'星臨が解けた','#c9b8ff');}
  yield*begin();}
 function* begin(){CBE.turnStart(b);for(const u of b.heroes)u.dhp=u.hp;phase='input';sel=CBE.H(b)[0]||null;if(!tgt||tgt.hp<=0)tgt=CBE.F(b)[0]||null;CBH.draw();
  }
-function* go(){CBE.auto(b);yield*turn();}
+function* go(){if(CBH.auto()===2)for(const u of CBE.H(b))if(CBE.canAw(u)&&CBE.awaken(b,u)){u.cmd=null;yield*awSeq(u,.75);}CBE.auto(b);yield*turn();}
+function* awSeq(u,k=1){phase='aw';CBH.draw();focus(u.x,u.y-34,1.45);u.actK='aw';u.actT=st.t;u.awT=999;ev({k:'aw',u});plate('星臨',{ou:1,ms:1300*k});cam.shake=2;yield((TDA.dur(u.id,'aw_in')||1.1)+.1)*k;home();}
 function* outcome(s){home();
- if(s==='next'){yield .6;banner(`<small>WAVE</small><b>${b.wave+2}</b>`,1200);CBE.nextWave(b);for(const f of b.foes)f.dhp=f.hp;for(const u of b.heroes){u.dhp=u.hp;if(u.rev){u.rev=0;u.rv=1;}}place();
+ if(s==='next'){yield .6;nums.length=0;tx.length=0;banner(`<small>WAVE</small><b>${b.wave+2}</b>`,1200);CBE.nextWave(b);for(const f of b.foes)f.dhp=f.hp;for(const u of b.heroes){u.dhp=u.hp;if(u.rev){u.rev=0;u.rv=1;}}place();
   for(const f of b.foes){move(f,f.hx,f.hy,170);}try{TDSFX.play('wave');}catch(e){}yield 1.1;tgt=CBE.F(b)[0]||null;yield*begin();return;}
  phase='over';const win=s==='win';b.over={win,stars:CBE.stars(b,win)};st.over=b.over;CBH.draw();
  if(win){banner('<b>勝利</b>',1600,'win');try{TDSFX.play('win');}catch(e){}for(const u of CBE.H(b)){u.actK='atk';u.actT=st.t;}focus(300,290,1.18);}else{banner('<b>敗北</b>',1600,'lose');try{TDSFX.play('lose');}catch(e){}}
@@ -204,7 +215,7 @@ function* outcome(s){home();
 /* ---------- 操作（CBH から） ---------- */
 function start(){if(phase!=='input'||gen)return;phase='run';gen=go();wake=st.t;}
 function awaken(u){if(phase!=='input'||gen||!CBE.canAw(u))return false;const r=CBE.awaken(b,u);if(!r)return false;
- gen=(function*(){phase='aw';CBH.draw();focus(u.x,u.y-34,1.45);u.actK='aw';u.actT=st.t;u.awT=999;ev({k:'aw',u});plate('星臨',{ou:1,ms:1300});cam.shake=2;yield(TDA.dur(u.id,'aw_in')||1.1)+.1;home();phase='input';CBH.draw();})();wake=st.t;return true;}
+ gen=(function*(){yield*awSeq(u);phase='input';CBH.draw();})();wake=st.t;return true;}
 function tap(ev0){if(!st||phase!=='input')return;const r=cv.getBoundingClientRect(),x=(ev0.clientX-r.left-CW/2)/(S*cam.z)+cam.x,y=(ev0.clientY-r.top-CHh/2)/(S*cam.z)+cam.y;
  let best=null,bd=1e9;for(const f of CBE.F(b)){const dx=x-f.x,dy=y-(f.y-f.hg/2),d=Math.abs(dx)/(f.boss?40:24)+Math.abs(dy)/(f.hg*.7);if(d<bd){bd=d;best=f;}}
  if(best&&bd<1.6){tgt=best;try{TDSFX.play('deploy');}catch(e){}CBH.draw();}}
@@ -229,6 +240,11 @@ function open(id,party){build();sid=id;party0=party.slice(0,4);cancelAnimationFr
   last=performance.now();raf=requestAnimationFrame(loop);banner(`<small>${esc(TDM.chOf(id).ch)}</small><b>${esc(b.S.name)}</b>`,1500,'st');
   gen=(function*(){yield 1.2;yield*begin();})();wake=0;});}
 function hide(){cancelAnimationFrame(raf);st=null;b=null;gen=null;if(root)root.classList.add('hide');}
-return{open,hide,start,awaken,sheet,banner,focus,
+function CB_aim(u){if(aimU===u)return;aimU=u;try{CBH.draw();}catch(e){}}let aimU=null;
+/* 敵の情報（TARGET を押す）：名前・Lv・HP・分かった弱点と耐性 */
+function info(f){const E=['斬','打','突','熱','冷','雷','陽','陰'],kn=f.kn||{};sheet(`<h3>${esc(f.name)} <small>Lv${f.lv}</small></h3><div class="cb-info"><div class="hpl"><b>${Math.max(0,Math.round(f.hp))}</b>/${f.mhp}</div>
+ <div class="els">${E.map((e,i)=>`<span class="${kn[e]||'unk'}"><i class="elh e${i}"><b>${e}</b></i></span>`).join('')}</div></div><div class="td-acts"><button class="td-btn on" data-a="resume">閉じる</button></div>`);}
+return{open,hide,start,awaken,sheet,banner,focus,info,get ord(){return ord;},get acting(){return acting;},get aim(){return aimU;},
+ picF:f=>{const F=spr(f.spr,f.kind,1,48);if(!F)return'';const c=document.createElement('canvas');c.width=F.w;c.height=F.h;c.getContext('2d').drawImage(F.cv,0,0);return c.toDataURL();},
  get st(){return st;},get b(){return b;},get phase(){return phase;},get sel(){return sel;},set sel(u){sel=u;},get tgt(){return tgt;},set tgt(f){tgt=f;},
  setSpeed(v){speed=v;},tickQ:()=>runQ(),spr,pic:(id,side,h)=>{const f=spr(id,id,side,h||48);if(!f)return'';const c=document.createElement('canvas');c.width=f.w;c.height=f.h;c.getContext('2d').drawImage(f.cv,0,0);return c.toDataURL();}};})();

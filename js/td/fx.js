@@ -94,10 +94,10 @@ let curSt=null; /* セレスの星臨・奥義は js/td/fx-celes-ult.js（FXU）
 function step(dt){FXK.step(dt);dimT+=dt;for(const e of L)e.t+=dt;L=L.filter(e=>e.t<e.d);
  for(const p of P){p.t+=dt;if(p.t<0||p.k==='mote')continue;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=p.gr*dt;p.vx*=.98;}P=P.filter(p=>p.t<p.d);}
 const BACK={gring:1,sigil:1,clock:1,flame:1,dome:0};
-function back(g){for(const e of L)if(e.t>=0&&BACK[e.k])draw(g,e,e.t/e.d);g.globalAlpha=1;FXK.draw(g,'back');}
+function back(g){for(const e of L)if(e.t>=0&&BACK[e.k])try{draw(g,e,e.t/e.d);}catch(x){e.t=e.d;}g.globalAlpha=1;FXK.draw(g,'back');}
 function dim(g){if(dimT>.75)return;const a=dimT<.12?dimT/.12:dimT<.32?1:1-(dimT-.32)/.43;g.globalAlpha=.4*a;g.fillStyle='#07071a';g.fillRect(B.cam()-4,0,B.vw()+8,FHH());g.globalAlpha=1;}
 const FHH=()=>(typeof TDD!=='undefined'?TDD.K.FH:420);
-function front(g){g.save();for(const e of L)if(e.t>=0&&!BACK[e.k])draw(g,e,e.t/e.d);
+function front(g){g.save();for(const e of L)if(e.t>=0&&!BACK[e.k])try{draw(g,e,e.t/e.d);}catch(x){e.t=e.d;}
  g.globalCompositeOperation='screen';for(const p of P){if(p.t<0)continue;const q=p.t/p.d;g.globalAlpha=1-q;g.fillStyle=p.c;
   if(p.k==='spark'){g.strokeStyle=p.c;g.lineWidth=1;g.beginPath();g.moveTo(p.x,p.y);g.lineTo(p.x-p.vx*.04,p.y-p.vy*.04);g.stroke();}
   else if(p.k==='mote'){const k=Math.min(1,q*1.2),x=p.x0+(p.x-p.x0)*k*k,y=p.y0+(p.y-p.y0)*k*k;g.globalAlpha=.4+.6*k;g.fillRect(x-1,y-1,2,2);}

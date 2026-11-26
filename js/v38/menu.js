@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.61';
+const VER='ver0.62';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,12 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　並びと敵の大きさを整え、使わなくなったデータを整理<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　戦闘画面をロマサガRS風に作り直し・フリーズを修正・背景を一新<br><small>`+
+ `・上に TURN と狙っている敵（名前・HP・8 属性の弱点と耐性。当てると分かる）、下に選んでいる仲間の HP・LP・BP と技の一覧<br>`+
+ `・戻る／AUTO通常（星臨は温存）／AUTO全力（星臨と奥義も）／リピート（前のターンと同じ行動）<br>`+
+ `・行動中は行動順の顔の帯。敵の行動は赤い札・赤い照準・画面の縁が赤く、狙われた仲間の欄が点滅<br>`+
+ `・技を使うと画面が止まる不具合を修正（演出の 1 つが失敗しても戦闘が止まらないように）<br>`+
+ `・8 つの章の背景を、空・遠景・中景・地面まで描き込んだ景色に<br></small></div><div class="nt"><b>ver0.61</b>　並びと敵の大きさを整え、使わなくなったデータを整理<br><small>`+
  `・味方も敵も 2 列×2 段に並べ、キャラ同士が重ならないように。敵と味方の間も広く<br>`+
  `・敵の大きさを味方と同じ目盛りに（人型は味方と同じ背丈、獣・魔物は少し低く、ボスは 1.3〜1.5 倍）<br>`+
  `・奥義の説明が TD の頃の文のままだったのを、本来の説明に戻した。アビリティの説明も本来の文に<br>`+

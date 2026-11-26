@@ -49,10 +49,10 @@ function embers(x,y,n,col,o={}){for(let i=0;i<n;i++)p({k:'ember',x:x+rnd(-(o.w||
 function stars(x,y,n,col,o={}){for(let i=0;i<n;i++)p({k:'star',x:x+rnd(-(o.w||8),o.w||8),y:y+rnd(-(o.h||6),o.h||6),vx:rnd(-12,12)*(o.v||1),vy:-rnd(o.up??10,(o.up??10)+24),gr:o.gr||0,d:(o.d||.7)*rnd(.7,1.3),c:Math.random()<.3?'#ffffff':col,s:o.s||1,dl:o.dl,ph:Math.random()*9});}
 /* ---- 時間つきの演出 ---- */
 function fx(o){if(E.length>=ECAP)E.shift();o.t=-(o.dl||0);E.push(o);return o;}
-function step(dt){for(const e of E){e.t+=dt;if(e.t>=0&&e.upd)e.upd(dt,e.t);}E=E.filter(e=>e.t<e.d);
+function step(dt){for(const e of E){e.t+=dt;if(e.t>=0&&e.upd)try{e.upd(dt,e.t);}catch(x){e.t=e.d;}}E=E.filter(e=>e.t<e.d);
  for(const q of P){q.t+=dt;if(q.t<0)continue;q.x+=q.vx*dt;q.y+=q.vy*dt;q.vy+=q.gr*dt;q.vx*=.985;}P=P.filter(q=>q.t<q.d);}
 /* 描く：layer='back'（地面・キャラの後ろ）か 'front'（キャラの前。粒もここ） */
-function draw(g,layer){g.save();for(const e of E)if(e.t>=0&&(e.layer||'front')===layer){g.globalAlpha=1;e.draw(g,clamp(e.t/e.d),e.t,e);}g.globalAlpha=1;
+function draw(g,layer){g.save();for(const e of E)if(e.t>=0&&(e.layer||'front')===layer){g.globalAlpha=1;g.globalCompositeOperation='source-over';try{e.draw(g,clamp(e.t/e.d),e.t,e);}catch(x){e.t=e.d;if(!FXK._err){FXK._err=1;console.warn('FXK',x);}}}g.globalAlpha=1;
  if(layer==='front'){g.globalCompositeOperation='lighter';for(const q of P){if(q.t<0)continue;const r=q.t/q.d,fa=1-r*r;
   if(q.k==='spark'){g.globalAlpha=fa;g.strokeStyle=q.c;g.lineWidth=1;g.beginPath();g.moveTo(snap(q.x),snap(q.y));g.lineTo(snap(q.x-q.vx*.05),snap(q.y-q.vy*.05));g.stroke();}
   else if(q.k==='ember'){g.globalAlpha=fa*(.55+.45*Math.sin(q.t*30+q.ph));dot(g,q.x,q.y,1+(r<.3?1:0),q.c);}
