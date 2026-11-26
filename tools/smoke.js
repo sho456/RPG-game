@@ -2,7 +2,7 @@
 /* ゲーム全体の自動点検（ブラウザで画面を巡回し、JavaScript のエラーを集める）。ver0.53：旧コマンド戦闘の削除に合わせて TD 向けに書き換え
    使い方：python3 -m http.server 8765 &   →   node tools/smoke.js [--url http://localhost:8765/index.html] [--shots <dir>] [--quick] [--fx]
    ・巡回：①タイトル → ホーム ②ホームの各ボタン（≡ の各項目・防衛・仲間・強化・鍛冶）を開いて閉じる（開いた画面のボタンも 1 つずつ押す）
-           ③ TDD.ORDER の全ステージを TDS.run で 1 回ずつ（自動の配置） ④各章の最初のステージを 出撃準備（TDM.prep）→ 出撃 → 数秒進める
+           ③ TDD.ORDER の全ステージを CBE.run で 1 回ずつ（コマンド戦闘の AUTO） ④各章の最初のステージを 出撃準備（TDM.prep）→ 出撃 → 数秒進める
            ⑤仲間画面で Lv 上げ・練達・装備の付け替え・星盤 ⑥図鑑（敵・仲間・装備の一覧と詳細・3 形態）
    ・--quick：短い版（④は最初の 2 章・⑤は 3 人・⑥は敵 8 種・押すボタンは画面ごとに 12 個まで）
    ・--fx：TD の戦闘を ×2 の速さで最後まで進める（自動の配置。戦闘画面の描画・結果の窓のエラーを拾う。終わらなければ失敗）
@@ -33,11 +33,11 @@ if (SHOTS) fs.mkdirSync(SHOTS, {recursive: true});
     try {const o = await p.evaluate(() => {const d = document.documentElement;return d.scrollWidth > innerWidth + 1 ? d.scrollWidth : 0;});if (o) errs.push([name, '横はみ出し: 幅 ' + o + 'px（画面 420px）']);} catch (e) {}};
   /* 開いている画面を全部閉じてホームへ */
   const HOME = `(()=>{try{ovClose();}catch(e){}try{const u=document.querySelector('#unit');if(u&&!u.classList.contains('hide'))u.classList.add('hide');}catch(e){}
-    try{TD.hide();}catch(e){}try{const t=document.querySelector('#tdm');if(t)t.classList.add('hide');}catch(e){}townMenu();})()`;
+    try{CB.hide();}catch(e){}try{const t=document.querySelector('#tdm');if(t)t.classList.add('hide');}catch(e){}townMenu();})()`;
 
   if (COV) await p.coverage.startJSCoverage({resetOnNavigation: false});
   await p.goto(URL);
-  await p.waitForFunction(() => typeof SPX !== 'undefined' && SPX.ready && typeof TDS !== 'undefined', {timeout: 60000});
+  await p.waitForFunction(() => typeof SPX !== 'undefined' && SPX.ready && typeof CBE !== 'undefined', {timeout: 60000});
   await shot('00_title');
   /* ① タイトル → ホーム（タップで始める）。全員加入・全ステージ開放の状態を作る */
   await step('title-tap', () => {try {titleTap();} catch (e) {}}, 600);
@@ -80,23 +80,19 @@ if (SHOTS) fs.mkdirSync(SHOTS, {recursive: true});
   }
   await step('home-back', HOME, 400);
 
-  /* ③ 全ステージを自動の配置で 1 回ずつ（画面なし） */
-  scene = 'td-run';
+  /* ③ 全ステージをコマンド戦闘の AUTO で 1 回ずつ（画面なし・CBE.run） */
+  scene = 'cb-run';
   const runs = await p.evaluate(() => {
     const out = [];
-    for (const id of TDD.ORDER) {
-      try {const S = TDD.STAGE[id], deck = TDD.rosterAt(id).slice(0, 8), L = {};deck.forEach(h => L[h] = S.lv);
-        const r = TDS.run(id, deck, L, 7919);out.push([id, !!r.win, r.t | 0, null]);}
-      catch (e) {out.push([id, false, 0, String(e.message).slice(0, 160)]);}
+    for (const id of [...TDD.ORDER, TDD.INF].filter(Boolean)) {
+      try {const S = TDD.STAGE[id], party = TDD.rosterAt(id).slice(0, 5);party.forEach(h => {G.h[h].lv = S.inf ? 50 : S.lv;G.h[h].hp = null;});
+        const r = CBE.run(id, party, 7919);out.push([id, !!r.win, r.turn | 0, null]);}
+      catch (e) {out.push([id, false, 0, String(e.stack || e.message).slice(0, 200)]);}
     }
-    /* 天への塔（無限 WAVE）：負けるまで。到達 WAVE を勝ちの欄の代わりに見る */
-    if (TDD.INF) try {const deck = TDD.rosterAt(TDD.ORDER[TDD.ORDER.length - 1]).slice(0, 8), L = {};deck.forEach(h => L[h] = 50);
-      const r = TDS.run(TDD.INF, deck, L, 7919, 3000);out.push([TDD.INF, (r.wave | 0) > 3, r.t | 0, r.wave == null ? '塔が終わらない' : null]);}
-    catch (e) {out.push([TDD.INF, false, 0, String(e.message).slice(0, 160)]);}
-    return out;
+    for (const h of G.members) G.h[h].lv = 40;return out;
   });
-  for (const [id, , , err] of runs) if (err) errs.push(['td-run:' + id, err]);
-  console.log(`TDS.run: ${runs.length} ステージ（勝ち ${runs.filter(r => r[1]).length}）`);
+  for (const [id, , , err] of runs) if (err) errs.push(['cb-run:' + id, err]);
+  console.log(`CBE.run: ${runs.length} ステージ（勝ち ${runs.filter(r => r[1]).length}）`);
 
   /* ④ 各章の最初のステージ：出撃準備 → 出撃（会話はとばす）→ 数秒 → 戻る */
   const firsts = await p.evaluate(() => TDD.CH.filter(c => c.st && c.st.length && !c.soon).map(c => c.st[0]));
@@ -104,10 +100,10 @@ if (SHOTS) fs.mkdirSync(SHOTS, {recursive: true});
     await step('td-prep:' + id, `TDM.prep('${id}')`, 500);await shot('04_prep_' + id);
     await step('td-go:' + id, `(()=>{const b=document.querySelector('#tdm [data-a="go"]');b&&b.click();})()`, 400);
     await step('td-talk:' + id, `(()=>{for(let i=0;i<30;i++){const k=document.querySelector('#tdm .tdm-talk .skip');if(!k)break;k.click();}})()`, 400);
-    await step('td-bot:' + id, `(()=>{window.__bot=setInterval(()=>{try{if(TD.st&&!TD.st.over)TDS.bot(TD.st);}catch(e){console.error(e);}},500);})()`, QUICK ? 3000 : 5000);
-    await shot('05_td_' + id);
-    await step('td-sheet:' + id, `(()=>{try{TD.sheet('deck');}catch(e){}})()`, 300);
-    await step('td-end:' + id, `(()=>{clearInterval(window.__bot);TD.hide();TDM.map();})()`, 400);
+    await step('cb-cmd:' + id, `(()=>{const b=[...document.querySelectorAll('#cb .cb-sk:not(.off)')];b[b.length-1]&&b[b.length-1].click();const g=document.querySelector('#cb [data-a="go"]');g&&g.click();})()`, QUICK ? 3000 : 5000);
+    await shot('05_cb_' + id);
+    await step('cb-menu:' + id, `(()=>{const m=document.querySelector('#cb [data-a="menu"]');m&&m.click();const r=document.querySelector('#cb [data-a="resume"]');r&&r.click();})()`, 300);
+    await step('cb-end:' + id, `(()=>{CB.hide();TDM.map();})()`, 400);
   }
   await step('home-back', HOME, 400);
 
@@ -142,19 +138,18 @@ if (SHOTS) fs.mkdirSync(SHOTS, {recursive: true});
   }
   await step('home-end', HOME, 600);await shot('09_home_end');
 
-  /* --fx：TD の戦闘を ×2 で最後まで進める（自動の配置）。1 ステージ（--quick）か各章の最初のステージ */
+  /* --fx：コマンド戦闘を ×2・AUTO で最後まで進める。1 ステージ（--quick）か各章の最初のステージ */
   if (FX) {
     for (const id of (QUICK ? firsts.slice(0, 1) : firsts)) {
       await step('fx-prep:' + id, `TDM.prep('${id}')`, 400);
       await step('fx-go:' + id, `(()=>{const b=document.querySelector('#tdm [data-a="go"]');b&&b.click();})()`, 400);
       await step('fx-talk:' + id, `(()=>{for(let i=0;i<30;i++){const k=document.querySelector('#tdm .tdm-talk .skip');if(!k)break;k.click();}})()`, 400);
-      await step('fx-x2:' + id, `(()=>{const s=document.querySelector('.td-btn[data-a="spd"]');if(s&&s.textContent.trim()!=='×2')s.click();
-        window.__bot=setInterval(()=>{try{if(TD.st&&!TD.st.over)TDS.bot(TD.st);}catch(e){console.error(e);}},400);})()`, 300);
+      await step('fx-x2:' + id, `(()=>{const s=document.querySelector('#cb [data-a="spd"]');if(s&&s.textContent.trim()!=='×2')s.click();const a=document.querySelector('#cb [data-a="auto"]');if(a&&!a.classList.contains('on'))a.click();})()`, 300);
       const t0 = Date.now();let over = false;
-      while (Date.now() - t0 < 150000) {over = await p.evaluate(() => !!(TD.st && TD.st.over)).catch(() => false);if (over) break;await p.waitForTimeout(500);}
-      if (!over) errs.push(['fx:' + id, '戦闘が終わらない（×2・150 秒）']);
+      while (Date.now() - t0 < 150000) {over = await p.evaluate(() => !!(CB.st && CB.st.over)).catch(() => false);if (over) break;await p.waitForTimeout(500);}
+      if (!over) errs.push(['fx:' + id, '戦闘が終わらない（×2・AUTO・150 秒）']);
       await p.waitForTimeout(2200);await shot('10_fx_result_' + id);
-      await step('fx-end:' + id, `(()=>{clearInterval(window.__bot);TD.hide();TDM.map();})()`, 400);
+      await step('fx-end:' + id, `(()=>{const a=document.querySelector('#cb [data-a="auto"]');if(a&&a.classList.contains('on'))a.click();CB.hide();TDM.map();})()`, 400);
     }
     await step('fx-home', HOME, 400);
   }

@@ -18,10 +18,10 @@
   `docs/CODEMAP.md` は全体の索引（大きいので丸ごと読まない。`grep` で引く）。
 - **画面を見る**：`python3 -m http.server 8765 &` → `node tools/ui_shots.js <出力dir> [画面名…]`（別のポートなら `URL=http://localhost:ポート/index.html`）。
   エージェントを並行で動かすときは、ポートを分ける（例：メイン 8790、エージェントごとに 8791〜）。同じポートだと別のフォルダの画面を見てしまう。
-  画面名：`home home-sheet td-map td-prep td-battle unit unit-detail unit-sheet board board-sel board-up board-up-lock equip-info smith growth inv zukan`。
+  画面名：`home home-sheet td-map td-prep cb-battle unit unit-detail unit-sheet board board-sel board-up board-up-lock equip-info smith growth inv zukan`。
   `SCROLL=1` で下の欄を最後までスクロールした画面（`_2.png`）も撮る。
   画像は scratchpad に出し、必要な部分だけ切り抜いて見る（PIL で crop / 横並び）。スクショは 1 枚ずつより、まとめて 1 枚に並べると安い。
-- **壊れていないか**：`node tools/smoke.js --quick`（TD 向け。タイトル→ホーム→各ボタン→全ステージの `TDS.run`→出撃準備と出撃→仲間画面→図鑑。エラー 0 が合格）。戦闘画面を触ったら `--fx`（TD の戦闘を ×2 で最後まで）も。長いので `run_in_background` で回して、その間に他の作業をする。
+- **壊れていないか**：`node tools/smoke.js --quick`（タイトル→ホーム→各ボタン→全ステージの `CBE.run`（AUTO）→出撃準備と出撃（技を選んで戦う）→仲間画面→図鑑。エラー 0 が合格）。戦闘画面を触ったら `--fx`（コマンド戦闘を ×2・AUTO で最後まで）も。長いので `run_in_background` で回して、その間に他の作業をする。サーバーのポートが 8765 以外なら `--url`。
 
 ## 2. 画面 → 正本のファイル
 
@@ -43,17 +43,17 @@
 | 用語・耐性 | `js/data/terms.js`（`TERMS`） | — |
 | 強化メニュー（経験値のストック・レベルアップ・旧酒場の統合） | `js/ui/growth.js`（`GROW`） | `css/ui/growth.css` |
 | 版表示・お知らせ | `js/v38/menu.js`（`VER` `NEWS`） | — |
-| **タワーディフェンス「灯守の防衛線」**（移行先の戦闘。入口＝ホーム右の縦メニュー「防衛」・`index.html#td`） | データ `js/td/data.js`（`TDD`）・章とステージ `js/td/stages.js`・ロジック `js/td/sim.js`（`TDS`。DOM なしの固定刻み・自動の配置 `bot`）・背景 `js/td/bg.js`（`TDBG`）・戦闘画面（横スクロール・縦画面・カメラの自動追従・ピンチ）`js/td/view.js`（`TD`）・帯と操作盤と手札（技 3 つ・星臨・奥義）`js/td/hud.js`（`TDH`）・技ボタンのドット絵 `js/td/skicon.js`（`TDI`）・役割（タンク〜特殊）と動きは `TDD.ROLE`・`sim.js` の `BR`・演出と敵の歩き `js/td/fx.js`（`TDFX`）・効果音と BGM `js/td/sfx.js`（`TDSFX`）・字を使わない導き `js/td/guide.js`（`GUIDE`）・章の地図/出撃準備/会話/加入 `js/td/menu.js`（`TDM`）。設計 `docs/TD-DESIGN.md` | `css/ui/td.css` |
-| **ホーム**（ver0.52。TD の「防衛」が主役・下のタブ 4 つ・≡ のシート） | `js/ui/home.js`（`HOME`。v22 の townMenu の重ね表示 .h22 を置き換え。背景の街の絵は v22 drawHome のまま） | `css/ui/home.css` |
-| **仲間**（ver0.52。一覧＋1 人の詳細で Lv・技の練達・装備・星盤をまとめる。TD の能力を表示） | `js/ui/unit.js`（`UNIT.open(id, 戻り先)`）。TD の能力は `TDD.hero(id, lv, TDD.real(id))`（装備の比・練達・星臨の位階を反映） | `css/ui/unit.css` |
-| **TD の仲間のコマ送り・エフェクト**（ver0.59。まずセレス） | 状態→アニメ・再生ロック・表示用の向き・整数倍の描画・焼き込み fx 層 `js/td/uanim.js`（`TDA`）。光と粒の共通部品 `js/td/fxkit.js`（`FXK`）。セレスの通常攻撃・技 `js/td/fx-celes.js`（`FXC`）、星臨・奥義 `js/td/fx-celes-ult.js`（`FXU`）。素材：原画 `assets_src/pixel-art/celes-hd/src/master/`（PixelLab のシートは `pl/`）→ `import_pl.py` → `assets_src/chars/celes/` → `python3 tools/spx_import.py build celes`（パック `celes_hd`・`celes_hd_fx`） | — |
+| **コマンド戦闘**（ver0.60。2D-HD のターン制。入口＝ホームの「出撃」→章のステージ→出撃準備（5 人）） | 進行 `js/cb/engine.js`（`CBE`。BP・LP・技と術・アビリティ・星臨・奥義・敵の AI・WAVE の読み替え）・敵の補正 `js/cb/tune.js`（`CBT`）・画面と振り付けとカメラ `js/cb/view.js`（`CB`）・操作盤 `js/cb/hud.js`（`CBH`）・章の地図/出撃準備/会話/精算 `js/td/menu.js`（`TDM`）・章とステージ `js/td/stages.js`・背景 `js/td/bg.js`（`TDBG`）・技ごとの演出 `js/td/fx.js`（`TDFX`）・効果音と BGM `js/td/sfx.js`・技のアイコン `js/td/skicon.js`（`TDI`）。計測 `tools/cb_sim.js`（`--tune`）。設計 `docs/CB-DESIGN.md` | `css/ui/cb.css`（地図と出撃準備は `css/ui/td.css`） |
+| **ホーム**（ver0.52。「出撃」が主役・下のタブ 4 つ・≡ のシート） | `js/ui/home.js`（`HOME`。v22 の townMenu の重ね表示 .h22 を置き換え。背景の街の絵は v22 drawHome のまま） | `css/ui/home.css` |
+| **仲間**（ver0.52。一覧＋1 人の詳細で Lv・技の練達・装備・星盤をまとめる。ver0.60 からコマンド戦闘の能力） | `js/ui/unit.js`（`UNIT.open(id, 戻り先)`）。能力は本編の `stats(id)`、奥義の位階は `TDD.hero(...).ult` | `css/ui/unit.css` |
+| **仲間のコマ送り・エフェクト**（ver0.59。まずセレス。コマンド戦闘でもそのまま使う） | 状態→アニメ・再生ロック・表示用の向き・整数倍の描画・焼き込み fx 層 `js/td/uanim.js`（`TDA`。u.actK/actT/hitT/awT/mv を見る）。光と粒の共通部品 `js/td/fxkit.js`（`FXK`）。セレスの通常攻撃・技 `js/td/fx-celes.js`（`FXC`）、星臨・奥義 `js/td/fx-celes-ult.js`（`FXU`）。素材：原画 `assets_src/pixel-art/celes-hd/src/master/`（PixelLab のシートは `pl/`）→ `import_pl.py` → `assets_src/chars/celes/` → `python3 tools/spx_import.py build celes`（パック `celes_hd`・`celes_hd_fx`） | — |
 | デザイントークン（新しい画面はこれ以外の色・角・影を使わない） | — | `css/ui/tokens.css` |
 
-**引き継ぎ（2026-11-22・ver0.54）**：P5 のうち 施設の画面の刷新・効果音と BGM・技の演出・敵の歩き（コード）・難易度の仕上げ・字を使わない導き・やり込み（天への塔・周回・星 3 の報酬）が完了。残りは 旧コードの残りの整理（絵の古い連鎖 dot-mon/dot-rig/ver19-art・v20-battle・v22 の旧 HUD など）と、敵の歩きの原画のコマ・図鑑の詳細画面の刷新。
+**引き継ぎ（2026-11-26・ver0.60）**：タワーディフェンスをやめ、2D-HD のコマンド戦闘に移した（`docs/CB-DESIGN.md`）。TD の戦闘画面・ロジック（`js/td/sim.js` `view.js` `hud.js` `guide.js`・`tools/td_sim.js`）は削除。次の作業：セレス以外の仲間のコマ送り（PixelLab）と固有の演出、敵の行動の演出、技の説明を長押しで、旧コードの整理（dot-mon/dot-rig/ver19-art・v20-battle・v22 の旧 HUD など）。
 旧コードの整理の道具：`node tools/smoke.js --cov cov.json`（一度も呼ばれなかった関数）→ `python3 tools/deadcode.py cov.json`（ファイルごとの候補）・`python3 tools/prune.py cov.json [--apply]`（名前でも参照されない宣言を消す）。smoke が通らない画面の関数も 0 回になるので、消す前に画面で確かめる。
-現在地と次の作業の一覧は `docs/TD-DESIGN.md` の「10. 現在地と次の作業」と、引き継ぎページ https://claude.ai/artifact/UEG6zszE5FohwKx6NVDMqf （Artifact の read で読める）。
+現在地と次の作業は `docs/CB-DESIGN.md` と上の引き継ぎ。TD の頃の記録は `docs/TD-DESIGN.md`。
 
-**方針（2026-11）：コマンドRPG → タワーディフェンスへ移行済み**（縦画面・横スクロールの戦場・灯域・本編 8 章を 6 章に）。旧コマンド戦闘（`startBattle` 系・`js/rs/battle.js`・`js/battle/*` など）は ver0.53 で削除した。戦闘の作業は `js/td/` と `docs/TD-DESIGN.md` に。古い版ファイル（ver16〜v38）には、ホーム・図鑑・持ち物・鑑定・鍛冶・星盤・セーブが使う部分だけが残っている（旧画面の入口は `js/ui/party.js` で仲間画面へ）。
+**方針（2026-11-26）：タワーディフェンス → 2D-HD のコマンド RPG へ移行**（ver0.60。縦画面・マップなし・章のステージを選んで戦う）。ファイル名の `td` は章・ステージ・演出の部品として残っている（`TDD` `TDM` `TDFX` `TDA` など）。戦闘の作業は `js/cb/` と `docs/CB-DESIGN.md` に。古い版ファイル（ver16〜v38）には、ホーム・図鑑・持ち物・鑑定・鍛冶・星盤・セーブが使う部分だけが残っている（旧画面の入口は `js/ui/party.js` で仲間画面へ）。
 
 戦闘システムの詳細は `docs/RS-SYSTEM.md`、素材は `docs/ASSETS.md` `docs/PIPELINE.md`、演出は `docs/FX.md`。
 
@@ -95,8 +95,8 @@
 | `rpg-hero-motion` | 戦闘モーション・技の演出 |
 | `rpg-equipment-icon` | 装備アイコン |
 | `rs-battle-fx` | 技・術の演出の設計（録画の実測：吹き出し→暗転→溜め→放出→着弾→明けの時間割・剣の振りの周期・術の段取り・エフェクトの色・効果音のレシピ・背景）と、参考を写さず応用・進化させる決まり。録画の分析 `scripts/vref.py` |
-| `td-stage-author` | TD のステージ・WAVE・道と隊形・灯域・敵の型・仲間の加入と会話（`js/td/stages.js`） |
-| `td-sim-balance` | TD の難易度の計測と調整（`tools/td_sim.js`。自動の配置で何十回も戦わせる・`--tune` で敵の HP 倍率を自動で探す） |
+| `td-stage-author` | 章のステージ・WAVE・敵・仲間の加入と会話（`js/td/stages.js`）。ver0.60 から WAVE は `CBE.wavesOf` で 1 戦 4 体までに読み替える（道・灯域・台座の項は TD の頃のもの） |
+| `td-sim-balance` | （TD の頃のもの。`tools/td_sim.js` は削除）コマンド戦闘の難易度は `node tools/cb_sim.js`（`--tune` で `js/cb/tune.js` を作る）。目安は `docs/CB-DESIGN.md` |
 | `rs-battle-flow` | ロマサガRS風の戦闘の流れと表示（HP/BP のタイミング・Critical/Weak・強化弱体・数字・区切り）。デモ `tools/battle_demo.js`・コマの一覧 `tools/frame_grid.py` |
 
 **PixelLab（MCP サーバー `pixellab`、AI のドット絵生成・アニメ・タイル・効果音。有料の回数制）**：クラウドでは環境「rpg-game」の起動スクリプトが `claude mcp add -s user -t http pixellab https://api.pixellab.ai/mcp` で登録し、API キーは環境のネットワークシークレット（api.pixellab.ai）からプロキシが付ける（キーをリポジトリに書かない）。手元の PC では `claude mcp add pixellab https://api.pixellab.ai/mcp -t http -H "Authorization: Bearer <キー>"`。使い方は `search_help`、残りの回数は `get_balance`。生成した絵はセレス案1・案2の絵柄（`assets_src/pixel-art/celes-48`・`celes-hd`）に合わせて手直ししてから取り込む。

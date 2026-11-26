@@ -6,7 +6,7 @@
  本番コマ（walk/atk/cast/hurt/down）：assets_src/pixel-art/celes-hd/import_pl.py。待機・aw_in は仮。差し替えは assets_src/chars/<id>/anim/<名>/ と character.json の ms・hit。 */
 const TDA=(()=>{
 const AN={celes:'celes_hd'};/* 仲間 id → 素材パックの id */
-const HGT={celes:72};/* 表示の背丈（論理 px。敵は雑魚 40・ボス 76、既定の仲間 60） */
+const HGT={celes:86};/* 表示の背丈（論理 px。敵は雑魚 40・ボス 76、既定の仲間 60） */
 const D=()=>SPX.D;
 const A=(id,n)=>{const d=D()[id];return d&&d.anims&&d.anims[n];};
 const tot=a=>a.tot||(a.tot=a.ms.reduce((x,y)=>x+y,0)||1);

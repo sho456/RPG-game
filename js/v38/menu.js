@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.59';
+const VER='ver0.60';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,13 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　セレスの新しいドット絵と演出<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　2D-HD のコマンド RPG へ<br><small>`+
+ `・戦いをタワーディフェンスからターン制のコマンド戦闘に。技・術・BP・LP・アビリティ・星臨・奥義は本編のものを引き継いだ<br>`+
+ `・味方 5 人まで。ターンの始めに全員の技を選ぶ → 素早さの順に動く。敵は戦場をタップで狙う<br>`+
+ `・星臨ゲージが満ちたら札の星を押して星臨（行動を使わない）。星臨中は奥義を 1 度だけ<br>`+
+ `・カメラの寄り・被写界深度・光の筋の舞台。セレスのモーションと演出はそのまま<br>`+
+ `・AUTO・×2・撤退。星 3 つ＝勝利・誰も倒れない・規定ターン以内</small></div>`+
+ `<div class="nt n38"><b>ver0.59</b>　セレスの新しいドット絵と演出<br><small>`+
  `・セレスの絵を描き直し、待機・歩き・攻撃・技・被弾・倒れ・星臨に入る・星臨の待機と技・奥義をなめらかなコマ送りに<br>`+
  `・奥義は星臨の姿で。空に金の時計が現れ、針が光の槍になって敵の群れへ落ちる<br>`+
  `・攻撃と技のエフェクトを光の質感から作り直し、当たった敵が一瞬止まって術の色に染まる。数字は着弾の瞬間に<br>`+

@@ -54,10 +54,10 @@ function ground(P,st,R){const W=st.S.W,c=cv(W,H),g=c.getContext('2d');
  for(let y=GT;y<H;y+=4){g.fillStyle=P.ground[Math.min(2,Math.floor((y-GT)/((H-GT)/3)))];g.fillRect(0,y,W,4);}
  g.fillStyle=P.edge;g.fillRect(0,GT,W,2);
  for(let i=0;i<W*.6;i++){g.fillStyle=R()>.5?P.ground[0]:P.ground[2];g.fillRect(Math.floor(R()*W),GT+4+Math.floor(R()*(H-GT-4)),2+Math.floor(R()*3),1);}
- for(const L of st.Ps){const pts=st.S.paths[st.Ps.indexOf(L)];
+ for(const L of(typeof TDS!=='undefined'?st.Ps:[])){const pts=st.S.paths[st.Ps.indexOf(L)];
   for(const[w,col]of[[30,P.edge],[26,P.road]]){g.strokeStyle=col;g.lineWidth=w;g.lineCap='butt';g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.stroke();}
   for(let s=0;s<L.L;s+=7){const a=TDS.at(L,s);g.fillStyle=R()>.5?P.roadE:P.edge;g.fillRect(Math.round(a.x),Math.round(a.y-12+R()*24),3,2);}}
- for(let i=0;i<W/14;i++){const x=Math.floor(R()*W),y=GT+8+Math.floor(R()*(H-GT-12));if(st.Ps.some(L=>Math.abs(TDS.at(L,Math.max(0,Math.min(L.L,x+30))).y-y)<20))continue;
+ for(let i=0;i<W/14;i++){const x=Math.floor(R()*W),y=GT+8+Math.floor(R()*(H-GT-12));if(typeof TDS!=='undefined'&&st.Ps.some(L=>Math.abs(TDS.at(L,Math.max(0,Math.min(L.L,x+30))).y-y)<20))continue;
   g.fillStyle=P.tuft;g.fillRect(x,y,1,3);g.fillRect(x+2,y-1,1,4);g.fillRect(x+4,y+1,1,2);}
  /* 入口の虚蝕の霧 */
  const gr=g.createLinearGradient(0,0,90,0);gr.addColorStop(0,'rgba(90,60,130,.75)');gr.addColorStop(1,'rgba(90,60,130,0)');g.fillStyle=gr;g.fillRect(0,GT,90,H-GT);

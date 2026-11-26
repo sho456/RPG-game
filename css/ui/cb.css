@@ -1,0 +1,63 @@
+/* ===== コマンド戦闘の画面（#cb。js/cb/view.js・hud.js）。色・角・影は tokens.css だけ ===== */
+#cb{position:fixed;inset:0;z-index:900;background:var(--tk-shade);color:var(--tk-ink);font-family:var(--tk-font);overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+#cb.hide{display:none}
+#cb button{font-family:inherit;color:inherit;cursor:pointer;border:0;-webkit-tap-highlight-color:transparent}
+#cb .cb-cv{position:absolute;inset:0;display:block}
+/* 上の帯 */
+.cb-top{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;gap:6px;padding:calc(8px + env(safe-area-inset-top,0px)) 10px 8px;background:linear-gradient(rgba(7,7,26,.7),rgba(7,7,26,0));z-index:3}
+.cb-top .sp{flex:1}
+.cb-w{display:flex;gap:4px}.cb-w i{width:10px;height:10px;transform:rotate(45deg);background:var(--tk-void);box-shadow:0 0 0 1px var(--tk-shade)}
+.cb-w i.on{background:var(--tk-lamp)}.cb-w i.done{background:var(--tk-star);opacity:.55}
+.cb-turn{font:italic 800 16px "Barlow Semi Condensed",sans-serif;color:var(--tk-star);min-width:20px;text-align:center}
+.cb-tb{height:30px;min-width:38px;padding:0 8px;border-radius:var(--tk-r);background:rgba(27,29,60,.86);box-shadow:var(--tk-frame);font-size:var(--tk-fs-s);font-weight:800;display:flex;align-items:center;justify-content:center}
+.cb-tb.on{background:var(--tk-lamp);color:var(--tk-shade);box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp-deep)}
+/* 技名の札（上の中央）と帯（中央） */
+.cb-plate{position:absolute;left:50%;top:calc(52px + env(safe-area-inset-top,0px));transform:translate(-50%,-6px);opacity:0;transition:opacity .12s,transform .12s;z-index:3;pointer-events:none;
+ display:flex;align-items:center;gap:8px;padding:6px 18px 6px 12px;background:linear-gradient(90deg,rgba(7,7,26,0),rgba(7,7,26,.88) 18%,rgba(7,7,26,.88) 82%,rgba(7,7,26,0));white-space:nowrap}
+.cb-plate.show{opacity:1;transform:translate(-50%,0)}
+.cb-plate b{font-family:var(--tk-disp);font-size:var(--tk-fs-l);color:var(--tk-star);letter-spacing:.06em}
+.cb-plate i{font-style:normal;font-family:var(--tk-disp);font-size:var(--tk-fs-s);width:20px;height:20px;display:grid;place-items:center;background:var(--tk-shade);color:var(--c);box-shadow:0 0 0 1px var(--c)}
+.cb-plate.foe b{color:#ffb0a0}.cb-plate.ou b{font-size:var(--tk-fs-xl);color:#fff6d8;text-shadow:0 0 8px var(--tk-lamp)}
+.cb-banner{position:absolute;left:0;right:0;top:30%;text-align:center;opacity:0;transition:opacity .18s;pointer-events:none;z-index:4}
+.cb-banner.show{opacity:1}
+.cb-banner b{display:inline-block;font-family:var(--tk-disp);font-size:var(--tk-fs-xxl);letter-spacing:.12em;padding:6px 40px;background:linear-gradient(90deg,rgba(7,7,26,0),rgba(7,7,26,.85) 20%,rgba(7,7,26,.85) 80%,rgba(7,7,26,0));color:var(--tk-star)}
+.cb-banner small{display:block;font-family:var(--tk-disp);font-size:var(--tk-fs-s);color:var(--tk-ink-2);letter-spacing:.3em}
+.cb-banner.ou b{font-size:28px;color:#fff6d8;text-shadow:0 0 12px var(--tk-lamp),0 0 2px #fff}
+.cb-banner.win b{color:var(--tk-lamp);font-size:40px}.cb-banner.lose b{color:var(--tk-void);font-size:40px}
+/* 下の盤 */
+.cb-ui{position:absolute;left:0;right:0;bottom:0;z-index:3;padding:10px 8px calc(10px + env(safe-area-inset-bottom,0px));background:linear-gradient(rgba(7,7,26,0),rgba(7,7,26,.9) 26px,var(--tk-shade));display:flex;flex-direction:column;gap:8px}
+.cb-cmds{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;min-height:142px;align-content:end}
+.cb-sk{display:flex;align-items:center;gap:6px;height:42px;padding:0 8px 0 4px;background:var(--tk-night-2);box-shadow:var(--tk-frame);border-radius:var(--tk-r);text-align:left;position:relative;min-width:0}
+.cb-sk .ic{width:34px;height:34px;flex:none;display:grid;place-items:center}
+.cb-sk .ic img,.cb-card .pk img{width:100%;height:100%;image-rendering:pixelated}
+.cb-sk b{flex:1;min-width:0;font-family:var(--tk-disp);font-size:var(--tk-fs-m);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cb-sk .bp{font:italic 800 15px "Barlow Semi Condensed",sans-serif;color:#9fd8ff;flex:none}
+.cb-sk .bp::before{content:"";display:inline-block;width:7px;height:7px;margin-right:3px;transform:rotate(45deg);background:#9fd8ff;vertical-align:1px}
+.cb-sk.on{box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp)}
+.cb-sk.off{opacity:.45;filter:saturate(.3)}.cb-sk.off .bp{color:var(--tk-void)}
+.cb-sk.ou{background:linear-gradient(90deg,#4a3410,var(--tk-night-2));box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp);grid-column:1/-1}
+.cb-sk.ou b{color:#fff1c8}
+.cb-sk:active{transform:translateY(1px)}
+.ic.bs{width:22px!important;height:22px!important;transform:rotate(45deg);background:var(--tk-shade);box-shadow:inset 0 0 0 3px var(--c),0 0 0 1px var(--tk-shade)}
+/* 仲間の札 */
+.cb-party{display:flex;gap:5px;align-items:stretch}
+.cb-card{flex:1;min-width:0;position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 3px 4px;background:var(--tk-night-2);box-shadow:var(--tk-frame);border-radius:var(--tk-r)}
+.cb-card .fc{--p:0;width:44px;height:44px;border-radius:50%;padding:3px;background:conic-gradient(var(--tk-lamp) calc(var(--p)*360deg),var(--tk-night-3) 0);display:block}
+.cb-card .fc img{width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:50% 12%;background:var(--tk-night);image-rendering:pixelated;display:block}
+.cb-card .hp{width:100%;height:5px;background:var(--tk-shade);box-shadow:0 0 0 1px var(--tk-line)}
+.cb-card .hp i{display:block;height:100%;background:#9fe8b8;transition:width .25s}.cb-card .hp i.low{background:#e86a6a}
+.cb-card .nb{width:100%;display:flex;justify-content:space-between;font:italic 800 12px "Barlow Semi Condensed",sans-serif;line-height:1}
+.cb-card .hpn{color:var(--tk-ink)}.cb-card .bpn{color:#9fd8ff}.cb-card .bpn::before{content:"";display:inline-block;width:5px;height:5px;margin-right:2px;transform:rotate(45deg);background:#9fd8ff;vertical-align:1px}
+.cb-card .pk{position:absolute;right:-3px;top:-4px;width:22px;height:22px;box-shadow:0 0 0 1px var(--tk-shade)}
+.cb-card.sel{box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp);background:var(--tk-night-3)}
+.cb-card.act{background:var(--tk-night-3);box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-star)}
+.cb-card.down{opacity:.4;filter:grayscale(1)}
+.cb-card.aw .fc{background:conic-gradient(#fff1a8 360deg,#fff1a8 0);box-shadow:0 0 10px var(--tk-lamp)}
+.cb-card .awb{position:absolute;left:50%;top:-12px;transform:translateX(-50%);width:26px;height:26px;background:var(--tk-star);clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);animation:cbAw .8s ease-in-out infinite alternate}
+@keyframes cbAw{from{transform:translateX(-50%) scale(.85);filter:drop-shadow(0 0 0 var(--tk-lamp))}to{transform:translateX(-50%) scale(1.1);filter:drop-shadow(0 0 6px var(--tk-lamp))}}
+.cb-go{flex:none;width:44px;border-radius:var(--tk-r);background:var(--tk-night-3);box-shadow:var(--tk-frame);font-size:18px;color:var(--tk-void)}
+.cb-go.on{background:var(--tk-lamp);color:var(--tk-shade);box-shadow:0 0 0 1px var(--tk-shade),0 0 0 2px var(--tk-lamp-deep)}
+.cb-ui:not(.inp) .cb-cmds{visibility:hidden}
+/* 結果・メニュー */
+.cb-sheet{position:absolute;inset:0;background:rgba(7,7,26,.78);display:flex;align-items:center;justify-content:center;padding:16px;z-index:6}
+.cb-sheet[hidden]{display:none}

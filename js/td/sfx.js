@@ -107,7 +107,7 @@ const SONG={'td:map':['calm',84,60,'maj',[0,5,3,4],[3,4,0,0]],'td:boss':['boss',
 try{if(typeof SONGS!=='undefined')Object.assign(SONGS,SONG);}catch(e){}
 let mine=false;
 const shown=id=>{const r=document.getElementById(id);return!!r&&!r.classList.contains('hide');};
-function want(){if(shown('td')&&typeof TD!=='undefined'){const s=TD.st;if(!s||s.over)return s&&s.over.win?'win':'td:map';
+function want(){if(shown('cb')&&typeof CB!=='undefined'){const s=CB.st;if(!s||s.over)return s&&s.over.win?'win':'td:map';
   if(s.foes.some(f=>f.boss&&f.hp>0))return'td:boss';const k='td:b:'+(s.S.th||'ash');return SONG[k]?k:'td:b:ash';}
  if(shown('tdm'))return'td:map';return null;}
 function bgm(){if(typeof BGM==='undefined')return;const w=want();if(w){BGM.force=w;mine=true;}else if(mine){BGM.force=null;mine=false;}}
