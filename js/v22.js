@@ -108,7 +108,7 @@ function hpBar(t,tg){const bs=V21.barState(t),bar=tg.querySelector('.bar');if(!b
  const cnt=tg.querySelector('.cnt'),ct=bs.n>1?'×'+bs.rem:'';if(cnt.textContent!==ct){cnt.textContent=ct;cnt.style.color=cur;}}
 /* 狙いの輪（弱点を突く技を選んでいるときは WEAK） */
 function reticle(){const r=$('#rt22');if(!r)return;if(!B||scene!=='battle'||B.over){r.style.display='none';return;}const t=B.tgt&&B.tgt.alive?B.tgt:null;
- if(!t||(!B.pick&&aliveE().length<2)){r.style.display='none';return;}let mx,my;try{[mx,my]=V19.mid(t);}catch(e){mx=t.x+8*t.sc;my=t.y+8*t.sc;}
+ if(!t||(!B.pick&&aliveE().length<2)||(B.cur&&B.cur.side===1)||$('#app').classList.contains('fc66')){r.style.display='none';return;}/* 敵の行動中・注目画面では出さない */let mx,my;try{[mx,my]=V19.mid(t);}catch(e){mx=t.x+8*t.sc;my=t.y+8*t.sc;}
  /* ver0.24：照準の大きさは敵の大きさに依らず画面幅の約13%（参考資料の比率）。大型ボスでも輪が体を覆い尽くさない */
  const A=t.A||{},x=(mx+(A.wx||0)+(A.kb||0))*SC,y=(my+(A.wy||0))*SC,s=Math.round(Math.max(44,Math.min(66,appW()*.132))),sk=B.sel22,wk=!!(sk&&sk.el&&t.weak.includes(sk.el)&&(t.known.has(sk.el)||(t.sts||[]).some(q=>q.k==='weak'&&q.el===sk.el)));
  const tf=`translate(${Math.round(x-s/2)}px,${Math.round(y-s/2)}px)`;if(r._tf!==tf){r._tf=tf;r.style.transform=tf;}if(r._s!==s){r._s=s;r.style.width=r.style.height=s+'px';}

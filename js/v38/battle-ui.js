@@ -28,13 +28,16 @@ HK23.botPx=()=>{const g=GEO||geo();return Math.round(g.sh-g.bandBot-3);};
 /* ==================== 2. 味方：右側に縦一列（ver0.65。少し千鳥・右端から吹き出しの分だけ離す） ==================== */
 function heroK(h,k){const A=ANIM.setup(h);if(!A||A.none)return;if(A._key25!==A.key||A._sc0==null){A._key25=A.key;A._sc0=A.sc;}h._k25=k;const s=A._sc0*k;if(Math.abs(A.sc-s)>1e-6)A.sc=s;}
 let SLOT=[],KH=1;
+const DZ=d=>.84+.28*d;/* 奥行きの倍率（d：0＝奥・1＝手前） */
 HK23.placeHeroes=(hs,LY)=>{hs.forEach(h=>heroK(h,1));let ww=0,hh=0;hs.forEach(h=>{const Dm=V19.dims(h);ww=Math.max(ww,Dm.w);hh=Math.max(hh,Dm.h);});
- const n=hs.length,band=LY.bot-LY.top,k=clamp(Math.min(V23.appW()*.15/(hh*SC),(band*(n>2?.36:.46))/hh),.6,1.35);KH=k;hs.forEach(h=>heroK(h,k));ww*=k;hh*=k;
- const xC=W-Math.max(ww*.5+8,32);SLOT=[];
- hs.forEach((h,i)=>{const fx=xC+(n>1?(i%2?-7:3):0),fy=LY.top+hh+(band-hh)*(n>1?i/(n-1):.5);SLOT[i]=[fx,fy];h.x=fx-8*h.sc;h.y=Math.round(fy-16*h.sc+2);h._fx23=fx;});
- LY.heroL=xC-7-ww/2-12;};
+ const n=hs.length,band=LY.bot-LY.top,k=clamp(Math.min(V23.appW()*.15/(hh*SC),(band*(n>2?.36:.46))/hh),.6,1.35);KH=k;ww*=k;hh*=k;
+ /* ver0.66 2D-HD：奥（上）ほど小さく画面の中央寄り、手前（下）ほど大きく外側。斜めの縦一列 */
+ const xC=W-Math.max(ww*DZ(1)*.5+8,32);SLOT=[];
+ hs.forEach((h,i)=>{const d=n>1?i/(n-1):.6,kd=k*DZ(d);heroK(h,kd);const hd=hh*DZ(d)/DZ(1);
+  const fx=xC-(1-d)*Math.min(18,ww*.6),fy=LY.top+hd+(band-hh)*(n>1?i/(n-1):.5)+(hh-hd);SLOT[i]=[fx,fy,kd];h.x=fx-8*h.sc;h.y=Math.round(fy-16*h.sc+2);h._fx23=fx;});
+ LY.heroL=xC-Math.min(18,ww*.6)-ww/2-12;};
 /* 交代で入った味方：同じ大きさ・同じ持ち場に */
-function fitNew(){if(!inB())return;B.heroes.forEach((h,i)=>{if(h._k25)return;heroK(h,KH);const sl=SLOT[i];if(sl&&!(h.A&&h.A.mv)){h.x=sl[0]-8*h.sc;h.y=Math.round(sl[1]-16*h.sc+2);h._fx23=sl[0];}});}
+function fitNew(){if(!inB())return;B.heroes.forEach((h,i)=>{if(h._k25)return;const sl=SLOT[i];heroK(h,sl&&sl[2]||KH);if(sl&&!(h.A&&h.A.mv)){h.x=sl[0]-8*h.sc;h.y=Math.round(sl[1]-16*h.sc+2);h._fx23=sl[0];}});}
 
 /* ==================== 3. コマンド入力中のスライド ==================== */
 const inputOn=()=>inB()&&!B.over&&!!B.rs&&B.rs.phase==='input'&&!auto&&!app.classList.contains('aw25')&&!!B.pick;

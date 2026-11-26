@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.65';
+const VER='ver0.66';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,9 +19,11 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　星臨と奥義のカットイン・強化と弱体のアイコン・縦一列の並び<br><small>`+
- `・敵は左、味方は右にそれぞれ縦一列。右端から離して、技名や演出が切れないように<br>`+
- `・強化（青）・弱体（赤）・状態異常（紫）を頭上にアイコンで。タップで味方／敵のタブ<br>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　2D-HD の戦闘画面・技と術の注目画面<br><small>`+
+ `・奥行きのある戦場（奥はぼけて霞む・床の光・漂う光の粒）。キャラは奥ほど小さい斜めの縦一列<br>`+
+ `・技・術・星臨・奥義の間は、使う味方と相手だけを写してカメラが寄る<br>`+
+ `・強化・弱体のアイコンはコマンド入力中の顔の横と、上の敵の欄に。上の敵の欄をコンパクトに<br>`+
+ `・敵の行動中は狙いの輪を出さない。セレスの顔・立ち絵・カットインを戦闘の絵に統一<br></small></div><div class="nt"><b>ver0.65</b>　星臨と奥義のカットイン・縦一列の並び<br><small>`+
  `・星臨は星の帯、奥義は閃光と金の帯で立ち絵と名前が大きく入る見せ場に<br>`+
  `・ステージごとに敵の強さを調整（ボスとライバル戦を中心に）<br></small></div><div class="nt"><b>ver0.64</b>　技と術を 1 人 4 つに・陣形とひらめきを廃止<br><small>`+
  `・技・術は Lv1 の 2 つ・Lv10 の 1 つ・星盤の 1 つ。旧ひらめきと天星盤の技は、それぞれの技に効果をまとめた<br>`+

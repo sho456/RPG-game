@@ -20,7 +20,7 @@ function ev(e){try{TDFX.ev(e,ST);}catch(x){console.warn(x);}return e;}
 function start(){if(on)return;on=true;try{TDFX.reset();TDA.clear();TDFX.bind({spr:()=>null,cam:()=>0,vw:()=>W/s});}catch(e){}}
 /* 描く：セレスの足元 (X0,Y0)（画面の画素）に TDA のコマ。旧の背丈 h（論理）に合わせて倍率 s を決める */
 V19.dr=function(u,X0,Y0,k,h){if(!isC(u)||!u.alive)return false;start();const p=Math.max(1,Math.round(k*2/3));s=Math.max(.05,h*p*1.1/(86*k));/* 旧の 1 ドット＝p 画素・座標の 1＝k 画素 */const P=px(u);
- ctx.save();ctx.setTransform(k*s,0,0,k*s,X0,Y0);const ok=TDA.draw(ctx,P,0,0,0,1,ST);ctx.restore();return ok;};
+ ctx.save();ctx.setTransform(k*s,0,0,k*s,X0,Y0);const ok=TDA.draw(ctx,P,0,0,0,ctx.globalAlpha,ST);ctx.restore();return ok;};
 /* 毎コマ：演出の層を旧戦闘の画面に重ねる */
 {const _d=draw;draw=function(){_d();if(!on||scene!=='battle'||!B)return;const t=performance.now()/1000,dt=Math.min(.1,t-(last||t));last=t;clk+=dt*rate();
  try{TDFX.step(dt);const k=bK();ctx.save();ctx.setTransform(k*s,0,0,k*s,0,0);TDFX.back(ctx);TDFX.front(ctx);ctx.restore();}catch(e){}};}

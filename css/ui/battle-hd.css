@@ -1,0 +1,23 @@
+/* ===== 戦闘の 2D-HD・注目画面・上の敵の欄のコンパクト化（js/battle/hd2d.js・HD。ver0.66） ===== */
+/* 上の敵の欄：名前と HP を 1 行、耐性と強化・弱体を 1 行に詰める */
+#app #bt22 .b22tg{max-width:min(230px,58vw);margin:1px 0 0 8px;display:grid;grid-template-columns:auto 1fr;align-items:center;column-gap:6px;row-gap:2px}
+#app #bt22 .b22tg .nm{grid-column:1;gap:3px}
+#app #bt22 .b22tg .nm b{font-size:12px;max-width:96px}
+#app #bt22 .b22tg .nm small{font-size:9px}
+#app #bt22 .b22tg .nm em{font-size:8px;line-height:11px;padding:0 3px}
+#app #bt22 .b22tg .hp{grid-column:2;margin:0;gap:3px}
+#app #bt22 .b22tg .bar{height:6px}
+#app #bt22 .b22tg.boss .bar{height:7px}
+#app #bt22 .b22tg .cnt{font-size:11px}
+#app #bt22 .b22tg .wk{grid-column:1/3;margin:0;display:flex;align-items:center;gap:1px}
+#app #bt22 .b22tg .wk span{width:13px}
+#app #bt22 .b22tg .wk span i{width:12px;height:13px;font-size:8px}
+#app #bt22 .b22tg .wk span u{height:5px;font-size:6px;line-height:5px}
+#app #bt22 .b22tg .st{display:none}
+#app #bt22 .b22tg .bst-foe{grid-column:1/3;justify-self:start}
+#app #bt22 .b22tg .wk~.bst-foe{margin-top:-1px}
+/* 注目画面：上の欄・行動順・吹き出し以外の飾りを消す */
+#app.fc66 #bt22 .b22tg,#app.fc66 #bt22 .b22ord,#app.fc66 #hl24{opacity:0;transition:opacity .25s;pointer-events:none}
+#app #bt22 .b22tg,#app #bt22 .b22ord{transition:opacity .35s}
+/* カメラの寄り（transform は hd2d.js が付ける） */
+#app[data-sc="battle"] #cv,#app[data-sc="battle"] #bp46{transition:transform .45s cubic-bezier(.2,.7,.2,1)}

@@ -202,12 +202,12 @@ function drawU(u,k,p,sx,sy){const A=setup(u);if(A.none)return;
 function drawBattle(){const k=bK();if(cv.width!==W*k||cv.height!==H*k){cv.width=W*k;cv.height=H*k;}const p=Math.max(1,Math.round(k*2/3));PXL=p/k;DS=Math.round(k/p/1.5*1000)/1000;ANIM.tick();
  let sx=0,sy=0;if(B&&B.shake>0){const m=Math.min(4,1+Math.floor(B.shake/5));sx=((tick&1)?m:-m)*p;sy=(((tick>>1)&1)?1:-1)*Math.ceil(m/2)*p;B.shake--;}
  ctx.setTransform(k,0,0,k,0,0);ctx.imageSmoothingEnabled=false;ctx.drawImage(BG,0,0);if(sx||sy){ctx.setTransform(k,0,0,k,sx,sy);ctx.drawImage(BG,0,0);}
- if(!B)return;if(B.intro>0)B.intro--;if(B.fx2&&B.fx2.length)B.fx2.length=0;if(B.heroes.some(h=>h.aw)){ctx.fillStyle='rgba(255,210,110,.07)';ctx.fillRect(0,0,W,H);}
+ if(!B)return;if(V19.pre)V19.pre(ctx,k);/* 2D-HD の光・注目画面の暗転（js/battle/hd2d.js） */if(B.intro>0)B.intro--;if(B.fx2&&B.fx2.length)B.fx2.length=0;if(B.heroes.some(h=>h.aw)){ctx.fillStyle='rgba(255,210,110,.07)';ctx.fillRect(0,0,W,H);}
  /* 旧来の簡易エフェクト要求（B.fx）は新しいエフェクトに置き換える */
  if(B.fx.length){for(const f of B.fx)if(!f.t||f.t<=0){if(f.m)FX19.ring(f.x,f.y,f.c,{r1:20,delay:Math.max(0,-f.t)*16});else FX19.burst(f.x,f.y,f.c);}B.fx.length=0;}
  ctx.setTransform(1,0,0,1,0,0);FX19.draw(ctx,k,p,0,sx,sy);
- const us=[...B.enemies,...B.heroes].map(u=>{const A=setup(u);return[u,u.y+16*u.sc+(A.wy||0)+(u._act?.5:0)];}).sort((a,b)=>a[1]-b[1]);for(const[u]of us)drawU(u,k,p,sx,sy);
- FX19.draw(ctx,k,p,1,sx,sy);ctx.setTransform(k,0,0,k,sx,sy);
+ const us=[...B.enemies,...B.heroes].map(u=>{const A=setup(u);return[u,u.y+16*u.sc+(A.wy||0)+(u._act?.5:0)];}).sort((a,b)=>a[1]-b[1]);for(const[u]of us){const va=V19.vis?V19.vis(u):1;if(va<=0)continue;ctx.globalAlpha=va;drawU(u,k,p,sx,sy);ctx.globalAlpha=1;}/* V19.vis：注目画面で写さない者は消える */
+ FX19.draw(ctx,k,p,1,sx,sy);if(V19.post)V19.post(ctx,k);ctx.setTransform(k,0,0,k,sx,sy);
  if(B.domain){ctx.fillStyle='rgba(255,220,120,.10)';ctx.fillRect(0,0,W,H);ctx.strokeStyle='rgba(255,230,150,.35)';for(const[gx,gy,gr,sp]of[[28,22,14,1],[150,30,10,-1.4],[96,10,7,2]]){const a0=tick/60*sp;ctx.beginPath();ctx.arc(gx,gy,gr,0,7);ctx.stroke();for(let i=0;i<8;i++){const an=a0+i/8*6.283;ctx.fillStyle='rgba(255,230,150,.35)';ctx.fillRect(gx+Math.cos(an)*(gr+2)-1|0,gy+Math.sin(an)*(gr+2)-1|0,3,3);}}}
  if(B.barrier>0){ctx.fillStyle='rgba(127,214,255,.5)';for(let j=0;j<H;j+=PXL*2)ctx.fillRect(Math.round((100+Math.sin(j*.11+tick/14)*2)/PXL)*PXL,j,PXL,PXL);}
  B.parts=B.parts.filter(q=>{q.y+=q.vy;q.l--;ctx.fillStyle=q.c;ctx.globalAlpha=Math.min(1,q.l/30);ctx.fillRect(Math.round(q.x/PXL)*PXL,Math.round(q.y/PXL)*PXL,PXL,PXL);return q.l>0;});ctx.globalAlpha=1;
@@ -231,7 +231,7 @@ function still(key,N,right){const inf=SPRX.info(key);if(!inf)return null;const k
  g.drawImage(f.cv,Math.round(N/2-f.ax),Math.round(N-2-f.ay));return c;}
 {const _hi=hiImg;hiImg=function(src,N,shade){if(!src)return src;const key=keyOf(src);if(!key||/_w$/.test(key))return _hi(src,N,shade);let m=STILL.get(src);if(!m){m={};STILL.set(src,m);}if(m[N])return m[N];const kd=key.replace(/_aw$/,''),ed=ED[kd];
   const c=still(key,N,ed&&!ed.flip);return m[N]=c||_hi(src,N,shade);};}
-function cutArt(cv2,key){const c=still(IMG[key]?key:key.replace(/_aw$/,''),48,false);if(!c)return;cv2.width=cv2.height=48;const g=cv2.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(c,0,0);}
+function cutArt(cv2,key){if(V19.art&&V19.art(cv2,key))return;const c=still(IMG[key]?key:key.replace(/_aw$/,''),48,false);if(!c)return;cv2.width=cv2.height=48;const g=cv2.getContext('2d');g.imageSmoothingEnabled=false;g.drawImage(c,0,0);}
 /* 行動順のアイコン：味方は顔まわり、敵は小さく描き直した全身 */
 const ICO=new Map();
 function icon(u){const key=sprKey(u),A=setup(u);if(A.none)return null;let c=ICO.get(key);if(c)return c;c=document.createElement('canvas');c.width=c.height=18;const g=c.getContext('2d'),R=A.rig,pose=ANIM.base(A);if(pose.y)pose.y=0;
@@ -242,4 +242,4 @@ function icon(u){const key=sprKey(u),A=setup(u);if(A.none)return null;let c=ICO.
 try{for(const k in IMG){if(/_(w|aw)$/.test(k)||!SPRX.info(k))continue;for(const sil of[0,1])Object.defineProperty(ZIMG,k+(sil?'_w':''),{configurable:true,enumerable:true,get(){const ed=ED[k],c=still(k,48,ed&&!ed.flip);const v=c?(sil?PX.whiteOf(c):c).toDataURL():'';Object.defineProperty(ZIMG,k+(sil?'_w':''),{value:v,writable:true,configurable:true,enumerable:true});return v;}});}}catch(e){}
 /* 版表示 */
 const VER19='ver0.19';{const _t=title;title=function(){_t();const v=$('#verL');if(v)v.textContent=VER19;};const v=$('#verL');if(v)v.textContent=VER19;}
-return{foot,mid,dims,near,dash,WP,MA,CAST,BOW,VIC,AWK,still,icon,drawBattle,ext:null,dr:null};})();
+return{foot,mid,dims,near,dash,WP,MA,CAST,BOW,VIC,AWK,still,icon,drawBattle,ext:null,dr:null,pre:null,post:null,vis:null,art:null};})();

@@ -1,7 +1,10 @@
-/* ===== 戦闘の強化・弱体のアイコンと専用のタブ（js/ui/battle-status.js・BST） ===== */
-#bst{position:absolute;inset:0;pointer-events:none;z-index:6}
-#bst .bst-row{position:absolute;left:0;top:0;display:flex;gap:1px;padding:2px;border:0;background:rgba(7,7,26,.55);border-radius:var(--tk-r);pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent}
-#bst .bst-row em{font:italic 800 10px/14px "Barlow Semi Condensed",sans-serif;color:var(--tk-ink-2);margin-left:1px}
+/* ===== 戦闘の強化・弱体のアイコンと専用のタブ（js/ui/battle-status.js・BST） =====
+ .bst-cmd＝コマンド欄の顔の横（2 段）・.bst-foe＝上の敵の欄 */
+.bst-row{display:grid;grid-auto-flow:column;gap:2px;padding:2px;border:0;background:rgba(7,7,26,.55);border-radius:var(--tk-r);cursor:pointer;-webkit-tap-highlight-color:transparent;flex:none}
+.bst-row em{font:italic 800 10px/14px "Barlow Semi Condensed",sans-serif;color:var(--tk-ink-2)}
+.bst-cmd{grid-template-rows:repeat(2,15px);align-self:center;margin-left:-2px}
+.bst-foe{grid-template-rows:13px;background:transparent;padding:0;margin-left:4px}
+.bst-foe .bst-i{width:13px;height:13px}.bst-foe .bst-i b{font-size:9px}
 .bst-i{position:relative;display:inline-grid;place-items:center;width:15px;height:15px;border-radius:2px;font-style:normal;box-shadow:0 0 0 1px var(--tk-shade)}
 .bst-i b{font:800 10px/1 var(--tk-font);color:#fff}
 .bst-i u{position:absolute;right:-2px;bottom:-3px;font:900 8px/1 var(--tk-font);text-decoration:none;text-shadow:0 0 2px #000}
