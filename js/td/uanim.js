@@ -40,4 +40,6 @@ return{has,hgt:(u,d)=>HGT[u]||d,
   const id=AN[o.id];put(g,id,'',frame(id,{n:'down',t0:o.t0},st.t,0),o.face,o.x,o.y,HGT[o.id],0,Math.min(1,(1.8-T)/.6));}},
  /* アニメの「当たるコマ」の時刻（秒。奥義なら anim 省略可）。hit が無い・アニメが無いなら null */
  hitT(uid,anim,aw){const id=AN[uid];if(!id||!has(uid))return null;const n=anim||ultName(id,aw),a=n&&A(id,n);if(!a||a.hit==null)return null;let t=0;for(let i=0;i<a.hit&&i<a.ms.length;i++)t+=a.ms[i];return t/1000;},
+ dur(uid,anim){const id=AN[uid],a=id&&A(id,anim);return a?tot(a)/1000:null;},
+ at(uid,anim,i){const id=AN[uid],a=id&&A(id,anim);if(!a)return null;let t=0;for(let k=0;k<i&&k<a.ms.length;k++)t+=a.ms[k];return t/1000;},
  clear(){ghosts.length=0;}};})();

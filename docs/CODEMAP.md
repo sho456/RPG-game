@@ -92,17 +92,18 @@
 | 86 | `js/td/sfx.js` | 10 | TD の音（TDSFX）：WebAudio で合成する効果音と、章ごとの短い BGM。音源ファイルなし | TDSFX |
 | 87 | `js/td/fxkit.js` | 8 | TD の演出の共通部品（FXK）：光のスプライト・ドットの格子にそろえた形・粒のプール・緩急・命中の手応え | FXK |
 | 88 | `js/td/fx-celes.js` | 12 | TD：セレスの演出（FXC）。通常攻撃（彗星の光弾）と技 3 種（遅延の砂＝時計の陣・刻の矢＝時計の針の矢 3 連・クロノスロウ＝時計の波）。部品は FXK（fxkit.js） | FXC |
-| 89 | `js/td/fx.js` | 30 | TD の戦闘の演出（TDFX）：技ごとのエフェクト・星臨の短い暗転・粒・敵の歩き/被弾/崩れ。描くだけで、ロジック（TDS）の結果に触れない | TDFX |
-| 90 | `js/td/skicon.js` | 4 | 戦闘の技ボタンの絵（TDI）：SKICON の白いシルエットから、技ごとのドット絵のアイコンを作る（ver0.58） | TDI |
-| 91 | `js/td/hud.js` | 8 | TD の戦闘画面の帯と操作盤（TDH）：上の帯・灯力と星片の帯・選んだ仲間の操作盤・手札。戦場の描画と操作は js/td/view.js | TDH |
-| 92 | `js/td/uanim.js` | 4 | TD：味方の状態ごとのコマ送り（TDA。素材パック assets_src/chars の anims を引く） | TDA |
-| 93 | `js/td/view.js` | 29 | TD の戦闘画面（TD）：横スクロールの戦場・上下の帯・手札・ユニットの窓・リザルト。ロジックは js/td/sim.js（TDS） | TD |
-| 94 | `js/td/guide.js` | 5 | TD の字を使わない導き（GUIDE）の正本：最初の 1〜2 面で、光る指・脈打つ輪・矢印だけで操作を順に示す | GUIDE |
-| 95 | `js/td/menu.js` | 15 | TD の章の地図・出撃準備・会話・仲間の加入（TDM）。戦闘画面は js/td/view.js（TD） | TDM |
-| 96 | `js/ui/home.js` | 4 | ホーム画面（灯都ルミナス）の正本：TD「防衛」を主役にした重ね表示 | HOME |
-| 97 | `js/ui/unit.js` | 13 | 仲間の画面（UNIT）：TD 用の一覧＋1 人の詳細。Lv・技 5 つ・奥義・アビリティ 3 つ・装備・星盤をここにまとめる | UNIT |
-| 98 | `js/ui/zukan.js` | 3 | 図鑑の一覧（ZKUI）：敵・仲間・装備の全画面の一覧。ver0.54 新規 | ZKUI |
-| 99 | `js/ui/dev.js` | 4 | 開発者モードの正本（タイトルの「開発者モード」・ホームの ≡ の DEV） | DEVUI |
+| 89 | `js/td/fx-celes-ult.js` | 15 | TD：セレスの星臨に入る演出と奥義「刻の巻き戻し」（FXU）。部品は FXK（fxkit.js）。fx.js の celesAw/celesUlt・cultB/cultF を置き換 | FXU |
+| 90 | `js/td/fx.js` | 22 | TD の戦闘の演出（TDFX）：技ごとのエフェクト・星臨の短い暗転・粒・敵の歩き/被弾/崩れ。描くだけで、ロジック（TDS）の結果に触れない | TDFX |
+| 91 | `js/td/skicon.js` | 4 | 戦闘の技ボタンの絵（TDI）：SKICON の白いシルエットから、技ごとのドット絵のアイコンを作る（ver0.58） | TDI |
+| 92 | `js/td/hud.js` | 8 | TD の戦闘画面の帯と操作盤（TDH）：上の帯・灯力と星片の帯・選んだ仲間の操作盤・手札。戦場の描画と操作は js/td/view.js | TDH |
+| 93 | `js/td/uanim.js` | 4 | TD：味方の状態ごとのコマ送り（TDA。素材パック assets_src/chars の anims を引く） | TDA |
+| 94 | `js/td/view.js` | 29 | TD の戦闘画面（TD）：横スクロールの戦場・上下の帯・手札・ユニットの窓・リザルト。ロジックは js/td/sim.js（TDS） | TD |
+| 95 | `js/td/guide.js` | 5 | TD の字を使わない導き（GUIDE）の正本：最初の 1〜2 面で、光る指・脈打つ輪・矢印だけで操作を順に示す | GUIDE |
+| 96 | `js/td/menu.js` | 15 | TD の章の地図・出撃準備・会話・仲間の加入（TDM）。戦闘画面は js/td/view.js（TD） | TDM |
+| 97 | `js/ui/home.js` | 4 | ホーム画面（灯都ルミナス）の正本：TD「防衛」を主役にした重ね表示 | HOME |
+| 98 | `js/ui/unit.js` | 13 | 仲間の画面（UNIT）：TD 用の一覧＋1 人の詳細。Lv・技 5 つ・奥義・アビリティ 3 つ・装備・星盤をここにまとめる | UNIT |
+| 99 | `js/ui/zukan.js` | 3 | 図鑑の一覧（ZKUI）：敵・仲間・装備の全画面の一覧。ver0.54 新規 | ZKUI |
+| 100 | `js/ui/dev.js` | 4 | 開発者モードの正本（タイトルの「開発者モード」・ホームの ≡ の DEV） | DEVUI |
 
 ## 上書きの連鎖（2 ファイル以上で定義・上書きされる関数）
 
@@ -146,6 +147,7 @@
 | `enterTown` | town.js → ch8.js → ver18-town.js |
 | `exprFace` | ch9.js → ver19-art.js → sprite/spx.js |
 | `gainXP` | engine.js → v31/core.js → ui/growth.js |
+| `hand` | sprite/legacy/px-enemy.js → td/fx-celes.js → td/fx-celes-ult.js |
 | `has` | sprite/facing.js → td/sim.js → td/uanim.js |
 | `hide` | ui/inv.js → td/view.js → td/guide.js |
 | `itemIcon` | ch3.js → v21-art.js → v31/items.js |
@@ -158,10 +160,12 @@
 | `portrait` | ver18-art.js → ver19-art.js → sprite/spx.js |
 | `put` | ver16.js → items/icons36.js → td/uanim.js |
 | `render` | v21-items.js → items/icons36.js → td/skicon.js |
+| `reset` | td/fxkit.js → td/fx-celes-ult.js → td/fx.js |
 | `rewards` | engine.js → rs/mastery.js → ui/growth.js |
 | `royalItem` | ch5.js → v31/items.js → data/resist.js |
 | `sparks` | v21-items.js → td/fxkit.js → td/fx.js |
 | `tick` | motion/anim.js → td/sim.js → td/hud.js |
+| `ult` | td/sim.js → td/fx-celes-ult.js → td/fx.js |
 | `ATK` | engine.js → v38/core.js |
 | `BCH` | items.js → v21.js |
 | `INF` | v31/core.js → rs/core.js |
@@ -196,7 +200,6 @@
 | `flask` | ver18-art.js → v21-art.js |
 | `follow` | td/sim.js → td/view.js |
 | `fuQ` | v20-battle.js → v31/board.js |
-| `hand` | sprite/legacy/px-enemy.js → td/fx-celes.js |
 | `hash` | td/fx.js → td/skicon.js |
 | `healAll` | field.js → v38/core.js |
 | `hex` | sprite/spx.js → items/icons36.js |
@@ -228,7 +231,6 @@
 | `power` | ver17.js → v31/board.js |
 | `ramp` | sprite/legacy/dot.js → sprite/legacy/px.js |
 | `reg` | sprite/legacy/dot-rig.js → ui/keywords.js |
-| `reset` | td/fxkit.js → td/fx.js |
 | `result` | ui/inv.js → td/view.js |
 | `rgb` | td/fxkit.js → td/skicon.js |
 | `rgb2hsl` | sprite/legacy/dot.js → v31/enemies.js |
@@ -238,6 +240,7 @@
 | `set` | sprite/facing.js → td/hud.js |
 | `shade` | items.js → items/icons36.js |
 | `shadow` | v21-items.js → items/icons36.js |
+| `shk` | td/fx-celes-ult.js → td/fx.js |
 | `skillList` | items.js → rs/core.js |
 | `smith` | town.js → ui/smith.js |
 | `sprite` | td/fxkit.js → td/view.js |
@@ -253,7 +256,6 @@
 | `title` | town.js → v38/menu.js |
 | `toast` | v22.js → ui/smith.js |
 | `toggle` | sprite/facing.js → td/sfx.js |
-| `ult` | td/sim.js → td/fx.js |
 | `wbase` | items.js → ch8.js |
 | `whiteOf` | sprite/legacy/dot.js → ver16.js |
 | `zimg` | ch9.js → v31/enemies.js |
