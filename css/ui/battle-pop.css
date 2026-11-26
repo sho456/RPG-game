@@ -1,0 +1,48 @@
+/* ===== 戦闘中の表示の枠（js/ui/battle-pop.js と対。決まりは docs/BATTLE-FLOW.md） =====
+ 3 段：1 段目＝Critical・Weak＋属性の漢字／2 段目＝強化・弱体（横並び）＋アビリティ名の行／3 段目＝数字。敵・味方とも中央揃え */
+#bp46{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:7}
+.bp46{position:absolute;left:0;top:0;display:none;flex-direction:column;gap:0;will-change:transform,opacity}
+.bp46.on{display:flex}
+.bp46.e,.bp46.h{align-items:center}
+.bp46>div{justify-content:center}
+.bp46>div{display:flex;align-items:flex-end;gap:3px;white-space:nowrap}
+.bp46>div:empty{display:none}
+.bp46 canvas{display:block}
+.bp46.out{animation:out46 .18s ease-in forwards}
+/* 出る動き：枠ごと少し大きく現れて落ち着く／消える動き：上へ少し浮いて薄くなる */
+.bp46.in{animation:in46 .2s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes in46{0%{opacity:0;scale:1.15}100%{opacity:1;scale:1}}
+@keyframes out46{0%{opacity:1;translate:0 0}100%{opacity:0;translate:0 -14px}}
+/* 1 段目：見出しと漢字は同時に叩きつける */
+.bp46 .r0,.bp46 .r1{gap:5px;margin-bottom:2px}
+.bp46 .lb{display:flex;align-items:flex-end;gap:2px}
+.bp46 .lb canvas{transform-origin:50% 70%;animation:sl43 .42s cubic-bezier(.25,.9,.3,1) both}
+.bp46 .lb .kj{position:relative;top:1px}
+/* 2 段目：状態の文字。小さく弾んで出る */
+.bp46 .r2,.bp46 .r2b{gap:4px;margin:0 0 3px}
+.bp46 .st{animation:st46 .26s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes st46{0%{opacity:0;transform:translateY(12px) scale(.5)}55%{opacity:1;transform:translateY(-3px) scale(1.15)}100%{opacity:1;transform:none}}
+/* 3 段目：数字。新しい数字は 1 桁ずつ右から落ち、前の数字は素早く消える */
+.bp46 .r3{position:relative;min-height:1em}
+.bp46 .nm{display:inline-flex;align-items:flex-end}
+.bp46 .nm.dg canvas{transform-origin:50% 100%;animation:dg43 .36s cubic-bezier(.25,.8,.35,1) both}
+.bp46 .nm.old{position:absolute;bottom:0;opacity:0;transition:opacity .14s ease-out}
+.bp46 .nm.old{left:50%;transform:translateX(-50%)}
+/* 数字の枠が出ている味方は HP・BP を隠す */
+#hl24 .hl.p46{opacity:0!important;transition:opacity .12s}
+@media (prefers-reduced-motion:reduce){.bp46 canvas,.bp46 .st{animation:none!important}}
+
+/* ver0.46e 動き（ロマサガRS の録画）：
+   見出し＝叩きつけ＋光の筋が横に走る／数字＝1 桁ずつ落ちる＋ヒットごとに数字全体が跳ねて揺れる／回復＝下から浮き上がる */
+.bp46 .lb{position:relative}
+.bp46 .lb::before{content:'';position:absolute;left:-25%;right:-25%;top:50%;height:2px;z-index:2;pointer-events:none;background:linear-gradient(90deg,rgba(255,255,255,0),#fff 45%,#fff 55%,rgba(255,255,255,0));
+ box-shadow:0 0 6px 1px rgba(255,235,170,.9);animation:ls43 .45s ease-out .06s both}
+.bp46 .lb.wk::before{box-shadow:0 0 6px 1px rgba(255,140,120,.95)}.bp46 .lb.rs::before{box-shadow:0 0 6px 1px rgba(140,190,255,.95)}
+.bp46 .r3.hit{animation:hit46 .26s cubic-bezier(.2,1.6,.4,1)}
+@keyframes hit46{0%{transform:scale(1.28) translateX(-3px)}35%{transform:scale(.94) translateX(2px)}65%{transform:scale(1.04) translateX(-1px)}100%{transform:none}}
+.bp46 .r3 .nm:not(.dg) canvas{animation:up46 .32s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes up46{0%{opacity:0;transform:translateY(10px) scale(.8)}100%{opacity:1;transform:none}}
+#app.v38.in38[data-sc="battle"] #bp46{translate:0 var(--sl38);transition:translate .42s var(--ez38)}
+#app.v38[data-sc="battle"] #bp46{transition:translate .5s var(--ez38)}
+@media (prefers-reduced-motion:reduce){.bp46 .r3.hit,.bp46 .lb::before{animation:none!important}}
+/* HP・BP（キャラの中央）：ver0.48 で弾む動き、続けて薄い黒の下地も外した */

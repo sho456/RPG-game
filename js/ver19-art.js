@@ -60,5 +60,5 @@ exprFace=function(id,ex='n'){const key=id+':'+ex;if(EXC19[key])return EXC19[key]
  if(ex==='o'){M(18,2,2,5,'#ffe27a');M(18,8,2,2,'#ffe27a');M(17,2,1,5,'#a07a20');}
  return EXC19[key]=c.toDataURL();};
 /* 古い16×16の顔データを捨てる（キャッシュ済みの画面が残らないように） */
-
-return{};})();
+try{for(const k in FACE18)delete FACE18[k];for(const k in ART18)delete ART18[k];if(typeof ARTC!=='undefined')for(const k in ARTC)delete ARTC[k];if(typeof EXC!=='undefined')for(const k in EXC)delete EXC[k];}catch(e){}
+return{look,frame,headCanvas,walkPose};})();

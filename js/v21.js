@@ -5,7 +5,7 @@
  4. 編成：カードに立ち姿を戻し、名前・職業・数値が重ならない配置に
  5. 星詠み（星盤）：画面の高さから盤面の大きさを決め、操作ボタンまでスクロールなしで収める
  6. 横スクロール：はみ出しの原因（負の余白）を直し、縦スクロール専用の領域は横に動かないように */
-
+'use strict';
 const VER21='ver0.21';
 const V21=(()=>{
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -25,7 +25,7 @@ fit=function(){const sw=Math.max(1,Math.floor(Math.min(innerWidth,480)/W));let s
 /* ホーム：下のナビまで必ず見えるように、街の絵の高さを縮める */
 function homeFit(){if(scene!=='town'||TSC!=='home')return;const c=$('#cmd');if(!c.classList.contains('home20'))return;
  const over=c.scrollHeight-c.clientHeight;if(over>1){const nh=clamp(H-Math.ceil(over/SC),104,H);if(nh!==H)setH(nh);}}
-
+{const _tm=townMenu;townMenu=function(m){_tm(m);try{homeFit();}catch(e){console.error(e);}};}
 addEventListener('resize',()=>{try{if(scene==='town'&&TSC==='home')requestAnimationFrame(homeFit);if(scene==='board')requestAnimationFrame(boardFit);}catch(e){}});
 
 /* ==================== 2・3. 戦闘：狙っている敵の情報とボスの複数HPゲージ ==================== */
@@ -65,8 +65,12 @@ function frame(){if(!B||scene!=='battle'){if(EL)EL.style.display='none';return;}
  if(y<2){y=2;up=false;}y=Math.min(y,SH-h-2);const ax=clamp(hd.x-x,10,w-10);
  const tf=`translate(${Math.round(x)}px,${Math.round(y)}px)`;if(el._tf!==tf){el._tf=tf;el.style.transform=tf;}el.style.setProperty('--ax',Math.round(ax)+'px');el.classList.toggle('up',up);}
 {const _d=draw;draw=function(){_d();try{frame();}catch(e){if(!frame._e){frame._e=1;console.error(e);}}};}
+{const _sb=startBattle;startBattle=function(list,opts){if(EL){EL.remove();EL=null;}return _sb(list,opts);};}
 
 /* ==================== 4. 編成 ==================== */
+{const _ps=partyScreen;partyScreen=function(m){_ps(m);try{document.querySelectorAll('#cmd .pcd').forEach(cd=>{const lv=cd.querySelector('.plv'),nm=cd.querySelector('.pnm');
+  if(lv&&!lv.dataset.v21){lv.dataset.v21=1;const t=lv.textContent.split('　');lv.innerHTML=`<b>${t[0]}</b><span>${t.slice(1).join(' ')}</span>`;lv.title=t.join(' ');}
+  if(nm&&!nm.dataset.v21){nm.dataset.v21=1;const ic=nm.querySelector('.elc'),tx=nm.textContent.replace(ic?ic.textContent:'','');nm.innerHTML='';if(ic)nm.appendChild(ic);const s=document.createElement('span');s.textContent=tx;nm.appendChild(s);nm.title=tx;}});}catch(e){console.error(e);}};}
 
 /* ==================== 5. 星詠み（星盤） ==================== */
 let BCH21=0;
@@ -76,13 +80,33 @@ function boardFit(){if(scene!=='board')return;const c=$('#cmd'),m=$('#msg'),cs=g
  for(const k of c.children){const s=getComputedStyle(k);need+=k.offsetHeight+px(s.marginTop)+px(s.marginBottom);}
  const ms=getComputedStyle(m),msgH=m.offsetHeight+px(ms.marginTop)+px(ms.marginBottom),h=clamp(Math.floor(contentH()-msgH-need-4),250,224*SC+90);
  if(h!==BCH21){BCH21=h;fit();}}
-
+{const _bm=boardMenu;boardMenu=function(m){_bm(m);try{boardFit();}catch(e){console.error(e);}};}
 {const _ob=openBoard;openBoard=function(id,m){BCH21=0;return _ob(id,m);};}
 
 /* ==================== 版表示 ==================== */
-
+{const _t=title;title=function(){_t();const v=$('#verL');if(v)v.textContent=VER21;};const v=$('#verL');if(v)v.textContent=VER21;}
 try{document.title='アストラル・ブレイカー '+VER21;}catch(e){}
 
-return{barState,contentH,boardFit};})();
+return{barsOf,barState,contentH,homeFit,boardFit,frame};})();
 /* ==================== 開発者メニュー：ver0.21 の確認 ==================== */
-
+const WNAME={sword:['剣','rio'],gsword:['大剣','gald'],tome:['魔導書','mire'],dual:['双剣','shion'],staff:['杖','noah'],bow:['弓','erna'],axe:['斧','balza'],scythe:['大鎌','crow'],fist:['手甲','hakua'],claw:['爪','jin'],glass:['砂時計','celes'],dsword:['竜剣','valk']};
+const ANAME={shield:'小盾',helm:'兜',band:'額当て',armor:'鎧'};
+const ONAME={charm:'灯の護符',ring_life:'生命の指輪',ring_wind:'疾風の指輪',neck_mag:'魔石の首飾り',neck_sand:'星砂の首飾り'};
+function design21Name(k){const[a,b]=k.split('_');if(WNAME[a]&&b)return[`${b}の${WNAME[a][0]}`,HB[WNAME[a][1]]?HB[WNAME[a][1]].name+'専用':'武器'];if(ANAME[a]&&b)return[`${b}の${ANAME[a]}`,'防具'];
+ if(k.startsWith('L_')){const L=LEG[k.slice(2)];return L?[L.n,L.uq?'専用ユニーク':'レジェンド']:[k,''];}if(k.startsWith('S_royal_')){return[ROYAL[k.slice(8)]||k,'王家セット'];}
+ if(ONAME[k])return[ONAME[k],k==='charm'?'副装備':'装飾品'];if(ITEMS[k])return[ITEMS[k].n,'道具'];if(MATS[k])return[MATS[k].n,'素材'];if(k.startsWith('st_')&&STONES[k.slice(3)])return[STONES[k.slice(3)].n,'宝石'];return[k,''];}
+function dev21(m){log((m||'<b>ver0.21</b>　装備・道具の新しいドット絵と、戦闘の敵HP表示を確認できる')+goldTxt());
+ menu([{l:'装備・道具のデザイン一覧',s:Object.keys(IC21.DES).length+'種（タップで名前）',cls:'ready',f:()=>gallery21()},
+  {l:'敵3体と戦う',s:'狙った敵の頭上にだけHPを表示',f:()=>devBattle([{kind:'slime',lv:8},{kind:'wolf',lv:8},{kind:'slime',lv:8}],'haido',{boss:false})},
+  {l:'虚ろの番人',s:'ボス・HPゲージ'+V21.barsOf({boss:true,mhp:ED.boss.mhp,kind:'boss'})+'本',f:()=>devBattle([{kind:'boss',lv:5}],'haido')},
+  {l:'沈みし女王',s:'ボス・HPゲージ'+V21.barsOf({boss:true,mhp:ED.boss6.mhp,kind:'boss6'})+'本',f:()=>devBattle([{kind:'boss6',lv:37}],'ouito',{theme:'ruin'})},
+  {l:'黒炎竜ヴォルガノン',s:'ボス・HPゲージ'+V21.barsOf({boss:true,mhp:ED.boss9.mhp,kind:'boss9'})+'本',f:()=>devBattle([{kind:'boss9',lv:68}],'ryuu')},
+  {l:'戻る',cls:'back',f:()=>dvMenu()}],true);}
+let G21='all';
+function gallery21(){const ks=Object.keys(IC21.DES),cat=k=>{const n=design21Name(k)[1];return/専用|武器|レジェンド|ユニーク/.test(n)&&!/^L_(hoshikuzu|kagerou|gyokuza|kiseki|senkou|koukagari|futago)$/.test(k)?'w':/防具|副装備|王家|^L_(hoshikuzu|kagerou|gyokuza)$/.test(n+k)?'a':/装飾|^L_(kiseki|senkou|koukagari|futago)$/.test(n+k)?'c':'i';};
+ const tabs=[['all','全部'],['w','武器'],['a','防具'],['c','装飾'],['i','道具・素材']],list=ks.filter(k=>G21==='all'||cat(k)===G21);
+ log(`<b>装備・道具のデザイン</b>　${list.length}種　タップで名前`);
+ panel(`<div class="stabs">${tabs.map(([k,l])=>`<button class="${G21===k?'on':''}" data-a="t" data-v="${k}">${l}</button>`).join('')}</div>
+  <div class="igrid g21">${list.map(k=>{const[n]=design21Name(k),r=k.startsWith('L_')?4:k.startsWith('S_')?3:/星鋼/.test(k)?2:/鋼/.test(k)?1:0;return`<div class="itile r${r}" data-a="i" data-v="${k}"><img src="${IC21.render(k,r)}"><small>${n}</small></div>`;}).join('')}</div>
+  <button class="tbtn back wide" data-a="back">戻る</button>`,{t:v=>{G21=v;gallery21();},i:k=>{const[n,s]=design21Name(k);log(`<b>${n}</b>　<small>${s}</small>`);},back:()=>dev21()});}
+{const _dv=dvMenu;dvMenu=function(m){_dv(m);try{addCmd('ver0.21 装備デザイン・戦闘表示','全装備・道具の新デザイン一覧／ボスの複数HPゲージ',dev21,0,'ready');}catch(e){}};}

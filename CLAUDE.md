@@ -21,7 +21,7 @@
   画面名：`home home-sheet td-map td-prep cb-battle unit unit-detail unit-sheet board board-sel board-up board-up-lock equip-info smith growth inv zukan`。
   `SCROLL=1` で下の欄を最後までスクロールした画面（`_2.png`）も撮る。
   画像は scratchpad に出し、必要な部分だけ切り抜いて見る（PIL で crop / 横並び）。スクショは 1 枚ずつより、まとめて 1 枚に並べると安い。
-- **壊れていないか**：`node tools/smoke.js --quick`（タイトル→ホーム→各ボタン→全ステージの `CBE.run`（AUTO）→出撃準備と出撃（技を選んで戦う）→仲間画面→図鑑。エラー 0 が合格）。戦闘画面を触ったら `--fx`（コマンド戦闘を ×2・AUTO で最後まで）も。長いので `run_in_background` で回して、その間に他の作業をする。サーバーのポートが 8765 以外なら `--url`。
+- **壊れていないか**：`node tools/smoke.js --quick`（タイトル→ホーム→各ボタン→全ステージの WAVE の確認→出撃準備と出撃（旧戦闘で技を選び AUTO）→仲間画面→図鑑。エラー 0 が合格）。戦闘を触ったら `--fx`（旧戦闘を AUTO で結果まで）も。長いので `run_in_background` で回して、その間に他の作業をする。サーバーのポートが 8765 以外なら `--url`。
 
 ## 2. 画面 → 正本のファイル
 
@@ -43,18 +43,18 @@
 | 用語・耐性 | `js/data/terms.js`（`TERMS`） | — |
 | 強化メニュー（経験値のストック・レベルアップ・旧酒場の統合） | `js/ui/growth.js`（`GROW`） | `css/ui/growth.css` |
 | 版表示・お知らせ | `js/v38/menu.js`（`VER` `NEWS`） | — |
-| **コマンド戦闘**（ver0.60。2D-HD のターン制。入口＝ホームの「出撃」→章のステージ→出撃準備（4 人）） | 進行 `js/cb/engine.js`（`CBE`。BP・LP・技と術・アビリティ・星臨・奥義・敵の AI・WAVE の読み替え）・敵の補正 `js/cb/tune.js`（`CBT`）・画面と振り付けとカメラ `js/cb/view.js`（`CB`）・操作盤 `js/cb/hud.js`（`CBH`）・章の地図/出撃準備/会話/精算 `js/td/menu.js`（`TDM`）・章とステージ `js/td/stages.js`・背景 `js/td/bg.js`（`TDBG`）・技ごとの演出 `js/td/fx.js`（`TDFX`）・効果音と BGM `js/td/sfx.js`・技のアイコン `js/td/skicon.js`（`TDI`）。計測 `tools/cb_sim.js`（`--tune`）。設計 `docs/CB-DESIGN.md` | `css/ui/cb.css`（地図と出撃準備は `css/ui/td.css`） |
+| **戦闘**（ver0.63 で ver0.49 のロマサガRS風の戦闘に戻した。入口＝ホームの「出撃」→章のステージ→出撃準備（4 人）） | ステージの WAVE の進行・結果・背景 `js/battle/stage.js`（`STG`）。戦闘そのものは旧の上書きの連鎖（`startBattle` `doAction` `hit` `end` … `python3 tools/codemap.py 関数名` で正本を引く。主に `js/rs/battle.js`・`js/rs/ui.js`・`js/v38/battle-ui.js`・`js/battle/*`・`js/ui/battle-pop.js`・`js/v20-battle.js`・`js/v24.js`・`js/v25.js`）。技・術・アビリティ・陣形は `js/rs/data.js`・`js/rs/core.js`（ver0.49 の版）。セレスだけ今のコマ送りと演出 `js/battle/celes.js`（`CEL`。`V19.dr` で TDA、doAction/hit/awaken で TDFX・FXC・FXU）。章の地図/出撃準備/会話/精算 `js/td/menu.js`（`TDM`）・章とステージ `js/td/stages.js` | `css/v24.css` `css/v25.css` `css/battle.css` `css/ui/battle-*.css` `css/ui/damage.css`（地図と出撃準備は `css/ui/td.css`） |
 | **ホーム**（ver0.52。「出撃」が主役・下のタブ 4 つ・≡ のシート） | `js/ui/home.js`（`HOME`。v22 の townMenu の重ね表示 .h22 を置き換え。背景の街の絵は v22 drawHome のまま） | `css/ui/home.css` |
 | **仲間**（ver0.52。一覧＋1 人の詳細で Lv・技の練達・装備・星盤をまとめる。ver0.60 からコマンド戦闘の能力） | `js/ui/unit.js`（`UNIT.open(id, 戻り先)`）。能力は本編の `stats(id)`、奥義の位階は `TDD.hero(...).ult` | `css/ui/unit.css` |
 | **仲間のコマ送り・エフェクト**（ver0.59。まずセレス。コマンド戦闘でもそのまま使う） | 状態→アニメ・再生ロック・表示用の向き・整数倍の描画・焼き込み fx 層 `js/td/uanim.js`（`TDA`。u.actK/actT/hitT/awT/mv を見る）。光と粒の共通部品 `js/td/fxkit.js`（`FXK`）。セレスの通常攻撃・技 `js/td/fx-celes.js`（`FXC`）、星臨・奥義 `js/td/fx-celes-ult.js`（`FXU`）。素材：原画 `assets_src/pixel-art/celes-hd/src/master/`（PixelLab のシートは `pl/`）→ `import_pl.py` → `assets_src/chars/celes/` → `python3 tools/spx_import.py build celes`（パック `celes_hd`・`celes_hd_fx`） | — |
 | デザイントークン（新しい画面はこれ以外の色・角・影を使わない） | — | `css/ui/tokens.css` |
 
-**ver0.62（2026-11-26）**：戦闘の操作盤をロマサガRS風に（`js/cb/hud.js`：上＝TURN・TARGET の敵と 8 属性の弱点、下＝仲間の HP/LP/BP と技の一覧・戻る/AUTO通常/AUTO全力/リピート、行動中は行動順の帯と仲間 4 人）。キャンバスは下の盤より上だけ。敵の行動は赤の札・照準・縁。演出の例外で画面が固まる不具合を修正（`fx-celes.js` の `st.fields`・FXK/TDFX/view の守り）。背景 `js/td/bg.js` を 8 テーマ描き込み。
-**引き継ぎ（2026-11-26・ver0.60）**：タワーディフェンスをやめ、2D-HD のコマンド戦闘に移した（`docs/CB-DESIGN.md`）。TD の戦闘画面・ロジック（`js/td/sim.js` `view.js` `hud.js` `guide.js`・`tools/td_sim.js`）は削除。次の作業：セレス以外の仲間のコマ送り（PixelLab）と固有の演出、敵の行動の演出、技の説明を長押しで、旧コードの整理（dot-mon/dot-rig/ver19-art・v20-battle・v22 の旧 HUD など）。
+**ver0.63（2026-11-26）**：戦闘をユーザーの指示で ver0.49（git `7bbc626`）のロマサガRS風に戻した。旧戦闘を消した 3 コミット（187346e・82ce1c4・bb0d361）の差分を今のファイルに 3-way で戻し、`js/rs/*`・`js/awaken.js` は 0.49 の版。コマンド戦闘（`js/cb/*`・ver0.60〜0.62）は削除。旧開発者メニューの上書きの受け皿 `dvMenu`・`devGear` は `js/core.js`。
+**次の作業**：セレス以外の仲間を今のコマ送りにするなら `js/battle/celes.js` の `ID` を広げる（TDA の素材が要る）。旧戦闘の演出の知見はスキル `rs-battle-flow` `rs-battle-fx` `rpg-hero-motion`。
 旧コードの整理の道具：`node tools/smoke.js --cov cov.json`（一度も呼ばれなかった関数）→ `python3 tools/deadcode.py cov.json`（ファイルごとの候補）・`python3 tools/prune.py cov.json [--apply]`（名前でも参照されない宣言を消す）。smoke が通らない画面の関数も 0 回になるので、消す前に画面で確かめる。
-現在地と次の作業は `docs/CB-DESIGN.md` と上の引き継ぎ。
+現在地は上の ver0.63 の行。`docs/CB-DESIGN.md` は削除したコマンド戦闘（ver0.60〜0.62）の記録。
 
-**方針（2026-11-26）：タワーディフェンス → 2D-HD のコマンド RPG へ移行**（ver0.60。縦画面・マップなし・章のステージを選んで戦う）。ファイル名の `td` は章・ステージ・演出の部品として残っている（`TDD` `TDM` `TDFX` `TDA` など）。戦闘の作業は `js/cb/` と `docs/CB-DESIGN.md` に。古い版ファイル（ver16〜v38）には、ホーム・図鑑・持ち物・鑑定・鍛冶・星盤・セーブが使う部分だけが残っている（旧画面の入口は `js/ui/party.js` で仲間画面へ）。
+**方針（2026-11-26）**：タワーディフェンス（ver0.50〜0.59）→ コマンド戦闘（ver0.60〜0.62）を経て、ver0.63 で戦闘は ver0.49 の旧戦闘に戻した。ファイル名の `td` は章・ステージ・セレスの演出の部品として残っている（`TDD` `TDM` `TDFX` `TDA` など）。
 
 戦闘システムの詳細は `docs/RS-SYSTEM.md`、素材は `docs/ASSETS.md` `docs/PIPELINE.md`、演出は `docs/FX.md`。
 

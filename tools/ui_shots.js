@@ -23,7 +23,7 @@ const want = n => !only.length || only.includes(n);
     G.td = G.td || {c: {}};G.td.c = G.td.c || {};G.td.v = 1;for (const id of TDD.ORDER) G.td.c[id] = 1;G.xpStock = 99999;
     for (let i = 0; i < 8; i++) G.inv.push(genItem(40, 1 + (i % 4), 0, null, 2 + (i % 3)));
     document.querySelector('#ov').classList.add('hide');townMenu();});
-  const HOME = () => {try {ovClose();} catch (e) {}try {CB.hide();} catch (e) {}for (const s of ['#unit', '#tdm']) {const u = document.querySelector(s);u && u.classList.add('hide');}townMenu();};
+  const HOME = () => {try {ovClose();} catch (e) {}try {CB.hide();} catch (e) {}for (const s of ['#unit', '#tdm', '#grow']) {const u = document.querySelector(s);u && u.classList.add('hide');}townMenu();};
   const shot = async (n, fn, ms = 600) => {if (!want(n)) return;try {await p.evaluate(HOME);await p.evaluate(fn);} catch (e) {errs.push(n + ': ' + String(e.message).split('\n')[0]);}
     await p.waitForTimeout(ms);
     /* SCROLL=1：スクロールする欄（#unit・#tdm）を最後までスクロールした画面も撮る（_2.png） */

@@ -5,7 +5,7 @@
  ・版表示・お知らせ・遊び方 */
 'use strict';
 const V38M=(()=>{
-const VER='ver0.62';
+const VER='ver0.63';
 const app=$('#app');
 /* ---------- ホーム ---------- */
 {const _tm=townMenu;townMenu=function(m){_tm(m);try{const L=$('#labels');if(!L)return;const left=L.querySelector('.h22left');if(left)left.remove();
@@ -19,7 +19,10 @@ const app=$('#app');
   SACT.ret38=()=>{try{V31Q.retreat();}catch(e){console.error(e);}};}catch(e){console.error(e);}};}
 
 /* ---------- 版表示・お知らせ・遊び方 ---------- */
-const NEWS=`<div class="nt n38"><b>${VER}</b>　戦闘画面をロマサガRS風に作り直し・フリーズを修正・背景を一新<br><small>`+
+const NEWS=`<div class="nt n38"><b>${VER}</b>　戦闘を ver0.49 のロマサガRS風に戻した<br><small>`+
+ `・戦闘の画面・操作（技の一覧と ⓘ・道具・交代・AUTO通常/全力・リピート）・演出・技と術・アビリティ・ひらめき・陣形を ver0.49 のものに<br>`+
+ `・章のステージから出撃すると、WAVE ごとに旧戦闘で戦い、最後に星と報酬<br>`+
+ `・セレスは今のドット絵のコマ送りと技・星臨・奥義の演出のまま。背景は 8 つの章の描き込んだ景色<br></small></div><div class="nt"><b>ver0.62</b>　戦闘画面をロマサガRS風に作り直し・フリーズを修正・背景を一新<br><small>`+
  `・上に TURN と狙っている敵（名前・HP・8 属性の弱点と耐性。当てると分かる）、下に選んでいる仲間の HP・LP・BP と技の一覧<br>`+
  `・戻る／AUTO通常（星臨は温存）／AUTO全力（星臨と奥義も）／リピート（前のターンと同じ行動）<br>`+
  `・行動中は行動順の顔の帯。敵の行動は赤い札・赤い照準・画面の縁が赤く、狙われた仲間の欄が点滅<br>`+

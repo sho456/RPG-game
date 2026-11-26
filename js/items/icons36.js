@@ -4,7 +4,7 @@
  ・輪郭は、隣の部品のいちばん暗い色（黒一色にしない）。レアリティが高いと光の縁取りときらめき
  ・道具・素材・宝石のアイコンは今まで（js/v21-items.js の IC21）のまま。ここで定義した名前だけ差し替える
  絵はすべてコードで描いている（画像生成は使っていない） */
-
+'use strict';
 const IC36=(()=>{
 const N=32;
 /* ---------- 色（明るい → 暗い の 5 段。0 は光の当たる角、4 は輪郭） ---------- */
@@ -309,4 +309,4 @@ if(typeof IC21!=='undefined'){const _r=IC21.render,_s=IC21.shadow;
  for(const k in DES)if(!IC21.DES[k])IC21.DES[k]=IC21.DES[k.replace(/^L_/,'')]||IC21.DES['armor_鉄'];
  IC21.render=function(key,rar){if(DES[key]){try{return render(key,rar);}catch(e){console.error('IC36',key,e);}}return _r.apply(this,arguments);};
  IC21.shadow=function(key){if(DES[key]){try{return shadow(key);}catch(e){console.error('IC36',key,e);}}return _s.apply(this,arguments);};}
-return{};})();
+return{N,P,TIER,DES,W,A,render,shadow,build,keys:()=>Object.keys(DES)};})();

@@ -6,7 +6,7 @@ ITYPE.unshift(['外套','armor']);
 Object.assign(SK,{kazemai:{n:'疾風の舞',sp:20,k:'haste',t:'self',d:'味方全員の次の手番を早める'},ouen:{n:'応援の舞',sp:25,k:'cheer',t:'self',d:'味方全員のAG+15'},
  megumi:{n:'星の恵み',sp:25,k:'grace',t:'ally',d:'味方1人のAG+40'},hoshiyomi:{n:'星読み',sp:15,k:'scan',t:'self',d:'敵全体の弱点をすべて暴く'}});
 /* --- 天への塔 --- */
-
+const G_TOWER_DEF={cp:1,cur:1};
 const TMOBS=['raiwolf','golemkin','onimusha','drowned','jelly','snowwolf','darkknight','shade','yukirei','minerghost','iceslime','waterslime'];
 ED.tower10=Object.assign({},ED.golemboss,{name:'塔の番兵',mhp:9800,atk:430,mag:300,def:96,res:60,ilv:42});
 ED.tower20=Object.assign({},ED.boss5,{name:'天狐の残照',mhp:14000,atk:360,mag:420,def:96,res:96,ilv:46});
@@ -25,6 +25,8 @@ function makeTowerArea(f){const lv=38+Math.floor(f*.4),map=genFloor(f),boss=f%10
  return{name:`天への塔 ${f}階`,map,lv:[lv,lv],groups:[0,1,2,3,4].map(i=>{const n=1+((f+i)%3);return Array.from({length:n},(_,j)=>TMOBS[(f*3+i*5+j*7)%TMOBS.length]);}),
   crew:[{loot:[lv,2]},{gold:3000+f*300},{loot:[lv,3]}],boss:boss?{kind:bk,lv}:null,bossKind:boss?()=>bk:null,bflag:boss?(f===30?'boss7':'tw'+f):'',theme:'tower',rec:`Lv${lv}`,
   intro:`<b>天への塔 ${f}階</b>――星空へ続く白亜の塔。${f%5===1?'（中継地点）':''}${boss?'<b>この階には番人がいる</b>。倒さないと階段は開かない。':'光る階段から上の階へ。'}`};}
-
-/* 未使用：js/v31/quests.js が置き換え */
+function towerMenu(){if(!G.tower)G.tower={...G_TOWER_DEF};const cps=[];for(let f=1;f<=G.tower.cp;f+=5)cps.push(f);
+ log(`<b>天への塔</b>　5階ごとの中継地点から挑める（最高到達：${G.tower.max||1}階）`+goldTxt());
+ menu([...cps.map(f=>({l:`${f}階から`,s:`推奨Lv${38+Math.floor(f*.4)}`,cls:f===cps[cps.length-1]?'ready':'',f:()=>enterTower(f)})),{l:'戻る',cls:'back',f:worldMap}],true);}
+function enterTower(){}/* 未使用：js/v31/quests.js が置き換え */
 const Q6=[{id:'q9',n:'天への塔',d:'星核の守護者を倒す',ok:()=>!!G.flags.boss7,pg:()=>G.flags.boss7?'達成':`最高${(G.tower&&G.tower.max)||0}階`,rw:'30000G・不死鳥の尾×3',give:()=>{G.gold+=30000;addItem('tail',3);}}];

@@ -1,7 +1,7 @@
 /* ===== 装備（ハクスラ） ===== */
 const RAR=[{n:'コモン',c:'#d8d8d8',m:1},{n:'アンコモン',c:'#6fdc7f',m:2},{n:'レア',c:'#6fb2ff',m:4},{n:'エピック',c:'#c08cff',m:8},{n:'レジェンド',c:'#ffa040',m:16}];
 const SLOTN={w:'武器',sub:'副装備',head:'頭',body:'体',acc1:'装飾1',acc2:'装飾2'};
-
+const SLOTS6=['w','sub','head','body','acc1','acc2'];
 const OPS={atkP:['攻撃','%',3,10],defP:['防御','%',3,10],magP:['魔力','%',3,10],resP:['精神','%',3,10],mhpP:['最大HP','%',4,12],spd:['素早さ','+',.3,1.2],
  crit:['会心率','%',2,8],weakDmg:['弱点ダメ','%',8,25],startAG:['開始時AG','+',8,25],awDmg:['星臨中与ダメ','%',8,30],spGain:['BP回復力','+',3,10],drop:['ドロップ率','%',3,10]};
 const LEG={koukagari:{n:'流星の後篝',slot:'acc',d:'星臨が解けるときAG50を残す'},shokei:{n:'処刑人の刃',slot:'w',who:'rio',d:'弱点を突いたときの与ダメ×1.3'},futago:{n:'双子星の首飾り',slot:'acc',d:'奥義の威力+30%'}};
@@ -18,14 +18,14 @@ function rollRar(minR,bonus){const r=Math.random()*100/(1+bonus);return Math.max
 function genItem(){}/* 未使用：js/v31/items.js が置き換え */
 function fixedItem(){}/* 未使用：js/v31/items.js が置き換え */
 const findItem=u=>G.inv.find(i=>i.uid===u);
-
+const nextM=id=>G.members[(G.members.indexOf(id)+1)%G.members.length];
 const eqBy=u=>G.members.find(id=>Object.values(G.h[id].eq).includes(u))||null;
 function itemBase(it){const o={};for(const k in it.base){const v=it.base[k]*(1+.1*it.plus);o[k]=k==='spd'?+v.toFixed(1):Math.round(v);}return o;}
 const opTxt=o=>o.k==='atkEl'?`攻撃が${o.v}属性`:`${OPS[o.k][0]}+${o.v}${OPS[o.k][1]==='%'?'%':''}`;
 const iname=it=>it.unid?`??? （${RAR[it.rar].n}・${SLOTN[it.slot]||'装飾'}）`:it.name+(it.plus?` +${it.plus}`:'');
 const ihtml=it=>ii(itemIcon(it),RAR[it.rar].c)+`<span style="color:${RAR[it.rar].c}">${it.lock?'🔒':''}${iname(it)}</span>`;
 const mainTxt=it=>Object.entries(itemBase(it)).map(([k,v])=>BN[k]+v).join(' ');
-
+const detailTxt=it=>it.unid?'未鑑定（街の鑑定屋で鑑定）':`${mainTxt(it)}${it.ops.length?'　'+it.ops.map(opTxt).join('・'):''}${it.sock&&it.sock.length?'　'+it.sock.map(k=>k?STONES[k].n:'◇').join(''):''}${it.leg?'<br><span style="color:#ffa040">★'+LEG[it.leg].d+'</span>':''}`;
 const price=it=>Math.round((8+it.ilv*6)*RAR[it.rar].m+it.plus*20);
 const W8={atkP:2,defP:1.5,magP:.4,resP:.8,mhpP:1.5,spd:8,crit:2,weakDmg:.8,startAG:.8,awDmg:.6,spGain:1,drop:.5};
 function score(it,id){if(it.unid)return-1e9;const b=itemBase(it);const mg=MAG(id);let s=(b.atk||0)*(mg?.15:1.2)+(b.def||0)+(b.res||0)*.6+(b.mag||0)*(mg?1.3:id==='rio'?.4:.1)+(b.mhp||0)*.15+(b.spd||0)*8;
@@ -36,7 +36,9 @@ function gear(id){const o={legs:[]};for(const s in G.h[id].eq){const it=G.h[id].
 function addLoot(it){if(G.set.autoSell&&it.rar===0&&!it.unid){G.gold+=price(it);return`<span style="color:#888">${it.name}（自動売却）</span>`;}
  if(G.inv.length>=invCap()){G.gold+=price(it);return`${iname(it)}（持ち物がいっぱいで売却）`;}G.inv.push(it);return ihtml(it);}
 function equip(id,slot,uid){const o=uid&&eqBy(uid);if(o)for(const s in G.h[o].eq)if(G.h[o].eq[s]===uid)G.h[o].eq[s]=null;G.h[id].eq[slot]=uid;}
-
+function bestEquip(id){for(const s of SLOTS6)G.h[id].eq[s]=null;
+ for(const s of SLOTS6){const used=new Set(G.members.flatMap(m=>Object.values(G.h[m].eq)));
+  const c=G.inv.filter(it=>canEq(it,id,s)&&!used.has(it.uid)).sort((a,b)=>score(b,id)-score(a,id))[0];if(c)G.h[id].eq[s]=c.uid;}}
 const DISM=[{haiseki:1},{haiseki:2},{kiba:1,haiseki:2},{kakera:1},{kakera:3}];
 function migrate(g){g.tower=g.tower||{cp:1,cur:1,max:0};g.tou=g.tou||0;g.fac=Object.assign({bar:1,smith:1,eye:1,shop:1,tower:1,store:1,garden:0},g.fac||{});g.garden=g.garden||{last:g.sorties||0,n:0};g.stones=g.stones||{};(g.inv||[]).forEach(i=>{if(!i.sock)i.sock=Array(i.rar>=3?2:i.rar>=2?1:0).fill(null);});g.members=g.members||['rio','gald'];g.party=g.party||['rio','gald'];g.inv=g.inv||[];g.uid=g.uid||0;g.set=g.set||{autoSell:false};g.sorties=g.sorties||0;G=g;
  for(const id of g.members){const h=g.h[id];h.board=h.board||['0,0'];h.jobs=h.jobs||{};h.pass=h.pass||[];if(h.job===undefined)h.job=null;if(!h.eq){h.eq={w:null,sub:null,head:null,body:null,acc1:null,acc2:null};
@@ -86,17 +88,17 @@ function canUnlock(id,k){const N=BOARD[id],n=N[k],U=G.h[id].board;if(!n||U.inclu
  return HEXD.some(([dq,dr])=>U.includes((n.q+dq)+','+(n.r+dr)));}
 function bonus(id){const o={},add=v=>{for(const k in v)o[k]=(o[k]||0)+v[k];};
  G.h[id].board.forEach(k=>{const n=BOARD[id][k];if(n&&n.v&&n.t!=='skill')add(n.v);});return o;}
-function skillList(){}
+function skillList(id){const h=G.h[id],s=[...HB[id].skills];h.board.forEach(k=>{const n=BOARD[id][k];if(n&&n.t==='skill')s.push(n.v);});return s;}
 function autoUnlock(id){let n=0;for(;;){const c=Object.keys(BOARD[id]).filter(k=>canUnlock(id,k)&&BOARD[id][k].cost<=ptsLeft(id));if(!c.length)break;
  const sc=k=>{const nd=BOARD[id][k];if(nd.t==='skill')return 25;if(nd.t==='aw')return 22;let s=0;for(const x in nd.v)s+=nd.v[x]*(W8[x]||1);return s/nd.cost;};
  c.sort((a,b)=>sc(b)-sc(a));G.h[id].board.push(c[0]);n++;}return n;}
 
 /* --- 星盤画面 --- */
 let BS={id:'rio',sel:null};
-const BSTAR=(()=>{const c=document.createElement('canvas');c.width=W;c.height=224;const g=c.getContext('2d'),R=rng(5);
- })();
+const BSTAR=(()=>{const c=document.createElement('canvas');c.width=W;c.height=224;const g=c.getContext('2d'),R=rng(5);g.fillStyle='#070914';g.fillRect(0,0,W,224);
+ for(let i=0;i<120;i++){g.fillStyle=['#2a3060','#3a4078','#8890c0','#fff'][R()*4|0];g.fillRect(R()*W|0,R()*224|0,1,1);}return c;})();
 const NCOL={core:'#fff3b0',stat:'#7fb6ff',skill:'#7dffa8',aw:'#ff7a7a',fork:'#c08cff'};
-
+const npos=n=>[90+13*Math.sqrt(3)*(n.q+n.r/2),H/2+13*1.5*n.r];
 const bcv=$('#bcv'),bctx=bcv.getContext('2d');
 const SHORT={atkP:'攻',defP:'防',mhpP:'HP',resP:'精',magP:'魔',spd:'速',crit:'会',weakDmg:'弱',startAG:'AG',awDmg:'覚',spGain:'BP'};
 const BGS=Array.from({length:90},(_,i)=>{const f=v=>v-Math.floor(v);return[f(Math.sin(i*99.7)*1e4),f(Math.sin(i*31.3)*1e4),f(Math.sin(i*7.1)*1e4)];});

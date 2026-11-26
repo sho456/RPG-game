@@ -26,4 +26,14 @@ AREAS.kouka={name:'東方の島・氷華の社',map:MAP5,lv:[24,30],groups:[['sn
  libGroups:[['onimusha'],['onimusha','yukirei'],['yukirei','yukirei'],['onimusha','onimusha']],crew:[{gold:4000},{loot:[27,2]},{item:'feather',n:3},{loot:[28,3]}],boss:{kind:'boss5',lv:30},bflag:'boss5',theme:'ice',rec:'推奨Lv24〜30',
  intro:'<b>第4章　東方の島</b>――雪に閉ざされた島。<b>氷の上は止まるまで滑る</b>。岩を目印に進もう。北の氷華の社に、星片を守る巫女がいるという。'};
 const Q4=[{id:'q7',n:'社の主',d:'氷華の妖狐を倒す',ok:()=>!!G.flags.boss5,pg:()=>G.flags.boss5?'達成':'未達成',rw:'8000G・不死鳥の羽×3',give:()=>{G.gold+=8000;addItem('feather',3);}}];
-
+function hakuaEvent(){F.pause=true;banner('ハクア','#bff4ff');
+ log('<b>ハクア</b>「あっ、お客さん！？ 社に来る人なんて何年ぶりだろ！」<br>「……そっか、空の穴を閉じに行くんだ。巫女の使命なんてガラじゃないけど――一緒に行かせて！ お腹すいたし！」');
+ menu([{l:'仲間にする',cls:'ready',f:()=>{G.flags.hakuaMet=1;newMember('hakua');SFX.aw();save();fieldMenu('<b>ハクアが仲間になった！</b>'+(G.party.includes('hakua')?'':'（控えに入った）'));renderPartyStatic();}},
+  {l:'今はやめる',f:()=>{G.flags.hakuaMet=1;G.declined=[...(G.declined||[]),'hakua'];save();fieldMenu('ハクア「えー！ じゃあ酒場で待ってるね！」');}}]);}
+function rhythm(){return new Promise(res=>{const ov=document.createElement('div');ov.className='rhy';ov.innerHTML='<div class="rt"></div><div class="rr"></div><div class="rc">0</div><div class="rl">TAP!</div>';$('#stage').appendChild(ov);
+ const P=640,t0=performance.now()+400,rr=ov.querySelector('.rr'),rc=ov.querySelector('.rc');let hits=0,last=-1,done=false;
+ const loop=now=>{if(done)return;const ph=(now-t0)/P,b=Math.floor(ph);if(b>=12){done=true;setTimeout(()=>{ov.remove();res(hits);},250);return;}
+  rr.style.transform=`translate(-50%,-50%) scale(${ph<0?2.6:2.6-1.8*(ph-b)})`;requestAnimationFrame(loop);};
+ ov.onpointerdown=e=>{e.preventDefault();const ph=(performance.now()-t0)/P,b=Math.floor(ph);if(ph<0||b===last||b>=12)return;last=b;const sc=2.6-1.8*(ph-b),ok=Math.abs(sc-1)<.24;
+  ov.classList.remove('ok','ng');void ov.offsetWidth;ov.classList.add(ok?'ok':'ng');if(ok){hits++;rc.textContent=hits;SFX.weak();}else SFX.sel();};
+ requestAnimationFrame(loop);});}

@@ -7,13 +7,13 @@
     名前付き装備は「固有の効果」を 1 つ持つ。装備Lv60・90 からは終盤専用の装備（星鉄・星銀・天極の系統）も出る
  4. 新しいレジェンド（主防具・副防具・装飾品・まだ持っていなかったキャラの武器）
  5. 終盤の付加能力：与ダメ・技の威力・会心ダメ・被ダメ軽減（装備Lv60以上で付く） */
-
+'use strict';
 const V31I=(()=>{
 const {GINF}=V31;
 /* ---------- 枠 ---------- */
 const NS=s=>s==='body'?'main':s==='head'?'sub':s;
-
-Object.assign(SLOTN,{w:'武器',main:'主防具',sub:'副防具',acc1:'装飾品1',acc2:'装飾品2'});
+SLOTS6.splice(0,SLOTS6.length,'w','main','sub','acc1','acc2');
+for(const k in SLOTN)delete SLOTN[k];Object.assign(SLOTN,{w:'武器',main:'主防具',sub:'副防具',acc1:'装飾品1',acc2:'装飾品2'});
 try{Object.assign(TERMS.EQUIP,{weapon:'武器',armor:'主防具',cloth:'副防具',acc:'装飾品'});
  Object.assign(TERMS.SLOT_CAT,{main:'armor',body:'armor',sub:'cloth',head:'cloth'});
  Object.assign(TERMS.SLOT_LABEL,{main:'主防具',sub:'副防具',body:'主防具',head:'副防具',acc1:'装飾品1',acc2:'装飾品2',acc:'装飾品'});}catch(e){}
@@ -85,7 +85,7 @@ const LPS={
  L_enjin:{n:'炉神の斧',d:LEG.enjin.d,out:(a,t,sk)=>sk&&sk.el==='熱'?1.4:1},
  L_juushin:{n:'獣神の爪',d:LEG.juushin.d,out:a=>a.hp<=a.mhp*.5?1.5:1,inc:t=>t.hp<=t.mhp*.5?.8:1}};
 Object.assign(V20.PS,LPS);
-
+{const _h=hero;hero=function(id){const u=_h(id);try{u.ps20=u.ps20||[];for(const l of u.legs||[])if(LPS['L_'+l]&&!u.ps20.some(p=>p.id==='L_'+l))u.ps20.push({id:'L_'+l,v:0});}catch(e){console.error(e);}return u;};}
 /* 能力値に効くレジェンド（画面の数値にも出す） */
 {const _s=stats;stats=function(id){const o=_s(id),L=o.legs||[];
  if(L.includes('tengan')){o.crit+=15;o.critDmg=(o.critDmg||0)+50;}if(L.includes('shuuen'))o.dmgP=(o.dmgP||0)+20;if(L.includes('seishin'))o.skDmg=(o.skDmg||0)+30;
@@ -131,6 +131,7 @@ royalItem=function(slot,ilv){slot=slot==='head'?'crown':NS(slot);const R=ROY[slo
  for(let i=0;i<3;i++){const av=Object.keys(OPS).filter(k=>!LATE.has(k)&&!it.ops.some(o=>o.k===k)),k=pick(av),[,,a,b]=OPS[k];let v=(a+(b-a)*Math.random())*(1+3*.08);it.ops.push({k,v:k==='spd'?+v.toFixed(1):Math.max(1,Math.round(v))});}
  setBase(it,R[1],1.1);inflate(it);it.set='royal';it.name=R[0];return it;};
 try{royalRand=ilv=>royalItem(pick(['main','sub','crown','acc']),ilv);}catch(e){}
+{const _u=uqItem;uqItem=function(id){const it=_u(id);inflate(it);return it;};}
 
 /* ---------- 見た目（アイコン） ---------- */
 const TIER=['星鋼','銅','鉄','鋼'];
@@ -161,8 +162,11 @@ function migItems(g){
 {const _mg=migrate;migrate=function(g){const r=_mg(g);try{migItems(G);if(G.stock)G.stock.forEach(it=>{it.slot=NS(it.slot);});G.mats.seishou=G.mats.seishou||0;}catch(e){console.error(e);}return r;};}
 {const _nm=newMember;newMember=function(id){_nm(id);try{const h=G.h[id];if(h&&h.eq&&('head'in h.eq||'body'in h.eq))h.eq=Object.assign(EMPTY(),{w:h.eq.w});}catch(e){console.error(e);}};}
 /* 開発用：装備一式 */
+devGear=function(lv=55){G.inv=G.inv.filter(i=>!i.dev);for(const id of G.members){const h=G.h[id];h.eq=Object.assign(EMPTY(),h.eq||{});const w=fixedItem('w',id,lv);w.rar=3;w.unid=false;w.dev=1;G.inv.push(w);h.eq.w=w.uid;
+ for(const[sl,es]of[['main','main'],['sub','sub'],['acc','acc1'],['acc','acc2']]){const it=genItem(lv,2,0,sl,2);it.unid=false;it.dev=1;G.inv.push(it);h.eq[es]=it.uid;}}};
 
 /* 鍛冶屋の品揃え：出撃ごとに入れ替わる。終盤でも使えるよう、品物のLvの上限を 30 → 100 に（武器2・主防具1・副防具2・装飾品1） */
-
+{const _sm=smith;smith=function(m){try{if(G.stockAt!==G.sorties||!G.stock){const lv=Math.max(1,Math.min(100,Math.max(...G.party.map(i=>G.h[i].lv))-1));
+ G.stock=['w','w','main','sub','sub','acc'].map((sl,i)=>genItem(lv,0,0,sl,G.fac.smith>=4&&i===0?2:i%3===2?1:0));G.stockAt=G.sorties;}}catch(e){console.error(e);}return _sm(m);};}
 /* 図鑑（装備）の分類：枠の名前 */
-return{};})();
+return{NS,WT,WN,CAT,LATEW,keyOf,inflate,addFx,migItems,LPS,EMPTY};})();

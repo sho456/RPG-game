@@ -1,0 +1,50 @@
+/* ===== 戦闘のダメージ表示の動き（js/ui/damage.js・js/v24.js dmgPop と対。v24.css・v25.css の同名の動きをここで置き換える） =====
+ ・見出し（Critical／Weak／Resist／Guard）と属性の漢字：大きく叩きつけて少し縮み、弾んで止まる。光の筋が横に走る
+ ・数字：1 桁ずつ上から落ちて弾む（桁ごとに少しずらす）
+ ・消えるとき：上へ流れて薄くなる */
+.p24 .ot{transition:opacity .3s ease-in,transform .3s cubic-bezier(.4,0,.8,.6)}
+.p24.out .ot{opacity:0;transform:translateY(-24px) scale(1.02)}
+.p24 .lb{margin-bottom:-9px;overflow:visible}
+.p24 .lb+.lb{margin-top:-7px}
+.p24 .nm{margin-top:-6px}
+.p24 .lb canvas{transform-origin:50% 80%}
+.p24 .lb.wk canvas+canvas,.p24 .lb.rs canvas+canvas{margin-left:1px}
+
+/* 叩きつけ：大きく・ぼやけて現れ、ぐっと縮んで小さく潰れ、弾んで止まる */
+.p24 .lb.cr canvas,.p24 .lb.wk canvas,.p24 .lb.rs canvas,.p24 .lb.gd canvas{animation:sl43 .5s cubic-bezier(.25,.9,.3,1) both}
+.p24 .lb.cr canvas{animation-name:sl43c;animation-duration:.56s}
+.p24 .lb.wk canvas+canvas,.p24 .lb.rs canvas+canvas{animation-delay:.06s}
+@keyframes sl43{0%{opacity:0;transform:scale(2.4) translateY(-8px)}20%{opacity:1;transform:scale(1.15)}38%{transform:scale(.9,.86)}58%{transform:scale(1.05)}78%{transform:scale(.98)}100%{opacity:1;transform:none}}
+@keyframes sl43c{0%{opacity:0;transform:scale(3) translateY(-12px) rotate(-4deg)}18%{opacity:1;transform:scale(1.2) rotate(0)}34%{transform:scale(.88,.82)}52%{transform:scale(1.08)}72%{transform:scale(.97)}100%{opacity:1;transform:none}}
+
+/* 光の筋：見出しの中央を横に走る細い光（出た瞬間だけ） */
+.p24 .lb.cr::before,.p24 .lb.wk::before,.p24 .lb.rs::before{content:'';position:absolute;left:-30%;right:-30%;top:48%;height:2px;z-index:2;pointer-events:none;
+ background:linear-gradient(90deg,rgba(255,255,255,0),#fff 45%,#fff 55%,rgba(255,255,255,0));box-shadow:0 0 6px 1px rgba(255,235,170,.9);
+ transform-origin:50% 50%;animation:ls43 .5s ease-out .08s both}
+.p24 .lb.wk::before{box-shadow:0 0 6px 1px rgba(255,150,130,.9)}.p24 .lb.rs::before{box-shadow:0 0 6px 1px rgba(150,200,255,.9)}
+@keyframes ls43{0%{opacity:0;transform:scaleX(0)}25%{opacity:1;transform:scaleX(1)}100%{opacity:0;transform:scaleX(1.25) scaleY(.2)}}
+
+/* 数字：1 桁ずつ弾む（animation-delay は dmgPop が桁ごとに付ける） */
+.dg42{display:inline-flex;align-items:flex-end}
+.dg42 canvas{display:block;transform-origin:50% 100%;animation:dg43 .46s cubic-bezier(.25,.8,.35,1) both}
+@keyframes dg43{0%{opacity:0;transform:translateY(-90%) scale(1.5)}34%{opacity:1;transform:translateY(6%) scale(1,.8)}56%{transform:translateY(-12%) scale(1,1.08)}76%{transform:translateY(2%) scale(1,.97)}100%{opacity:1;transform:none}}
+
+@media (prefers-reduced-motion:reduce){.p24 .lb canvas,.dg42 canvas{animation:none !important}.p24 .lb::before{display:none}}
+
+/* ver0.44 連続ヒット：次の数字を少し下・斜めにずらして前の数字に被せる（前の数字は消さず、少し小さく・暗く） */
+.p24 .in{padding:0 .5em}
+.p24 .nm.hit{position:relative;transform:translateX(var(--dx,0));z-index:2}
+.p24 .nm.old{transform:translateX(var(--odx,0)) scale(var(--sc,.9));transform-origin:50% 100%;filter:brightness(.82);opacity:.9;z-index:1;transition:transform .14s ease-out,filter .14s,opacity .14s}
+.p24 .nm.hit.old{transform:translateX(var(--dx,0)) scale(var(--sc,.9))}
+.p24 .nm.hit>canvas,.p24 .nm.hit .dg42>canvas{animation-duration:.4s}
+
+/* ver0.45 連続ヒット：数字は合計を数え上げる（1 つの数字）。数え上げのたびに少し跳ねる */
+.p24 .nm.bump{animation:bm45 .2s cubic-bezier(.2,1.6,.4,1)}
+@keyframes bm45{0%{transform:scale(1.18,1.12)}100%{transform:none}}
+.p24 .nm{transform-origin:20% 100%}
+/* 見出し（Critical・Weak・Resist・Guard）は同じ大きさ。左寄せで数字の上に積む */
+.p24.e .in{align-items:flex-start}
+.p24.e .lb{align-self:flex-start}
+/* 状態の文字（css/v25.css .fl25）：▲▼の箱をやめ、細い縁の文字を横に並べる */
+.fl25 .ar25{display:none}
+.fl25.ab{margin-top:0}

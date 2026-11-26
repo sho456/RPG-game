@@ -1,5 +1,5 @@
 /* ===== TD の章の地図・出撃準備・会話・仲間の加入（TDM）。戦闘画面は js/td/view.js（TD） =====
- 流れ（ver0.60 からコマンド戦闘）：ホームの「出撃」→ map()（章のタブ・ステージの道）→ prep(id)（出る敵と弱点・仲間 4 人の編成）→ CB.open→ 出撃前の会話 → TD.open
+ 流れ（ver0.60 からコマンド戦闘）：ホームの「出撃」→ map()（章のタブ・ステージの道）→ prep(id)（出る敵と弱点・仲間 4 人の編成）→ STG.run（ver0.63 から ver0.49 の旧戦闘）→ 出撃前の会話 → TD.open
        → 結果 → after()：初回クリアなら加入の会話と newMember → 次のステージの出撃準備へ。
  進み具合は G.td.c[ステージ]＝星の数、手札は G.td.deck。会話は本編のクエスト（QD）の pre と加入（QD.POST）を使う */
 'use strict';
@@ -17,8 +17,8 @@ const IMG={};
 function pic(key,fk,side,h){const k=key+side+h;if(IMG[k])return IMG[k];let f=null;try{f=SPX.unitCv(key,fk,side,h);}catch(e){}if(!f)return'';
  const c=document.createElement('canvas');c.width=f.w;c.height=f.h;c.getContext('2d').drawImage(f.cv,0,0);return IMG[k]=c.toDataURL();}
 function build(){if(root)return;root=document.createElement('div');root.id='tdm';root.className='hide';document.body.appendChild(root);root.addEventListener('click',onClick);}
-function show(html){build();CB.hide();root.innerHTML=html;root.classList.remove('hide');root.scrollTop=0;}
-function close(){if(root)root.classList.add('hide');CB.hide();try{townMenu();}catch(e){}}
+function show(html){build();STG.hide();root.innerHTML=html;root.classList.remove('hide');root.scrollTop=0;}
+function close(){if(root)root.classList.add('hide');STG.hide();try{townMenu();}catch(e){}}
 /* ---------- 章の地図 ---------- */
 /* 天への塔：全章クリア（最後のステージに星）で地図のタブに出る。到達の最高は G.td.inf */
 const infOpen=()=>!!(TDD.INF&&stars(TDD.ORDER[TDD.ORDER.length-1])>0);
@@ -52,7 +52,7 @@ function skyArt(c,th){const st={S:{W:900,th}};
 const PMAX=4;/* 出撃する仲間（コマンド戦闘は 4 人まで） */
 function prep(id){const S=TDD.STAGE[id];if(!S||(S.inf?!infOpen():!open(id)))return map();cur=id;const C=S.inf?{ch:'∞',n:S.name}:chOf(id);TD0();
  const mem=(G.members||[]).filter(h=>TDD.HERO[h]),deck=TDD.deckOf().filter(h=>mem.includes(h)).slice(0,PMAX);G.td.deck=deck;
- const W=S.inf?[]:CBE.wavesOf(S),kinds=S.inf?[...S.pool,...S.bosses]:[...new Set(W.flat())],cnt=k=>W.reduce((a,w)=>a+w.filter(x=>x===k).length,0);
+ const W=S.inf?[]:STG.wavesOf(S),kinds=S.inf?[...S.pool,...S.bosses]:[...new Set(W.flat())],cnt=k=>W.reduce((a,w)=>a+w.filter(x=>x===k).length,0);
  const avg=deck.length?Math.round(deck.reduce((a,h)=>a+(G.h[h]?G.h[h].lv:1),0)/deck.length):1;
  show(`<header class="tdm-h"><button class="td-btn" data-a="map" aria-label="戻る">◀</button><b>出撃準備</b><span class="tdm-sum">${esc(C.ch)}</span></header>
  <section class="tdm-st"><h2>${S.boss?'<i class="bs">◆</i>':''}${esc(S.name)}</h2><canvas class="tdm-prev" width="360" height="90"></canvas>
@@ -71,7 +71,7 @@ function talk(lines,done){if(!lines||!lines.length)return done();let i=0;build()
  box.addEventListener('click',e=>{e.stopPropagation();if(e.target.dataset.k==='skip')i=lines.length;step();});step();}
 /* ---------- 出撃・結果のあと ---------- */
 function go(id){const S=TDD.STAGE[id],deck=G.td.deck||TDD.deckOf();try{save();}catch(e){}
- const run=()=>{root.classList.add('hide');root.innerHTML='';CB.open(id,deck.slice(0,PMAX));};if(S.pre&&!stars(id))talk(S.pre,run);else run();}
+ const run=()=>{root.classList.add('hide');root.innerHTML='';STG.run(id,deck.slice(0,PMAX));};if(S.pre&&!stars(id))talk(S.pre,run);else run();}
 let pendEnd=false;
 /* ---------- 結果の精算（view.js の result が呼ぶ）：星・報酬（初回・周回・星 3 の錬磨石）・天への塔の到達 WAVE ----------
  返り値：{rw, first, chips}（chips＝報酬の欄に足す印の HTML）。塔は {sheet}（結果の窓をまるごと） */
@@ -91,8 +91,8 @@ const ENDING=[[null,'n','星核の光が、灯都の灯台へ流れこんでい�
 function ending(done){show('<div class="tdm-blank"></div>');talk(ENDING,()=>{const n=TDD.ORDER.reduce((a,id)=>a+stars(id),0);
  show(`<div class="tdm-join tdm-end"><i class="ic-star"></i><b>灯は継がれた</b><span class="tdm-sum">★ ${n}/${TDD.ORDER.length*3}</span><button class="td-btn on" data-a="fin">灯都へ</button></div>`);
  root.querySelector('[data-a="fin"]').onclick=e=>{e.stopPropagation();done();};});}
-function after(id,next){if(TDD.STAGE[id]&&TDD.STAGE[id].inf){CB.hide();tab='inf';return map();}if(pendEnd){pendEnd=false;return ending(()=>close());}const fin=()=>{const i=TDD.ORDER.indexOf(id),nx=TDD.ORDER[i+1];if(next&&nx&&TDD.STAGE[nx]&&open(nx))prep(nx);else map();};
- CB.hide();if(!pend)return fin();const who=pend,S=TDD.STAGE[id];pend=null;show('<div class="tdm-blank"></div>');
+function after(id,next){if(TDD.STAGE[id]&&TDD.STAGE[id].inf){STG.hide();tab='inf';return map();}if(pendEnd){pendEnd=false;return ending(()=>close());}const fin=()=>{const i=TDD.ORDER.indexOf(id),nx=TDD.ORDER[i+1];if(next&&nx&&TDD.STAGE[nx]&&open(nx))prep(nx);else map();};
+ STG.hide();if(!pend)return fin();const who=pend,S=TDD.STAGE[id];pend=null;show('<div class="tdm-blank"></div>');
  talk(S.join_lines,()=>{try{newMember(who);G.td.deck=G.td.deck||[];if(G.td.deck.length<PMAX&&!G.td.deck.includes(who))G.td.deck.push(who);save();}catch(e){console.error(e);}
   show(`<div class="tdm-join"><img src="${pic(who,who,0,64)}" alt=""><b>${esc(HB[who].name)}が仲間になった</b><button class="td-btn on" data-a="fin">続ける</button></div>`);
   root.querySelector('[data-a="fin"]').onclick=e=>{e.stopPropagation();fin();};});}

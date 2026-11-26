@@ -3,7 +3,7 @@ name: td-stage-author
 description: アストラル・ブレイカー（このリポジトリ）のコマンド戦闘のステージ・WAVE・敵・章・会話・仲間の加入のデータを作る／直す／増やす（js/td/stages.js の TDD.STAGE・TDD.CH・TDD.ORDER）。ステージを足したら tools/cb_sim.js --tune で敵の補正（js/cb/tune.js）を作り直す。Use when the user asks for new stages, waves, enemy placement, chapters, story dialogue before battle, or a new party member joining in this game.
 ---
 
-# ステージとデータ（コマンド戦闘・ver0.60〜）
+# ステージとデータ（ver0.63〜：戦闘は ver0.49 の旧戦闘。WAVE の読み替えは `js/battle/stage.js` の `STG.wavesOf`。`js/cb/*` と `tools/cb_sim.js` は削除済み）
 
 正本：`js/td/stages.js`（ステージと章）・`js/cb/engine.js`（`CBE.wavesOf` で 1 戦の敵に読み替え）・設計 `docs/CB-DESIGN.md`。
 ID の `td〜` はセーブ（`G.td.c`＝ステージごとの星の数）の互換のため変えない。

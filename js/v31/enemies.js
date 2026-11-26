@@ -5,9 +5,12 @@
     戦闘ユニットの spr に入れる（データの kind はそのまま）
  3. 各章の中ボス（序章〜終章）と、天極の門・星海の深淵・終焉の星域・極限の星闘の敵
  4. 多段階のボス（stages）は、クエストで指定したレベルで次の形態を出す（以前は Lv58 固定） */
-
+'use strict';
 const V31E=(()=>{
-
+const{INF}=V31;
+const EHP=lv=>lv<=60?1:Math.pow(1.07,lv-60);
+const ESPD=lv=>lv<=60?1:1+(lv-60)*.008;
+const EATK=lv=>lv<=60?1:Math.pow(1.021,lv-60);
 /* ---------- 色違いのパレット ---------- */
 const hx=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
 const toH=a=>'#'+a.map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
@@ -85,13 +88,20 @@ try{ED.boss9.xp=6000;}catch(e){}
 try{TERMS.reset();}catch(e){}
 
 /* ---------- 強さの曲線と見た目のキー ---------- */
-
+{const _en=enemy;enemy=function(kind,lv,x,y,suf=''){const e=_en(kind,lv,x,y,suf);try{const d=ED[kind];if(d&&d.spr)e.spr=d.spr;
+ const L=e.lv||lv||1;if(L>60){const m=INF(L),h=EHP(L),a=EATK(L);e.mhp=Math.round(e.mhp*m*h);e.hp=e.mhp;for(const k of['atk','mag'])e[k]=Math.round(e[k]*m*a);for(const k of['def','res'])e[k]=Math.round(e[k]*m);e.spd=+(e.spd*ESPD(L)).toFixed(2);}}catch(x){console.error(x);}return e;};}
 /* 多段階ボスの次の形態：クエストで決めたレベルで出す */
-
+nextStage=async function(){B.stage=(B.stage||0)+1;const k=B.opts.stages[B.stage],prev=B.opts.stages[B.stage-1],lv=B.opts.stageLv||58;await wait(600);
+ B.flashBg=26;B.shake=14;SFX.warn();log(ED[prev].intro||'');await wait(1400);
+ const e=enemy(k,lv,18,34);B.enemies=[e];setCT(e);try{e.sts=[];}catch(x){}
+ B.heroes.forEach(h=>{if(!h.alive){h.alive=true;h.hp=1;setCT(h);}const v=Math.round(h.mhp*.2);h.hp=Math.min(h.mhp,h.hp+v);h.sp=Math.min(100,(h.sp||0)+30);pop(h,'+'+v,'#7dffa8');});
+ log(`星々の灯が仲間を支える――<b>${e.name}</b>が現れた！（第${B.stage+1}形態）`);refresh();await wait(1200);
+ if(B.stage===B.opts.stages.length-1&&B.opts.zen!==false){const r=B.heroes.find(h=>h.id==='rio'&&h.alive);if(r&&G.flags.zenkyo&&!r.aw&&B.opts.stages[0]==='last1'){r.ag=100;pop(r,'星片が輝く','#ffe27a');log('空白の星片が、みんなの色で満ちていく――<b>リオのAGが最大になった！</b>');refresh();await wait(1000);}}};
 /* 図鑑：新しい敵の絵（色違いのキーから） */
 function zimg(){if(typeof ZIMG==='undefined'||typeof V19==='undefined')return;for(const k in NEW){const d=NEW[k];for(const sil of[0,1]){const zz=k+(sil?'_w':'');let val=null;
  try{Object.defineProperty(ZIMG,zz,{configurable:true,enumerable:true,get(){if(val===null){try{const c=V19.still(d.spr,48,!d.flip);val=c?(sil?PX.whiteOf(c):c).toDataURL():'';}catch(e){val='';}}return val;},set(x){val=x;}});}catch(e){}}}}
 {let tries=0;const t=setInterval(()=>{tries++;if((typeof SPX!=='undefined'&&SPX.ready)||tries>60){clearInterval(t);try{applyVars();zimg();}catch(e){console.error(e);}}},250);}
 /* 戦闘以外の画面で使う 1 枚絵 */
+function still(kind,N=64){const d=ED[kind];try{return V19.still(d&&d.spr||kind,N,!(d&&d.flip));}catch(e){return null;}}
 
-return{};})();
+return{EHP,EATK,ESPD,VAR,recolor,NEW,still,applyVars};})();

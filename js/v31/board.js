@@ -7,7 +7,7 @@
     ・パッシブの星：天星パッシブ。外周の 2 か所の分岐で、それぞれ 2 つのうち 1 つを選ぶ
  2. キャラ専用パッシブを Lv60・Lv90 に 1 つずつ追加（各キャラ 4 つに）
  3. 技の強化：Lv60 を超えると技の威力が Lv ごとに +1.5%（v31/core.js）。極技は既存の技の 2〜3 倍の威力 */
-
+'use strict';
 const V31B=(()=>{
 const{esc,fm,lbStage,capOf}=V31;
 /* ---------- 極技 ---------- */
@@ -123,9 +123,9 @@ function auto2(id){let n=0;for(;;){const c=Object.keys(BOARD2[id]).filter(k=>can
  c.sort((a,b)=>sc(b)-sc(a));b2(id).push(c[0]);n++;}return n;}
 /* 能力・技・パッシブへの反映 */
 {const _bo=bonus;bonus=function(id){const o=_bo(id);try{const N=BOARD2[id];if(N&&G.h[id].board2)for(const k of G.h[id].board2){const n=N[k];if(n&&n.v&&(n.t==='stat'||n.t==='ex'||n.t==='aw'))for(const x in n.v)o[x]=(o[x]||0)+n.v[x];}}catch(e){console.error(e);}return o;};}
-
+{const _sl=skillList;skillList=function(id){const s=_sl(id);try{const N=BOARD2[id];if(N&&G.h[id].board2)for(const k of G.h[id].board2){const n=N[k];if(n&&n.t==='skill'&&!s.includes(n.v))s.push(n.v);}}catch(e){}return s;};}
 const psOf=id=>{const N=BOARD2[id],o=[];if(N&&G.h[id]&&G.h[id].board2)for(const k of G.h[id].board2){const n=N[k];if(n&&n.t==='ps')o.push(n.v.ps);}return o;};
-
+{const _h=hero;hero=function(id){const u=_h(id);try{u.ps20=u.ps20||[];for(const p of psOf(id))if(!u.ps20.some(x=>x.id===p)){u.ps20.push({id:p,v:0});const P=V20.PS[p];if(P&&P.make)P.make(u,0);}}catch(e){console.error(e);}return u;};}
 {const _pw=power;power=function(id){const s=stats(id);return Math.round(_pw(id)*(1+(s.dmgP||0)/100)*(1+(s.skDmg||0)/250)*(1+(s.dmgCut||0)/100)+psOf(id).length*400);};}
 
 /* ---------- 天星盤の画面 ---------- */
@@ -140,9 +140,30 @@ BS.up=false;
  try{_db();}finally{BOARD[id]=o.N;h.board=o.U;bpos=o.bp;canUnlock=o.cu;}
  try{const c=bctx,cw=W*SC;c.fillStyle='rgba(255,184,107,.10)';c.fillRect(0,0,cw,3);}catch(e){}};}
 {const _bt=boardTap;boardTap=function(x,y){if(!BS.up)return _bt(x,y);const N=BOARD2[BS.id];let best=null,bd=1e9;for(const k in N){const[nx,ny,s]=bpos2(N[k]),d=Math.hypot(nx-x,ny-y);if(d<s*.8&&d<bd){bd=d;best=k;}}if(best){BS.sel=best;SFX.sel();boardMenu();}};}
-
+const NT2={core:'中心',stat:'能力',skill:'極技',aw:'星臨強化',ps:'天星パッシブ',ex:'極'};
+function upMenu(m){const id=BS.id,h=G.h[id],N=BOARD2[id],U=b2(id),n=BS.sel&&N[BS.sel],pl=tenLeft(id),tot=Object.keys(N).length-1,lock=h.lv<OPEN_LV,can=!lock&&n&&canUnlock2(id,n.k)&&n.cost<=pl;
+ $('#labels').innerHTML=`<div class="bdh up31" style="--ec:${elCol(id)}"><img src="${art(id)}"><div class="bdn"><small>天星盤「${esc(BDEF[id].star)}・天」</small><b>${esc(HB[id].name)}</b><span>Lv${h.lv}/${capOf(id)}　解放 ${U.length-1}/${tot}</span></div><div class="bdp${pl>0&&!lock?' rdy':''}"><small>天星ポイント</small><b>${lock?'—':pl}</b></div></div>
+  <div class="bdl">${['stat','ex','skill','aw','ps'].map(k=>`<span><i style="background:${NCOL[k]}"></i>${NT2[k]}</span>`).join('')}</div>${lock?`<div class="lk31">Lv${OPEN_LV}で開放<small>（あとLv${OPEN_LV-h.lv}）</small></div>`:''}`;
+ log(m||(lock?`<b>天星盤</b>は Lv${OPEN_LV} から使える。Lv${OPEN_LV} を超えるとLv1ごとに<b>天星ポイント+4</b>、限界突破で<b>+10</b>`:n?'星を選択中。光る輪の星は解放できる':'星をタップで詳細。<b>光る輪の星</b>が解放できる'));
+ const st=n?(U.includes(n.k)?['解放済み','on']:lock?['Lv不足','ng']:canUnlock2(id,n.k)?(n.cost<=pl?['解放できる','ok']:['ポイント不足','ng']):n.t==='ps'&&U.some(u=>N[u]&&N[u].t==='ps'&&N[u].g===n.g)?['もう一方を選択済み','ng']:['未接続（隣の星を先に解放）','ng']):null;
+ panel(`<div class="bdm">${G.members.map(x=>`<div class="bdf${x===id?' on':''}${G.h[x].lv>=OPEN_LV&&tenLeft(x)>0?' rdy':''}" data-a="m" data-v="${x}" style="--ec:${elCol(x)}"><img src="${art(x)}"><small>${esc(HB[x].name)}</small></div>`).join('')}</div>
+ <div class="bdi"${n?` style="--nc:${NCOL[n.t]}"`:''}>${n?`<div class="bdt"><i>${NT2[n.t]}${n.t==='ps'?'（2つのうち1つ）':''}</i><em class="${st[1]}">${st[0]}</em></div><b>${esc(n.d)}</b><small>必要ポイント ${n.cost}</small>`:'<div class="bdt"><i style="--nc:#ffb86b">天星盤</i></div><small>通常の星盤の上位版。大きな能力の上昇・極技・天星パッシブ・新しい能力値（与ダメ／技の威力／会心ダメ／被ダメ軽減）を解放できる。</small>'}</div>
+ <div class="bdb"><button class="tbtn gold" data-a="un" ${can?'':'disabled'}>解放${n?`<small>ポイント${n.cost}</small>`:''}</button><button class="tbtn" data-a="auto" ${pl>0&&!lock?'':'disabled'}>おまかせ<small>自動で振り分け</small></button><button class="tbtn" data-a="rs">リセット<small>無料</small></button></div>
+ <div class="bdb b31"><button class="tbtn" data-a="sw">通常の星盤へ<small>星ポイント</small></button><button class="tbtn${G.members.some(x=>!V31.lbCheck(x))?' gold':''}" data-a="lb">限界突破<small>上限 ${capOf(id)}</small></button><button class="tbtn back" data-a="back">戻る</button></div>`,
+ {m:x=>{BS.sel=null;BS.id=x;boardMenu();},un:()=>{U.push(n.k);SFX.aw();save();boardMenu(`<b>${esc(n.d)}</b> を解放した！`);},
+  auto:()=>{const c=auto2(id);if(c)SFX.aw();save();boardMenu(c?`${c}個の星を解放した`:'解放できる星がない（ポイント不足）');},rs:()=>{h.board2=['0,0'];BS.sel=null;save();boardMenu('天星盤をリセットした（ポイントは全て戻る）');},
+  sw:()=>{BS.up=false;BS.sel=null;boardMenu();},lb:()=>V31.lbScreen(()=>{openBoard(id);BS.up=true;boardMenu();}),
+  back:()=>{BS.up=false;const f=BFROM;BFROM='town';enterTown();if(f==='party')partyScreen();}});
+ try{V21.boardFit();}catch(e){}}
+{const _bm=boardMenu;boardMenu=function(m){if(BS.up)return upMenu(m);_bm(m);try{const c=$('#cmd'),rows=c.querySelectorAll('.bdb');const last=rows[rows.length-1];if(last&&!c.querySelector('.b31')){const id=BS.id,lv=G.h[id].lv,d=document.createElement('div');d.className='bdb b31';
+  d.innerHTML=`<button class="tbtn${lv>=OPEN_LV&&tenLeft(id)>0?' gold':''}" data-a="sw">天星盤へ<small>${lv>=OPEN_LV?'天星ポイント '+tenLeft(id):'Lv'+OPEN_LV+'で開放'}</small></button><button class="tbtn" data-a="lb">限界突破<small>上限 ${capOf(id)}</small></button>`;
+  last.before(d);ACT.sw=()=>{BS.up=true;BS.sel=null;boardMenu();};ACT.lb=()=>V31.lbScreen(()=>{openBoard(id);});V21.boardFit();}}catch(e){console.error(e);}};}
 {const _ob=openBoard;openBoard=function(id,m){BS.up=false;return _ob(id,m);};}
 
 /* ---------- キャラ詳細：新しい能力値・天星パッシブの表示 ---------- */
+{const _ch=charHTML;charHTML=function(id,tab,ed){let s=_ch(id,tab,ed);try{if(tab==='st'){const st=stats(id),rows=[['与ダメ',st.dmgP],['技の威力',st.skDmg],['会心ダメ',st.critDmg],['被ダメ軽減',Math.min(60,st.dmgCut)]].filter(x=>x[1]>0)
+   .map(([k,v])=>`<div class="sr x31"><span><i class="gn">◆</i>${k}</span><b>+${v}%</b></div>`).join('');
+  if(rows)s=s.replace(/(ドロップ率<\/span><b>[^<]*<\/b><\/div>)/,'$1'+rows);}
+ if(tab==='bd'&&G.h[id].lv>=OPEN_LV){const ps=psOf(id).map(p=>V20.PS[p]).filter(Boolean);s=s.replace(/(<i class="tsb-anchor" hidden><\/i>)/,`<div class="sh2">天星盤「${esc(BDEF[id].star)}・天」</div><div class="stx">解放 ${b2(id).length-1}／${Object.keys(BOARD2[id]).length-1}　天星ポイント残り <b>${tenLeft(id)}</b>${ps.length?'<br>天星パッシブ：'+ps.map(p=>esc(p.n)).join('・'):''}</div>$1`);}}catch(e){console.error(e);}return s;};}
 
 return{XSK,TP,CP,PSP,BOARD2,build2,tenTotal,tenLeft,canUnlock2,auto2,psOf,OPEN_LV,b2};})();

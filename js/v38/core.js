@@ -4,7 +4,8 @@
  ・武器種：剣・短剣・大剣・斧・体術・弓・杖・双剣（RSD.WPN）。武器種は「通常攻撃の属性」と「技の威力の能力配分」を決める
  ・LP：クエストの間は引き継ぎ、灯都に戻る（全回復）と最大値に戻る
  ・オーバードライブ・連携・共鳴技・ジョブは ver0.38 で廃止（関連する処理・画面・データは削除済み） */
-
+'use strict';
+let ALTATK=()=>null,basicsOf=u=>[ATK(u)];
 const V38=(()=>{
 const D=RSD;
 const NORM={'炎':'熱','氷':'冷','光':'陽','闇':'陰','風':'斬','地':'打'};
@@ -21,6 +22,8 @@ function normAll(){
  try{for(const k in ED){const d=ED[k];if(!d)continue;d.weak=nList(d.weak||[]);if(d.res)d.res=nList(d.res);if(d.el)d.el=nel(d.el);}}catch(e){console.error(e);}}
 normAll();
 /* 召喚・生成で後から作られる敵（試練の幻影・回廊など）も、戦闘の始めに直す */
+{const _sb=startBattle;startBattle=function(list,opts){try{for(const e of list||[]){const d=ED[e.kind];if(d){d.weak=nList(d.weak||[]);}}}catch(x){}return _sb(list,opts);};}
+{const _en=enemy;enemy=function(...a){const e=_en(...a);try{e.weak=nList(e.weak||[]);}catch(x){}return e;};}
 
 /* ---------- 敵の技：LP を削る攻撃・属性の見直し ---------- */
 const LPATK={curse:1,bell:1,voidslash:1,senju:1,tokiyomi:1,chrono:1};
@@ -34,8 +37,9 @@ ATK=u=>{if(!u||u.side!==0)return _ATK(u);const W=D.WPN[u.wpn]||D.WPN['剣'];
  if(W.mag||MAG(u.id))return{n:'魔弾',bn:u.wpn||'杖',el:nel(u.atkEl)||elOf(u.id)||'打',k:'mag',pow:.8,t:'one',basic:true};
  return{n:'攻撃',bn:u.wpn,el:u.aw&&u.id==='rio'?'陽':(nel(u.atkEl)||W.el),k:'phys',pow:1,t:'one',basic:true};};
 /* 2 つ目の通常攻撃（クロウの鎌杖：杖の魔弾に加えて、大鎌の斬撃） */
-
+ALTATK=u=>{const X=u&&u.side===0&&D.HERO[u.id]&&D.HERO[u.id].alt;if(!X)return null;return{n:X.n,bn:X.bn,el:X.el,k:'phys',pow:1,t:'one',basic:true,drain:X.drain,d:X.d};};
 /* 通常攻撃の一覧 */
+basicsOf=u=>[ATK(u),ALTATK(u)].filter(Boolean);
 
 /* ---------- 属性の色（旧名の色をそのまま新しい名前へ） ---------- */
 try{for(const[o,n]of Object.entries(NORM))if(ELC[o]&&!ELC[n])ELC[n]=ELC[o];}catch(e){}
@@ -56,4 +60,4 @@ function migItem(it){if(!it)return;
 /* ---------- LP：灯都で全回復 ---------- */
 {const _h=healAll;healAll=function(...a){const r=_h(...a);try{for(const id of G.members)if(G.h[id])G.h[id].lp=null;}catch(e){}return r;};}
 
-return{};})();
+return{NORM,nel,nList,normAll,migItem};})();

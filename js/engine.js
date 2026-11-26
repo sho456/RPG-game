@@ -35,7 +35,7 @@ function makeBg(th='ash',boss=false){const c=document.createElement('canvas');c.
   for(let i=0;i<70;i++){g.fillStyle=fo?(R()<.5?'#3e7038':'#1a3016'):boss?(R()<.5?'#3a2840':'#4a2a5a'):(R()<.5?'#4f5e38':'#2a3520');g.fillRect(R()*W|0,hz+R()*(H-hz)|0,R()<.3?2:1,1);}}
  if(boss&&th!=='ash'){g.fillStyle='rgba(60,0,80,.22)';g.fillRect(0,0,W,H);}
  g.fillStyle='rgba(0,0,0,.25)';g.fillRect(0,hz,W,1);return c;}
-
+function battleTheme(boss){if(!F||!A||!MAP1)return'ash';if(boss)return{midori:'lib',seido:'chapel',raimei:'mine',kouka:'shrine',ouito:'ruin',tower:'tower',zankyo:'void',kairou:'void',ryuu:'lava'}[AREA]||'ash';const t=MAP1[F.p.ty][F.p.tx];return AREA==='tower'?'tower':AREA==='zankyo'||AREA==='kairou'?'void':AREA==='ryuu'?'lava':AREA==='ouito'?'ruin':'hU'.includes(t)?'shrine':A.theme==='ice'?'ice':'rlVY'.includes(t)?'mine':A.theme==='storm'&&'.,GE'.includes(t)?'storm':'fM'.includes(t)?'lib':'zN'.includes(t)?'chapel':A.theme==='forest'?'forest':'ash';}
 let BG=makeBg('ash');
 
 /* ===== サウンド ===== */
@@ -70,13 +70,22 @@ const ED={slime:{name:'虚蝕スライム',mhp:150,atk:34,def:10,mag:16,res:14,s
 const HB={rio:{name:'リオ',mhp:240,atk:36,def:20,mag:28,res:22,spd:12,g:{mhp:'B',atk:'B',def:'B',mag:'B',res:'B',spd:'B'},skills:['koujin','harai','teate']},
  gald:{name:'ガルド',mhp:330,atk:31,def:32,mag:8,res:24,spd:8,g:{mhp:'S',atk:'B',def:'S',mag:'D',res:'A',spd:'D'},skills:['tateuchi','chiretsu','chouhatsu']}};
 const GR={S:.09,A:.08,B:.07,C:.06,D:.05};
-
+const EQ={dozen:{n:'銅の剣',who:'rio',slot:'w',atk:4,price:60},tetsuken:{n:'鉄の剣',who:'rio',slot:'w',atk:9,price:180,mat:{haiseki:2}},
+ dotai:{n:'銅の大剣',who:'gald',slot:'w',atk:5,price:80},tettai:{n:'鉄の大剣',who:'gald',slot:'w',atk:11,price:220,mat:{haiseki:3}},
+ kawa:{n:'革の鎧',slot:'a',def:4,price:50},munaate:{n:'鉄の胸当て',slot:'a',def:9,price:160,mat:{kiba:2}}};
 const ITEMS={potion:{n:'ポーション',p:30,d:'HP120回復'},drop:{n:'星の雫',p:120,d:'AG+30'},feather:{n:'不死鳥の羽',p:150,d:'戦闘不能から復活'}};
 const MATS={haiseki:{n:'灰石',p:10},kiba:{n:'獣の牙',p:15},kakera:{n:'虚の欠片',p:40}};
 const nextXP=l=>Math.round(15*Math.pow(l,1.5));
 function stats(id){const b=HB[id],s=G.h[id],o={},g=gear(id),bo=bonus(id);for(const k in bo)g[k]=(g[k]||0)+bo[k];for(const k of['mhp','atk','def','mag','res','spd']){const v=b[k]*(1+GR[b.g[k]]*(k==='spd'?.3:1)*(s.lv-1))+(g[k]||0);o[k]=k==='spd'?+v.toFixed(2):Math.round(v);}
  for(const k of['atk','def','mag','res','mhp'])if(g[k+'P'])o[k]=Math.round(o[k]*(1+g[k+'P']/100));
  return Object.assign(o,{crit:g.crit||0,weakDmg:g.weakDmg||0,startAG:g.startAG||0,awDmg:g.awDmg||0,spGain:g.spGain||0,drop:g.drop||0,atkEl:g.atkEl||null,legs:g.legs,awTurn:g.awTurn||0,noRecoil:g.noRecoil||0,storeUp:g.storeUp||0,gaugeSave:g.gaugeSave||0});}
+function hero(id){const s=stats(id),b=HB[id],pos={x:0,y:0};const hp=G.h[id].hp==null?s.mhp:Math.min(s.mhp,G.h[id].hp);
+ return Object.assign({id,side:0,spr:id,name:b.name,skills:skillList(id),sp:50,ag:Math.min(100,s.startAG+(s.legs.includes('senkou')?50:0)),elem:MAG(id)?null:'斬',alive:hp>0,aw:false,awT:0,store:0,taunt:0,ox:0,tox:0,flash:0,sc:2},s,pos,{hp,awLv:G.h[id].awLv||1,awDmg:s.awDmg+((G.h[id].awLv||1)-1)*10});}
+function enemy(kind,lv,x,y,suf=''){const d=ED[kind],L=d.boss?0:lv-1,M={mhp:.7+.17*L,atk:1+.14*L,mag:1+.14*L,def:.8+.1*L,res:.8+.1*L};
+ const e={kind,lv,side:1,spr:kind,name:d.name+suf,weak:d.weak,boss:d.boss,known:new Set(G.known[kind]||[]),charging:false,turn:0,x,y,ox:0,tox:0,flash:0,fade:0,sc:d.sc||2,alive:true,spd:d.spd};
+ for(const k of['mhp','atk','def','mag','res'])e[k]=Math.round(d[k]*M[k]);e.mhp=Math.max(1,Math.round(e.mhp*(d.boss?.93:.88)));
+ /* ver0.25：ブレイク（被ダメ1.5倍・行動遅延・溜め打ち消し）と部位破壊（攻撃・魔力-10%×3）の廃止に合わせ、HPを通常-12%・ボス-7%、ボスの攻撃・魔力を-4% */
+ if(d.boss){e.atk=Math.round(e.atk*.96);e.mag=Math.round(e.mag*.96);}e.hp=e.mhp;return e;}
 
 /* ===== 戦闘 ===== */
 let B=null,G=null,F=null,speed=1,auto=false;
@@ -84,8 +93,34 @@ const SPD={1:1.7,2:.75,4:.35};
 const wait=ms=>new Promise(r=>setTimeout(r,ms*SPD[speed]));
 const log=t=>{$('#msg').innerHTML=t;};
 const aliveE=()=>B.enemies.filter(e=>e.alive),aliveH=()=>B.heroes.filter(h=>h.alive);
+const spdOf=u=>u.spd*(u.aw&&u.id==='rio'?1.2:1)*(u.aw&&u.id==='jin'?1.3:1);
+const st=(u,k)=>u[k]*(u.aw&&u.id==='rio'?1.2:1)*(u.aw&&u.id==='jin'&&k==='atk'?1.3:1)*(k==='atk'&&u.aw&&u.id==='balza'?1+.15*u.awT:1);
+const setCT=(u,w=1)=>{u.ct=100/spdOf(u)*w;};
+const gald=()=>B.heroes.find(h=>h.id==='gald'),rio=()=>B.heroes.find(h=>h.id==='rio');
 
-/* 未使用：js/rs/battle.js が置き換え */
+const SLOTS={1:[[34,40]],2:[[12,26],[54,52]],3:[[6,22],[52,46],[6,74]]};
+function startBattle(list,opts={}){show('battle');setH(128);
+ const sl=SLOTS[Math.min(3,list.length)]||SLOTS[1],cnt={},idx={};list.forEach(e=>cnt[e.kind]=(cnt[e.kind]||0)+1);
+ const enemies=list.map((e,i)=>{let suf='';if(cnt[e.kind]>1){idx[e.kind]=(idx[e.kind]||0)+1;suf='ABCDE'[idx[e.kind]-1]||'';}
+  return ED[e.kind].boss?enemy(e.kind,e.lv,18,34):enemy(e.kind,e.lv,sl[i%sl.length][0],sl[i%sl.length][1],suf);});
+ const hs=G.party.map(hero);hs.forEach((h,i)=>{[h.x,h.y]=HPOS[hs.length][i];});
+ B={opts,heroes:hs,enemies,awUsed:new Set(),turns:0,shake:0,flashBg:0,parts:[],fx:[],cur:null,over:false};
+ BG=makeBg(opts.theme||battleTheme(!!opts.boss),!!opts.boss);
+ [...B.heroes,...B.enemies].forEach(u=>{u.ct=100/u.spd*(.75+Math.random()*.3);});
+ if(opts.first)B.heroes.forEach(h=>h.ct*=.2);
+ $('#ov').classList.add('hide');log(opts.boss?ED[list[0].kind].name+'が立ちはだかる！':opts.first?'<b>先制攻撃！</b> 魔物の不意を突いた':'魔物が現れた！');refresh();setTimeout(run,500);}
+
+function nextActor(){const us=[...aliveH(),...aliveE()];const m=Math.min(...us.map(u=>u.ct));us.forEach(u=>u.ct-=m);return us.find(u=>u.ct<=1e-6)||us[0];}
+function preview(){}/* 未使用：js/rs/battle.js が置き換え */
+
+async function run(){
+ while(!B.over){
+  const u=nextActor();B.cur=u;refresh();
+  if(u.side===0){B.turns++;await heroTurn(u);}else await enemyTurn(u);
+  B.cur=null;refresh();
+  if(!aliveE().length){if(B.opts.stages&&(B.stage||0)<B.opts.stages.length-1){await nextStage();continue;}await wait(500);return end(true);}
+  if(!aliveH().length){await wait(500);return end(false);}
+ }}
 
 /* ver0.49：防御の式。基礎ダメージ＝攻撃（魔力）× 威力 × 防御の倍率
    防御の倍率＝1 ÷（1 + 防御 ÷（DEFK × 標準の防御））。標準の防御＝攻撃する側のレベルでの、仲間 12 人の体力（術なら精神）の平均（基礎ステータス）
@@ -96,24 +131,199 @@ const DEFK=3,EATK=1.15,DREF={};
 function defRef(lv,phys){lv=Math.max(1,Math.round(lv||1));const k=lv+(phys?'p':'m');if(DREF[k])return DREF[k];let v=0;
  try{const ids=Object.keys(RSD.HERO);let n=0;for(const id of ids){const o=RSC.rs7(id,lv);v+=phys?o.vit:o.wil;n++;}v/=Math.max(1,n);}catch(e){v=0;}
  return DREF[k]=v>0?v:20+lv*6;}
+function calc(a,t,sk){const phys=sk.k!=='mag';const D=Math.max(0,st(t,phys?'def':'res'));
+ const A=Math.max(1,sk.fixed!=null?sk.fixed:st(a,phys?'atk':'mag'));let d=(sk.fixed!=null?sk.fixed:A*sk.pow)/(1+D/(DEFK*defRef(a.lv||(a.side===0&&G.h[a.id]?G.h[a.id].lv:1),phys)));if(a.side===1)d*=EATK;d=Math.max(1,d);
+ let weak=false;if(t.weak&&sk.el&&t.weak.includes(sk.el)){d*=1.7*(1+(a.weakDmg||0)/100);weak=true;}if(!phys&&a.legs&&a.legs.includes('taiyou'))d*=1.25;
+ if(weak&&a.legs&&a.legs.includes('shokei'))d*=1.3;if(a.aw&&a.awDmg)d*=1+a.awDmg/100;if(a.aw&&a.id==='crow')d*=1+(1-a.hp/a.mhp)*1.5;const crit=(a.aw&&a.id==='erna')||Math.random()<.06+(a.crit||0)/100;if(crit)d*=1.5;d*=.95+Math.random()*.1;return{d:Math.round(d),weak,crit};}
 
-/* 未使用：js/ch5.js が置き換え */
+function hurt(t,d){if(t.side===0){if(t.legs){if(t.legs.includes('kagerou')&&!t._dodge){t._dodge=1;setTimeout(()=>pop(t,'MISS','#ffffff',true),50);return 0;}if(t.legs.includes('gyokuza')&&!(B&&B.rs))d*=.85;}if(t.guard)d*=.5;if(t.id==='gald'&&t.aw){t.store+=d*(t.kenshu?1.5:1)*(1+(t.storeUp||0)/100);d*=.55;if(t.kenshu)d*=.5;}
+  d=Math.max(1,Math.round(d));if(!t.aw)t.ag=Math.min(100,t.ag+d/t.mhp*60);}
+ if(t.side===0){/* 結界・玉座（レジェンド）は RS の戦闘では受けるダメージの枠（js/rs/battle.js frames）で足す */if(B.barrier>0&&!B.rs)d=Math.max(1,Math.round(d*.7));if(B.domain&&t.hp-d<=0&&!t.saved){d=t.hp-1;t.saved=1;setTimeout(()=>pop(t,'聖域が守った','#ffe27a',true),150);}}
+ t.hp=Math.max(0,t.hp-d);return d;}
+
+function pop(){}/* 未使用：js/ch5.js が置き換え */
+
+async function hit(a,t,sk){
+ const r=calc(a,t,sk);const d=hurt(t,r.d);t.flash=8;if(a.side===0&&a.legs&&a.legs.includes('meikai')&&d>0){a.hp=Math.min(a.mhp,a.hp+Math.round(d*.2));}B.fx.push({x:t.x+8*t.sc,y:t.y+8*t.sc,t:0,m:sk.k==='mag',c:ELC[sk.el]||'#ffffff'});
+ /* ver0.49：ミス・回避・障壁で 0 ダメージのときは、会心・弱点・耐性の印も数字も出さない（MISS・障壁の表示は hurt 側が出す） */
+ if(!(d>0)){r.crit=r.weak=r.resist=false;t._xf=0;}
+ if(d>0){pop(t,d,r.crit?'#ffe14a':r.weak?'#ffb030':(t.side===0?'#ff8a8a':'#ffffff'),false,(r.crit?'crit ':'')+(r.weak?'weak ':'')+(r.resist?'resist ':'')+(t.side===0?'hurt':''),sk.el);comboAdd(d);}
+ if(r.weak)SFX.weak();else if(d>0)SFX.hit();if(r.crit)B.fx.push({x:t.x+8*t.sc,y:t.y+8*t.sc,t:0,m:true,c:'#ffe14a'});
+ if(r.crit)B.shake=6;
+ if(a.side===0){if(!a.aw)a.ag=Math.min(100,a.ag+(d>0?6:0)+(r.weak?10:0)+(r.crit?4:0));
+  if(r.weak){t.known.add(sk.el);G.known[t.kind]=[...t.known];}}
+ refresh();
+ if(t.hp<=0)await kill(t);return d;}
+
+
+async function kill(t){if(t.side===0&&t.legs&&t.legs.includes('kiseki')&&!t._ks){t._ks=1;t.hp=Math.round(t.mhp*.3);pop(t,'奇跡！','#ffe27a');log(`${t.name}は奇跡の指輪で立ち上がった！`);refresh();return;}t.alive=false;
+ if(t.side){t.fade=24;SFX.ko();log(`${t.name}を倒した！`);}
+ else{SFX.ko();log(`${t.name}は倒れた…`);if(t.aw)endAw(t,true);t.ag=0;aliveH().forEach(h=>{if(!h.aw)h.ag=Math.min(100,h.ag+25);});}
+ refresh();await wait(300);}
 
 /* ===== 星臨 ===== */
+async function awaken(u){const A=AW[u.id];u.aw=true;u.awT=0;u.ag=GAUGE.includes(u.id)?100:0;u.charged=0;u.stk=0;u.lastEl=null;u.store=0;B.awUsed.add(u.id);if(u.id==='shion')aliveE().forEach(e=>{e.ct+=100/e.spd;pop(e,'DELAY','#7fd6ff',true);});if(u.id==='noah')B.domain=true;
+ const cut=$('#cut');const c=document.createElement('canvas');c.width=16;c.height=16;c.getContext('2d').drawImage(IMG[u.spr+'_aw'],0,0);
+ cut.style.background='';cut.innerHTML='';cut.appendChild(c);const tx=document.createElement('div');tx.innerHTML=`<div class="t">${u.name} ― 星臨${(u.awLv||1)>1?'・位階'+ROMAN[u.awLv]:''}</div><div class="b">${A.name}</div>`;cut.appendChild(tx);
+ cut.classList.remove('show');void cut.offsetWidth;cut.classList.add('show');B.flashBg=30;SFX.aw();
+ log(`<b>${u.name}、星臨――「${A.name}」！</b>`);refresh();await wait(1150);cut.classList.remove('show');}
+
+function endAw(u,silent){u._gk=0;if(u.id==='noah')B.domain=false;u.aw=false;u.awT=0;u.store=0;u.stk=0;u.second=false;if(u.legs&&u.legs.includes('koukagari'))u.ag=50;if(!silent){if(!u.noRecoil)u.ct+=20/spdOf(u)*5;log(`${u.name}の星臨が解けた（反動で行動が遅れる）`);}refresh();}
+
+async function release(g){const base=g.store*.9+st(g,'atk')*1.5;log(`<b>城壁崩し！</b> 蓄積した ${Math.round(g.store)} の力を解き放つ！`);
+ B.flashBg=20;B.shake=14;SFX.brk();await wait(400);
+ for(const e of aliveE()){await hit(g,e,{n:'城壁崩し',el:'打',k:'phys',fixed:base});await wait(120);}
+ endAw(g);}
 
 /* ===== 行動 ===== */
-
+const awN=u=>AW[u.id].turns+(u.awTurn||0)+((u.awLv||1)-1);
+const awTag=h=>h.id==='gald'?' 蓄積'+Math.round(h.store):h.id==='mire'?` ゲージ${Math.round(h.ag)} 対消滅${h.stk||0}`:' 残'+(awN(h)-h.awT);
 let ATK=u=>MAG(u.id)?{n:'魔弾',el:u.atkEl||null,k:'mag',pow:.8,t:'one',basic:true}:({n:'攻撃',el:u.aw&&u.id==='rio'?'陽':(u.atkEl||u.elem),k:'phys',pow:1,t:'one',basic:true});
 const GUARD={n:'防御',k:'guard',t:'self'};
+
+async function doAction(u,sk,t){
+ if(sk.k==='zen'){await zenStrike(u);return;}
+ if(sk.k==='guard'){u.guard=true;if(!u.aw)u.ag=Math.min(100,u.ag+10);log(`${u.name}は身を守っている`);setCT(u,.7);return;}
+ if(sk.k==='kenshu'){u.guard=true;u.kenshu=true;log('ガルドは城塞と化した――<b>堅守</b>');setCT(u,.7);return;}
+ if(sk.k==='taunt'){u.sp-=sk.sp;u.taunt=3;if(sk.guard)u.guard=true;log(`${u.name}の${sk.n}！ 敵の視線が集まる`);SFX.sel();setCT(u);return;}
+ if(sk.k==='healAll'){u.sp-=sk.sp;log(`${u.name}の${sk.n}！`);aliveH().forEach(h=>{const v=Math.round(h.mhp*sk.pow);h.hp=Math.min(h.mhp,h.hp+v);pop(h,'+'+v,'#7dffa8');});SFX.heal();setCT(u);refresh();await wait(500);return;}
+ if(sk.k==='guardRegen'){u.sp-=sk.sp;u.guard=true;const v=Math.round(u.mhp*.15);u.hp=Math.min(u.mhp,u.hp+v);pop(u,'+'+v,'#7dffa8');log(`${u.name}の${sk.n}！`);SFX.heal();setCT(u,.8);refresh();await wait(450);return;}
+ if(sk.k==='release'){await release(u);setCT(u);return;}
+ if(sk.k==='item'){await useItem(u,sk.id,t);setCT(u,.8);return;}
+ if(sk.k==='roar'){aliveE().forEach(e=>{e.ct+=40/e.spd;pop(e,'DELAY','#7fd6ff',true);});aliveH().forEach(h=>{if(!h.aw)h.ag=Math.min(100,h.ag+15);});log(`${u.name}の<b>咆哮</b>！ 敵がすくみ、味方が奮い立つ`);B.shake=8;SFX.warn();setCT(u);refresh();await wait(500);return;}
+ if(sk.k==='rhythm'){B.combo={n:0,tot:0};setTimeout(comboEnd,4000);log('<b>氷華乱舞</b>――白い輪が青い輪に重なった瞬間にタップ！');await wait(300);const n0=auto?Math.round(5+Math.random()*6):await rhythm(),n=Math.min(16,n0+(u.legs&&u.legs.includes('hyouga')?4:0));
+  log(`<b>${n}連撃！</b>`);u.tox=-10;for(let i=0;i<n&&t&&t.alive;i++){await hit(u,t,{n:'乱舞',el:i%3===2?'冷':'打',k:'phys',pow:.55});await wait(60);}u.tox=0;
+  if(n0>=12&&t&&t.alive){t.ct+=150/t.spd;pop(t,'凍結','#bff4ff');log('<b>氷華終の型！</b> 敵が凍りついた');}setCT(u);return;}
+ if(sk.k==='charge'){u.ag=Math.max(0,u.ag-(sk.gauge||0));u.charged=1;log(`${u.name}は弓を引き絞った…（天穿が撃てる）`);pop(u,'充填','#7fd6ff',true);setCT(u,.6);refresh();await wait(400);return;}
+ if(sk.k==='release2'){const n=u.awT;log('<b>溶鉄爆砕！</b> 溜めた熱を叩きつける');B.shake=14;SFX.brk();for(const e of aliveE()){await hit(u,e,{n:sk.n,el:'熱',k:'phys',pow:1.6});await wait(100);}
+  if(n>=4){const c=Math.round(u.mhp*.2);u.hp=Math.max(1,u.hp-c);pop(u,'-'+c,'#ff8a8a');log('熱が逆流した…！');}endAw(u);setCT(u);refresh();return;}
+ if(sk.k==='pct'){log('<b>死経</b>――命を削る呪言が響く');B.flashBg=20;for(const e of aliveE()){const d=Math.max(1,Math.round(e.hp*(e.boss?.12:.4)));e.hp=Math.max(0,e.hp-d);e.flash=8;pop(e,d,'#b07cff');refresh();if(e.hp<=0)await kill(e);await wait(150);}setCT(u);return;}
+ if(['haste','cheer','grace','scan'].includes(sk.k)){u.sp-=sk.sp||0;
+  if(sk.k==='haste')aliveH().forEach(h=>{if(h!==u){h.ct=Math.max(0,h.ct-30/spdOf(h));pop(h,'HASTE','#8ff0a8',true);}});
+  if(sk.k==='cheer')aliveH().forEach(h=>{if(!h.aw){h.ag=Math.min(100,h.ag+15);pop(h,'AG+15','#ffe27a',true);}});
+  if(sk.k==='grace'&&t&&!t.aw){t.ag=Math.min(100,t.ag+40);pop(t,'AG+40','#ffe27a',true);}
+  if(sk.k==='scan')aliveE().forEach(e=>{e.weak.forEach(w=>e.known.add(w));G.known[e.kind]=[...e.known];pop(e,'SCAN','#7fd6ff',true);});
+  log(`${u.name}の${sk.n}！`);SFX.heal();setCT(u);refresh();await wait(450);return;}
+ if(sk.k==='reviveAll'){B.heroes.forEach(h=>{if(!h.alive){h.alive=true;h.hp=1;setCT(h);}const v=Math.round(h.mhp*.4);h.hp=Math.min(h.mhp,h.hp+v);pop(h,'+'+v,'#7dffa8');});log(`${u.name}の<b>${sk.n}</b>！`);SFX.heal();B.flashBg=20;setCT(u);refresh();await wait(500);return;}
+ if(sk.k==='barrier'){u.sp-=sk.sp||0;B.barrier=sk.long?6:3;log(`${u.name}の${sk.n}！ 光の膜が味方を包む`);SFX.heal();setCT(u);refresh();await wait(450);return;}
+ if(sk.k==='revive'){u.sp-=sk.sp;t.alive=true;t.hp=Math.round(t.mhp*.4);setCT(t);pop(t,'REVIVE','#7dffa8');log(`${u.name}の${sk.n}！ ${t.name}が立ち上がった`);SFX.heal();setCT(u);refresh();await wait(450);return;}
+ if(sk.k==='heal'){u.sp-=sk.sp;const v=Math.round(t.mhp*sk.pow);t.hp=Math.min(t.mhp,t.hp+v);log(`${u.name}の${sk.n}！`);pop(t,'+'+v,'#7dffa8');SFX.heal();setCT(u);refresh();await wait(450);return;}
+ u.sp-=sk.sp||0;u.tox=-10;B.combo={n:0,tot:0};
+ if(sk.gauge){u.ag=Math.max(0,u.ag-(sk.gauge-(u.gaugeSave||0)-((u.awLv||1)-1)*3));if(u.lastEl&&sk.el!==u.lastEl){u.stk=Math.min(3,(u.stk||0)+1);pop(u,'対消滅'+u.stk,'#ffb030',true);}u.lastEl=sk.el;}if(sk.gaugeAll)u.ag=0;if(sk.hpCost){const c=Math.round(u.mhp*sk.hpCost);u.hp=Math.max(1,u.hp-c);pop(u,'-'+c,'#b07cff',true);}if(sk.req==='charged')u.charged=0;log(`${u.name}の${sk.n}！`);refresh();await wait(180);
+ const ts=sk.t==='all'?aliveE():[t&&t.alive?t:aliveE()[0]];
+ /* ver0.46：全体攻撃は 1 ヒットごとに全員へ同時に当てる（演出は 1 回・命中と数字は全員同時。_sim の当たりは振りと止めを省く js/ver19.js） */
+ if(ts.length>1&&!sk.basic){const sOf=e=>{let s2=sk.auto?{...sk,el:sk.auto.find(x=>e.weak.includes(x))||sk.el}:sk;return s2;},n=Math.max(...ts.map(e=>sOf(e).hits||1));
+  for(let i=0;i<n;i++){let first=true;for(const e of ts){if(!e||!e.alive)continue;const s2=sOf(e);if(i>=(s2.hits||1))continue;const s3=Object.assign({},s2,first?{_simLead:1}:{_sim:1});first=false;
+    const dd=await hit(u,e,s3);if(sk.drain&&dd){const v=Math.round(dd*sk.drain);u.hp=Math.min(u.mhp,u.hp+v);pop(u,'+'+v,'#7dffa8',true);}}
+   await wait(sk.hits?160:120);}
+  for(const e of ts){if(!e||!e.alive)continue;if(sk.steal)doSteal(u,e,sk.steal);if(sk.delay){e.ct+=sk.delay*(e.boss?.4:1)/e.spd;pop(e,'DELAY','#7fd6ff',true);}}
+  await wait(140);}
+ else for(const e of ts){if(!e)continue;let s2=sk.auto?{...sk,el:sk.auto.find(x=>e.weak.includes(x))||sk.el}:sk;if(sk.basic&&u.legs&&u.legs.includes('tenkyuu'))s2={...s2,hits:2};for(let i=0;i<(s2.hits||1)&&e.alive;i++){const dd=await hit(u,e,s2);if(sk.drain&&dd){const v=Math.round(dd*sk.drain);u.hp=Math.min(u.mhp,u.hp+v);pop(u,'+'+v,'#7dffa8',true);}if(sk.hits)await wait(120);}if(sk.steal&&e.alive)doSteal(u,e,sk.steal);if(sk.delay&&e.alive){e.ct+=sk.delay*(e.boss?.4:1)/e.spd;pop(e,'DELAY','#7fd6ff',true);}await wait(140);}
+ if(sk.basic)u.sp=Math.min(100,u.sp+10+(u.spGain||0));
+ comboEnd();u.tox=0;setCT(u,sk.w||(sk.t==='all'?1.1:1));await wait(200);}
+
+function doSteal(u,e,lv){if(e.stolen){pop(e,'もう盗めない','#aab0d8',true);return;}if(lv<2&&Math.random()>.6){pop(e,'MISS','#aab0d8',true);return;}e.stolen=1;let s;
+ if(lv>=2)s=addLoot(genItem(e.lv,2,0));else if(Math.random()<.5){const d=ED[e.kind].drop[0],k=d?d[0]:'haiseki';G.mats[k]=(G.mats[k]||0)+1;s=MATS[k].n;}else{addItem('potion',1);s='ポーション';}
+ pop(e,'STEAL','#7dffa8',true);log(`${u.name}は<b>${s}</b>を盗んだ！`);}
+async function useItem(u,id,t){G.items[id]--;const nm=ITEMS[id].n;
+ if(id==='potion'||id==='hipotion'){const v=Math.min(id==='potion'?120:Math.round(t.mhp*.5),t.mhp-t.hp);t.hp+=v;pop(t,'+'+v,'#7dffa8');}
+ if(id==='ether'){t.sp=Math.min(100,t.sp+50);pop(t,'SP+50','#6fb2ff',true);}
+ if(id==='drop'||id==='drop2'){const v=id==='drop'?30:60;if(!t.aw)t.ag=Math.min(100,t.ag+v);pop(t,'AG+'+v,'#ffe27a',true);}
+ if(id==='feather'||id==='tail'){t.alive=true;t.hp=id==='tail'?t.mhp:Math.round(t.mhp*.3);setCT(t);pop(t,'REVIVE','#7dffa8',true);}
+ SFX.heal();log(`${u.name}は${nm}を使った`);
+ refresh();await wait(450);}
+
+async function heroTurn(u){
+ u.guard=false;u.kenshu=false;if(u.taunt>0)u.taunt--;
+ if(u.legs&&u.legs.includes('hoshikuzu')&&u.alive&&u.hp<u.mhp){const v=Math.round(u.mhp*.05);u.hp=Math.min(u.mhp,u.hp+v);pop(u,'+'+v,'#7dffa8',true);}
+ if(B.domain&&u.alive&&u.hp<u.mhp){const v=Math.round(u.mhp*.1);u.hp=Math.min(u.mhp,u.hp+v);pop(u,'+'+v,'#ffe27a',true);refresh();}if(u.id==='noah'&&B.barrier>0)B.barrier--;
+ let ch=auto?(await wait(250),autoPick(u)):await chooseRoot(u);
+ if(ch&&ch.aw){await awaken(u);ch=autoPick(u);}
+ if(ch&&ch.swap){const nh=hero(ch.swap);nh.x=u.x;nh.y=u.y;nh.ct=0;nh.swapped=1;G.h[u.id].hp=u.hp;B.heroes[B.heroes.indexOf(u)]=nh;G.party[G.party.indexOf(u.id)]=ch.swap;
+  log(`${u.name}と${nh.name}が入れ替わった！`);SFX.sel();B.cur=nh;refresh();await wait(300);return heroTurn(nh);}
+ if(ch&&ch.flee){const hs=aliveH(),es=aliveE(),p=Math.max(.2,Math.min(.95,.5+(hs.reduce((a,h)=>a+h.spd,0)/hs.length-es.reduce((a,e)=>a+e.spd,0)/es.length)*.06));
+  if(Math.random()<p){log('うまく逃げ切った！');SFX.sel();await wait(500);B.over=true;B.heroes.forEach(h=>{G.h[h.id].hp=Math.max(h.hp,1);});B.opts.onEnd&&B.opts.onEnd('flee');return;}
+  log('逃げられなかった！');setCT(u);await wait(500);return;}
+ $('#cmd').innerHTML='<div class="wait">…</div>';
+ await doAction(u,ch.sk,ch.t);
+ if(u.aw&&u.alive&&u.id==='mire'){if(u.ag<=0)endAw(u);else if(!u.second){u.second=true;u.ct=0;log('<b>二重詠唱！</b> もう一度行動できる');}else u.second=false;}
+ else if(u.aw&&u.alive){u.awT++;
+  if(['rio','noah','crow','hakua','jin','celes','valk'].includes(u.id)&&u.awT>=awN(u))endAw(u);
+  else if(u.id==='erna'){if(u.ag<=0)endAw(u);}
+  else if(u.id==='balza'&&u.awT>=awN(u)){log('炉心が臨界に――<b>自動で溶鉄爆砕</b>！');await wait(400);await doAction(u,SK.youtetsu);}
+  else if(u.id==='shion'){if(u.awT>=awN(u))endAw(u);else{u.ct=0;log('<b>影縫いの刻</b>――続けて動ける');}}
+  else if(u.id==='gald'&&u.awT>=awN(u)){log('城塞が限界を迎えた――<b>自動解放</b>！');await wait(500);await release(u);}}
+ refresh();}
+
+function autoPick(u){
+ if(u.ag>=100&&!u.aw&&B.heroes.filter(h=>h.aw).length<2)return{aw:true};
+ if(u.id==='rio'&&!u.aw&&u.sp>=20){const low=aliveH().find(h=>h.hp<h.mhp*.35);if(low)return{sk:SK.teate,t:low};}
+ const es=aliveE().sort((a,b)=>a.hp-b.hp);
+ if(u.aw&&(u.awLv||1)>=3&&!u._gk&&!((SK['goku'+u.id].gauge||0)>u.ag)){u._gk=1;return{sk:SK['goku'+u.id],t:es[0]};}
+ if(u.aw){if(u.id==='jin')return{sk:SK[aliveE().length>2?'shippuuga':'juuou'],t:es[0]};if(u.id==='hakua')return{sk:SK[aliveE().length>2?'hyoukajin':'ranbu'],t:es[0]};if(u.id==='erna')return{sk:SK[u.charged?'tenkuu':u.ag>=50?'juuten':'raisen'],t:es[0]};if(u.id==='balza')return{sk:SK[u.awT>=3?'youtetsu':'tanda'],t:es[0]};if(u.id==='crow')return{sk:SK[u.hp<=u.mhp*.25?'shikyou':'judan'],t:es[0]};if(u.id==='mire')return{sk:SK[(u.stk||0)>=3?'zettai':u.lastEl==='熱'?'blizz2':'fira2'],t:es[0]};if(u.id==='gald'&&u.awT>=2)return{sk:SK.houkai};return{sk:SK[AW[u.id].cmds[0]],t:es[0]};}
+ for(const k of u.skills){const s=SK[k];if(!['phys','mag'].includes(s.k)||s.sp>u.sp)continue;const e=es.find(e=>e.known.has(s.el));if(e)return{sk:s,t:e};}
+ return{sk:ATK(u),t:es[0]};}
 
 /* ===== メニュー ===== */
 function menu(items,list,xc){const c=$('#cmd');if(scene==='town')$('#stage').style.display=xc==='grid9'?'':'none';c.className=(list?'list':'')+(xc?' '+xc:'');c.innerHTML='';
  items.forEach(it=>{const b=document.createElement('button');b.className='c '+(it.cls||'');b.innerHTML=(it.ic?`<img class="ic" src="${ICON[it.ic]}">`:'')+it.l+(it.s?`<small>${it.s}</small>`:'');b.disabled=!!it.dis;
   b.onclick=()=>{SFX.sel();it.f();};c.appendChild(b);});}
+function chooseRoot(u){return new Promise(res0=>{const res=v=>{B.res=null;res0(v);};B.res=()=>res(autoPick(u));
+ const root=()=>{const ready=u.ag>=100&&!u.aw&&B.heroes.filter(h=>h.aw).length<2;
+  const its=[{l:'たたかう',f:()=>pickT(u,ATK(u),root,res)},{l:u.aw?'星臨技':'スキル',f:()=>skillMenu(u,root,res)},
+   {l:'星臨',s:u.aw?'発動中':`AG ${Math.floor(u.ag)}%`,cls:'aw'+(ready?' ready':''),dis:!ready,f:async()=>{$('#cmd').innerHTML='';await awaken(u);root();}},
+   {l:'防御',s:'被ダメ半減',f:()=>res({sk:GUARD})},{l:'アイテム',f:()=>itemMenu(u,root,res)}];
+  if(u.aw&&u.id==='rio')its.push({l:'星臨解除',s:'任意で解く',f:()=>{endAw(u);root();}});
+
+  const rs=G.members.filter(id=>!B.heroes.some(h=>h.id===id)&&G.h[id].hp!==0);
+  its.push({l:'交代',s:rs.length?'控えと入替':'控えなし',dis:!rs.length||u.swapped||u.aw,f:()=>menu([...rs.map(id=>({l:HB[id].name,s:`Lv${G.h[id].lv}`,f:()=>res({swap:id})})),{l:'戻る',cls:'back',f:root}],true)});
+  its.push({l:'逃げる',dis:!!B.opts.boss||!!B.opts.event||!!B.opts.trial,f:()=>res({flee:1})});
+  log(`<b>${u.name}</b>の番${u.aw?`（${AW[u.id].name}：${awTag(u)}）`:''}`);
+  menu(its);};
+ root();});}
+function skillMenu(u,back,res){const ks=u.aw?awCmds(u):u.skills;
+ menu([...ks.map(k=>{const s=SK[k];const lock=s.req==='charged'?!u.charged:s.req==='lowhp'?u.hp>u.mhp*.25:s.req==='stk3'?(u.stk||0)<3:s.req&&!B.awUsed.has(s.req);
+  return{l:s.n,s:(s.sp?`SP${s.sp} `:'')+s.d,dis:(s.sp||0)>u.sp||lock||(s.k==='zen'&&B.zenUsed)||(s.revive&&!B.heroes.some(h=>!h.alive)),f:()=>pickT(u,s,()=>skillMenu(u,back,res),res)};}),{l:'戻る',cls:'back',f:back}],true);}
+function pickT(u,sk,back,res){
+ if(sk.t==='all'||sk.t==='self')return res({sk});
+ const pool=sk.t==='one'?aliveE():(sk.revive?B.heroes.filter(h=>!h.alive):aliveH());
+ if(pool.length===1&&sk.t==='one')return res({sk,t:pool[0]});
+ menu([...pool.map(t=>({l:t.name,s:`HP ${t.hp}/${t.mhp}`,f:()=>res({sk,t})})),{l:'戻る',cls:'back',f:back}],true);}
+function itemMenu(u,back,res){const I=G.items,dead=B.heroes.some(h=>!h.alive);
+ menu([...Object.keys(ITEMS).filter(k=>(I[k]||0)>0||k==='potion').map(k=>{const rv=k==='feather'||k==='tail';return{ic:k,l:`${ITEMS[k].n} ×${I[k]||0}`,s:ITEMS[k].d,dis:!I[k]||(rv&&!dead),f:()=>pickT(u,{k:'item',id:k,t:'ally',revive:rv},()=>itemMenu(u,back,res),res)};}),
+  {l:'戻る',cls:'back',f:back}],true);}
 
 /* ===== 敵 ===== */
-/* 未使用：js/rs/battle.js が置き換え */
+function pickHero(){}/* 未使用：js/rs/battle.js が置き換え */
+async function enemyTurn(e){
+ e.turn++;let sk;const ai=ED[e.kind].ai,pick=a=>{let r=Math.random();for(const[k,w]of a){if((r-=w)<0)return k;}return a[0][0];};
+ if(ai){
+  if(e.charging){sk=Object.assign({},EA[ai.charge]);if(sk.pow)sk.pow*=.85;e.charging=false;}
+  else if(!e.summoned&&ai.summon&&e.hp<e.mhp/2){e.summoned=true;log(`${e.name}が<b>眷属を呼び出した</b>！`);
+   const s1=enemy(ai.summon,ai.sumLv,78,14,'A'),s2=enemy(ai.summon,ai.sumLv,78,80,'B');[s1,s2].forEach(s=>{setCT(s);B.enemies.push(s);});SFX.warn();setCT(e);refresh();await wait(700);return;}
+  else if(e.turn%ai.every===0){e.charging=true;SFX.warn();pop(e,'溜め！','#ffb030');log(`${e.name}は<b>力を溜めている</b>…！ 防御で備えろ！`);setCT(e);refresh();await wait(800);return;}
+  else sk=EA[pick(ai.acts)];}
+ else sk=EA[pick(ED[e.kind].acts||[['claw',1]])];
+ e.tox=10;log(`${e.name}の${sk.n}！`);refresh();await wait(260);
+ let ts;
+ if(sk.t==='all'){const g=gald();if(g&&g.alive&&g.aw){ts=[g];pop(g,'肩代わり','#ffe27a',true);log(`${e.name}の${sk.n}！ ――<b>ガルドが全てを受け止める</b>`);}else ts=aliveH();}
+ else ts=[pickHero()];
+ if(sk===EA.roar)B.shake=16;
+ /* ver0.46：敵の全体攻撃も全員へ同時に当てる */
+ if(ts.length>1){let first=true;for(const t of ts){await hit(e,t,Object.assign({},sk,first?{_simLead:1}:{_sim:1}));first=false;}await wait(260);}
+ else for(const t of ts){await hit(e,t,sk);await wait(130);}
+ e.tox=0;setCT(e);await wait(250);}
 
+async function end(win){B.over=true;$('#cmd').innerHTML='';B.heroes.forEach(h=>{G.h[h.id].hp=Math.max(h.hp,Math.ceil(h.mhp*.2));});
+ const ov=$('#ov');ov.classList.remove('hide');
+ if(!win){if(B.opts.trial){G.party=B.opts.prevParty;save();ov.innerHTML=`<div class="logo" style="font-size:28px">試練失敗</div><div class="sub">幻影に押し返された。<br>鍛え直して、また挑もう（ペナルティなし）</div><button class="big" id="cont">灯都へ</button>`;$('#cont').onclick=()=>enterTown('試練の間から戻った…');return;}
+  save();/* ver0.32：全滅してもお金は減らない（クエストと同じ決まり。それまでに得た報酬も残る） */
+  ov.innerHTML=`<div class="logo" style="font-size:28px">全滅…</div><div class="sub">虚蝕に呑まれ、灯都へ運ばれた。<br>所持金は失わなかった（${G.gold}G）</div><button class="big" id="cont">灯都へ</button>`;
+  $('#cont').onclick=()=>enterTown('灯守たちに救われ、灯都で目を覚ました…');return;}
+ const r=rewards(B.enemies);if(B.opts.boss&&A)G.flags[A.bflag]=true;save();
+ const dr=Object.entries(r.drops).map(([k,n])=>`${MATS[k].n}×${n}`).join('・');
+ ov.innerHTML=`<div class="logo" style="font-size:28px">VICTORY</div><div class="sub">経験値 +${r.xp}　${r.gold}G 獲得　灯力+${r.tou}${r.sts.length?'<br>星石：'+r.sts.join('・'):''}${dr?'<br>入手：'+dr:''}${r.loot.length?'<br>装備：'+r.loot.join('、'):''}${r.ups.length?'<br><b style="color:#ffe27a">レベルアップ！ '+r.ups.join('・')+'</b>':''}</div><button class="big" id="cont">続ける</button>`;
+ $('#cont').onclick=()=>{SFX.sel();B.opts.onEnd&&B.opts.onEnd(true);};}
 function gainXP(){}/* 未使用：js/v31/core.js が置き換え */
 function rewards(es){let xp=0,gold=0;const drops={};
  es.forEach(e=>{const d=ED[e.kind],m=1+.3*(e.lv-1);xp+=Math.round(d.xp*m*(1+.05*(G.fac.bar-1)));gold+=Math.round(d.gold*m);
@@ -145,7 +355,7 @@ function draw(){tick++;if(scene==='field'){drawField();requestAnimationFrame(dra
  ctx.restore();requestAnimationFrame(draw);}
 
 /* ===== UI更新 ===== */
-
+function bar(cls,v,m,txt){return`<div class="bar ${cls}${cls==='ag'&&v>=100?' full':''}"><i style="width:${Math.max(0,Math.min(100,v/m*100))}%"></i><span>${txt}</span></div>`;}
 function refresh(){}/* 未使用：js/ch5.js が置き換え */
-
+const BBOX={};function bbox(k){if(BBOX[k])return BBOX[k];let x0=16,y0=16,x1=0,y1=0;SPR[k].forEach((r,y)=>[...r].forEach((c,x)=>{if(c!=='.'){x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y);}}));return BBOX[k]={x:x0,y:y0,w:x1-x0+1,h:y1-y0+1};}
 const ELC={'斬':'#cfd6e6','打':'#e0b98a','突':'#b9e0c9','熱':'#ff7a3a','冷':'#7fd6ff','雷':'#ffe14a','風':'#8ff0a8','地':'#d0a060','陽':'#fff3a6','陰':'#b07cff'};

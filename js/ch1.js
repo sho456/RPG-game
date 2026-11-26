@@ -29,7 +29,7 @@ BDEF.mire={star:'双極座',sec:[['magP'],['resP'],['spd','crit'],['mhpP'],['def
   '3,0':{t:'fork',g:1,v:{magP:12},d:'灼星：魔力+12%'},'0,3':{t:'fork',g:1,v:{mhpP:15},d:'霜星：最大HP+15%'},
   '-3,0':{t:'fork',g:2,v:{awDmg:20},d:'極星：星臨中与ダメ+20%'},'-3,3':{t:'fork',g:2,v:{weakDmg:20},d:'看破：弱点ダメ+20%'}}};
 BOARD.mire=buildBoard('mire');
-
+const HPOS={1:[[130,46]],2:[[120,28],[140,62]],3:[[118,10],[140,44],[120,78]],4:[[116,2],[140,28],[118,56],[142,84]]};
 function newMember(id){const lv=Math.max(1,Math.round(G.party.reduce((a,i)=>a+G.h[i].lv,0)/G.party.length)-2);
  G.h[id]={lv,xp:0,hp:null,eq:{w:null,sub:null,head:null,body:null,acc1:null,acc2:null},board:['0,0'],jobs:{},pass:[],job:null};
  const w=fixedItem('w',id,Math.max(1,lv-1));G.inv.push(w);G.h[id].eq.w=w.uid;if(!G.members.includes(id))G.members.push(id);if(G.party.length<4)G.party.push(id);}

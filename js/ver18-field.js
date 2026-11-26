@@ -1,5 +1,5 @@
 /* ===== ver0.18 探索の名残：マップの差し替え・宝箱の移し替え・塔と回廊の番人の広間（探索の描画・敵の配置・ミニマップは探索マップの廃止で削除） ===== */
-
+'use strict';
 /* ---------- マップの差し替えと宝箱の移し替え ---------- */
 for(const k in MAPS18)if(AREAS[k])AREAS[k].map=MAPS18[k];
 const chestsOf=m=>{const o=[];m.forEach((r,y)=>[...r].forEach((t,x)=>{if(t==='C')o.push([x,y]);}));return o;};

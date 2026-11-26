@@ -1,15 +1,20 @@
 /* ===== 灯都ルミナス ===== */
 function enterTown(m){show('town');setH(128);TOWN=makeTown(townP());gardenTick();$('#ov').classList.add('hide');healAll();save();townMenu(m);}
-/* 未使用：js/ver17.js が置き換え */
+function worldMap(){}/* 未使用：js/ver17.js が置き換え */
 const QS=[{id:'q1',n:'灰狼退治',d:'灰狼を3体倒す',ok:()=>G.q.wolf>=3,pg:()=>`${Math.min(3,G.q.wolf)}/3`,rw:'150G',give:()=>{G.gold+=150;}},
  {id:'q2',n:'灰石の納品',d:'灰石を3個納める',ok:()=>G.mats.haiseki>=3,pg:()=>`${G.mats.haiseki}/3`,rw:'星の雫×1',give:()=>{G.mats.haiseki-=3;addItem('drop',1);}},
  {id:'q3',n:'街道の番人',d:'虚ろの番人を倒す',ok:()=>G.flags.boss1,pg:()=>G.flags.boss1?'達成':'未達成',rw:'500G・不死鳥の羽',give:()=>{G.gold+=500;addItem('feather',1);}}];
 function board(){}/* 未使用：js/ver18-town.js が置き換え */
-/* 未使用：js/ver18-town.js が置き換え */
-function townMenu(){}
-
+function shop(){}/* 未使用：js/ver18-town.js が置き換え */
+function townMenu(m){devBtn(!!G.dev);log((m||'大灯（おおあかり）に守られた最後の街。準備を整えよう。')+goldTxt()+(!G.dev&&G.sorties-(G.lastExp??0)>=8?'<br><small style="color:#ffb030">⚠ しばらく記録の控えを取っていません。「記録→書き出す」で控えを</small>':''));const un=G.inv.filter(i=>i.unid).length;
+ hud(`灯都ルミナス　<b>${chapter()}</b>`);if(G.flags.boss8)$('#msg').insertAdjacentHTML('beforeend',voidNews());
+ menu([{l:'出撃',ic:'go',cls:'ready',f:worldMap},{l:'装備',ic:'eq',f:()=>equipMenu(G.party[0])},{l:'酒場',ic:'bar',f:tavern},
+  {l:'鍛冶屋',ic:'smith',f:smith},{l:'鑑定屋',ic:'eye',s:un?`未鑑定${un}`:'',cls:un?'ready':'',f:appraise},{l:'道具屋',ic:'shop',f:shop},
+  {l:'星詠みの塔',ic:'star',cls:G.members.some(i=>ptsLeft(i)>0)?'ready':'',f:()=>openBoard(G.party[0])},{l:'街の発展',ic:'door',cls:G.fac.garden&&G.garden.n?'ready':'',f:devMenu},{l:'記録',ic:'rec',f:saveMenu}],false,'grid9');}
+function statLine(id){const s=stats(id),h=G.h[id];return`<b>${HB[id].name}</b> Lv${h.lv}　HP${s.mhp} 攻${s.atk} 防${s.def} 魔${s.mag} 精${s.res} 速${+s.spd.toFixed(1)}`+
+ [s.crit&&`会心+${s.crit}%`,s.weakDmg&&`弱点+${s.weakDmg}%`,s.startAG&&`開始AG${s.startAG}`,s.awDmg&&`星臨中+${s.awDmg}%`,s.spGain&&`SP+${s.spGain}`,s.drop&&`ドロップ+${s.drop}%`,s.atkEl&&`攻撃${s.atkEl}属性`].filter(Boolean).map(t=>`<span style="color:#7fd6ff"> ${t}</span>`).join('');}
 function tavern(){}/* 未使用：js/ch9.js が置き換え */
-/* 未使用：js/ver17.js が置き換え */
+function formation(){}/* 未使用：js/ver17.js が置き換え */
 function ecost(it){return{g:Math.round((it.plus+1)*25*(1+it.ilv/4)),haiseki:it.plus+1,kakera:Math.max(0,it.plus-4)};}
 function saveMenu(m){log((m?m+'<br>':'<b>記録</b>　街に戻ると自動でセーブ<br>')+`<div style="margin-top:6px;padding:6px 8px;border:1px solid #ffb030;border-radius:6px;background:rgba(255,176,48,.1);font-size:12px;color:#ffe0a0">⚠ セーブはこの端末のブラウザの中だけにあります。ブラウザのデータ削除・機種変更・プライベートブラウズで消えるので、ときどき<b>「書き出す」</b>で文字列を控え、メモ帳などに保管してください。<br>最後の書き出し：${G.lastExp==null?'まだ一度もない':G.sorties-G.lastExp===0?'今回の出撃中':(G.sorties-G.lastExp)+'回前の出撃'}</div>`);
  menu([{l:'セーブする',f:()=>saveMenu(save()?'セーブしました。':'この環境ではブラウザに保存できません。書き出しを使ってください。')},
@@ -33,7 +38,8 @@ function title(){SAVE='astral_save_v1';show('title');const ov=$('#ov');ov.classL
 
 /* ver0.34：戦闘速度は ×1・×2 の 2 段階（以前の ×4 の保存値は ×2 として読む） */
 function setSpeed(v){v=+v===1?1:2;speed=v;$('#spd').textContent='×'+v;document.documentElement.style.setProperty('--pd',(v===1?1.4:.95)+'s');if(G)G.speed=v;}
-
+$('#spd').onclick=()=>setSpeed(speed===1?2:1);
+$('#autoB').onclick=()=>{auto=!auto;$('#autoB').classList.toggle('on',auto);if(auto&&B&&B.res&&!B.over)B.res();};
 /* ===== 装備系UI（パネル） ===== */
 let ACT={};
 function panel(html,acts){const c=$('#cmd');if(scene==='town')$('#stage').style.display='none';c.className='panel';ACT=acts||{};c.innerHTML=html;c.scrollTop=0;}
@@ -64,10 +70,12 @@ for(const k in STONES){const c=document.createElement('canvas');c.width=c.height
 const invCap=()=>200+(G.fac.store-1)*75;
 const ecap=()=>Math.min(12,2+2*G.fac.smith);
 const townP=()=>{if(!G||!G.fac)return 1;const s=Object.values(G.fac).reduce((a,b)=>a+b,0);return .15+.85*Math.min(1,(s-6)/29);};
-/* 未使用：js/ver18-town.js が置き換え */
+function makeTown(){}/* 未使用：js/ver18-town.js が置き換え */
 const ISLE=(()=>{const c=document.createElement('canvas');c.width=40;c.height=24;const g=c.getContext('2d'),R=rng(31);
-
- })();
+ for(let y=8;y<22;y++){const w=Math.max(0,18-(y-8)*1.4);g.fillStyle=y<11?'#5a4030':'#3a2820';g.fillRect(20-w|0,y,w*2|0,1);}
+ g.fillStyle='#3e8a3a';g.fillRect(3,6,34,3);g.fillStyle='#5aac4a';g.fillRect(4,5,32,1);
+ for(let i=0;i<5;i++){const tx=6+i*7;g.fillStyle='#2a6a2a';g.fillRect(tx,1,5,5);g.fillStyle='#4a3020';g.fillRect(tx+2,6,1,2);}
+ g.fillStyle='#ff90c0';for(let i=0;i<6;i++)g.fillRect(4+R()*32|0,4+R()*2|0,1,1);g.fillStyle='#8ad0ff';g.fillRect(31,9,1,12);return c;})();
 function gardenTick(){if(!G.fac.garden)return;const n=Math.min(10,G.sorties-(G.garden.last||0));if(n>0)G.garden.n=Math.min(10,(G.garden.n||0)+n);G.garden.last=G.sorties;}
 
 function upgradeRar(it){if(it.rar>=4)return false;const n=genItem(it.ilv,0,0,it.slot,4);Object.assign(it,n,{uid:it.uid,unid:false});return true;}

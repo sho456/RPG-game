@@ -1,5 +1,5 @@
 /* ===== ver0.18 顔グラ・立ち絵・図鑑の絵・アイコン（16×16）・街の人 ===== */
-
+'use strict';
 /* ---------- 顔の位置 ---------- */
 function faceCenter(key){const d=SPDEF[key];if(!d)return[9,9];if(d.human)return[d.face[0]+9,d.face[1]+9];const s=d.s||1,f=d.draw;
  return f===dSlime?[d.ax+3,d.ay-9]:f===dBeast?[d.ax+13*s,d.ay-15*s]:f===dShroom?[d.ax+2,d.ay-12]:f===dJelly?[d.ax+3,d.ay-25]:f===dBook?[d.ax,d.ay-18]:f===dShade?[d.ax+3,d.ay-29]:f===dYuki?[d.ax+2,d.ay-23]:f===dEmber?[d.ax+2,d.ay-13]:
@@ -10,15 +10,16 @@ function portrait(key,opt,size,flip){const ck=key+'|'+(opt||'')+'|'+size+'|'+(fl
 function trimCanvas(src,pad=1){const w=src.width,h=src.height,d=src.getContext('2d').getImageData(0,0,w,h).data;let x0=w,y0=h,x1=0,y1=0;for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(d[(y*w+x)*4+3]>10){x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y);}
  if(x1<x0)return src;const s=Math.max(x1-x0+1,y1-y0+1)+pad*2,c=document.createElement('canvas');c.width=c.height=s;c.getContext('2d').drawImage(src,x0,y0,x1-x0+1,y1-y0+1,((s-(x1-x0+1))>>1),s-pad-(y1-y0+1),x1-x0+1,y1-y0+1);return c;}
 const awO=aw=>aw?'{"aw":1}':'';
-
-/* 未使用：js/ver19-art.js が置き換え */
+const FACE18={},ART18={};
+face=function(id,aw){const key=SPDEF[id]?id:'rio',k=key+(aw?'_aw':'');return FACE18[k]||(FACE18[k]=portrait(key,awO(aw),18).toDataURL());};
+art=function(){};/* 未使用：js/ver19-art.js が置き換え */
 /* 旧16×16の絵を参照している箇所（図鑑など）へ新しい絵を渡す */
 function syncIMG(){for(const k in SPDEF){try{const d=SPDEF[k],f=frameOf(k,'idle',0,''),t=trimCanvas(f.c);IMG[k]=t;IMG[k+'_w']=whiteOf(t);if(d.human&&d.aw)IMG[k+'_aw']=trimCanvas(frameOf(k,'idle',0,awO(1)).c);}catch(e){}}}
 syncIMG();
 {const _vk=voidKind;voidKind=function(k){const vk=_vk(k);try{if(!IMG[vk]||IMG[vk].width===16){const key=resolveSpr(vk),t=trimCanvas(frameOf(key,'idle',0,'').c);IMG[vk]=t;IMG[vk+'_w']=whiteOf(t);}}catch(e){}return vk;};}
 /* 行動順バー：新しい顔ドットで描き直す */
 /* 会話の顔グラ（表情5種）：目・眉・口を描き分ける */
-/* 未使用：js/ver19-art.js が置き換え */
+exprFace=function(){};/* 未使用：js/ver19-art.js が置き換え */
 
 /* ---------- アイコン（16×16） ---------- */
 const IC18={};

@@ -4,7 +4,7 @@
  ・ver0.49：ボス以外はすべて MOB 倍で同じ大きさ。ボスだけ CLS（絵の名前ごと。人型は HUM）× BOSS 倍
  ・この後に v23.js の capScale が、戦場の帯からはみ出さないよう縮める
  ・味方の背丈は js/sprite/spx.js（regRigs：全員 36）、並べ方と倍率は js/v38/battle-ui.js */
-
+'use strict';
 const BSIZE=(()=>{
 /* 種類の倍率（味方の見た目の大きさ＝1） */
 const CLS={spx_slime:1.25,spx_jelly:1.3,spx_shroom:1.3,
