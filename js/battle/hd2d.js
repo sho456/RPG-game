@@ -75,8 +75,8 @@ function target(t){const fd=field(),cv=$('#cv');let x=fd.cx,y=fd.cy,z=1,r=0;
  if(F){const ph=(t-F.t0);let list=[F.a,...F.ts].filter(Boolean);
   /* アップ：まず行動するキャラに寄り、最初の命中で相手へ素早く振る（カメラの切り返し） */
   if(F.cu)list=F.hitT&&F.ts.size?[...F.ts]:[F.a];else if(!F.ts.size)list=[F.a];const R=frameOf(list);
-  if(R){const pad=F.cu?1.35:1.9,[x0,y0]=scr(R[0],R[1]),[x1,y1]=scr(R[2],R[3]),bw=(x1-x0)*pad+40,bh=(y1-y0)*pad+30;
-   z=Math.min(fd.w/bw,fd.fh/bh);z=F.cu?Math.max(1.45,Math.min(F.aw?2.7:2.4,z)):Math.max(1,Math.min(1.22,z));x=(x0+x1)/2;y=(y0+y1)/2-(y1-y0)*.08;
+  if(R){const pad=F.cu?1.6:1.9,[x0,y0]=scr(R[0],R[1]),[x1,y1]=scr(R[2],R[3]),bw=(x1-x0)*pad+40,bh=(y1-y0)*pad+30;
+   z=Math.min(fd.w/bw,fd.fh/bh);z=F.cu?Math.max(1.4,Math.min(F.aw?2.3:2,z)):Math.max(1,Math.min(1.22,z));x=(x0+x1)/2;y=(y0+y1)/2-(y1-y0)*.08;
    if(F.cu)r=(F.a.side?1:-1)*(F.hitT?-.01:.014)*Math.min(1,ph*2);}}
  else{/* 引きの画：全員が入る範囲まで寄って、ゆっくり呼吸 */const R=frameOf([...B.enemies,...B.heroes].filter(u=>u.alive||u.side===0));
   if(R){const[x0,y0]=scr(R[0],R[1]),[x1,y1]=scr(R[2],R[3]);z=Math.max(1,Math.min(1.4,fd.w/((x1-x0)+50),fd.fh/((y1-y0)*1.5+40)));x=(x0+x1)/2;y=(y0+y1)/2-(y1-y0)*.12;}
