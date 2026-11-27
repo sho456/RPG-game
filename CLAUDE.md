@@ -103,6 +103,6 @@
 | `td-stage-author` | 章のステージ・WAVE・敵・仲間の加入と会話（`js/td/stages.js`）。WAVE は `STG.wavesOf`（`js/battle/stage.js`）で 1 戦 4 体までに読み替え |
 | `rs-battle-flow` | ロマサガRS風の戦闘の流れと表示（HP/BP のタイミング・Critical/Weak・強化弱体・数字・区切り）。デモ `tools/battle_demo.js`・コマの一覧 `tools/frame_grid.py` |
 
-**PixelLab（MCP サーバー `pixellab`、AI のドット絵生成・アニメ・タイル・効果音。有料の回数制）**：クラウドでは環境「rpg-game」の起動スクリプトが `claude mcp add -s user -t http pixellab https://api.pixellab.ai/mcp` で登録し、API キーは環境のネットワークシークレット（api.pixellab.ai）からプロキシが付ける（キーをリポジトリに書かない）。手元の PC では `claude mcp add pixellab https://api.pixellab.ai/mcp -t http -H "Authorization: Bearer <キー>"`。使い方は `search_help`、残りの回数は `get_balance`。生成した絵はセレス案1・案2の絵柄（`assets_src/pixel-art/celes-48`・`celes-hd`）に合わせて手直ししてから取り込む。
+**PixelLab は rpg-game の環境では切ってある**（2026-11-27。起動スクリプトの MCP 登録を削除。ネットワークシークレット api.pixellab.ai のキーは環境の設定から手動で外す）。ドット絵は `pixel-art-studio`・`pixelbolt-pixel-art`・`pixelfx` と手描きで作る。
 
 pixelbolt を最新版に上げるとき：`npx -y pixelbolt@latest skill install` → `~/.claude/skills/pixelbolt-pixel-art` を `.claude/skills/` に上書きコピーしてコミット。
