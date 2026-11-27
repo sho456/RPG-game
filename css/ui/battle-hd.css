@@ -21,3 +21,7 @@
 #app #bt22 .b22tg,#app #bt22 .b22ord{transition:opacity .35s}
 /* カメラの寄り（transform は hd2d.js が付ける） */
 #app[data-sc="battle"] #cv,#app[data-sc="battle"] #bp46,#app[data-sc="battle"] #pops,#app[data-sc="battle"] #labels{transition:transform .45s cubic-bezier(.2,.7,.2,1)}
+/* 演出専用画面への切り替えの暗転・切り替えの瞬間はカメラの動きを止める */
+#fcbk{position:fixed;inset:0;z-index:930;background:#020108;opacity:0;pointer-events:none;transition:opacity 200ms ease}
+#fcbk.on{opacity:1}
+#app.fcsw #cv,#app.fcsw #bp46,#app.fcsw #pops,#app.fcsw #labels{transition:none!important}

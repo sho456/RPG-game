@@ -27,10 +27,11 @@ V19.dr=function(u,X0,Y0,k,h){if(!isC(u)||!u.alive)return false;start();const p=M
 /* 行動：通常攻撃＝atk、技・術＝cast（FXC）、奥義＝ult（FXU） */
 {const _da=doAction;doAction=async function(u,sk,t){if(isC(u)&&sk){try{start();const P=px(u),tg=Array.isArray(t)?t[0]:t,f=tg&&tg.side===1?px(tg):(B.enemies.find(e=>e.alive)?px(B.enemies.find(e=>e.alive)):null),T=now();
   if(isOu(sk)){P.actK='ult';P.actT=T;ev({k:'ult',u:P,r:999,x:f?f.x:P.x-120,y:f?f.y:P.y});P.impT=T+1.1;}
+  else if(typeof CFX!=='undefined'&&CFX.has(u,sk)){P.actK='cast';P.actT=T;P.impT=null;P._cfx=1;}/* 技・術の演出は js/battle/fx-celes-rs.js（CFX） */
   else{const ts=tdSk(u,sk);if(ts){P.actK='cast';P.actT=T;P.cs=ts;P._skDl=null;ev({k:'cast',u:P,sk:ts,f});P.impT=T+(P._skDl!=null?P._skDl:.35);}else{P.actK='atk';P.actT=T;P.impT=T+.25;}}}catch(e){console.warn(e);}}
  return _da(u,sk,t);};}
 /* 命中：セレスの最初の命中は演出の着弾（impT）まで待って数字を出す（数字と光が同時） */
-{const _h=hit;hit=async function(a,t,sk){try{if(isC(t))px(t).hitT=now();if(isC(a)&&t&&t.side===1){const P=px(a);if(P.impT!=null){const w=(P.impT-now())/rate();P.impT=null;if(w>0)await new Promise(r=>setTimeout(r,Math.min(1800,w*1000)));}const ts=sk?tdSk(a,sk):null;ev({k:'hit',u:px(a),f:px(t),v:0,sk:ts,big:isOu(sk)?1:0});}}catch(e){}return _h(a,t,sk);};}
+{const _h=hit;hit=async function(a,t,sk){try{if(isC(t))px(t).hitT=now();if(isC(a)&&t&&t.side===1){const P=px(a);if(P.impT!=null){const w=(P.impT-now())/rate();P.impT=null;if(w>0)await new Promise(r=>setTimeout(r,Math.min(1800,w*1000)));}if(typeof CFX!=='undefined'&&CFX.has(a,sk))return _h(a,t,sk);const ts=sk?tdSk(a,sk):null;ev({k:'hit',u:px(a),f:px(t),v:0,sk:ts,big:isOu(sk)?1:0});}}catch(e){}return _h(a,t,sk);};}
 {const _aw=awaken;awaken=async function(u){if(isC(u)){try{start();const P=px(u);P.actK='aw';P.actT=now();P.awT=999;ev({k:'aw',u:P});}catch(e){}}return _aw(u);};}
 {const _sb=startBattle;startBattle=function(list,opts){on=false;M.clear();last=0;clk=0;return _sb(list,opts);};}
 return{px,get s(){return s;}};})();

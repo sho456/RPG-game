@@ -119,13 +119,14 @@
 | 113 | `js/td/menu.js` | 14 | TD の章の地図・出撃準備・会話・仲間の加入（TDM）。戦闘画面は js/td/view.js（TD） | TDM |
 | 114 | `js/battle/stage.js` | 6 | 章のステージを ver0.49 のロマサガRS風の戦闘で戦う（STG。ver0.63 でコマンド戦闘 js/cb/* を置き換えた正本） | STG |
 | 115 | `js/battle/celes.js` | 4 | 旧戦闘（ver0.49 のロマサガRS風）でセレスだけを今のコマ送りと演出で描く橋（CEL。ver0.63） | CEL |
-| 116 | `js/ui/battle-status.js` | 3 | 戦闘の強化・弱体のアイコン（BST。ver0.66 の正本） | BST |
-| 117 | `js/battle/showcase.js` | 2 | 星臨と奥義の見せ場のカットイン（SHOW。ver0.65 の正本） | SHOW |
-| 118 | `js/battle/hd2d.js` | 14 | 戦闘の 2D-HD の見た目と、技・術・星臨・奥義の注目画面（HD。ver0.66 の正本） | HD |
-| 119 | `js/ui/home.js` | 4 | ホーム画面（灯都ルミナス）の正本：「出撃」（コマンド戦闘のステージ）を主役にした重ね表示 | HOME |
-| 120 | `js/ui/unit.js` | 12 | 仲間の画面（UNIT）：一覧＋1 人の詳細（ver0.60 からコマンド戦闘の能力）。Lv・技 5 つ・奥義・アビリティ 3 つ・装備・星盤をここにまとめる | UNIT |
-| 121 | `js/ui/zukan.js` | 3 | 図鑑の一覧（ZKUI）：敵・仲間・装備の全画面の一覧。ver0.54 新規 | ZKUI |
-| 122 | `js/ui/dev.js` | 4 | 開発者モードの正本（タイトルの「開発者モード」・ホームの ≡ の DEV） | DEVUI |
+| 116 | `js/battle/fx-celes-rs.js` | 11 | セレスの技・術の演出（CFX。ver0.66 の正本。旧戦闘の座標で直接描く） | CFX |
+| 117 | `js/ui/battle-status.js` | 3 | 戦闘の強化・弱体のアイコン（BST。ver0.66 の正本） | BST |
+| 118 | `js/battle/showcase.js` | 2 | 星臨と奥義の見せ場のカットイン（SHOW。ver0.65 の正本） | SHOW |
+| 119 | `js/battle/hd2d.js` | 14 | 戦闘の 2D-HD の見た目と、技・術・星臨・奥義の注目画面（HD。ver0.66 の正本） | HD |
+| 120 | `js/ui/home.js` | 4 | ホーム画面（灯都ルミナス）の正本：「出撃」（コマンド戦闘のステージ）を主役にした重ね表示 | HOME |
+| 121 | `js/ui/unit.js` | 12 | 仲間の画面（UNIT）：一覧＋1 人の詳細（ver0.60 からコマンド戦闘の能力）。Lv・技 5 つ・奥義・アビリティ 3 つ・装備・星盤をここにまとめる | UNIT |
+| 122 | `js/ui/zukan.js` | 3 | 図鑑の一覧（ZKUI）：敵・仲間・装備の全画面の一覧。ver0.54 新規 | ZKUI |
+| 123 | `js/ui/dev.js` | 4 | 開発者モードの正本（タイトルの「開発者モード」・ホームの ≡ の DEV） | DEVUI |
 
 ## 上書きの連鎖（2 ファイル以上で定義・上書きされる関数）
 
@@ -133,8 +134,8 @@
 
 | 関数 | 定義 → 上書き（読み込み順） |
 |---|---|
-| `draw` | engine.js → ver16.js → ver17.js → sprite/legacy/dot-rig.js → motion/fx19.js → ver19.js → v21.js → v22.js → v23.js → v25.js → sprite/spx.js → zukan/viewer.js → battle/core.js → battle/flow.js → rs/ui.js → v38/battle-ui.js → ui/inv.js → ui/battle-pop.js → ui/growth.js → td/fxkit.js → td/fx.js → battle/celes.js → ui/battle-status.js → ui/unit.js → ui/zukan.js → ui/dev.js |
-| `startBattle` | engine.js → ch8.js → ver18-battle.js → ver19.js → v20-battle.js → v21.js → v22.js → v23.js → v24.js → v25.js → battle/seq.js → battle/flow.js → rs/battle.js → v38/core.js → v38/battle-ui.js → ui/battle-pop.js → battle/celes.js → battle/hd2d.js |
+| `draw` | engine.js → ver16.js → ver17.js → sprite/legacy/dot-rig.js → motion/fx19.js → ver19.js → v21.js → v22.js → v23.js → v25.js → sprite/spx.js → zukan/viewer.js → battle/core.js → battle/flow.js → rs/ui.js → v38/battle-ui.js → ui/inv.js → ui/battle-pop.js → ui/growth.js → td/fxkit.js → td/fx.js → battle/celes.js → battle/fx-celes-rs.js → ui/battle-status.js → ui/unit.js → ui/zukan.js → ui/dev.js |
+| `startBattle` | engine.js → ch8.js → ver18-battle.js → ver19.js → v20-battle.js → v21.js → v22.js → v23.js → v24.js → v25.js → battle/seq.js → battle/flow.js → rs/battle.js → v38/core.js → v38/battle-ui.js → ui/battle-pop.js → battle/celes.js → battle/fx-celes-rs.js → battle/hd2d.js |
 | `title` | town.js → ver16.js → ver17.js → ver18-town.js → ver19.js → v20-ui.js → v21.js → v22.js → v23.js → v24.js → v25.js → v30.js → v31/core.js → v32.js → v33.js → battle/version.js → v38/menu.js |
 | `show` | core.js → ver17.js → ver18-town.js → v20-ui.js → v22.js → v23.js → v24.js → v25.js → battle/flow.js → v38/battle-ui.js → ui/inv.js → ui/keywords.js → ui/battle-pop.js → td/menu.js |
 | `dvMenu` | core.js → ch9.js → ver16.js → ver17.js → ver18-town.js → v20-ui.js → v21.js → v23.js → v24.js → v25.js → v29.js → v30.js → battle/viewer.js |
@@ -142,34 +143,34 @@
 | `townMenu` | town.js → ch9.js → ver18-town.js → v20-ui.js → v21.js → v22.js → v23.js → v38/menu.js → ui/inv.js → td/menu.js → ui/home.js |
 | `awaken` | engine.js → ch8.js → v22.js → v23.js → v25.js → battle/viewer.js → rs/battle.js → battle/celes.js → battle/showcase.js → battle/hd2d.js |
 | `close` | ver17.js → battle/viewer.js → battle/flow.js → ui/equip-info.js → ui/keywords.js → ui/growth.js → td/menu.js → ui/unit.js → ui/zukan.js → ui/dev.js |
+| `doAction` | engine.js → ch8.js → v20-battle.js → v20-ui.js → v22.js → battle/flow.js → battle/celes.js → battle/fx-celes-rs.js → battle/hd2d.js |
 | `build` | motion/skeleton.js → items/icons36.js → ui/growth.js → td/skicon.js → td/menu.js → ui/home.js → ui/unit.js → ui/zukan.js |
 | `calc` | engine.js → ch8.js → ch9.js → ver19.js → v20-battle.js → data/terms.js → v31/core.js → rs/battle.js |
-| `doAction` | engine.js → ch8.js → v20-battle.js → v20-ui.js → v22.js → battle/flow.js → battle/celes.js → battle/hd2d.js |
 | `hero` | engine.js → ver18-battle.js → v20-battle.js → v31/items.js → v31/board.js → battle/viewer.js → rs/core.js → td/data.js |
 | `open` | battle/viewer.js → ui/equip-info.js → ui/growth.js → td/menu.js → ui/battle-status.js → ui/unit.js → ui/zukan.js → ui/dev.js |
 | `face` | ui-assets.js → ver18-art.js → sprite/legacy/dot-rig.js → ver19-art.js → sprite/spx.js → td/uanim.js → battle/hd2d.js |
+| `keyOf` | sprite/legacy/dot-rig.js → ver19.js → v21-items.js → v31/items.js → battle/seq.js → rs/core.js → battle/fx-celes-rs.js |
 | `refresh` | engine.js → ch5.js → ver17.js → v20-ui.js → v22.js → v24.js → v25.js |
 | `rewards` | engine.js → ch8.js → ch9.js → v20-ui.js → v31/core.js → rs/mastery.js → ui/growth.js |
 | `row` | ver17.js → v22.js → v24-text.js → zukan/zukan.js → data/resist.js → ui/battle-status.js → ui/unit.js |
-| `step` | ch7.js → v20-ui.js → v24.js → td/fxkit.js → td/fx.js → td/menu.js → battle/hd2d.js |
 | `add` | motion/fx19.js → data/terms.js → motion/registry.js → battle/core.js → ui/growth.js → td/fx.js |
 | `art` | ver17.js → ver18-art.js → ver19-art.js → sprite/spx.js → battle/showcase.js → battle/hd2d.js |
 | `boardMenu` | items.js → ver17.js → v21.js → v31/board.js → rs/core.js → ui/board.js |
 | `charHTML` | ver17.js → v20-ui.js → v22.js → v31/core.js → v31/board.js → rs/ui.js |
-| `keyOf` | sprite/legacy/dot-rig.js → ver19.js → v21-items.js → v31/items.js → battle/seq.js → rs/core.js |
+| `has` | v24.js → sprite/facing.js → battle/rig.js → battle/viewer.js → td/uanim.js → battle/fx-celes-rs.js |
+| `hit` | engine.js → v20-battle.js → rs/battle.js → td/fxkit.js → battle/celes.js → battle/fx-celes-rs.js |
 | `mix` | sprite/legacy/dot.js → v22.js → v24-text.js → battle/core.js → td/bg.js → td/skicon.js |
 | `onClick` | battle/viewer.js → ui/growth.js → td/menu.js → ui/unit.js → ui/zukan.js → ui/dev.js |
 | `panel` | town.js → ver18-town.js → v20-ui.js → v22.js → battle/viewer.js → ui/battle-pop.js |
 | `stats` | engine.js → v31/core.js → v31/items.js → rs/core.js → data/equip7.js → ui/unit.js |
+| `step` | ch7.js → v20-ui.js → v24.js → td/fxkit.js → td/fx.js → td/menu.js |
 | `autoPick` | engine.js → ch8.js → ver17.js → v20-battle.js → rs/battle.js |
 | `cap` | sprite/legacy/dot-rig.js → battle/seq.js → battle/viewer.js → ui/inv.js → ui/growth.js |
 | `enemy` | engine.js → v31/enemies.js → v32.js → battle/size.js → v38/core.js |
 | `enemyTurn` | engine.js → v20-battle.js → v20-ui.js → v25.js → battle/viewer.js |
 | `fit` | core.js → v20-ui.js → v21.js → v22.js → v23.js |
 | `frameOf` | sprite/legacy/px.js → sprite/legacy/px-enemy.js → ver19-art.js → sprite/spx.js → zukan/viewer.js |
-| `has` | v24.js → sprite/facing.js → battle/rig.js → battle/viewer.js → td/uanim.js |
 | `heroTurn` | engine.js → v20-battle.js → v22.js → v25.js → battle/viewer.js |
-| `hit` | engine.js → v20-battle.js → rs/battle.js → td/fxkit.js → battle/celes.js |
 | `openSheet` | ch3.js → ver17.js → v22.js → rs/ui.js → ui/party.js |
 | `pick` | ver17.js → v31/items.js → battle/seq.js → td/uanim.js → battle/stage.js |
 | `put` | ver16.js → items/icons36.js → rs/battle.js → td/uanim.js → ui/battle-status.js |
@@ -177,6 +178,7 @@
 | `addLoot` | items.js → ch9.js → ver17.js → v20-ui.js |
 | `bbar` | ver17.js → v22.js → v25.js → rs/ui.js |
 | `board` | town.js → ver18-town.js → v22.js → ui/party.js |
+| `burst` | motion/fx19.js → v24-text.js → battle/core.js → battle/fx-celes-rs.js |
 | `cut` | sprite/spx.js → battle/prim.js → ui/battle-pop.js → battle/showcase.js |
 | `end` | engine.js → v20-ui.js → rs/battle.js → battle/stage.js |
 | `exprFace` | ch9.js → ver18-art.js → ver19-art.js → sprite/spx.js |
@@ -191,13 +193,13 @@
 | `ring` | motion/fx19.js → v21-art.js → td/sfx.js → td/fxkit.js |
 | `skillList` | items.js → v20-battle.js → v31/board.js → rs/core.js |
 | `sparks` | v21-items.js → battle/prim.js → td/fxkit.js → td/fx.js |
+| `start` | zukan/viewer.js → battle/viewer.js → battle/celes.js → battle/fx-celes-rs.js |
 | `tick` | motion/anim.js → v25.js → ui/battle-pop.js → ui/battle-status.js |
 | `voidKind` | ch8.js → ver19-pre.js → ver18-art.js → sprite/spx.js |
 | `worldMap` | town.js → ver17.js → ver18-town.js → v22.js |
 | `arm` | sprite/legacy/px.js → sprite/legacy/dot-rig.js → v24.js |
 | `base` | motion/anim.js → sprite/facing.js → td/bg.js |
 | `bonus` | items.js → ch9.js → v31/board.js |
-| `burst` | motion/fx19.js → v24-text.js → battle/core.js |
 | `card` | ver17.js → v22.js → ui/unit.js |
 | `chooseRoot` | engine.js → ch8.js → rs/ui.js |
 | `clear` | motion/fx19.js → battle/core.js → ui/battle-pop.js |
@@ -210,19 +212,23 @@
 | `formation` | town.js → ver17.js → v22.js |
 | `gainXP` | engine.js → v31/core.js → ui/growth.js |
 | `gather` | motion/fx19.js → battle/prim.js → battle/hd2d.js |
+| `glow` | td/bg.js → td/fxkit.js → battle/fx-celes-rs.js |
 | `hash` | ver19.js → td/fx.js → td/skicon.js |
 | `hex` | v24-text.js → sprite/spx.js → items/icons36.js |
 | `itemIcon` | ch3.js → v21-art.js → v31/items.js |
 | `key` | ver18-field.js → sprite/facing.js → ui/smith.js |
 | `kill` | engine.js → battle/core.js → rs/battle.js |
 | `leg` | sprite/legacy/px.js → sprite/legacy/px-enemy.js → sprite/legacy/dot-rig.js |
+| `line` | battle/core.js → td/bg.js → battle/fx-celes-rs.js |
 | `list` | motion/registry.js → zukan/zukan.js → ui/unit.js |
 | `loop` | ch4.js → v21-art.js → zukan/viewer.js |
 | `makeBg` | engine.js → v22.js → battle/stage.js |
 | `makeTown` | field.js → town.js → ver18-town.js |
 | `mark` | zukan/zukan.js → rs/ui.js → ui/keywords.js |
 | `menu` | engine.js → ver18-town.js → v22.js |
+| `mid` | ver19.js → td/bg.js → battle/fx-celes-rs.js |
 | `nextStage` | ch7.js → ver18-battle.js → ui/home.js |
+| `now` | v24.js → ui/battle-pop.js → battle/fx-celes-rs.js |
 | `openBoard` | items.js → v21.js → v31/board.js |
 | `part` | sprite/legacy/px.js → motion/fx19.js → td/fx.js |
 | `pic` | ui/growth.js → td/menu.js → ui/unit.js |
@@ -238,7 +244,6 @@
 | `score` | items.js → v20-battle.js → rs/battle.js |
 | `smith` | town.js → v31/items.js → ui/smith.js |
 | `stars` | rs/ui.js → td/fxkit.js → td/menu.js |
-| `start` | zukan/viewer.js → battle/viewer.js → battle/celes.js |
 | `talk` | ch9.js → ver17.js → td/menu.js |
 | `tavern` | town.js → ch9.js → ver18-town.js |
 | `tierOf` | v21-items.js → v24.js → v31/items.js |
@@ -255,7 +260,6 @@
 | `banner` | field.js → rs/battle.js |
 | `bar` | engine.js → ui/inv.js |
 | `bbox` | engine.js → v21-items.js |
-| `big` | battle/flow.js → battle/hd2d.js |
 | `blade` | sprite/legacy/dot-rig.js → items/icons36.js |
 | `boardTap` | items.js → v31/board.js |
 | `bondMenu` | ch9.js → ui/party.js |
@@ -294,8 +298,8 @@
 | `fixedItem` | items.js → v31/items.js |
 | `flame` | sprite/legacy/px-enemy.js → battle/prim.js |
 | `flask` | ver18-art.js → v21-art.js |
+| `foot` | ver19.js → battle/fx-celes-rs.js |
 | `fuQ` | v20-battle.js → v31/board.js |
-| `glow` | td/bg.js → td/fxkit.js |
 | `hand` | sprite/legacy/px-enemy.js → td/fx-celes.js |
 | `healAll` | field.js → v38/core.js |
 | `heroK` | v25.js → v38/battle-ui.js |
@@ -314,7 +318,6 @@
 | `items` | rs/ui.js → ui/smith.js |
 | `kind` | data/resist.js → ui/battle-status.js |
 | `layer` | v24.js → ui/battle-pop.js |
-| `line` | battle/core.js → td/bg.js |
 | `lit` | sprite/legacy/px-enemy.js → motion/fx19.js |
 | `look` | ver19-art.js → ui/keywords.js |
 | `main` | ver17.js → ui/smith.js |
@@ -322,10 +325,8 @@
 | `makeKairouArea` | ch8.js → ver18-field.js |
 | `makeTowerArea` | ch6.js → ver18-field.js |
 | `mem` | ver18-town.js → td/uanim.js |
-| `mid` | ver19.js → td/bg.js |
 | `need` | ui/smith.js → ui/growth.js |
 | `newMember` | ch1.js → v31/items.js |
-| `now` | v24.js → ui/battle-pop.js |
 | `one` | v24.js → items/icons36.js |
 | `opening` | v25.js → rs/battle.js |
 | `parse` | ver19-art.js → sprite/spx.js |
@@ -336,6 +337,7 @@
 | `prep` | rs/battle.js → td/menu.js |
 | `preview` | engine.js → rs/battle.js |
 | `proj` | motion/fx19.js → battle/prim.js |
+| `rate` | battle/celes.js → battle/fx-celes-rs.js |
 | `react` | battle/data/motion-heroes.js → td/fxkit.js |
 | `reg` | sprite/legacy/dot-rig.js → ui/keywords.js |
 | `repOK` | ver17.js → rs/battle.js |
@@ -344,6 +346,7 @@
 | `rise` | battle/prim.js → td/fx.js |
 | `rows` | motion/skeleton.js → rs/ui.js |
 | `royalRand` | ch5.js → v31/items.js |
+| `sOf` | engine.js → battle/fx-celes-rs.js |
 | `saveMenu` | town.js → ver17.js |
 | `set` | sprite/facing.js → battle/core.js |
 | `shade` | items.js → items/icons36.js |
@@ -358,6 +361,7 @@
 | `src` | ui/inv.js → td/skicon.js |
 | `stTags` | ch5.js → v20-battle.js |
 | `stage` | v24.js → v25.js |
+| `star` | td/bg.js → battle/fx-celes-rs.js |
 | `star4` | td/fxkit.js → td/fx.js |
 | `stat` | battle/viewer.js → ui/unit.js |
 | `still` | ver19.js → v31/enemies.js |
@@ -366,6 +370,7 @@
 | `strike` | ver19.js → battle/seq.js |
 | `sum` | data/resist.js → data/equip7.js |
 | `svg` | v20-ui.js → ui/skill-icons.js |
+| `tip` | ver17.js → battle/fx-celes-rs.js |
 | `toast` | v22.js → ui/smith.js |
 | `toggle` | sprite/facing.js → td/sfx.js |
 | `trialEnemy` | awaken.js → ver19-pre.js |

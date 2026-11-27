@@ -6,13 +6,16 @@
 const SHOW=(()=>{
 const IMG={},esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function art(id,h,aw){const k=id+h+(aw?'a':'');if(IMG[k]!=null)return IMG[k];let s='';try{const f=(aw&&SPX.unitCv(id+'_aw',id,0,h))||SPX.unitCv(id,id,0,h);if(f){const c=document.createElement('canvas');c.width=f.w;c.height=f.h;c.getContext('2d').drawImage(f.cv,0,0);s=c.toDataURL();}}catch(e){}return IMG[k]=s;}
+/* 星臨の姿の一枚絵（ある仲間だけ。無ければ戦闘のコマ） */
+const CUT={celes:'img/cutin/celes_aw.png'};
+for(const k in CUT){const i=new Image();i.src=CUT[k];}
 const K=()=>({1:1,2:.72,4:.5})[typeof speed!=='undefined'?speed:1]||1;
 let el=null;
 function cut(kind,u,title,label,ms){return new Promise(res=>{try{
  if(!el){el=document.createElement('div');el.id='show';document.body.appendChild(el);}
  const d=Math.round(ms*K());el.style.setProperty('--d',d+'ms');el.className='';void el.offsetWidth;
  el.innerHTML=`<i class="sh-dim"></i><i class="sh-flash"></i><div class="sh-band b1"></div><div class="sh-band b2"></div><i class="sh-stars"></i>
-  <img class="sh-art" src="${art(u.id,220,kind==='aw'||u.aw)}" alt=""><div class="sh-tt"><small>${esc(label)}</small><b>${esc(title)}</b><em>${esc(u.name)}</em></div>`;
+  <img class="sh-art" src="${(kind==='aw'||u.aw)&&CUT[u.id]||art(u.id,220,kind==='aw'||u.aw)}" alt=""><div class="sh-tt"><small>${esc(label)}</small><b>${esc(title)}</b><em>${esc(u.name)}</em></div>`;
  el.className=kind+' on';try{SFX.aw();}catch(e){}
  setTimeout(()=>{el.className=kind;res();},d);}catch(e){res();}});}
 /* 星臨 */

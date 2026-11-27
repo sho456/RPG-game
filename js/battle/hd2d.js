@@ -1,7 +1,7 @@
 /* ===== 戦闘の 2D-HD の見た目と、技・術・星臨・奥義の注目画面（HD。ver0.66 の正本） =====
  1. 2D-HD：背景の上に奥行きの光（床の光だまり・地平の霧・周辺減光・漂う光の粒）。並びの奥行き（奥ほど小さく中央寄り）は
     js/v38/battle-ui.js の placeHeroes と js/v23.js の ANC・scM。描く順の差し込み口は js/ver19.js の drawBattle（V19.pre・V19.vis・V19.post）。
- 2. 注目画面：味方が技・術・奥義を使う間と星臨の間だけ、行動する味方とその相手だけを写す（他は消える・二人を中央に寄せて向かい合わせ・カメラが大きく寄る・背景は暗く）。
+ 2. 演出専用画面：奥義と星臨のときだけ。暗転して切り替え、行動する味方と相手だけを中央で向かい合わせてカメラが寄る。数字・強化弱体はこの画面で見せ切り、暗転して戻る。
  3. セレスの絵：立ち絵・顔・カットインも戦闘のコマ（素材パック celes_hd）に揃える（SPX.unitCv・face・V19.art を包む）。 */
 'use strict';
 const HD=(()=>{
@@ -48,26 +48,34 @@ V19.art=(cv2,key)=>{if(key.replace(/_aw$/,'')!==CID||!pk())return false;const f=
 let F=null;/* {u, set:Set(写すユニット), a:0→1, on, cx, cy} */
 const ally=sk=>{try{if(RSC.isHealSpell(sk))return true;}catch(e){}return sk.t==='ally'||sk.t==='self'||sk.k==='sup20'||!!sk.heal20||sk.role==='heal';};
 function targets(u,sk,t){if(Array.isArray(t))return t.filter(Boolean);if(sk&&(sk.t==='all'||sk.t==='allies'))return ally(sk)?aliveH():aliveE();if(t)return[t];return sk&&ally(sk)?[]:aliveE();}
-function focus(u,list){if(!inB())return;F={u,set:new Set([u,...list]),a:F?F.a:0,on:true};app.classList.add('fc66');}
-function unfocus(){if(F)F.on=false;app.classList.remove('fc66');}
-const step=()=>{if(!F)return;F.a=Math.max(0,Math.min(1,F.a+(F.on?.09:-.07)));if(!F.on&&F.a<=0){F=null;cam(null);}};
-/* 寄せ：写す味方と相手を画面の中央へ寄せて向かい合わせる（元の位置は HOME。終わったら戻す） */
-const HOME=new Map();
+function focus(u,list){if(!inB())return;F={u,set:new Set([u,...list]),a:1,on:true};app.classList.add('fc66');}
 const SPDK=()=>(typeof SPD!=='undefined'&&SPD[speed])||1;
-function tween(L,ms){return new Promise(res=>{if(!L.length)return res();const t0=performance.now();const f=()=>{const k=Math.min(1,(performance.now()-t0)/ms),e=1-Math.pow(1-k,3);
-  for(const[u,x0,y0,x1,y1]of L){u.x=x0+(x1-x0)*e;u.y=Math.round(y0+(y1-y0)*e);}if(k<1)requestAnimationFrame(f);else res();};requestAnimationFrame(f);});}
-async function gather(u,list){if(!inB())return;const[top,bot]=band(),cy=top+(bot-top)*.56,H=[u,...list.filter(x=>x&&x.side===0&&x!==u)],E=list.filter(x=>x&&x.side===1&&x.alive),M=[];
+const sleep2=ms=>new Promise(r=>setTimeout(r,ms));
+/* 暗転：画面を黒で覆う（v=1）・明ける（v=0）。覆っている間に舞台を切り替える */
+function black(v,ms){let el=$('#fcbk');if(!el){el=document.createElement('div');el.id='fcbk';document.body.appendChild(el);}
+ el.style.transitionDuration=ms+'ms';void el.offsetWidth;el.classList.toggle('on',!!v);return sleep2(ms);}
+/* 寄せ：写す味方と相手を画面の中央に置いて向かい合わせる（暗転の間に一瞬で。元の位置は HOME） */
+const HOME=new Map();
+function gather(u,list){const[top,bot]=band(),cy=top+(bot-top)*.56,H=[u,...list.filter(x=>x&&x.side===0&&x!==u)],E=list.filter(x=>x&&x.side===1&&x.alive);
  const lay=(G2,cx,dir)=>{const n=G2.length,sp=Math.min((bot-top)*.24,n>1?(bot-top)*.62/(n-1):0);G2.forEach((x,i)=>{if(!HOME.has(x))HOME.set(x,[x.x,x.y]);const d=i-(n-1)/2;
-  let fx=x.x+8*x.sc,fy=x.y+16*x.sc;try{[fx,fy]=V19.foot(x);}catch(e){}const tx=cx+dir*d*5,ty=cy+d*sp;M.push([x,x.x,x.y,x.x+(tx-fx),x.y+(ty-fy)]);});};
- lay(E,W*(H.length&&E.length?.33:.5),-1);if(E.length)lay(H,W*.68,1);else lay(H,W*(H.length>1?.6:.5),1);
- await tween(M,Math.round(240*SPDK()));}
-async function scatter(){if(!HOME.size)return;const M=[];for(const[u,[x,y]]of HOME)M.push([u,u.x,u.y,x,y]);HOME.clear();await tween(M,Math.round(220*SPDK()));}
-V19.vis=u=>{if(!F)return 1;return F.set.has(u)?1:1-F.a;};
-const big=sk=>!!sk&&!sk.basic&&!(sk.k==='item');
-async function run(u,list,fn){focus(u,list);await gather(u,list);try{return await fn();}finally{unfocus();await scatter();}}
-{const _da=doAction;doAction=async function(u,sk,t){const a=arguments;if(inB()&&u&&u.side===0&&big(sk))return run(u,targets(u,sk,t),()=>_da.apply(this,a));return _da.apply(this,a);};}
-{const _aw=awaken;awaken=async function(u){const a=arguments;if(inB()&&u&&u.side===0&&!F)return run(u,[],()=>_aw.apply(this,a));return _aw.apply(this,a);};}
-{const _sb=startBattle;startBattle=function(){F=null;HOME.clear();app.classList.remove('fc66');cam(null);return _sb.apply(this,arguments);};}
+  let fx=x.x+8*x.sc,fy=x.y+16*x.sc;try{[fx,fy]=V19.foot(x);}catch(e){}x.x+=cx+dir*d*5-fx;x.y=Math.round(x.y+cy+d*sp-fy);});};
+ lay(E,W*(H.length&&E.length?.33:.5),-1);if(E.length)lay(H,W*.68,1);else lay(H,W*(H.length>1?.6:.5),1);}
+function scatter(){for(const[u,[x,y]]of HOME){u.x=x;u.y=y;}HOME.clear();}
+V19.vis=u=>!F||F.set.has(u)?1:0;
+/* 専用画面は奥義と星臨のときだけ */
+async function run(u,list,fn){const k=Math.min(1.4,SPDK()/1.7);
+ await black(1,Math.round(200*k));app.classList.add('fcsw');focus(u,list);gather(u,list);try{cam(camOf());}catch(e){}
+ await sleep2(60);app.classList.remove('fcsw');await black(0,Math.round(260*k));
+ try{return await fn();}finally{
+  /* 数字・強化弱体の表示をこの画面で見せ切ってから消す */
+  await sleep2(Math.round(700*k));try{BPOP.cut();}catch(e){}const ps=$('#pops');if(ps)ps.innerHTML='';
+  await black(1,Math.round(200*k));app.classList.add('fcsw');F=null;app.classList.remove('fc66');scatter();cam(null);
+  await sleep2(60);app.classList.remove('fcsw');await black(0,Math.round(260*k));}}
+const ougi=sk=>!!sk&&(!!sk.ougi||sk.k==='rewind');
+const castOf=(u,sk,t)=>sk.k==='rewind'?B.heroes.filter(h=>h!==u):targets(u,sk,t);
+{const _da=doAction;doAction=async function(u,sk,t){const a=arguments;if(inB()&&u&&u.side===0&&ougi(sk)&&!F)return run(u,castOf(u,sk,t),()=>_da.apply(this,a));return _da.apply(this,a);};}
+{const _aw=awaken;awaken=async function(u){const a=arguments;if(inB()&&u&&u.side===0&&!F)return run(u,aliveE(),()=>_aw.apply(this,a));return _aw.apply(this,a);};}
+{const _sb=startBattle;startBattle=function(){F=null;HOME.clear();app.classList.remove('fc66');cam(null);const bk=$('#fcbk');if(bk)bk.classList.remove('on');return _sb.apply(this,arguments);};}
 /* カメラ：写すユニットの中心へ少し寄る（キャンバスとダメージの数字の層を同じ倍率で） */
 let CAM='';
 function cam(c){const cv=$('#cv');if(!cv)return;const L=[cv,$('#bcv'),$('#bp46'),$('#pops'),$('#labels')].filter(Boolean);
@@ -91,7 +99,7 @@ function dof(k,top,bot){const key=k+'|'+Math.round(top)+'|'+Math.round(bot);let 
  g.globalCompositeOperation='destination-in';const m=g.createLinearGradient(0,0,0,H*k),y1=(top+(bot-top)*.12)/H,y2=(top+(bot-top)*.3)/H,y3=Math.min(.99,(bot+4)/H);
  m.addColorStop(0,'rgba(0,0,0,1)');m.addColorStop(Math.min(y1,.98),'rgba(0,0,0,.9)');m.addColorStop(Math.min(y2,.985),'rgba(0,0,0,0)');m.addColorStop(y3,'rgba(0,0,0,0)');m.addColorStop(1,'rgba(0,0,0,.7)');
  g.fillStyle=m;g.fillRect(0,0,W*k,H*k);DOF.set(BG,c);return c;}
-V19.pre=(g,k)=>{if(!B)return;step();const[top,bot]=band(),a=F?F.a:0;g.save();g.setTransform(1,0,0,1,0,0);try{g.drawImage(dof(k,top,bot),0,0);}catch(e){}g.setTransform(k,0,0,k,0,0);
+V19.pre=(g,k)=>{if(!B)return;const[top,bot]=band(),a=F?F.a:0;g.save();g.setTransform(1,0,0,1,0,0);try{g.drawImage(dof(k,top,bot),0,0);}catch(e){}g.setTransform(k,0,0,k,0,0);
  /* 地平の霧：奥（上）ほど白っぽく霞む */
  let gr=g.createLinearGradient(0,top-20,0,top+(bot-top)*.55);gr.addColorStop(0,'rgba(170,180,230,.20)');gr.addColorStop(1,'rgba(170,180,230,0)');g.fillStyle=gr;g.fillRect(0,0,W,top+(bot-top)*.55);
  /* 床の光だまり（戦場の中央） */
